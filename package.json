@@ -11,7 +11,7 @@
     "url": "https://github.com/IdentityModel/OidcClient.git"
   },
   "author": "",
-  "license": "Apache2",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/IdentityModel/OidcClient/issues"
   },

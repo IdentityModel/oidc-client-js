@@ -7,7 +7,7 @@
   ],
   "description": "OpenID Connect (OIDC) client library",
   "main": "oidc-client.js",
-  "license": "Apache2",
+  "license": "Apache-2.0",
   "ignore": [
     "**/.*",
     "node_modules",
