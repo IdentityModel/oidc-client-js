@@ -1,0 +1,18 @@
+{
+  "name": "oidc-client",
+  "version": "0.1.0",
+  "homepage": "https://github.com/IdentityModel/OidcClient",
+  "authors": [
+    "Brock Allen <brockallen@gmail.com>"
+  ],
+  "description": "OpenID Connect (OIDC) client library",
+  "main": "oidc-client.js",
+  "license": "Apache2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
