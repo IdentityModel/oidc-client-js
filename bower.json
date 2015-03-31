@@ -7,7 +7,7 @@
     "Dominick Baier <dbaier@leastprivilege.com>"
   ],
   "description": "OpenID Connect (OIDC) client library",
-  "main": "oidc-client.js",
+  "main": "dist/oidc-client.js",
   "license": "Apache-2.0",
   "ignore": [
     "**/.*",
