@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/IdentityModel/OidcClient.git"
+    "url": "https://github.com/IdentityModel/oidc-client.git"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/IdentityModel/OidcClient/issues"
+    "url": "https://github.com/IdentityModel/oidc-client/issues"
   },
-  "homepage": "https://github.com/IdentityModel/OidcClient",
+  "homepage": "https://github.com/IdentityModel/oidc-client",
   "devDependencies": {
     "bower": "^1.4.0"
   }
