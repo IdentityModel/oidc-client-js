@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "homepage": "https://github.com/IdentityModel/OidcClient",
   "authors": [
-    "Brock Allen <brockallen@gmail.com>"
+    "Brock Allen <brockallen@gmail.com>",
+    "Dominick Baier <dbaier@leastprivilege.com>"
   ],
   "description": "OpenID Connect (OIDC) client library",
   "main": "oidc-client.js",
