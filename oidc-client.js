@@ -440,7 +440,7 @@ OidcClient.prototype.processResponseAsync = function (queryString) {
             return error("No access token");
         }
 
-        if (result.token_type !== "Bearer") {
+        if (!result.token_type || result.token_type.toLowerCase() !== "bearer") {
             return error("Invalid token type");
         }
 
