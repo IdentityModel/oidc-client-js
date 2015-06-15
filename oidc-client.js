@@ -44,6 +44,9 @@ function parseOidcResult(queryString) {
 
     var idx = queryString.lastIndexOf("#");
     if (idx >= 0) {
+        var lastQuestionMarkIndex = queryString.lastIndexOf("?");
+        idx = Math.max(idx, lastQuestionMarkIndex);
+        
         queryString = queryString.substr(idx + 1);
     }
 
