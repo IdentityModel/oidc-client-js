@@ -7633,7 +7633,7 @@ KJUR.jws.IntDate.intDate2Zulu = function(intDate) {
 }).call(this);
 /**
  * Feature detection
- * @type {{XmlHttpRequest, XDomainRequst, ActiveXObject}}
+ * @type {{XmlHttpRequest, XDomainRequest, addEventListener, querySelector, matchMedia}}
  * @private
  */
 _featureDetection = (function () {
@@ -7699,7 +7699,7 @@ _featureDetection = (function () {
 
 /**
  * Browser detection
- * @type {{isIE8, isIE9}}
+ * @type {{isIE7, isIE8, isIE9}}
  * @private
  */
 _browserDetection = (function (featureDetection) {
@@ -7757,7 +7757,7 @@ function DefaultHttpRequest() {
      * @type DefaultPromiseFactory
      */
 
-    var isCrossDomainCompatible = !(_browserDetection.isIE8() || _browserDetection.isIE9());
+    var isCrossDomainCompatible = !(_browserDetection.isIE7() || _browserDetection.isIE8() || _browserDetection.isIE9());
 
     /**
      * @param {XMLHttpRequest} xhr
