@@ -18,6 +18,8 @@ gulp.task('default', ['clean'], function () {
 	    ,'lib/json-sans-eval.js'
 	    ,'lib/jws-3.0.js'
 	    ,'lib/es6-promise-2.0.0.js'
+			,'lib/feature-detection.js'
+			,'lib/browser-detection.js'
 	    ,'lib/defaultHttpRequest.js'
 	    ,'lib/defaultPromiseFactory.js'
 	    ,'oidc-client.js'
