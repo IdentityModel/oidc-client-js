@@ -7667,7 +7667,7 @@ function DefaultHttpRequest() {
             try {
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
-                xhr.responseType = "json";
+                xhr.responseType = config && config.responseType ? config.responseType : "json";
 
                 if (config) {
                     if (config.headers) {
@@ -7678,12 +7678,18 @@ function DefaultHttpRequest() {
                 xhr.onload = function () {
                     try {
                         if (xhr.status === 200) {
-                            var response = xhr.response;
-                            if (typeof response === "string") {
-                                response = JSON.parse(response);
+                                var response = "";
+                                // To support IE9 get the response from xhr.responseText not xhr.response
+                                if (window.XDomainRequest) {
+                                    response = xhr.responseText;
+                                } else {
+                                    response = xhr.response;
+                                }
+                                if (typeof response === "string") {
+                                    response = JSON.parse(response);
+                                }
+                                resolve(response);
                             }
-                            resolve(response);
-                        }
                         else {
                             reject(Error(xhr.statusText + "(" + xhr.status + ")"));
                         }
@@ -7831,17 +7837,20 @@ function parseOidcResult(queryString) {
 OidcClient.prototype.getJson = function (url, token) {
     log("getJson", url);
 
-    var config = {};
-
-    if (token) {
-        config.headers = {"Authorization": "Bearer " + token};
+    if (!this._config) {
+        this._config = {};
     }
 
-    return _httpRequest.getJSON(url, config);
+    if (token) {
+        this._config.headers = {"Authorization": "Bearer " + token};
+    }
+
+    return _httpRequest.getJSON(url, this._config);
 }
 
-function OidcClient(settings) {
-    this._settings = settings || {};
+function OidcClient(settings, config) {
+    this._settings  = settings || {};
+    this._config    = config   || {};
 
     if (!this._settings.request_state_key) {
         this._settings.request_state_key = "OidcClient.request_state";
