@@ -7667,7 +7667,7 @@ function DefaultHttpRequest() {
             try {
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
-                xhr.responseType = "json";
+                xhr.responseType = config && config.responseType ? config.responseType : "json";
 
                 if (config) {
                     if (config.headers) {
@@ -7831,17 +7831,20 @@ function parseOidcResult(queryString) {
 function getJson(url, token) {
     log("getJson", url);
 
-    var config = {};
-
-    if (token) {
-        config.headers = {"Authorization": "Bearer " + token};
+    if (!this._config) {
+        this._config = {};
     }
 
-    return _httpRequest.getJSON(url, config);
+    if (token) {
+        this._config.headers = {"Authorization": "Bearer " + token};
+    }
+
+    return _httpRequest.getJSON(url, this._config);
 }
 
-function OidcClient(settings) {
-    this._settings = settings || {};
+function OidcClient(settings, config) {
+    this._settings  = settings || {};
+    this._config    = config   || {};
 
     if (!this._settings.request_state_key) {
         this._settings.request_state_key = "OidcClient.request_state";
