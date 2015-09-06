@@ -133,6 +133,8 @@ function OidcClient(settings) {
     });
 }
 
+OidcClient.parseOidcResult = parseOidcResult;
+
 OidcClient.prototype.loadMetadataAsync = function () {
     log("OidcClient.loadMetadataAsync");
 
