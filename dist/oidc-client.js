@@ -7992,7 +7992,7 @@ OidcClient.prototype.loadAuthorizationEndpoint = function () {
     });
 };
 
-OidcClient.prototype.createTokenRequestAsync = function () {
+OidcClient.prototype.createTokenRequestAsync = function (state) {
     log("OidcClient.createTokenRequestAsync");
 
     var client = this;
@@ -8000,7 +8000,9 @@ OidcClient.prototype.createTokenRequestAsync = function () {
 
     return client.loadAuthorizationEndpoint().then(function (authorization_endpoint) {
 
-        var state = rand();
+        if (state === undefined){
+            state = rand();
+        }
         var url = authorization_endpoint + "?state=" + encodeURIComponent(state);
 
         if (client.isOidc) {
@@ -8043,7 +8045,7 @@ OidcClient.prototype.createTokenRequestAsync = function () {
     });
 }
 
-OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint) {
+OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint, state) {
     log("OidcClient.createLogoutRequestAsync");
 
     var settings = this._settings;
@@ -8056,6 +8058,10 @@ OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint) {
         if (id_token_hint && settings.post_logout_redirect_uri) {
             url += "?post_logout_redirect_uri=" + encodeURIComponent(settings.post_logout_redirect_uri);
             url += "&id_token_hint=" + encodeURIComponent(id_token_hint);
+
+            if (state !== undefined) {
+                url += "&state=" + encodeURIComponent(state);
+            }
         }
         return url;
     });
