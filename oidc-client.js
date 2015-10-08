@@ -66,7 +66,7 @@ function parseOidcResult(queryString) {
     }
 }
 
-function getJson(url, token) {
+OidcClient.prototype.getJson = function (url, token) {
     log("getJson", url);
 
     var config = {};
@@ -183,12 +183,13 @@ OidcClient.prototype.loadX509SigningKeyAsync = function () {
         return getKeyAsync(settings.jwks);
     }
 
+    var that = this;
     return this.loadMetadataAsync().then(function (metadata) {
         if (!metadata.jwks_uri) {
             return error("Metadata does not contain jwks_uri");
         }
 
-        return getJson(metadata.jwks_uri).then(function (jwks) {
+        return that.getJson(metadata.jwks_uri).then(function (jwks) {
             settings.jwks = jwks;
             return getKeyAsync(jwks);
         }, function (err) {
@@ -200,13 +201,14 @@ OidcClient.prototype.loadX509SigningKeyAsync = function () {
 OidcClient.prototype.loadUserProfile = function (access_token) {
     log("OidcClient.loadUserProfile");
 
+    var that = this;
     return this.loadMetadataAsync().then(function (metadata) {
 
         if (!metadata.userinfo_endpoint) {
             return _promiseFactory.reject(Error("Metadata does not contain userinfo_endpoint"));
         }
 
-        return getJson(metadata.userinfo_endpoint, access_token);
+        return that.getJson(metadata.userinfo_endpoint, access_token);
     });
 }
 
