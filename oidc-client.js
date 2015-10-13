@@ -301,6 +301,8 @@ OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint, state) 
                 url += "&state=" + encodeURIComponent(state);
             }
         }
+
+        // Modify to return an object like redirect for token and generate state here
         return url;
     });
 }
