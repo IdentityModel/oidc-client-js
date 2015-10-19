@@ -7992,7 +7992,7 @@ OidcClient.prototype.loadAuthorizationEndpoint = function () {
     });
 };
 
-OidcClient.prototype.createTokenRequestAsync = function (state) {
+OidcClient.prototype.createTokenRequestAsync = function () {
     log("OidcClient.createTokenRequestAsync");
 
     var client = this;
@@ -8000,9 +8000,7 @@ OidcClient.prototype.createTokenRequestAsync = function (state) {
 
     return client.loadAuthorizationEndpoint().then(function (authorization_endpoint) {
 
-        if (state === undefined){
-            state = rand();
-        }
+        var state = rand();
         var url = authorization_endpoint + "?state=" + encodeURIComponent(state);
 
         if (client.isOidc) {
@@ -8045,7 +8043,7 @@ OidcClient.prototype.createTokenRequestAsync = function (state) {
     });
 }
 
-OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint, state) {
+OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint) {
     log("OidcClient.createLogoutRequestAsync");
 
     var settings = this._settings;
@@ -8054,16 +8052,19 @@ OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint, state) 
             return error("No end_session_endpoint in metadata");
         }
 
+        var state = rand();
         var url = metadata.end_session_endpoint;
         if (id_token_hint && settings.post_logout_redirect_uri) {
             url += "?post_logout_redirect_uri=" + encodeURIComponent(settings.post_logout_redirect_uri);
             url += "&id_token_hint=" + encodeURIComponent(id_token_hint);
-
-            if (state !== undefined) {
-                url += "&state=" + encodeURIComponent(state);
-            }
+            url += "&state=" + encodeURIComponent(state);
         }
-        return url;
+
+        // Modify to return an object like redirect for token and generate state here
+        return {
+            url: url,
+            state: state
+        };
     });
 }
 
