@@ -203,7 +203,7 @@ OidcClient.prototype.loadUserProfile = function (access_token) {
     return this.loadMetadataAsync().then(function (metadata) {
 
         if (!metadata.userinfo_endpoint) {
-            return _promiseFactory.reject(Error("Metadata does not contain userinfo_endpoint"));
+            return error("Metadata does not contain userinfo_endpoint");
         }
 
         return getJson(metadata.userinfo_endpoint, access_token);
