@@ -153,7 +153,7 @@ OidcClient.prototype.loadMetadataAsync = function () {
             settings.metadata = metadata;
             return metadata;
         }, function (err) {
-            return error("Failed to load metadata (" + err.message + ")");
+            return error("Failed to load metadata (" + err && err.message + ")");
         });
 };
 
@@ -192,7 +192,7 @@ OidcClient.prototype.loadX509SigningKeyAsync = function () {
             settings.jwks = jwks;
             return getKeyAsync(jwks);
         }, function (err) {
-            return error("Failed to load signing keys (" + err.message + ")");
+            return error("Failed to load signing keys (" + err && err.message + ")");
         });
     });
 };
