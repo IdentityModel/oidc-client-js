@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "noEmitOnError": true,
+        "removeComments": false,
+        "sourceMap": false,
+        "target": "es5",
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "exclude": [
+        "node_modules"        
+    ]
+}
