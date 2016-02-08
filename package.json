@@ -1,6 +1,6 @@
 {
   "name": "oidc-client",
-  "version": "0.3.0",
+  "version": "0.3.3",
   "description": "OpenID Connect (OIDC) client library",
   "main": "oidc-client.js",
   "scripts": {

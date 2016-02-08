@@ -33,6 +33,10 @@ function rand() {
     return ((Date.now() + Math.random()) * Math.random()).toString().replace(".", "");
 }
 
+function resolve(param) {
+    return _promiseFactory.resolve(param);
+}
+
 function error(message) {
     return _promiseFactory.reject(Error(message));
 }
@@ -141,7 +145,7 @@ OidcClient.prototype.loadMetadataAsync = function () {
     var settings = this._settings;
 
     if (settings.metadata) {
-        return _promiseFactory.resolve(settings.metadata);
+        return resolve(settings.metadata);
     }
 
     if (!settings.authority) {
@@ -153,7 +157,7 @@ OidcClient.prototype.loadMetadataAsync = function () {
             settings.metadata = metadata;
             return metadata;
         }, function (err) {
-            return error("Failed to load metadata (" + err.message + ")");
+            return error("Failed to load metadata (" + err && err.message + ")");
         });
 };
 
@@ -176,7 +180,7 @@ OidcClient.prototype.loadX509SigningKeyAsync = function () {
             return error("RSA keys empty");
         }
 
-        return _promiseFactory.resolve(key.x5c[0]);
+        return resolve(key.x5c[0]);
     }
 
     if (settings.jwks) {
@@ -192,7 +196,7 @@ OidcClient.prototype.loadX509SigningKeyAsync = function () {
             settings.jwks = jwks;
             return getKeyAsync(jwks);
         }, function (err) {
-            return error("Failed to load signing keys (" + err.message + ")");
+            return error("Failed to load signing keys (" + err && err.message + ")");
         });
     });
 };
@@ -203,7 +207,7 @@ OidcClient.prototype.loadUserProfile = function (access_token) {
     return this.loadMetadataAsync().then(function (metadata) {
 
         if (!metadata.userinfo_endpoint) {
-            return _promiseFactory.reject(Error("Metadata does not contain userinfo_endpoint"));
+            return error("Metadata does not contain userinfo_endpoint");
         }
 
         return getJson(metadata.userinfo_endpoint, access_token);
@@ -214,7 +218,7 @@ OidcClient.prototype.loadAuthorizationEndpoint = function () {
     log("OidcClient.loadAuthorizationEndpoint");
 
     if (this._settings.authorization_endpoint) {
-        return _promiseFactory.resolve(this._settings.authorization_endpoint);
+        return resolve(this._settings.authorization_endpoint);
     }
 
     if (!this._settings.authority) {
@@ -380,7 +384,7 @@ OidcClient.prototype.validateAccessTokenAsync = function (id_token_contents, acc
         return error("at_hash failed to validate");
     }
 
-    return _promiseFactory.resolve();
+    return resolve();
 };
 
 OidcClient.prototype.validateIdTokenAndAccessTokenAsync = function (id_token, nonce, access_token) {
@@ -458,7 +462,7 @@ OidcClient.prototype.processResponseAsync = function (queryString) {
         }
     }
 
-    var promise = _promiseFactory.resolve();
+    var promise = resolve();
     if (request_state.oidc && request_state.oauth) {
         promise = client.validateIdTokenAndAccessTokenAsync(result.id_token, request_state.nonce, result.access_token);
     }
