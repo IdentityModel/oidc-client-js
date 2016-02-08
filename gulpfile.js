@@ -4,13 +4,23 @@ var gulp = require('gulp')
 	, concat = require('gulp-concat')
 	, uglify = require('gulp-uglify')
 	, rename = require('gulp-rename')
+    , ts = require('gulp-typescript')
 ;
+
+var tsProject = ts.createProject('tsconfig.json')
 
 gulp.task('clean', function(cb){
 	del('dist', cb);
 });
 
-gulp.task('default', ['clean'], function () {
+gulp.task('build-ts', function() {
+    return tsProject.src()
+        .pipe(ts(tsProject))
+        .js
+        .pipe(gulp.dest("./"));
+})
+
+gulp.task('default', ['clean', 'build-ts'], function () {
   return gulp.src([
 		'lib/iife-start.js'
 	    ,'lib/crypto.js'
@@ -18,9 +28,9 @@ gulp.task('default', ['clean'], function () {
 	    ,'lib/json-sans-eval.js'
 	    ,'lib/jws-3.0.js'
 	    ,'lib/es6-promise-3.0.2.js'
-	    ,'lib/defaultHttpRequest.js'
-	    ,'lib/defaultPromiseFactory.js'
-	    ,'oidc-client.js'
+	    ,'src/defaultHttpRequest.js'
+	    ,'src/defaultPromiseFactory.js'
+	    ,'src/oidc-client.js'
 	    ,'lib/iife-end.js'
 	])
   	.pipe(concat('oidc-client.js'))

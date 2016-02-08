@@ -1,7 +1,9 @@
-﻿/**
+﻿/// <reference path="./defaultPromiseFactory.ts" />
+
+/**
  * @constructor
  */
-function DefaultHttpRequest() {
+class DefaultHttpRequest {
 
     /**
      * @name _promiseFactory
@@ -12,7 +14,7 @@ function DefaultHttpRequest() {
      * @param {XMLHttpRequest} xhr
      * @param {object.<string, string>} headers
      */
-    function setHeaders(xhr, headers) {
+    private setHeaders(xhr: XMLHttpRequest, headers: { [header: string]: string }) {
         var keys = Object.keys(headers);
 
         for (var i = 0; i < keys.length; i++) {
@@ -28,8 +30,8 @@ function DefaultHttpRequest() {
      * @param {{ headers: object.<string, string> }} [config]
      * @returns {Promise}
      */
-    this.getJSON = function (url, config) {
-        return _promiseFactory.create(function (resolve, reject) {
+     getJSON<T>(url: string, config: { headers: { [header: string]: string } }) {
+        return _promiseFactory.create((resolve, reject) => {
 
             try {
                 var xhr = new XMLHttpRequest();
@@ -38,24 +40,24 @@ function DefaultHttpRequest() {
 
                 if (config) {
                     if (config.headers) {
-                        setHeaders(xhr, config.headers);
+                        this.setHeaders(xhr, config.headers);
                     }
                 }
 
                 xhr.onload = function () {
                     try {
                         if (xhr.status === 200) {
-                            var response = "";
+                            var response: string | T = "";
                             // To support IE9 get the response from xhr.responseText not xhr.response
-                            if (window.XDomainRequest) {
+                            if ("XDomainRequest" in window) {
                                 response = xhr.responseText;
                             } else {
                                 response = xhr.response;
                             }
                             if (typeof response === "string") {
-                                response = JSON.parse(response);
+                                response = JSON.parse(<string>response);
                             }
-                            resolve(response);
+                            resolve(<T>response);
                         }
                         else {
                             reject(Error(xhr.statusText + "(" + xhr.status + ")"));
@@ -79,4 +81,4 @@ function DefaultHttpRequest() {
     };
 }
 
-_httpRequest = new DefaultHttpRequest();
+var _httpRequest = new DefaultHttpRequest();

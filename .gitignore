@@ -16,6 +16,8 @@ build/
 [Oo]bj/
 bower_components/
 node_modules/
+src/**/*.js
+src/**/*.map
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
@@ -155,3 +157,4 @@ $RECYCLE.BIN/
 distribution/
 *_NCrunch_*
 source/IdentityServer3.sln.GhostDoc.xml
+.vscode/tasks.json

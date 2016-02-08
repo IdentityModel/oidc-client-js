@@ -7631,58 +7631,55 @@ KJUR.jws.IntDate.intDate2Zulu = function(intDate) {
 }).call(this);
 
 
+/// <reference path="./defaultPromiseFactory.ts" />
 /**
  * @constructor
  */
-function DefaultHttpRequest() {
-
+var DefaultHttpRequest = (function () {
+    function DefaultHttpRequest() {
+    }
     /**
      * @name _promiseFactory
      * @type DefaultPromiseFactory
      */
-
     /**
      * @param {XMLHttpRequest} xhr
      * @param {object.<string, string>} headers
      */
-    function setHeaders(xhr, headers) {
+    DefaultHttpRequest.prototype.setHeaders = function (xhr, headers) {
         var keys = Object.keys(headers);
-
         for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
             var value = headers[key];
-
             xhr.setRequestHeader(key, value);
         }
-    }
-
+    };
     /**
      * @param {string} url
      * @param {{ headers: object.<string, string> }} [config]
      * @returns {Promise}
      */
-    this.getJSON = function (url, config) {
+    DefaultHttpRequest.prototype.getJSON = function (url, config) {
+        var _this = this;
         return _promiseFactory.create(function (resolve, reject) {
-
             try {
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
                 xhr.responseType = "json";
-
                 if (config) {
                     if (config.headers) {
-                        setHeaders(xhr, config.headers);
+                        _this.setHeaders(xhr, config.headers);
                     }
                 }
-
                 xhr.onload = function () {
                     try {
                         if (xhr.status === 200) {
                             var response = "";
                             // To support IE9 get the response from xhr.responseText not xhr.response
-                            if (window.XDomainRequest) {
+                            if ("XDomainRequest" in window) {
                                 response = xhr.responseText;
-                            } else {
+                            }
+                            else {
                                 response = xhr.response;
                             }
                             if (typeof response === "string") {
@@ -7698,11 +7695,9 @@ function DefaultHttpRequest() {
                         reject(err);
                     }
                 };
-
                 xhr.onerror = function () {
                     reject(Error("Network error"));
                 };
-
                 xhr.send();
             }
             catch (err) {
@@ -7710,62 +7705,68 @@ function DefaultHttpRequest() {
             }
         });
     };
-}
+    ;
+    return DefaultHttpRequest;
+})();
+var _httpRequest = new DefaultHttpRequest();
 
-_httpRequest = new DefaultHttpRequest();
-
+/// <reference path="../typings/es6-promise/es6-promise.d.ts" />
 /**
  * @constructor
  * @param {Promise} promise
  */
-function DefaultPromise(promise) {
-
+var DefaultPromise = (function () {
+    function DefaultPromise(promise) {
+        this.promise = promise;
+    }
     /**
      * @param {function(*):*} successCallback
      * @param {function(*):*} errorCallback
      * @returns {DefaultPromise}
      */
-    this.then = function (successCallback, errorCallback) {
-        var childPromise = promise.then(successCallback, errorCallback);
-
+    DefaultPromise.prototype.then = function (successCallback, errorCallback) {
+        var childPromise = this.promise.then(successCallback, errorCallback);
         return new DefaultPromise(childPromise);
     };
-
+    ;
     /**
      *
      * @param {function(*):*} errorCallback
      * @returns {DefaultPromise}
      */
-    this.catch = function (errorCallback) {
-        var childPromise = promise.catch(errorCallback);
-
+    DefaultPromise.prototype.catch = function (errorCallback) {
+        var childPromise = this.promise.then(null, errorCallback);
         return new DefaultPromise(childPromise);
     };
-}
-
+    ;
+    return DefaultPromise;
+})();
 /**
  * @constructor
  */
-function DefaultPromiseFactory() {
-
-    this.resolve = function (value) {
+var DefaultPromiseFactory = (function () {
+    function DefaultPromiseFactory() {
+    }
+    DefaultPromiseFactory.prototype.resolve = function (value) {
         return new DefaultPromise(Promise.resolve(value));
     };
-
-    this.reject = function (reason) {
+    ;
+    DefaultPromiseFactory.prototype.reject = function (reason) {
         return new DefaultPromise(Promise.reject(reason));
     };
-
+    ;
     /**
      * @param {function(resolve:function, reject:function)} callback
      * @returns {DefaultPromise}
      */
-    this.create = function (callback) {
+    DefaultPromiseFactory.prototype.create = function (callback) {
         return new DefaultPromise(new Promise(callback));
     };
-}
+    ;
+    return DefaultPromiseFactory;
+})();
+var _promiseFactory = new DefaultPromiseFactory();
 
-_promiseFactory = new DefaultPromiseFactory();
 /*
  * Copyright 2015 Dominick Baier, Brock Allen
  *
@@ -7781,12 +7782,19 @@ _promiseFactory = new DefaultPromiseFactory();
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/// <reference path="./defaultHttpRequest.ts" />
+/// <reference path="./defaultPromiseFactory.ts" />
+/// <reference path="../typings/jsrsasign/jws.d.ts" />
+/// <reference path="../typings/jsrsasign/crypto/Util.d.ts" />
+/// <reference path="../typings/openid-configuration.d.ts" />
 function log() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i - 0] = arguments[_i];
+    }
     //var param = [].join.call(arguments);
     //console.log(param);
 }
-
 function copy(obj, target) {
     target = target || {};
     for (var key in obj) {
@@ -7796,91 +7804,49 @@ function copy(obj, target) {
     }
     return target;
 }
-
 function rand() {
     return ((Date.now() + Math.random()) * Math.random()).toString().replace(".", "");
 }
-
 function resolve(param) {
     return _promiseFactory.resolve(param);
 }
-
 function error(message) {
     return _promiseFactory.reject(Error(message));
 }
-
-function parseOidcResult(queryString) {
-    log("parseOidcResult");
-
-    queryString = queryString || location.hash;
-
-    var idx = queryString.lastIndexOf("#");
-    if (idx >= 0) {
-        queryString = queryString.substr(idx + 1);
-    }
-
-    var params = {},
-        regex = /([^&=]+)=([^&]*)/g,
-        m;
-
-    var counter = 0;
-    while (m = regex.exec(queryString)) {
-        params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
-        if (counter++ > 50) {
-            return {
-                error: "Response exceeded expected number of parameters"
-            };
-        }
-    }
-
-    for (var prop in params) {
-        return params;
-    }
-}
-
 function getJson(url, token) {
     log("getJson", url);
-
     var config = {};
-
     if (token) {
-        config.headers = {"Authorization": "Bearer " + token};
+        config.headers = { "Authorization": "Bearer " + token };
     }
-
     return _httpRequest.getJSON(url, config);
 }
-
-function OidcClient(settings) {
-    this._settings = settings || {};
-
-    if (!this._settings.request_state_key) {
-        this._settings.request_state_key = "OidcClient.request_state";
-    }
-
-    if (!this._settings.request_state_store) {
-        this._settings.request_state_store = window.localStorage;
-    }
-
-    if (typeof this._settings.load_user_profile === 'undefined') {
-        this._settings.load_user_profile = true;
-    }
-
-    if (typeof this._settings.filter_protocol_claims === 'undefined') {
-        this._settings.filter_protocol_claims = true;
-    }
-
-    if (this._settings.authority && this._settings.authority.indexOf('.well-known/openid-configuration') < 0) {
-        if (this._settings.authority[this._settings.authority.length - 1] !== '/') {
-            this._settings.authority += '/';
+var OidcClient = (function () {
+    function OidcClient(settings) {
+        this._settings = settings || {};
+        if (!this._settings.request_state_key) {
+            this._settings.request_state_key = "OidcClient.request_state";
         }
-        this._settings.authority += '.well-known/openid-configuration';
+        if (!this._settings.request_state_store) {
+            this._settings.request_state_store = window.localStorage;
+        }
+        if (typeof this._settings.load_user_profile === 'undefined') {
+            this._settings.load_user_profile = true;
+        }
+        if (typeof this._settings.filter_protocol_claims === 'undefined') {
+            this._settings.filter_protocol_claims = true;
+        }
+        if (this._settings.authority && this._settings.authority.indexOf('.well-known/openid-configuration') < 0) {
+            if (this._settings.authority[this._settings.authority.length - 1] !== '/') {
+                this._settings.authority += '/';
+            }
+            this._settings.authority += '.well-known/openid-configuration';
+        }
+        if (!this._settings.response_type) {
+            this._settings.response_type = "id_token token";
+        }
     }
-
-    if (!this._settings.response_type) {
-        this._settings.response_type = "id_token token";
-    }
-
-    Object.defineProperty(this, "isOidc", {
+    Object.defineProperty(OidcClient.prototype, "isOidc", {
         get: function () {
             if (this._settings.response_type) {
                 var result = this._settings.response_type.split(/\s+/g).filter(function (item) {
@@ -7889,10 +7855,11 @@ function OidcClient(settings) {
                 return !!(result[0]);
             }
             return false;
-        }
+        },
+        enumerable: true,
+        configurable: true
     });
-
-    Object.defineProperty(this, "isOAuth", {
+    Object.defineProperty(OidcClient.prototype, "isOAuth", {
         get: function () {
             if (this._settings.response_type) {
                 var result = this._settings.response_type.split(/\s+/g).filter(function (item) {
@@ -7901,354 +7868,305 @@ function OidcClient(settings) {
                 return !!(result[0]);
             }
             return false;
-        }
+        },
+        enumerable: true,
+        configurable: true
     });
-}
-
-OidcClient.parseOidcResult = parseOidcResult;
-
-OidcClient.prototype.loadMetadataAsync = function () {
-    log("OidcClient.loadMetadataAsync");
-
-    var settings = this._settings;
-
-    if (settings.metadata) {
-        return resolve(settings.metadata);
-    }
-
-    if (!settings.authority) {
-        return error("No authority configured");
-    }
-
-    return getJson(settings.authority)
-        .then(function (metadata) {
+    OidcClient.parseOidcResult = function (queryString) {
+        log("parseOidcResult");
+        queryString = queryString || location.hash;
+        var idx = queryString.lastIndexOf("#");
+        if (idx >= 0) {
+            queryString = queryString.substr(idx + 1);
+        }
+        var params = {}, regex = /([^&=]+)=([^&]*)/g, m;
+        var counter = 0;
+        while (m = regex.exec(queryString)) {
+            params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            if (counter++ > 50) {
+                return {
+                    error: "Response exceeded expected number of parameters"
+                };
+            }
+        }
+        for (var prop in params) {
+            return params;
+        }
+    };
+    OidcClient.prototype.loadX509SigningKeyAsync = function () {
+        log("OidcClient.loadX509SigningKeyAsync");
+        var settings = this._settings;
+        function getKeyAsync(jwks) {
+            if (!jwks.keys || !jwks.keys.length) {
+                return error("Signing keys empty");
+            }
+            var key = jwks.keys[0];
+            if (key.kty !== "RSA") {
+                return error("Signing key not RSA");
+            }
+            if (!key.x5c || !key.x5c.length) {
+                return error("RSA keys empty");
+            }
+            return resolve(key.x5c[0]);
+        }
+        if (settings.jwks) {
+            return getKeyAsync(settings.jwks);
+        }
+        return this.loadMetadataAsync().then(function (metadata) {
+            if (!metadata.jwks_uri) {
+                return error("Metadata does not contain jwks_uri");
+            }
+            return getJson(metadata.jwks_uri).then(function (jwks) {
+                settings.jwks = jwks;
+                return getKeyAsync(jwks);
+            }, function (err) {
+                return error("Failed to load signing keys (" + err && err.message + ")");
+            });
+        });
+    };
+    ;
+    OidcClient.prototype.loadMetadataAsync = function () {
+        log("OidcClient.loadMetadataAsync");
+        var settings = this._settings;
+        if (settings.metadata) {
+            return resolve(settings.metadata);
+        }
+        if (!settings.authority) {
+            return error("No authority configured");
+        }
+        return getJson(settings.authority)
+            .then(function (metadata) {
             settings.metadata = metadata;
             return metadata;
         }, function (err) {
             return error("Failed to load metadata (" + err && err.message + ")");
         });
-};
-
-OidcClient.prototype.loadX509SigningKeyAsync = function () {
-    log("OidcClient.loadX509SigningKeyAsync");
-
-    var settings = this._settings;
-
-    function getKeyAsync(jwks) {
-        if (!jwks.keys || !jwks.keys.length) {
-            return error("Signing keys empty");
-        }
-
-        var key = jwks.keys[0];
-        if (key.kty !== "RSA") {
-            return error("Signing key not RSA");
-        }
-
-        if (!key.x5c || !key.x5c.length) {
-            return error("RSA keys empty");
-        }
-
-        return resolve(key.x5c[0]);
-    }
-
-    if (settings.jwks) {
-        return getKeyAsync(settings.jwks);
-    }
-
-    return this.loadMetadataAsync().then(function (metadata) {
-        if (!metadata.jwks_uri) {
-            return error("Metadata does not contain jwks_uri");
-        }
-
-        return getJson(metadata.jwks_uri).then(function (jwks) {
-            settings.jwks = jwks;
-            return getKeyAsync(jwks);
-        }, function (err) {
-            return error("Failed to load signing keys (" + err && err.message + ")");
-        });
-    });
-};
-
-OidcClient.prototype.loadUserProfile = function (access_token) {
-    log("OidcClient.loadUserProfile");
-
-    return this.loadMetadataAsync().then(function (metadata) {
-
-        if (!metadata.userinfo_endpoint) {
-            return error("Metadata does not contain userinfo_endpoint");
-        }
-
-        return getJson(metadata.userinfo_endpoint, access_token);
-    });
-}
-
-OidcClient.prototype.loadAuthorizationEndpoint = function () {
-    log("OidcClient.loadAuthorizationEndpoint");
-
-    if (this._settings.authorization_endpoint) {
-        return resolve(this._settings.authorization_endpoint);
-    }
-
-    if (!this._settings.authority) {
-        return error("No authorization_endpoint configured");
-    }
-
-    return this.loadMetadataAsync().then(function (metadata) {
-        if (!metadata.authorization_endpoint) {
-            return error("Metadata does not contain authorization_endpoint");
-        }
-
-        return metadata.authorization_endpoint;
-    });
-};
-
-OidcClient.prototype.createTokenRequestAsync = function () {
-    log("OidcClient.createTokenRequestAsync");
-
-    var client = this;
-    var settings = client._settings;
-
-    return client.loadAuthorizationEndpoint().then(function (authorization_endpoint) {
-
-        var state = rand();
-        var url = authorization_endpoint + "?state=" + encodeURIComponent(state);
-
-        if (client.isOidc) {
-            var nonce = rand();
-            url += "&nonce=" + encodeURIComponent(nonce);
-        }
-
-        var required = ["client_id", "redirect_uri", "response_type", "scope"];
-        required.forEach(function (key) {
-            var value = settings[key];
-            if (value) {
-                url += "&" + key + "=" + encodeURIComponent(value);
+    };
+    ;
+    OidcClient.prototype.loadUserProfile = function (access_token) {
+        log("OidcClient.loadUserProfile");
+        return this.loadMetadataAsync().then(function (metadata) {
+            if (!metadata.userinfo_endpoint) {
+                return error("Metadata does not contain userinfo_endpoint");
             }
+            return getJson(metadata.userinfo_endpoint, access_token);
         });
-
-        var optional = ["prompt", "display", "max_age", "ui_locales", "id_token_hint", "login_hint", "acr_values"];
-        optional.forEach(function (key) {
-            var value = settings[key];
-            if (value) {
-                url += "&" + key + "=" + encodeURIComponent(value);
+    };
+    OidcClient.prototype.loadAuthorizationEndpoint = function () {
+        log("OidcClient.loadAuthorizationEndpoint");
+        if (this._settings.authorization_endpoint) {
+            return resolve(this._settings.authorization_endpoint);
+        }
+        if (!this._settings.authority) {
+            return error("No authorization_endpoint configured");
+        }
+        return this.loadMetadataAsync().then(function (metadata) {
+            if (!metadata.authorization_endpoint) {
+                return error("Metadata does not contain authorization_endpoint");
             }
+            return metadata.authorization_endpoint;
         });
-
-        var request_state = {
-            oidc: client.isOidc,
-            oauth: client.isOAuth,
-            state: state
-        };
-
-        if (nonce) {
-            request_state["nonce"] = nonce;
-        }
-
-        settings.request_state_store.setItem(settings.request_state_key, JSON.stringify(request_state));
-
-        return {
-            request_state: request_state,
-            url: url
-        };
-    });
-}
-
-OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint) {
-    log("OidcClient.createLogoutRequestAsync");
-
-    var settings = this._settings;
-    return this.loadMetadataAsync().then(function (metadata) {
-        if (!metadata.end_session_endpoint) {
-            return error("No end_session_endpoint in metadata");
-        }
-
-        var url = metadata.end_session_endpoint;
-        if (id_token_hint && settings.post_logout_redirect_uri) {
-            url += "?post_logout_redirect_uri=" + encodeURIComponent(settings.post_logout_redirect_uri);
-            url += "&id_token_hint=" + encodeURIComponent(id_token_hint);
-        }
-        return url;
-    });
-}
-
-OidcClient.prototype.validateIdTokenAsync = function (id_token, nonce, access_token) {
-    log("OidcClient.validateIdTokenAsync");
-
-    var client = this;
-    var settings = client._settings;
-
-    return client.loadX509SigningKeyAsync().then(function (cert) {
-
-        var jws = new KJUR.jws.JWS();
-        if (jws.verifyJWSByPemX509Cert(id_token, cert)) {
-            var id_token_contents = JSON.parse(jws.parsedJWS.payloadS);
-
-            if (nonce !== id_token_contents.nonce) {
-                return error("Invalid nonce");
+    };
+    ;
+    OidcClient.prototype.createTokenRequestAsync = function () {
+        log("OidcClient.createTokenRequestAsync");
+        var client = this;
+        var settings = client._settings;
+        return client.loadAuthorizationEndpoint().then(function (authorization_endpoint) {
+            var state = rand();
+            var url = authorization_endpoint + "?state=" + encodeURIComponent(state);
+            if (client.isOidc) {
+                var nonce = rand();
+                url += "&nonce=" + encodeURIComponent(nonce);
             }
-
-            return client.loadMetadataAsync().then(function (metadata) {
-
-                if (id_token_contents.iss !== metadata.issuer) {
-                    return error("Invalid issuer");
+            var required = ["client_id", "redirect_uri", "response_type", "scope"];
+            required.forEach(function (key) {
+                var value = settings[key];
+                if (value) {
+                    url += "&" + key + "=" + encodeURIComponent(value);
                 }
-
-                if (id_token_contents.aud !== settings.client_id) {
-                    return error("Invalid audience");
-                }
-
-                var now = parseInt(Date.now() / 1000);
-
-                // accept tokens issues up to 5 mins ago
-                var diff = now - id_token_contents.iat;
-                if (diff > (5 * 60)) {
-                    return error("Token issued too long ago");
-                }
-
-                if (id_token_contents.exp < now) {
-                    return error("Token expired");
-                }
-
-                if (access_token && settings.load_user_profile) {
-                    // if we have an access token, then call user info endpoint
-                    return client.loadUserProfile(access_token, id_token_contents).then(function (profile) {
-                        return copy(profile, id_token_contents);
-                    });
-                }
-                else {
-                    // no access token, so we have all our claims
-                    return id_token_contents;
-                }
-
             });
-        }
-        else {
-            return error("JWT failed to validate");
-        }
-
-    });
-
-};
-
-OidcClient.prototype.validateAccessTokenAsync = function (id_token_contents, access_token) {
-    log("OidcClient.validateAccessTokenAsync");
-
-    if (!id_token_contents.at_hash) {
-        return error("No at_hash in id_token");
-    }
-
-    var hash = KJUR.crypto.Util.sha256(access_token);
-    var left = hash.substr(0, hash.length / 2);
-    var left_b64u = hextob64u(left);
-
-    if (left_b64u !== id_token_contents.at_hash) {
-        return error("at_hash failed to validate");
-    }
-
-    return resolve();
-};
-
-OidcClient.prototype.validateIdTokenAndAccessTokenAsync = function (id_token, nonce, access_token) {
-    log("OidcClient.validateIdTokenAndAccessTokenAsync");
-
-    var client = this;
-
-    return client.validateIdTokenAsync(id_token, nonce, access_token).then(function (id_token_contents) {
-
-        return client.validateAccessTokenAsync(id_token_contents, access_token).then(function () {
-
-            return id_token_contents;
-
-        });
-
-    });
-}
-
-OidcClient.prototype.processResponseAsync = function (queryString) {
-    log("OidcClient.processResponseAsync");
-
-    var client = this;
-    var settings = client._settings;
-
-    var request_state = settings.request_state_store.getItem(settings.request_state_key);
-    settings.request_state_store.removeItem(settings.request_state_key);
-
-    if (!request_state) {
-        return error("No request state loaded");
-    }
-
-    request_state = JSON.parse(request_state);
-    if (!request_state) {
-        return error("No request state loaded");
-    }
-
-    if (!request_state.state) {
-        return error("No state loaded");
-    }
-
-    var result = parseOidcResult(queryString);
-    if (!result) {
-        return error("No OIDC response");
-    }
-
-    if (result.error) {
-        return error(result.error);
-    }
-
-    if (result.state !== request_state.state) {
-        return error("Invalid state");
-    }
-
-    if (request_state.oidc) {
-        if (!result.id_token) {
-            return error("No identity token");
-        }
-
-        if (!request_state.nonce) {
-            return error("No nonce loaded");
-        }
-    }
-
-    if (request_state.oauth) {
-        if (!result.access_token) {
-            return error("No access token");
-        }
-
-        if (!result.token_type || result.token_type.toLowerCase() !== "bearer") {
-            return error("Invalid token type");
-        }
-
-        if (!result.expires_in) {
-            return error("No token expiration");
-        }
-    }
-
-    var promise = resolve();
-    if (request_state.oidc && request_state.oauth) {
-        promise = client.validateIdTokenAndAccessTokenAsync(result.id_token, request_state.nonce, result.access_token);
-    }
-    else if (request_state.oidc) {
-        promise = client.validateIdTokenAsync(result.id_token, request_state.nonce);
-    }
-
-    return promise.then(function (profile) {
-        if (profile && settings.filter_protocol_claims) {
-            var remove = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss"];
-            remove.forEach(function (key) {
-                delete profile[key];
+            var optional = ["prompt", "display", "max_age", "ui_locales", "id_token_hint", "login_hint", "acr_values"];
+            optional.forEach(function (key) {
+                var value = settings[key];
+                if (value) {
+                    url += "&" + key + "=" + encodeURIComponent(value);
+                }
             });
+            var request_state = {
+                oidc: client.isOidc,
+                oauth: client.isOAuth,
+                state: state
+            };
+            if (nonce) {
+                request_state["nonce"] = nonce;
+            }
+            settings.request_state_store.setItem(settings.request_state_key, JSON.stringify(request_state));
+            return {
+                request_state: request_state,
+                url: url
+            };
+        });
+    };
+    ;
+    OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint) {
+        log("OidcClient.createLogoutRequestAsync");
+        var settings = this._settings;
+        return this.loadMetadataAsync().then(function (metadata) {
+            if (!metadata.end_session_endpoint) {
+                return error("No end_session_endpoint in metadata");
+            }
+            var url = metadata.end_session_endpoint;
+            if (id_token_hint && settings.post_logout_redirect_uri) {
+                url += "?post_logout_redirect_uri=" + encodeURIComponent(settings.post_logout_redirect_uri);
+                url += "&id_token_hint=" + encodeURIComponent(id_token_hint);
+            }
+            return url;
+        });
+    };
+    ;
+    OidcClient.prototype.validateIdTokenAsync = function (id_token, nonce, access_token) {
+        log("OidcClient.validateIdTokenAsync");
+        var client = this;
+        var settings = client._settings;
+        return client.loadX509SigningKeyAsync().then(function (cert) {
+            var jws = new KJUR.jws.JWS();
+            if (jws.verifyJWSByPemX509Cert(id_token, cert)) {
+                var id_token_contents = JSON.parse(jws.parsedJWS.payloadS);
+                if (nonce !== id_token_contents.nonce) {
+                    return error("Invalid nonce");
+                }
+                return client.loadMetadataAsync().then(function (metadata) {
+                    if (id_token_contents.iss !== metadata.issuer) {
+                        return error("Invalid issuer");
+                    }
+                    if (id_token_contents.aud !== settings.client_id) {
+                        return error("Invalid audience");
+                    }
+                    var now = parseInt((Date.now() / 1000));
+                    // accept tokens issues up to 5 mins ago
+                    var diff = now - id_token_contents.iat;
+                    if (diff > (5 * 60)) {
+                        return error("Token issued too long ago");
+                    }
+                    if (id_token_contents.exp < now) {
+                        return error("Token expired");
+                    }
+                    if (access_token && settings.load_user_profile) {
+                        // if we have an access token, then call user info endpoint
+                        return client.loadUserProfile(access_token).then(function (profile) {
+                            return copy(profile, id_token_contents);
+                        });
+                    }
+                    else {
+                        // no access token, so we have all our claims
+                        return id_token_contents;
+                    }
+                });
+            }
+            else {
+                return error("JWT failed to validate");
+            }
+        });
+    };
+    ;
+    OidcClient.prototype.validateAccessTokenAsync = function (id_token_contents, access_token) {
+        log("OidcClient.validateAccessTokenAsync");
+        if (!id_token_contents.at_hash) {
+            return error("No at_hash in id_token");
         }
-
-        return {
-            profile: profile,
-            id_token: result.id_token,
-            access_token: result.access_token,
-            expires_in: result.expires_in,
-            scope: result.scope,
-            session_state : result.session_state
-        };
-    });
-}
+        var hash = KJUR.crypto.Util.sha256(access_token);
+        var left = hash.substr(0, hash.length / 2);
+        var left_b64u = hextob64u(left);
+        if (left_b64u !== id_token_contents.at_hash) {
+            return error("at_hash failed to validate");
+        }
+        return resolve();
+    };
+    ;
+    OidcClient.prototype.validateIdTokenAndAccessTokenAsync = function (id_token, nonce, access_token) {
+        log("OidcClient.validateIdTokenAndAccessTokenAsync");
+        var client = this;
+        return client.validateIdTokenAsync(id_token, nonce, access_token).then(function (id_token_contents) {
+            return client.validateAccessTokenAsync(id_token_contents, access_token).then(function () {
+                return id_token_contents;
+            });
+        });
+    };
+    ;
+    OidcClient.prototype.processResponseAsync = function (queryString) {
+        log("OidcClient.processResponseAsync");
+        var client = this;
+        var settings = client._settings;
+        var request_state = settings.request_state_store.getItem(settings.request_state_key);
+        settings.request_state_store.removeItem(settings.request_state_key);
+        if (!request_state) {
+            return error("No request state loaded");
+        }
+        request_state = JSON.parse(request_state);
+        if (!request_state) {
+            return error("No request state loaded");
+        }
+        if (!request_state.state) {
+            return error("No state loaded");
+        }
+        var result = OidcClient.parseOidcResult(queryString);
+        if (!result) {
+            return error("No OIDC response");
+        }
+        if (result.error) {
+            return error(result["error"]);
+        }
+        if (result.state !== request_state.state) {
+            return error("Invalid state");
+        }
+        if (request_state.oidc) {
+            if (!result.id_token) {
+                return error("No identity token");
+            }
+            if (!request_state.nonce) {
+                return error("No nonce loaded");
+            }
+        }
+        if (request_state.oauth) {
+            if (!result.access_token) {
+                return error("No access token");
+            }
+            if (!result.token_type || result.token_type.toLowerCase() !== "bearer") {
+                return error("Invalid token type");
+            }
+            if (!result.expires_in) {
+                return error("No token expiration");
+            }
+        }
+        var promise = resolve();
+        if (request_state.oidc && request_state.oauth) {
+            promise = client.validateIdTokenAndAccessTokenAsync(result.id_token, request_state.nonce, result.access_token);
+        }
+        else if (request_state.oidc) {
+            promise = client.validateIdTokenAsync(result.id_token, request_state.nonce);
+        }
+        return promise.then(function (profile) {
+            if (profile && settings.filter_protocol_claims) {
+                var remove = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss"];
+                remove.forEach(function (key) {
+                    delete profile[key];
+                });
+            }
+            return {
+                profile: profile,
+                id_token: result.id_token,
+                access_token: result.access_token,
+                expires_in: result.expires_in,
+                scope: result.scope,
+                session_state: result.session_state
+            };
+        });
+    };
+    ;
+    return OidcClient;
+})();
+;
 
     // exports
     OidcClient._promiseFactory = _promiseFactory;
