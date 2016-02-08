@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/// <reference path="./lib/defaultHttpRequest.ts" />
-/// <reference path="./lib/defaultPromiseFactory.ts" />
-/// <reference path="./typings/jsrsasign/jws.d.ts" />
-/// <reference path="./typings/jsrsasign/crypto/Util.d.ts" />
-/// <reference path="./typings/openid-configuration.d.ts" />
+/// <reference path="./defaultHttpRequest.ts" />
+/// <reference path="./defaultPromiseFactory.ts" />
+/// <reference path="../typings/jsrsasign/jws.d.ts" />
+/// <reference path="../typings/jsrsasign/crypto/Util.d.ts" />
+/// <reference path="../typings/openid-configuration.d.ts" />
 
 declare var hextob64u: (hexString: string) => string;
 
