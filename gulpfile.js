@@ -17,7 +17,6 @@ gulp.task('default', ['clean'], function () {
 	    ,'lib/rsa.js'
 	    ,'lib/json-sans-eval.js'
 	    ,'lib/jws-3.0.js'
-	    ,'lib/es6-promise-3.0.2.js'
 	    ,'lib/defaultHttpRequest.js'
 	    ,'lib/defaultPromiseFactory.js'
 	    ,'oidc-client.js'
