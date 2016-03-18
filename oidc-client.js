@@ -34,11 +34,11 @@ function rand() {
 }
 
 function resolve(param) {
-    return _promiseFactory.resolve(param);
+    return Promise.resolve(param);
 }
 
 function error(message) {
-    return _promiseFactory.reject(Error(message));
+    return Promise.reject(Error(message));
 }
 
 function parseOidcResult(queryString) {
