@@ -1,3 +1,4 @@
+import Log from './Log';
 import Window from './Window';
 
 export default class AuthorizationResultParser {
@@ -22,6 +23,8 @@ export default class AuthorizationResultParser {
         while (m = regex.exec(value)) {
             params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
             if (counter++ > 50) {
+                Log.error("AuthorizationResultParser.parseResult: response exceeded expected number of parameters", value);
+                
                 return {
                     error: "Response exceeded expected number of parameters"
                 };
