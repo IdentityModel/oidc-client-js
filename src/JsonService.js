@@ -1,6 +1,8 @@
+import XMLHttpRequestFactory from './XMLHttpRequestFactory';
+
 export default class JsonService {
     constructor(httpRequestFactory) {
-        this._httpRequestFactory = httpRequestFactory;
+        this._httpRequestFactory = httpRequestFactory || XMLHttpRequestFactory;
     }
     
     getJson(url, token) {

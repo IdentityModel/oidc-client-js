@@ -1,7 +1,5 @@
 import JsonService from '../src/JsonService';
 
-import FakeXMLHttpRequestFactory from './FakeXMLHttpRequestFactory';
-
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
@@ -96,3 +94,32 @@ describe("JsonService", function() {
         });
     });
 });
+
+
+class FakeXMLHttpRequest {
+    constructor(sendCallback) {
+        this.headers = new Map();
+    }
+    
+    open(method, url) {
+        this.method = method;
+        this.url = url;
+    }
+    
+    setRequestHeader(header, value){
+        this.headers.set(header, value);
+    }
+    
+    send() {
+    }
+}
+
+class FakeXMLHttpRequestFactory {
+    constructor(request){
+        this.request = request || new FakeXMLHttpRequest();
+    }
+    
+    create() {
+        return this.request;
+    }
+}

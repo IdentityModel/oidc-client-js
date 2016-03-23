@@ -34,5 +34,16 @@ describe("AuthorizationResultParser", function() {
             result.should.have.property('error');
         });
         
+        it("should use window.location.hash when no value is passed", function() {
+            var w = {
+                location : {
+                    hash: "a=apple&b=banana&c=carrot"
+                }
+            };
+            subject = new AuthorizationResultParser(w);
+            var result = subject.parseResult();
+            result.should.deep.equal({a:"apple", b:"banana", c:"carrot"});
+        });
+        
     });
 });

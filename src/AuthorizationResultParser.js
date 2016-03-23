@@ -1,10 +1,13 @@
-export default class AuthorizationResultParser {
-    constructor(location) {
-        this._location = location;
-    }
+import Window from './Window';
 
+export default class AuthorizationResultParser {
+    
+    constructor(window){
+        this._window = window || Window;
+    }
+    
     parseResult(value) {
-        value = value || this._location.hash;
+        value = value || this._window.location.hash;
         
         var idx = value.lastIndexOf("#");
         if (idx >= 0) {
@@ -29,4 +32,5 @@ export default class AuthorizationResultParser {
             return params;
         }
     }
+    
 }
