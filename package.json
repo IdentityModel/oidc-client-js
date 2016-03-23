@@ -2,7 +2,7 @@
     "name": "oidc-client",
     "version": "1.0.0",
     "description": "OpenID Connect (OIDC) client library",
-    "main": "src/index.js",
+    "main": "src/_index.js",
     "scripts": {
         "build": "webpack",
         "test": "mocha --compilers js:babel-register test/*.spec.js"
