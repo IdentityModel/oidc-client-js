@@ -1,3 +1,5 @@
+import Log from './Log';
+
 export default class TokenValidator {
     
 //     OidcClient.prototype.validateIdTokenAsync = function (id_token, nonce, access_token) {

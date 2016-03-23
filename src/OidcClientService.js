@@ -1,3 +1,4 @@
+import Log from './Log';
 import OidcClientSettings from './OidcClientSettings';
 
 export default class OidcClientService {

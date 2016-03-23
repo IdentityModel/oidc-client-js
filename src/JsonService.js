@@ -1,3 +1,4 @@
+import Log from './Log';
 import XMLHttpRequestFactory from './XMLHttpRequestFactory';
 
 export default class JsonService {
@@ -21,11 +22,13 @@ export default class JsonService {
                     resolve(JSON.parse(req.response));
                 }
                 else {
+                    Log.error("getJson request failed with status" + req.status + " for url " + url);
                     reject(Error(req.statusText + " (" + req.status + ")"));
                 }
             };
 
             req.onerror = function() {
+                Log.error("getJson failed with network error");
                 reject(Error("Network Error"));
             };
             
