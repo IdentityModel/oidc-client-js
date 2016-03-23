@@ -19,7 +19,7 @@ export default class JsonService {
                     resolve(JSON.parse(req.response));
                 }
                 else {
-                    reject(Error(req.statusText + "(" + req.status + ")"));
+                    reject(Error(req.statusText + " (" + req.status + ")"));
                 }
             };
 
