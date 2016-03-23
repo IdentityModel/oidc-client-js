@@ -1,5 +1,5 @@
 export default class MetadataService {
     constructor(jsonService){
-        this._JsonService = jsonService;
+        this._jsonService = jsonService;
     }
 }

@@ -10,6 +10,6 @@ let metadataService = new MetadataService(jsonService);
 
 export default class OidcClient extends OidcClientService {
     constructor(settings) {
-        super(setting)
+        super(setting, metadataService)
     }
 }
