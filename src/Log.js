@@ -16,7 +16,6 @@ export default class Log {
     static get enabled(){
         return enabled;
     }
-    
     static set enabled(value){
         enabled = !!value;
     }

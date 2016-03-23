@@ -1,5 +1,6 @@
 import Log from './Log';
 import OidcClientSettings from './OidcClientSettings';
+import SigninRequest from './SigninRequest';
 
 export default class OidcClientService {
     constructor(settings) {
@@ -14,13 +15,20 @@ export default class OidcClientService {
         return this._settings;
     }
     
-    createSigninRequest(){
+    createSigninRequest() {
+        Log.info("createSigninRequest");
+        
+        //reSigninRequest.create(this._settings);
     }
     
     processSigninResponse(){
+        Log.info("processSigninResponse");
+        
     }
     
     createSignoutRequest(){
+        Log.info("createSignoutRequest");
+        
     }
     
 //     OidcClient.prototype.createTokenRequestAsync = function () {

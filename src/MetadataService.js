@@ -2,14 +2,14 @@ import JsonService from './JsonService';
 import Log from './Log';
 
 export default class MetadataService {
-    constructor(settings, jsonService) {
+    constructor(settings, jsonService = new JsonService()) {
         
         if (!settings){
             throw new Error("settings");
         }
         
         this._settings = settings;
-        this._jsonService = jsonService || new JsonService();
+        this._jsonService = jsonService;
     }
 
     getMetadata() {

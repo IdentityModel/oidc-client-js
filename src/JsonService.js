@@ -2,8 +2,8 @@ import Log from './Log';
 import XMLHttpRequestFactory from './XMLHttpRequestFactory';
 
 export default class JsonService {
-    constructor(httpRequestFactory) {
-        this._httpRequestFactory = httpRequestFactory || XMLHttpRequestFactory;
+    constructor(httpRequestFactory = XMLHttpRequestFactory) {
+        this._httpRequestFactory = httpRequestFactory;
     }
     
     getJson(url, token) {

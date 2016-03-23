@@ -3,8 +3,8 @@ import Window from './Window';
 
 export default class AuthorizationResultParser {
     
-    constructor(window){
-        this._window = window || Window;
+    constructor(window = Window){
+        this._window = window;
     }
     
     parseResult(value) {

@@ -1,8 +1,8 @@
 import Window from './Window';
 
 export default class XMLHttpRequestFactory {
-    constructor(window){
-        this._window = window || Window;
+    constructor(window = Window){
+        this._window = window;
     }
     
     create() {
