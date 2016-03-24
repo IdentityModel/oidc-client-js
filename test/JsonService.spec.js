@@ -30,24 +30,24 @@ describe("JsonService", function() {
         });
         
         it("should return a promise", function() {
-            var p = subject.getJson("http://test");
+            let p = subject.getJson("http://test");
             p.should.be.instanceof(Promise);
         });
         
         it("should make GET request to url", function() {
-            var p = subject.getJson("http://test");
+            let p = subject.getJson("http://test");
             stubHttpRequest.method.should.be.equal('GET');
             stubHttpRequest.url.should.be.equal('http://test');
         });
         
         it("should set token as authorization header", function() {
-            var p = subject.getJson("http://test", "token");
+            let p = subject.getJson("http://test", "token");
             stubHttpRequest.headers.has('Authorization').should.be.true;
             stubHttpRequest.headers.get('Authorization').should.be.equal('Bearer token');
         });
         
         it("should fulfill promise when http response is 200", function(done) {
-            var p = subject.getJson("http://test");
+            let p = subject.getJson("http://test");
             
             p.then(result => {
                 result.should.not.be.undefined;
@@ -63,7 +63,7 @@ describe("JsonService", function() {
         });
         
         it("should reject promise when http response is not 200", function(done) {
-            var p = subject.getJson("http://test");
+            let p = subject.getJson("http://test");
             
             p.then(result => {
                 assert.fail();
@@ -80,7 +80,7 @@ describe("JsonService", function() {
         });
         
         it("should reject promise when http response is error", function(done) {
-            var p = subject.getJson("http://test");
+            let p = subject.getJson("http://test");
             
             p.then(result => {
                 assert.fail();

@@ -1,43 +1,40 @@
+const OidcMetadataUrlPath = '.well-known/openid-configuration';
+
 export default class OidcClientSettings {
     constructor(settings) {
         if (!settings) {
             throw new Error("settings");
         }
 
-        if (settings.metadata){
-            this._metadata = settings.metadata;
+        this._authority = settings.authority;
+        this._metadataUrl = settings.metadataUrl; 
+        this._metadata = settings.metadata;
+    }
+    
+    get authority() {
+        return this._authority;
+    }
+
+    get metadataUrl() {
+        if (!this._metadataUrl) {
+            this._metadataUrl = this.authority;
+             
+            if (this._metadataUrl && this._metadataUrl.indexOf(OidcMetadataUrlPath) < 0) {
+                if (this._metadataUrl[this._metadataUrl.length - 1] !== '/') {
+                    this._metadataUrl += '/';
+                }
+                this._metadataUrl += OidcMetadataUrlPath;
+            }
         }
         
-        if (settings.authority){
-            this._authority = authority;
-        }
-        
-        // if (!this._settings.request_state_key) {
-        //     this._settings.request_state_key = "OidcClient.request_state";
-        // }
-
-        // if (!this._settings.request_state_store) {
-        //     this._settings.request_state_store = window.localStorage;
-        // }
-
-        // if (typeof this._settings.load_user_profile === 'undefined') {
-        //     this._settings.load_user_profile = true;
-        // }
-
-        // if (typeof this._settings.filter_protocol_claims === 'undefined') {
-        //     this._settings.filter_protocol_claims = true;
-        // }
-
-        // if (this._settings.authority && this._settings.authority.indexOf('.well-known/openid-configuration') < 0) {
-        //     if (this._settings.authority[this._settings.authority.length - 1] !== '/') {
-        //         this._settings.authority += '/';
-        //     }
-        //     this._settings.authority += '.well-known/openid-configuration';
-        // }
-
-        // if (!this._settings.response_type) {
-        //     this._settings.response_type = "id_token token";
-        // }
+        return this._metadataUrl;
+    }
+    
+    get metadata() {
+        return this._metadata;
+    }
+    set metadata(value){
+        this._metadata = value;
     }
 
     // get isOidc() {
@@ -59,11 +56,4 @@ export default class OidcClientSettings {
     //     }
     //     return false;
     // }
-    
-    get metadata(){
-        return this._metadata;
-    }
-    set metadata(val){
-        this._metadata = val;
-    }
 }

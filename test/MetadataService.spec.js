@@ -38,7 +38,7 @@ describe("MetadataService", function() {
         it("should use metadata on settings", function(done) {
             settings.metadata = "test";
 
-            var p = subject.getMetadata();
+            let p = subject.getMetadata();
 
             p.then(result => {
                 result.should.equal("test");
@@ -49,7 +49,7 @@ describe("MetadataService", function() {
         it("should require metadataUrl", function(done) {
             delete settings.metadataUrl;
 
-            var p = subject.getMetadata();
+            let p = subject.getMetadata();
 
             p.then(null, err => {
                 err.message.should.contain('metadataUrl');
@@ -60,7 +60,7 @@ describe("MetadataService", function() {
         it("should require metadataUrl", function(done) {
             delete settings.metadataUrl;
 
-            var p = subject.getMetadata();
+            let p = subject.getMetadata();
 
             p.then(null, err => {
                 err.message.should.contain('metadataUrl');
@@ -81,7 +81,7 @@ describe("MetadataService", function() {
             settings.metadataUrl = "http://sts/metadata";
             stubJsonService.result = Promise.resolve("test");
 
-            var p = subject.getMetadata();
+            let p = subject.getMetadata();
 
             p.then(result => {
                 result.should.equal("test");
@@ -93,7 +93,7 @@ describe("MetadataService", function() {
             settings.metadataUrl = "http://sts/metadata";
             stubJsonService.result = Promise.resolve("test");
 
-            var p = subject.getMetadata();
+            let p = subject.getMetadata();
 
             p.then(result => {
                 settings.metadata.should.equal("test");
@@ -105,7 +105,7 @@ describe("MetadataService", function() {
             settings.metadataUrl = "http://sts/metadata";
             stubJsonService.result = Promise.reject("test");
 
-            var p = subject.getMetadata();
+            let p = subject.getMetadata();
 
             p.then(null, err => {
                 err.message.should.contain("metadata");

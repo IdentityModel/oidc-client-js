@@ -1,14 +1,17 @@
 import Log from './Log';
 import OidcClientSettings from './OidcClientSettings';
+import MetadataService from './MetadataService';
 import SigninRequest from './SigninRequest';
+import SignoutRequest from './SignoutRequest';
 
 export default class OidcClientService {
-    constructor(settings) {
+    constructor(settings, MetadataServiceCtor = MetadataService) {
         if (!settings) {
             throw new Error("settings");
         }
         
         this._settings = new OidcClientSettings(settings);
+        this._metadataService = new MetadataServiceCtor(this._settings);
     }
     
     get settings() {
