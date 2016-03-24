@@ -84,4 +84,25 @@ describe("OidcClientSettings", function() {
         });
         
     });
+    
+    describe("filterProtocolClaims", function() {
+        
+        it("should use default value", function(){
+            let subject = new OidcClientSettings({
+            });
+            subject.filterProtocolClaims.should.equal(true);
+        });
+        
+        it("should return value from initial settings", function(){
+            let subject = new OidcClientSettings({
+                filterProtocolClaims:true
+            });
+            subject.filterProtocolClaims.should.equal(true);
+            
+            subject = new OidcClientSettings({
+                filterProtocolClaims:false
+            });
+            subject.filterProtocolClaims.should.equal(false);
+        });
+    });
 });

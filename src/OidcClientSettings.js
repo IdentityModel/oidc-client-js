@@ -11,6 +11,13 @@ export default class OidcClientSettings {
         this._metadataUrl = settings.metadataUrl; 
         this._metadata = settings.metadata;
         this._signingKeys = settings.signingKeys;
+        
+        if (settings.filterProtocolClaims === undefined){
+            this._filterProtocolClaims = true;
+        }
+        else {
+            this._filterProtocolClaims = !!settings.filterProtocolClaims;
+        }
     }
     
     get authority() {
@@ -44,6 +51,10 @@ export default class OidcClientSettings {
     }
     set signingKeys(value){
         this._signingKeys = value;
+    }
+    
+    get filterProtocolClaims(){
+        return this._filterProtocolClaims;
     }
 
     // get isOidc() {
