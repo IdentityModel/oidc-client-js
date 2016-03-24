@@ -49,8 +49,8 @@ describe("UserInfoService", function() {
                 });
         });
 
-        it("should call userinfo url and pass token", function(done) {
-            stubMetadataService.userInfoUrlResult = Promise.resolve("http://sts/userinfo");
+        it("should call userinfo endpoint and pass token", function(done) {
+            stubMetadataService.userInfoEndpointResult = Promise.resolve("http://sts/userinfo");
             stubJsonService.result = Promise.resolve("test");
 
             subject.getClaims("token").then(claims => {
@@ -62,7 +62,7 @@ describe("UserInfoService", function() {
         });
 
         it("should fail when dependencies fail", function(done) {
-            stubMetadataService.userInfoUrlResult = Promise.reject("test");
+            stubMetadataService.userInfoEndpointResult = Promise.reject("test");
 
             subject.getClaims("token").then(null,
                 err => {
@@ -74,7 +74,7 @@ describe("UserInfoService", function() {
         });
 
         it("should return claims", function(done) {
-            stubMetadataService.userInfoUrlResult = Promise.resolve("http://sts/userinfo");
+            stubMetadataService.userInfoEndpointResult = Promise.resolve("http://sts/userinfo");
             stubJsonService.result = Promise.resolve({
                 foo: 1, bar: 'test',
                 aud:'some_aud', iss:'issuer', 
@@ -99,7 +99,7 @@ describe("UserInfoService", function() {
         });
         
         it("should filter protocol claims", function(done) {
-            stubMetadataService.userInfoUrlResult = Promise.resolve("http://sts/userinfo");
+            stubMetadataService.userInfoEndpointResult = Promise.resolve("http://sts/userinfo");
             stubJsonService.result = Promise.resolve({
                 foo: 1, bar: 'test',
                 aud:'some_aud', iss:'issuer', 

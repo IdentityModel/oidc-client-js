@@ -38,39 +38,36 @@ export default class MetadataService {
             });
     }
     
-    getAuthorizationUrl(){
-        Log.info("MetadataService.getAuthorizationUrl");
-        
-        return this.getMetadata().then(metadata => {
-            Log.info("metadata recieved");
-
-            if (!metadata.authorization_endpoint) {
-                Log.error("Metadata does not contain authorization_endpoint");
-                throw new Error("Metadata does not contain authorization_endpoint");
-            }
-            
-            return metadata.authorization_endpoint;
-        }, err => {
-            Log.error("Failed to load authorization url", err);
-            throw new Error("Failed to load authorization url")
-        });
+    getAuthorizationEndpoint(){
+        Log.info("MetadataService.getAuthorizationEndpoint");
+        return this.getMetadataProperty("authorization_endpoint");
     }
     
-    getUserInfoUrl(){
-        Log.info("MetadataService.getUserInfoUrl");
+    getUserInfoEndpoint(){
+        Log.info("MetadataService.getUserInfoEndpoint");
+        return this.getMetadataProperty("userinfo_endpoint");
+    }
+    
+    getEndSessionEndpoint(){
+        Log.info("MetadataService.getEndSessionEndpoint");
+        return this.getMetadataProperty("end_session_endpoint");
+    }
+    
+    getMetadataProperty(name){
+        Log.info("MetadataService.getMetadataProperty", name);
         
         return this.getMetadata().then(metadata => {
             Log.info("metadata recieved");
 
-            if (!metadata.userinfo_endpoint) {
-                Log.error("Metadata does not contain userinfo_endpoint");
-                throw new Error("Metadata does not contain userinfo_endpoint");
+            if (metadata[name] === undefined) {
+                Log.error("Metadata does not contain property " + name);
+                throw new Error("Metadata does not contain property " + name);
             }
             
-            return metadata.userinfo_endpoint;
+            return metadata[name];
         }, err => {
-            Log.error("Failed to load userinfo url", err);
-            throw new Error("Failed to load userinfo url")
+            Log.error("Failed to load metadata property " + name, err);
+            throw new Error("Failed to load metadata property " + name)
         });
     }
     
@@ -82,17 +79,10 @@ export default class MetadataService {
             return Promise.resolve(this._settings.signingKeys);
         }
 
-        return this.getMetadata().then(metadata => {
-            Log.info("Metadata received", metadata);
-            
-            if (!metadata.jwks_uri) {
-                Log.error("Metadata does not contain jwks_uri");
-                throw new Error("Metadata does not contain jwks_uri");
-            }
-            
-            Log.info("getting keys from", metadata.jwks_uri);
+        return this.getMetadataProperty("jwks_uri").then(jwks_uri => {
+            Log.info("jwks_uri received", jwks_uri);
 
-            return this._jsonService.getJson(metadata.jwks_uri).then(keySet => {
+            return this._jsonService.getJson(jwks_uri).then(keySet => {
                 Log.info("key set received", keySet);
                 
                 if (!keySet.keys){

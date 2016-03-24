@@ -117,34 +117,34 @@ describe("MetadataService", function() {
         });
 
     });
-
-    describe("getAuthorizationUrl", function() {
+    
+     describe("getMetadataProperty", function() {
 
         it("should return a promise", function() {
-            subject.getAuthorizationUrl().should.be.instanceof(Promise);
+            subject.getMetadataProperty().should.be.instanceof(Promise);
         });
 
         it("should use metadata on settings", function(done) {
             settings.metadata = {
-                authorization_endpoint: "http://sts/authorize"
+                foo: "test"
             };
 
-            let p = subject.getAuthorizationUrl();
+            let p = subject.getMetadataProperty("foo");
 
             p.then(result => {
-                result.should.equal("http://sts/authorize");
+                result.should.equal("test");
                 done();
             });
         });
 
-        it("should fail if no authorization_endpoint on metadata", function(done) {
+        it("should fail if no data on metadata", function(done) {
             settings.metadata = {
             };
 
-            let p = subject.getAuthorizationUrl();
+            let p = subject.getMetadataProperty("foo");
 
             p.then(null, err => {
-                err.message.should.contain("authorization_endpoint");
+                err.message.should.contain("foo");
                 done();
             });
         });
@@ -155,28 +155,41 @@ describe("MetadataService", function() {
             };
             stubJsonService.result = Promise.reject("test");
 
-            let p = subject.getAuthorizationUrl();
+            let p = subject.getMetadataProperty("foo");
 
             p.then(null, err => {
-                err.message.should.contain("authorization");
+                err.message.should.contain("foo");
                 done();
             });
         });
         
     });
 
-    describe("getUserInfoUrl", function() {
+    describe("getAuthorizationEndpoint", function() {
 
-        it("should return a promise", function() {
-            subject.getUserInfoUrl().should.be.instanceof(Promise);
+        it("should return value from metadata", function(done) {
+            settings.metadata = {
+                authorization_endpoint: "http://sts/authorize"
+            };
+
+            let p = subject.getAuthorizationEndpoint();
+
+            p.then(result => {
+                result.should.equal("http://sts/authorize");
+                done();
+            });
         });
+        
+    });
 
-        it("should use metadata on settings", function(done) {
+    describe("getUserInfoEndpoint", function() {
+
+        it("should return value from", function(done) {
             settings.metadata = {
                 userinfo_endpoint: "http://sts/userinfo"
             };
 
-            let p = subject.getUserInfoUrl();
+            let p = subject.getUserInfoEndpoint();
 
             p.then(result => {
                 result.should.equal("http://sts/userinfo");
@@ -184,32 +197,23 @@ describe("MetadataService", function() {
             });
         });
 
-        it("should fail if no userinfo_endpoint on metadata", function(done) {
+    });
+
+    describe("getEndSessionEndpoint", function() {
+
+        it("should return value from", function(done) {
             settings.metadata = {
+                end_session_endpoint: "http://sts/signout"
             };
 
-            let p = subject.getUserInfoUrl();
+            let p = subject.getEndSessionEndpoint();
 
-            p.then(null, err => {
-                err.message.should.contain("userinfo_endpoint");
+            p.then(result => {
+                result.should.equal("http://sts/signout");
                 done();
             });
         });
-        
-         it("should fail if json call to load metadata fails", function(done) {
-            settings.metadata = {
-                metadataUrl:"http://sts/metadata"
-            };
-            stubJsonService.result = Promise.reject("test");
 
-            let p = subject.getUserInfoUrl();
-
-            p.then(null, err => {
-                err.message.should.contain("userinfo");
-                done();
-            });
-        });
-        
     });
     
     describe("getSigningKeys", function() {
@@ -235,7 +239,7 @@ describe("MetadataService", function() {
             let p = subject.getSigningKeys();
 
             p.then(null, err => {
-                err.message.should.contain('jwks_uri');
+                err.message.should.contain('signing keys');
                 done();
             });
         });

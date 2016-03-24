@@ -19,19 +19,17 @@ export default class OidcClientService {
         return this._settings;
     }
     
-    createSigninRequest() {
+    createSigninRequest(request) {
         Log.info("createSigninRequest");
-        
-        //reSigninRequest.create(this._settings);
     }
     
     processSigninResponse(){
         Log.info("processSigninResponse");
-        
     }
     
-    createSignoutRequest(){
+    createSignoutRequest(request){
         Log.info("createSignoutRequest");
+        
         
     }
     

@@ -24,7 +24,7 @@ export default class UserInfoService {
             return Promise.reject(new Error("A token is required"));
         }
 
-        return this._metadataService.getUserInfoUrl().then(url => {
+        return this._metadataService.getUserInfoEndpoint().then(url => {
             Log.info("received userinfo url", url);
 
             return this._jsonService.getJson(url, token).then(claims => {
