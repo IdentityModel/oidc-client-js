@@ -7,6 +7,7 @@ import SignoutRequest from './SignoutRequest';
 export default class OidcClientService {
     constructor(settings, MetadataServiceCtor = MetadataService) {
         if (!settings) {
+            Log.error("No settings passed to OidcClientService");
             throw new Error("settings");
         }
         

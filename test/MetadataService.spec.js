@@ -1,3 +1,4 @@
+import Log from '../src/Log';
 import MetadataService from '../src/MetadataService';
 
 import chai from 'chai';
@@ -113,6 +114,79 @@ describe("MetadataService", function() {
             });
         });
 
+    });
+    
+    describe("getSigningKeys", function() {
+
+        it("should return a promise", function() {
+            subject.getSigningKeys().should.be.instanceof(Promise);
+        });
+        
+        it("should use signingKeys on settings", function(done) {
+            settings.signingKeys = "test";
+            
+            let p = subject.getSigningKeys();
+            
+            p.then(result => {
+               result.should.equal("test");
+               done(); 
+            });
+        });
+        
+        it("should fail if metadata does not have jwks_uri", function(done) {
+            settings.metadata = "test";
+            
+            let p = subject.getSigningKeys();
+            
+            p.then(null, err => {
+                err.message.should.contain('jwks_uri');
+                done();
+            });
+        });
+        
+        it("should make json call to jwks_uri", function(done) {
+            settings.metadata = {
+                jwks_uri:"http://sts/metadata/keys"
+            };
+            stubJsonService.result = Promise.resolve("test");
+            
+            let p = subject.getSigningKeys();
+            
+            p.then(result => {
+                stubJsonService.url.should.equal("http://sts/metadata/keys");
+                done();
+            });
+        });
+        
+        it("should return keys from jwks_uri", function(done) {
+            settings.metadata = {
+                jwks_uri:"http://sts/metadata/keys"
+            };
+            stubJsonService.result = Promise.resolve("test");
+            
+            let p = subject.getSigningKeys();
+            
+            p.then(keys => {
+                keys.should.equal("test");
+                done();
+            });
+        });
+        
+        it("should cache keys in settings", function(done) {
+            settings.metadata = {
+                jwks_uri:"http://sts/metadata/keys"
+            };
+            stubJsonService.result = Promise.resolve("test");
+            
+            let p = subject.getSigningKeys();
+            
+            p.then(keys => {
+                settings.signingKeys.should.equal("test");
+                done();
+            })
+        });
+        
+        
     });
 });
 

@@ -3,28 +3,33 @@ import Log from './Log';
 
 export default class MetadataService {
     constructor(settings, jsonService = new JsonService()) {
-        
-        if (!settings){
+        if (!settings) {
+            Log.error("No settings passed to MetadataService");
             throw new Error("settings");
         }
-        
+
         this._settings = settings;
         this._jsonService = jsonService;
     }
 
     getMetadata() {
         Log.info("MetadataService.getMetadata");
-        
+
         if (this._settings.metadata) {
+            Log.info("Returning metadata from settings");
             return Promise.resolve(this._settings.metadata);
         }
-        
+
         if (!this._settings.metadataUrl) {
-            return Promise.reject(new Error("No metadataUrl configured"));
+            Log.error("No metadataUrl configured on settings");
+            return Promise.reject(new Error("No metadataUrl configured on settings"));
         }
-        
+
+        Log.info("getting metadata from", this._settings.metadataUrl);
+
         return this._jsonService.getJson(this._settings.metadataUrl)
             .then(metadata => {
+                Log.info("metadata received", metadata);
                 this._settings.metadata = metadata;
                 return metadata;
             }, err => {
@@ -32,7 +37,36 @@ export default class MetadataService {
                 throw new Error("Failed to load metadata");
             });
     }
-    
+
+    getSigningKeys() {
+        Log.info("MetadataService.getSigningKeys");
+
+        if (this._settings.signingKeys) {
+            Log.info("Returning signingKeys from settings");
+            return Promise.resolve(this._settings.signingKeys);
+        }
+
+        return this.getMetadata().then(metadata => {
+            Log.info("Metadata received", metadata);
+            
+            if (!metadata.jwks_uri) {
+                Log.error("Metadata does not contain jwks_uri");
+                throw new Error("Metadata does not contain jwks_uri");
+            }
+            
+            Log.info("getting keys from", metadata.jwks_uri);
+
+            return this._jsonService.getJson(metadata.jwks_uri).then(keys => {
+                Log.info("Keys received", keys);
+                this._settings.signingKeys = keys;
+                return keys;
+            });
+        }, err => {
+            Log.error("Failed to load signing keys", err);
+            throw new Error("Failed to load signing keys");
+        });
+    }
+
     // getKeys() {
     //     log("OidcClient.loadX509SigningKeyAsync");
 
@@ -59,19 +93,7 @@ export default class MetadataService {
     //         return getKeyAsync(settings.jwks);
     //     }
 
-    //     return this.loadMetadataAsync().then(function (metadata) {
-    //         if (!metadata.jwks_uri) {
-    //             return error("Metadata does not contain jwks_uri");
-    //         }
 
-    //         return getJson(metadata.jwks_uri).then(function (jwks) {
-    //             settings.jwks = jwks;
-    //             return getKeyAsync(jwks);
-    //         }, function (err) {
-    //             return error("Failed to load signing keys (" + err && err.message + ")");
-    //         });
-    //     });
-    // };
 
     // getAuthorizationEndpoint() {
     //     log("OidcClient.loadAuthorizationEndpoint");
