@@ -8,6 +8,8 @@ export default class AuthorizationResultParser {
     }
     
     parseResult(value) {
+        Log.info("AuthorizationResultParser.parseResult");
+        
         value = value || this._window.location.hash;
         
         var idx = value.lastIndexOf("#");
