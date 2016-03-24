@@ -7,13 +7,13 @@ let assert = chai.assert;
 describe("JsonService", function() {
     let subject;
     
-    let fakeXMLHttpRequestFactory;
-    let fakeHttpRequest;
+    let stubXMLHttpRequestFactory;
+    let stubHttpRequest;
     
     beforeEach(function(){
-        fakeXMLHttpRequestFactory = new FakeXMLHttpRequestFactory();
-        fakeHttpRequest = fakeXMLHttpRequestFactory.request;
-        subject = new JsonService(fakeXMLHttpRequestFactory); 
+        stubXMLHttpRequestFactory = new StubXMLHttpRequestFactory();
+        stubHttpRequest = stubXMLHttpRequestFactory.request;
+        subject = new JsonService(stubXMLHttpRequestFactory); 
     });
     
     describe("getJson", function() {
@@ -36,14 +36,14 @@ describe("JsonService", function() {
         
         it("should make GET request to url", function() {
             var p = subject.getJson("http://test");
-            fakeHttpRequest.method.should.be.equal('GET');
-            fakeHttpRequest.url.should.be.equal('http://test');
+            stubHttpRequest.method.should.be.equal('GET');
+            stubHttpRequest.url.should.be.equal('http://test');
         });
         
         it("should set token as authorization header", function() {
             var p = subject.getJson("http://test", "token");
-            fakeHttpRequest.headers.has('Authorization').should.be.true;
-            fakeHttpRequest.headers.get('Authorization').should.be.equal('Bearer token');
+            stubHttpRequest.headers.has('Authorization').should.be.true;
+            stubHttpRequest.headers.get('Authorization').should.be.equal('Bearer token');
         });
         
         it("should fulfill promise when http response is 200", function(done) {
@@ -57,9 +57,9 @@ describe("JsonService", function() {
                 done();
             });
             
-            fakeHttpRequest.status = 200;
-            fakeHttpRequest.response = JSON.stringify({foo:1, bar:'test'});
-            fakeHttpRequest.onload();
+            stubHttpRequest.status = 200;
+            stubHttpRequest.response = JSON.stringify({foo:1, bar:'test'});
+            stubHttpRequest.onload();
         });
         
         it("should reject promise when http response is not 200", function(done) {
@@ -74,9 +74,9 @@ describe("JsonService", function() {
                 done();
             });
             
-            fakeHttpRequest.status = 500;
-            fakeHttpRequest.statusText = "server error";
-            fakeHttpRequest.onload();
+            stubHttpRequest.status = 500;
+            stubHttpRequest.statusText = "server error";
+            stubHttpRequest.onload();
         });
         
         it("should reject promise when http response is error", function(done) {
@@ -90,13 +90,12 @@ describe("JsonService", function() {
                 done();
             });
             
-            fakeHttpRequest.onerror();
+            stubHttpRequest.onerror();
         });
     });
 });
 
-
-class FakeXMLHttpRequest {
+class StubXMLHttpRequest {
     constructor(sendCallback) {
         this.headers = new Map();
     }
@@ -114,9 +113,9 @@ class FakeXMLHttpRequest {
     }
 }
 
-class FakeXMLHttpRequestFactory {
+class StubXMLHttpRequestFactory {
     constructor(request){
-        this.request = request || new FakeXMLHttpRequest();
+        this.request = request || new StubXMLHttpRequest();
     }
     
     create() {
