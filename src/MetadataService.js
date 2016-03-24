@@ -19,11 +19,11 @@ export default class MetadataService {
             return Promise.resolve(this._settings.metadata);
         }
         
-        if (!this._settings.authority) {
-            Promise.reject(new Error("No authority configured"));
+        if (!this._settings.metadataUrl) {
+            return Promise.reject(new Error("No metadataUrl configured"));
         }
         
-        return this._jsonService.getJson(this._settings.authority)
+        return this._jsonService.getJson(this._settings.metadataUrl)
             .then(metadata => {
                 this._settings.metadata = metadata;
                 return metadata;
