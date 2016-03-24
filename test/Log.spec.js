@@ -23,7 +23,6 @@ describe("Log", function() {
             
             Log.setLogger(fake);
             Log.enabled = false;
-            console.log(Log.enabled);
             Log.info("test info");
             
             fake.infoWasCalled.should.be.false;
