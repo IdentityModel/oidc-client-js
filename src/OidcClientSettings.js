@@ -3,12 +3,14 @@ const OidcMetadataUrlPath = '.well-known/openid-configuration';
 export default class OidcClientSettings {
     constructor(settings) {
         if (!settings) {
+            Log.error("No settings passed to OidcClientSettings");
             throw new Error("settings");
         }
 
         this._authority = settings.authority;
         this._metadataUrl = settings.metadataUrl; 
         this._metadata = settings.metadata;
+        this._signingKeys = settings.signingKeys;
     }
     
     get authority() {
@@ -35,6 +37,13 @@ export default class OidcClientSettings {
     }
     set metadata(value){
         this._metadata = value;
+    }
+    
+    get signingKeys() {
+        return this._signingKeys;
+    }
+    set signingKeys(value){
+        this._signingKeys = value;
     }
 
     // get isOidc() {

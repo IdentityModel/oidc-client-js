@@ -67,4 +67,21 @@ describe("OidcClientSettings", function() {
         });
         
     });
+    
+    describe("signingKeys", function() {
+        it("should return value from initial settings", function(){
+            let subject = new OidcClientSettings({
+                signingKeys:"test"
+            });
+            subject.signingKeys.should.equal("test");
+        });
+        
+        it("should store value", function(){
+            let subject = new OidcClientSettings({
+            });
+            subject.signingKeys = "test";
+            subject.signingKeys.should.equal("test");
+        });
+        
+    });
 });
