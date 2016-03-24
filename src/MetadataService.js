@@ -37,7 +37,25 @@ export default class MetadataService {
                 throw new Error("Failed to load metadata");
             });
     }
+    
+    getAuthorizationUrl(){
+        Log.info("MetadataService.getAuthorizationUrl");
+        
+        return this.getMetadata().then(metadata => {
+            Log.info("metadata recieved");
 
+            if (!metadata.authorization_endpoint) {
+                Log.error("Metadata does not contain authorization_endpoint");
+                throw new Error("Metadata does not contain authorization_endpoint");
+            }
+            
+            return metadata.authorization_endpoint;
+        }, err => {
+            Log.error("Failed to load authorization url", err);
+            throw new Error("Failed to load authorization url")
+        });
+    }
+    
     getSigningKeys() {
         Log.info("MetadataService.getSigningKeys");
 
@@ -56,62 +74,20 @@ export default class MetadataService {
             
             Log.info("getting keys from", metadata.jwks_uri);
 
-            return this._jsonService.getJson(metadata.jwks_uri).then(keys => {
-                Log.info("Keys received", keys);
-                this._settings.signingKeys = keys;
-                return keys;
+            return this._jsonService.getJson(metadata.jwks_uri).then(keySet => {
+                Log.info("key set received", keySet);
+                
+                if (!keySet.keys){
+                    Log.error("Missing keys on keyset");
+                    throw new Error("Missing keys on keyset");
+                }
+                
+                this._settings.signingKeys = keySet.keys;
+                return this._settings.signingKeys;
             });
         }, err => {
             Log.error("Failed to load signing keys", err);
             throw new Error("Failed to load signing keys");
         });
     }
-
-    // getKeys() {
-    //     log("OidcClient.loadX509SigningKeyAsync");
-
-    //     var settings = this._settings;
-
-    //     function getKeyAsync(jwks) {
-    //         if (!jwks.keys || !jwks.keys.length) {
-    //             return error("Signing keys empty");
-    //         }
-
-    //         var key = jwks.keys[0];
-    //         if (key.kty !== "RSA") {
-    //             return error("Signing key not RSA");
-    //         }
-
-    //         if (!key.x5c || !key.x5c.length) {
-    //             return error("RSA keys empty");
-    //         }
-
-    //         return resolve(key.x5c[0]);
-    //     }
-
-    //     if (settings.jwks) {
-    //         return getKeyAsync(settings.jwks);
-    //     }
-
-
-
-    // getAuthorizationEndpoint() {
-    //     log("OidcClient.loadAuthorizationEndpoint");
-
-    //     if (this._settings.authorization_endpoint) {
-    //         return resolve(this._settings.authorization_endpoint);
-    //     }
-
-    //     if (!this._settings.authority) {
-    //         return error("No authorization_endpoint configured");
-    //     }
-
-    //     return this.loadMetadataAsync().then(function (metadata) {
-    //         if (!metadata.authorization_endpoint) {
-    //             return error("Metadata does not contain authorization_endpoint");
-    //         }
-
-    //         return metadata.authorization_endpoint;
-    //     });
-    // };
 }

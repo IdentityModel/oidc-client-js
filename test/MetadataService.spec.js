@@ -101,7 +101,7 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
         it("should fail if json call fails", function(done) {
             settings.metadataUrl = "http://sts/metadata";
             stubJsonService.result = Promise.reject("test");
@@ -115,78 +115,138 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
+    describe("getAuthorizationUrl", function() {
+
+        it("should return a promise", function() {
+            subject.getAuthorizationUrl().should.be.instanceof(Promise);
+        });
+
+        it("should use metadata on settings", function(done) {
+            settings.metadata = {
+                authorization_endpoint: "http://sts/authorize"
+            };
+
+            let p = subject.getAuthorizationUrl();
+
+            p.then(result => {
+                result.should.equal("http://sts/authorize");
+                done();
+            });
+        });
+
+        it("should fail if no authorization_endpoint on metadata", function(done) {
+            settings.metadata = {
+            };
+
+            let p = subject.getAuthorizationUrl();
+
+            p.then(null, err => {
+                err.message.should.contain("authorization_endpoint");
+                done();
+            });
+        });
+        
+         it("should fail if json call to load metadata fails", function(done) {
+            settings.metadata = {
+                metadataUrl:"http://sts/metadata"
+            };
+            stubJsonService.result = Promise.reject("test");
+
+            let p = subject.getAuthorizationUrl();
+
+            p.then(null, err => {
+                err.message.should.contain("authorization");
+                done();
+            });
+        });
+        
+    });
+
     describe("getSigningKeys", function() {
 
         it("should return a promise", function() {
             subject.getSigningKeys().should.be.instanceof(Promise);
         });
-        
+
         it("should use signingKeys on settings", function(done) {
             settings.signingKeys = "test";
-            
+
             let p = subject.getSigningKeys();
-            
+
             p.then(result => {
-               result.should.equal("test");
-               done(); 
+                result.should.equal("test");
+                done();
             });
         });
-        
+
         it("should fail if metadata does not have jwks_uri", function(done) {
             settings.metadata = "test";
-            
+
             let p = subject.getSigningKeys();
-            
+
             p.then(null, err => {
                 err.message.should.contain('jwks_uri');
                 done();
             });
         });
-        
+
+        it("should fail if keys missing on keyset from jwks_uri", function(done) {
+            settings.metadata = {
+                jwks_uri: "http://sts/metadata/keys"
+            };
+            stubJsonService.result = Promise.resolve({});
+
+            let p = subject.getSigningKeys();
+
+            p.then(null, err => {
+                err.message.should.contain("keyset");
+                done();
+            })
+        });
+
         it("should make json call to jwks_uri", function(done) {
             settings.metadata = {
-                jwks_uri:"http://sts/metadata/keys"
+                jwks_uri: "http://sts/metadata/keys"
             };
-            stubJsonService.result = Promise.resolve("test");
-            
+            stubJsonService.result = Promise.resolve({keys:"test"});
+
             let p = subject.getSigningKeys();
-            
+
             p.then(result => {
                 stubJsonService.url.should.equal("http://sts/metadata/keys");
                 done();
             });
         });
-        
+
         it("should return keys from jwks_uri", function(done) {
             settings.metadata = {
-                jwks_uri:"http://sts/metadata/keys"
+                jwks_uri: "http://sts/metadata/keys"
             };
-            stubJsonService.result = Promise.resolve("test");
-            
+            stubJsonService.result = Promise.resolve({keys:"test"});
+
             let p = subject.getSigningKeys();
-            
+
             p.then(keys => {
                 keys.should.equal("test");
                 done();
             });
         });
-        
+
         it("should cache keys in settings", function(done) {
             settings.metadata = {
-                jwks_uri:"http://sts/metadata/keys"
+                jwks_uri: "http://sts/metadata/keys"
             };
-            stubJsonService.result = Promise.resolve("test");
-            
+            stubJsonService.result = Promise.resolve({keys:"test"});
+
             let p = subject.getSigningKeys();
-            
+
             p.then(keys => {
                 settings.signingKeys.should.equal("test");
                 done();
             })
         });
-        
-        
+
     });
 });
 
