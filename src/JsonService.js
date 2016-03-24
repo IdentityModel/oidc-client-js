@@ -1,9 +1,9 @@
 import Log from './Log';
-import XMLHttpRequestFactory from './XMLHttpRequestFactory';
+import Window from './Window';
 
 export default class JsonService {
-    constructor(httpRequestFactory = XMLHttpRequestFactory) {
-        this._httpRequestFactory = httpRequestFactory;
+    constructor(XMLHttpRequestCtor = Window.XMLHttpRequest) {
+        this._XMLHttpRequest = XMLHttpRequestCtor;
     }
     
     getJson(url, token) {
@@ -15,7 +15,7 @@ export default class JsonService {
         
         return new Promise((resolve, reject) => {
             
-            var req = this._httpRequestFactory.create();
+            var req = new this._XMLHttpRequest();
 
             Log.info("getJson from url", url);
             req.open('GET', url);

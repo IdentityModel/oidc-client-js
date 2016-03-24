@@ -1,6 +1,8 @@
 import Log from '../src/Log';
 import MetadataService from '../src/MetadataService';
 
+import StubJsonService from './StubJsonService';
+
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
@@ -13,7 +15,7 @@ describe("MetadataService", function() {
     beforeEach(function() {
         settings = {};
         stubJsonService = new StubJsonService();
-        subject = new MetadataService(settings, stubJsonService);
+        subject = new MetadataService(settings, ()=>stubJsonService);
     });
 
     describe("constructor", function() {
@@ -163,6 +165,53 @@ describe("MetadataService", function() {
         
     });
 
+    describe("getUserInfoUrl", function() {
+
+        it("should return a promise", function() {
+            subject.getUserInfoUrl().should.be.instanceof(Promise);
+        });
+
+        it("should use metadata on settings", function(done) {
+            settings.metadata = {
+                userinfo_endpoint: "http://sts/userinfo"
+            };
+
+            let p = subject.getUserInfoUrl();
+
+            p.then(result => {
+                result.should.equal("http://sts/userinfo");
+                done();
+            });
+        });
+
+        it("should fail if no userinfo_endpoint on metadata", function(done) {
+            settings.metadata = {
+            };
+
+            let p = subject.getUserInfoUrl();
+
+            p.then(null, err => {
+                err.message.should.contain("userinfo_endpoint");
+                done();
+            });
+        });
+        
+         it("should fail if json call to load metadata fails", function(done) {
+            settings.metadata = {
+                metadataUrl:"http://sts/metadata"
+            };
+            stubJsonService.result = Promise.reject("test");
+
+            let p = subject.getUserInfoUrl();
+
+            p.then(null, err => {
+                err.message.should.contain("userinfo");
+                done();
+            });
+        });
+        
+    });
+    
     describe("getSigningKeys", function() {
 
         it("should return a promise", function() {
@@ -249,10 +298,3 @@ describe("MetadataService", function() {
 
     });
 });
-
-class StubJsonService {
-    getJson(url) {
-        this.url = url;
-        return this.result;
-    }
-}

@@ -2,14 +2,14 @@ import JsonService from './JsonService';
 import Log from './Log';
 
 export default class MetadataService {
-    constructor(settings, jsonService = new JsonService()) {
+    constructor(settings, JsonServiceCtor = JsonService) {
         if (!settings) {
             Log.error("No settings passed to MetadataService");
             throw new Error("settings");
         }
 
         this._settings = settings;
-        this._jsonService = jsonService;
+        this._jsonService = new JsonServiceCtor();
     }
 
     getMetadata() {
@@ -53,6 +53,24 @@ export default class MetadataService {
         }, err => {
             Log.error("Failed to load authorization url", err);
             throw new Error("Failed to load authorization url")
+        });
+    }
+    
+    getUserInfoUrl(){
+        Log.info("MetadataService.getUserInfoUrl");
+        
+        return this.getMetadata().then(metadata => {
+            Log.info("metadata recieved");
+
+            if (!metadata.userinfo_endpoint) {
+                Log.error("Metadata does not contain userinfo_endpoint");
+                throw new Error("Metadata does not contain userinfo_endpoint");
+            }
+            
+            return metadata.userinfo_endpoint;
+        }, err => {
+            Log.error("Failed to load userinfo url", err);
+            throw new Error("Failed to load userinfo url")
         });
     }
     

@@ -8,7 +8,7 @@ export default class Window {
     static get sessionStorage() {
         return window.sessionStorage;
     }
-    static get XMLHttpRequest(){
+    static XMLHttpRequest(){
         return window.XMLHttpRequest;
     }
 };

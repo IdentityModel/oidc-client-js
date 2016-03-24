@@ -7,13 +7,11 @@ let assert = chai.assert;
 describe("JsonService", function() {
     let subject;
     
-    let stubXMLHttpRequestFactory;
     let stubHttpRequest;
     
     beforeEach(function(){
-        stubXMLHttpRequestFactory = new StubXMLHttpRequestFactory();
-        stubHttpRequest = stubXMLHttpRequestFactory.request;
-        subject = new JsonService(stubXMLHttpRequestFactory); 
+        stubHttpRequest = new StubXMLHttpRequest();
+        subject = new JsonService(()=>stubHttpRequest); 
     });
     
     describe("getJson", function() {
@@ -96,7 +94,7 @@ describe("JsonService", function() {
 });
 
 class StubXMLHttpRequest {
-    constructor(sendCallback) {
+    constructor() {
         this.headers = new Map();
     }
     
@@ -110,15 +108,5 @@ class StubXMLHttpRequest {
     }
     
     send() {
-    }
-}
-
-class StubXMLHttpRequestFactory {
-    constructor(request){
-        this.request = request || new StubXMLHttpRequest();
-    }
-    
-    create() {
-        return this.request;
     }
 }
