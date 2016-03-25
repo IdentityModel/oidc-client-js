@@ -13,16 +13,6 @@ describe("OidcClientSettings", function() {
     });
 
     describe("constructor", function() {
-        it("should require a settings param", function() {
-            try {
-                new OidcClientSettings();
-            }
-            catch (e) {
-                e.message.should.contain('settings');
-                return;
-            }
-            assert.fail();
-        });
 
         it("should require client_id on settings", function() {
             try {

@@ -5,36 +5,32 @@ const DefaultResponseType = "id_token";
 const DefaultScope = "openid";
 
 export default class OidcClientSettings {
-    constructor(settings) {
-        if (!settings) {
-            Log.error("No settings passed to OidcClientSettings");
-            throw new Error("settings");
-        }
-        if (!settings.client_id) {
+    constructor({
+        // metadata related
+        authority, metadataUrl, metadata, signingKeys, 
+        // client related
+        client_id, response_type = DefaultResponseType, scope = DefaultScope, 
+        redirect_uri, post_logout_redirect_uri,
+        // behavior flags
+        filterProtocolClaims = true
+    }) {
+        if (!client_id) {
             Log.error("No client_id on settings passed to OidcClientSettings");
             throw new Error("client_id");
         }
 
-        // metadata related
-        this._authority = settings.authority;
-        this._metadataUrl = settings.metadataUrl;
-        this._metadata = settings.metadata;
-        this._signingKeys = settings.signingKeys;
+        this._authority = authority;
+        this._metadataUrl = metadataUrl;
+        this._metadata = metadata;
+        this._signingKeys = signingKeys;
 
-        // client related
-        this._client_id = settings.client_id;
-        this._response_type = settings.response_type || DefaultResponseType;
-        this._scope = settings.scope || DefaultScope;
-        this._redirect_uri = settings.redirect_uri;
-        this._post_logout_redirect_uri = settings.post_logout_redirect_uri;
+        this._client_id = client_id;
+        this._response_type = response_type;
+        this._scope = scope;
+        this._redirect_uri = redirect_uri;
+        this._post_logout_redirect_uri = post_logout_redirect_uri;
 
-        // behavior flags
-        if (settings.filterProtocolClaims === undefined) {
-            this._filterProtocolClaims = true;
-        }
-        else {
-            this._filterProtocolClaims = !!settings.filterProtocolClaims;
-        }
+        this._filterProtocolClaims = !!filterProtocolClaims;
     }
 
     // config values
