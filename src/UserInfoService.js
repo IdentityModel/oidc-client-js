@@ -2,7 +2,7 @@ import JsonService from './JsonService';
 import MetadataService from './MetadataService';
 import Log from './Log';
 
-const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss"];
+const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "c_hash"];
 
 export default class UserInfoService {
     constructor(settings, JsonServiceCtor = JsonService, MetadataServiceCtor = MetadataService) {

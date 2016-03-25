@@ -105,4 +105,13 @@ describe("OidcClientSettings", function() {
             subject.filterProtocolClaims.should.equal(false);
         });
     });
+    
+    describe("post_logout_redirect_uri", function() {
+        it("should return value from initial settings", function(){
+            let subject = new OidcClientSettings({
+                post_logout_redirect_uri:"http://app/loggedout"
+            });
+            subject.post_logout_redirect_uri.should.equal("http://app/loggedout");
+        });
+    });
 });

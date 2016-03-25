@@ -27,10 +27,22 @@ export default class OidcClientService {
         Log.info("processSigninResponse");
     }
     
-    createSignoutRequest(request){
+    createSignoutRequest({id_token_hint, state, post_logout_redirect_uri}){
         Log.info("createSignoutRequest");
         
+        post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
         
+        return this._metadataService.getEndSessionEndpoint(url => {
+            Log.info("Received end session endpoint", url);
+            
+            return new SignoutRequest(url, {
+                id_token_hint,
+                post_logout_redirect_uri,
+                state});
+        }, err => {
+            Log.error("Failed to create signout request", err);
+            throw new Error("Failed to create signout request");
+        });
     }
     
 //     OidcClient.prototype.createTokenRequestAsync = function () {

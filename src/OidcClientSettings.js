@@ -12,6 +12,8 @@ export default class OidcClientSettings {
         this._metadata = settings.metadata;
         this._signingKeys = settings.signingKeys;
         
+        this._post_logout_redirect_uri = settings.post_logout_redirect_uri;
+        
         if (settings.filterProtocolClaims === undefined){
             this._filterProtocolClaims = true;
         }
@@ -55,5 +57,8 @@ export default class OidcClientSettings {
     
     get filterProtocolClaims(){
         return this._filterProtocolClaims;
+    }
+    get post_logout_redirect_uri(){
+        return this._post_logout_redirect_uri;
     }
 }
