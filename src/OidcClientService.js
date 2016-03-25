@@ -3,15 +3,22 @@ import OidcClientSettings from './OidcClientSettings';
 import MetadataService from './MetadataService';
 import SigninRequest from './SigninRequest';
 import SignoutRequest from './SignoutRequest';
+import WebStorageStateStore from './WebStorageStateStore';
+
+// const OidcOptionalParams = ["prompt", "display", "max_age", "ui_locales", "id_token_hint", "login_hint", "acr_values"];
 
 export default class OidcClientService {
-    constructor(settings, MetadataServiceCtor = MetadataService) {
+    constructor(settings, 
+        stateStore = new WebStorageStateStore(), 
+        MetadataServiceCtor = MetadataService
+    ){
         if (!settings) {
             Log.error("No settings passed to OidcClientService");
             throw new Error("settings");
         }
         
         this._settings = new OidcClientSettings(settings);
+        this._stateStore = stateStore;
         this._metadataService = new MetadataServiceCtor(this._settings);
     }
     
@@ -26,7 +33,7 @@ export default class OidcClientService {
         response_type = response_type || this._settings.response_type;
         scope = scope || this._settings.scope;
         redirect_uri = redirect_uri || this._settings.redirect_uri;
-        
+
         return this._metadataService.getAuthorizationEndpoint().then(url => {
             Log.info("Received authorization endpoint", url);
             
@@ -35,7 +42,8 @@ export default class OidcClientService {
                 redirect_uri,
                 response_type,
                 scope,
-                data});
+                data
+            });
         }, err => {
             Log.error("Failed to create signin request", err);
             throw new Error("Failed to create signin request");
@@ -44,8 +52,6 @@ export default class OidcClientService {
     
     processSigninResponse(stateString){
         Log.info("OidcClientService.processSigninResponse");
-        
-        
     }
     
     createSignoutRequest({id_token_hint, data, post_logout_redirect_uri}={}){
@@ -59,7 +65,8 @@ export default class OidcClientService {
             return new SignoutRequest({url,
                 id_token_hint,
                 post_logout_redirect_uri,
-                data});
+                data
+            });
         }, err => {
             Log.error("Failed to create signout request", err);
             throw new Error("Failed to create signout request");

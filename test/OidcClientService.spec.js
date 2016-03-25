@@ -2,6 +2,8 @@ import OidcClientService from '../src/OidcClientService';
 import SigninRequest from '../src/SigninRequest';
 import SignoutRequest from '../src/SignoutRequest';
 import Log from '../src/Log';
+import WebStorageStateStore from '../src/WebStorageStateStore';
+import InMemoryWebStorage from '../src/InMemoryWebStorage';
 
 import StubMetadataService from './StubMetadataService';
 
@@ -13,23 +15,26 @@ describe("OidcClientService", function() {
     let settings;
     let subject;
     let stubMetadataService;
+    let store;
 
     beforeEach(function() {
         Log.setLogger(console);
         Log.level = Log.NONE;
+        
+        store = new WebStorageStateStore(new InMemoryWebStorage());
 
         settings = {
             client_id: 'client',
             redirect_uri: "http://app"
         };
         stubMetadataService = new StubMetadataService();
-        subject = new OidcClientService(settings, () => stubMetadataService);
+        subject = new OidcClientService(settings, store, () => stubMetadataService);
     });
 
     describe("constructor", function() {
         it("should require a settings param", function() {
             try {
-                new OidcClientService();
+                new OidcClientService(undefined, store, stubMetadataService);
             }
             catch (e) {
                 e.message.should.contain('settings');

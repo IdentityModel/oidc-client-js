@@ -34,6 +34,7 @@ describe("SigninRequest", function() {
             }
             assert.fail();
         });
+        
         it("should require a client_id param", function() {
             try {
                 delete settings.client_id;
@@ -45,6 +46,7 @@ describe("SigninRequest", function() {
             }
             assert.fail();
         });
+        
         it("should require a redirect_uri param", function() {
             try {
                 delete settings.redirect_uri;
@@ -56,6 +58,7 @@ describe("SigninRequest", function() {
             }
             assert.fail();
         });
+        
         it("should require a response_type param", function() {
             try {
                 delete settings.response_type;
@@ -67,6 +70,7 @@ describe("SigninRequest", function() {
             }
             assert.fail();
         });
+        
         it("should require a scope param", function() {
             try {
                 delete settings.scope;
@@ -86,18 +90,23 @@ describe("SigninRequest", function() {
         it("should include url", function() {
             subject.signinUrl.indexOf("http://sts/signin").should.equal(0);
         });
+        
         it("should include client_id", function() {
             subject.signinUrl.should.contain("client_id=client");
         });
+        
         it("should include redirect_uri", function() {
             subject.signinUrl.should.contain("redirect_uri=" + encodeURIComponent("http://app"));
         });
+        
         it("should include response_type", function() {
             subject.signinUrl.should.contain("response_type=id_token");
         });
+        
         it("should include scope", function() {
             subject.signinUrl.should.contain("scope=openid");
         });
+        
         it("should include state", function() {
             subject.signinUrl.should.contain("state=" + subject.state.id);
         });
