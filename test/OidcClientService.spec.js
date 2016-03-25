@@ -32,6 +32,7 @@ describe("OidcClientService", function() {
                 new OidcClientService();
             }
             catch (e) {
+                e.message.should.contain('settings');
                 return;
             }
             assert.fail();

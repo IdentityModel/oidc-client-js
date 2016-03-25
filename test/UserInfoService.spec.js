@@ -28,6 +28,7 @@ describe("UserInfoService", function() {
                 new UserInfoService();
             }
             catch (e) {
+                e.message.should.contain('settings');
                 return;
             }
             assert.fail();

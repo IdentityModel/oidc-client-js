@@ -25,6 +25,7 @@ describe("MetadataService", function() {
                 new MetadataService();
             }
             catch (e) {
+                e.message.should.contain('settings');
                 return;
             }
             assert.fail();
