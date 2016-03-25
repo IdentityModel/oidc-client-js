@@ -33,6 +33,6 @@ export default class SignoutRequest {
     }
     
     get state(){
-        return this._state;
+        return this._state.toClientStorageString();
     }
 }

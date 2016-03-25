@@ -27,12 +27,12 @@ export default class OidcClientService {
         Log.info("processSigninResponse");
     }
     
-    createSignoutRequest({id_token_hint, state, post_logout_redirect_uri}){
+    createSignoutRequest({id_token_hint, state, post_logout_redirect_uri}={}){
         Log.info("createSignoutRequest");
         
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
         
-        return this._metadataService.getEndSessionEndpoint(url => {
+        return this._metadataService.getEndSessionEndpoint().then(url => {
             Log.info("Received end session endpoint", url);
             
             return new SignoutRequest(url, {
@@ -93,24 +93,6 @@ export default class OidcClientService {
 //             request_state: request_state,
 //             url: url
 //         };
-//     });
-// }
-
-// OidcClient.prototype.createLogoutRequestAsync = function (id_token_hint) {
-//     log("OidcClient.createLogoutRequestAsync");
-
-//     var settings = this._settings;
-//     return this.loadMetadataAsync().then(function (metadata) {
-//         if (!metadata.end_session_endpoint) {
-//             return error("No end_session_endpoint in metadata");
-//         }
-
-//         var url = metadata.end_session_endpoint;
-//         if (id_token_hint && settings.post_logout_redirect_uri) {
-//             url += "?post_logout_redirect_uri=" + encodeURIComponent(settings.post_logout_redirect_uri);
-//             url += "&id_token_hint=" + encodeURIComponent(id_token_hint);
-//         }
-//         return url;
 //     });
 // }
 
