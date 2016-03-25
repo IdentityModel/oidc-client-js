@@ -20,6 +20,7 @@ describe("SignoutRequest", function() {
                 new SignoutRequest();
             }
             catch (e) {
+                e.message.should.contain('url');
                 return;
             }
             assert.fail();

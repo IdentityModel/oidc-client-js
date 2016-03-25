@@ -1,3 +1,4 @@
+import Log from './Log';
 import UrlUtility from './UrlUtility';
 import State from './State';
 

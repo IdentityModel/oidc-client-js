@@ -10,6 +10,10 @@ export default class State {
         
         this._crypto = crypto;
     }
+    
+    get id() {
+        return this._data.nonce;
+    }
 
     toUriString(){
         return encodeURIComponent(JSON.stringify(this._data));

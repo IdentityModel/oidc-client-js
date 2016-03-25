@@ -19,8 +19,27 @@ export default class OidcClientService {
         return this._settings;
     }
     
-    createSigninRequest(request) {
+    createSigninRequest({response_type, scope, redirect_uri, state}={}) {
         Log.info("createSigninRequest");
+        
+        let client_id = this._settings.client_id;
+        response_type = response_type || this._settings.response_type;
+        scope = scope || this._settings.scope;
+        redirect_uri = redirect_uri || this._settings.redirect_uri;
+        
+        return this._metadataService.getAuthorizationEndpoint().then(url => {
+            Log.info("Received authorization endpoint", url);
+            
+            return new SigninRequest(url, 
+                client_id,
+                redirect_uri,
+                response_type,
+                scope,
+                state);
+        }, err => {
+            Log.error("Failed to create signin request", err);
+            throw new Error("Failed to create signin request");
+        });
     }
     
     processSigninResponse(){
@@ -43,6 +62,10 @@ export default class OidcClientService {
             Log.error("Failed to create signout request", err);
             throw new Error("Failed to create signout request");
         });
+    }
+    
+    processSignoutResponse(){
+        Log.info("processSignoutResponse");
     }
     
 //     OidcClient.prototype.createTokenRequestAsync = function () {
