@@ -1,55 +1,37 @@
 import Log from './Log';
 import random from './random';
-import Crypto from './Crypto';
 
 export default class State {
-    constructor(state, crypto = Crypto){
-        
-        this._data = {nonce:random()};
-        this._data.state = state;
-        
-        this._crypto = crypto;
+    constructor({id, nonce, data}={}) {
+        this._id = id || random();
+        if (nonce === true){
+            this._nonce = random();
+        }
+        else if (nonce){
+            this._nonce = nonce;
+        }
+        this._data = data;
     }
     
     get id() {
-        return this._data.nonce;
+        return this._id;
+    }
+    get nonce() {
+        return this._nonce;
+    }
+    get data() {
+        return this._data;
     }
 
-    toUriString(){
-        return encodeURIComponent(JSON.stringify(this._data));
-    }
-    
-    toClientStorageString(){
+    toStorageString() {
         return JSON.stringify({
-            hash: this._crypto.hash(this.toUriString()),
-            nonce: this._data.nonce
+            id:this.id,
+            nonce:this.nonce,
+            data:this.data
         });
     }
     
-    static verify(clientStorageString, stateString, crypto = Crypto){
-        Log.info("State.verify");
-        
-        var clientStorage = JSON.parse(clientStorageString);
-        
-        if (clientStorage.hash === crypto.hash(stateString)){
-            Log.info("hash comparison successful");
-            
-            var json = decodeURIComponent(stateString);
-            var data = JSON.parse(json);
-            
-            if (data.nonce === clientStorage.nonce) {
-                Log.info("nonce comparison successful");
-                
-                return data.state || true;
-            }
-            else{
-                Log.warn("nonce comparison failed");
-            }
-        }
-        else {
-            Log.warn("hash comparison failed");
-        }
-        
-        return false;
+    static fromStorageString(storageString){
+        return new State(JSON.parse(storageString));
     }
 }

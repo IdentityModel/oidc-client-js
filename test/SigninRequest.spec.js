@@ -1,28 +1,32 @@
 import Log from '../src/Log';
 import SigninRequest from '../src/SigninRequest';
 
-import StubState from './StubState';
-
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 
 describe("SigninRequest", function() {
-    
-    let stubState = new StubState("state");
-    let StubStateCtor = () => stubState; 
-    
+
     let subject;
-    
-    beforeEach(function(){
-        subject = new SigninRequest("http://sts/signin", "client", "http://app", "id_token", "openid", undefined, StubStateCtor);
+    let settings;
+
+    beforeEach(function() {
+        settings = {url: "http://sts/signin",
+            client_id: "client", 
+            redirect_uri: "http://app", 
+            response_type: "id_token", 
+            scope: "openid", 
+            state: {data: "test"}
+        };
+        subject = new SigninRequest(settings);
     });
 
     describe("constructor", function() {
 
         it("should require a url param", function() {
             try {
-                new SigninRequest(undefined, "client", "http://app", "id_token", "openid");
+                delete settings.url;
+                new SigninRequest(settings);
             }
             catch (e) {
                 e.message.should.contain('url');
@@ -32,7 +36,8 @@ describe("SigninRequest", function() {
         });
         it("should require a client_id param", function() {
             try {
-                new SigninRequest("http://sts/signin", undefined, "http://app", "id_token", "openid");
+                delete settings.client_id;
+                new SigninRequest(settings);
             }
             catch (e) {
                 e.message.should.contain('client_id');
@@ -42,7 +47,8 @@ describe("SigninRequest", function() {
         });
         it("should require a redirect_uri param", function() {
             try {
-                new SigninRequest("http://sts/signin", "client", undefined, "id_token", "openid");
+                delete settings.redirect_uri;
+                new SigninRequest(settings);
             }
             catch (e) {
                 e.message.should.contain('redirect_uri');
@@ -52,7 +58,8 @@ describe("SigninRequest", function() {
         });
         it("should require a response_type param", function() {
             try {
-                new SigninRequest("http://sts/signin", "client", "http://app", undefined, "openid");
+                delete settings.response_type;
+                new SigninRequest(settings);
             }
             catch (e) {
                 e.message.should.contain('response_type');
@@ -62,7 +69,8 @@ describe("SigninRequest", function() {
         });
         it("should require a scope param", function() {
             try {
-                new SigninRequest("http://sts/signin", "client", "http://app", "id_token", undefined);
+                delete settings.scope;
+                new SigninRequest(settings);
             }
             catch (e) {
                 e.message.should.contain('scope');
@@ -72,7 +80,7 @@ describe("SigninRequest", function() {
         });
 
     });
-    
+
     describe("signinUrl", function() {
 
         it("should include url", function() {
@@ -91,9 +99,49 @@ describe("SigninRequest", function() {
             subject.signinUrl.should.contain("scope=openid");
         });
         it("should include state", function() {
-            subject.signinUrl.should.contain("state=state");
+            subject.signinUrl.should.contain("state=" + subject.state.id);
         });
-        
+
+    });
+
+    describe("isOidc", function() {
+        it("should indicate if response_type is oidc", function() {
+            settings.response_type = "id_token";
+            subject = new SigninRequest(settings);
+            subject.isOidc.should.be.true;
+            
+            settings.response_type = "id_token token";
+            subject = new SigninRequest(settings);
+            subject.isOidc.should.be.true;
+            
+            settings.response_type = "token id_token";
+            subject = new SigninRequest(settings);
+            subject.isOidc.should.be.true;
+
+            settings.response_type = "token";
+            subject = new SigninRequest(settings);
+            subject.isOidc.should.be.false;
+        });
+    });
+
+    describe("isOAuth", function() {
+        it("should indicate if response_type is oauth", function() {
+            settings.response_type = "token";
+            subject = new SigninRequest(settings);
+            subject.isOAuth.should.be.true;
+            
+            settings.response_type = "id_token token";
+            subject = new SigninRequest(settings);
+            subject.isOAuth.should.be.true;
+            
+            settings.response_type = "token id_token";
+            subject = new SigninRequest(settings);
+            subject.isOAuth.should.be.true;
+
+            settings.response_type = "id_token";
+            subject = new SigninRequest(settings);
+            subject.isOAuth.should.be.false;
+        });
     });
 
 });

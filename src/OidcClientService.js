@@ -30,12 +30,12 @@ export default class OidcClientService {
         return this._metadataService.getAuthorizationEndpoint().then(url => {
             Log.info("Received authorization endpoint", url);
             
-            return new SigninRequest(url, 
+            return new SigninRequest({url, 
                 client_id,
                 redirect_uri,
                 response_type,
                 scope,
-                state);
+                state});
         }, err => {
             Log.error("Failed to create signin request", err);
             throw new Error("Failed to create signin request");
@@ -56,7 +56,7 @@ export default class OidcClientService {
         return this._metadataService.getEndSessionEndpoint().then(url => {
             Log.info("Received end session endpoint", url);
             
-            return new SignoutRequest(url, {
+            return new SignoutRequest({url,
                 id_token_hint,
                 post_logout_redirect_uri,
                 state});

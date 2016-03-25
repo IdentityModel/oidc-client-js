@@ -5,47 +5,38 @@ import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 
-
 describe("State", function() {
 
-    let stubCrypto;
+    it("can generate id", function() {
+        var subject = new State();
+        subject.id.should.be.ok;
+    });
+    it("can accept nonce", function() {
+        var subject = new State({id:5});
+        subject.id.should.be.equal(5);
+    });
+    it("can generate nonce", function() {
+        var subject = new State({nonce:true});
+        subject.nonce.should.be.ok;
+    });
+    it("can accept nonce", function() {
+        var subject = new State({nonce:5});
+        subject.nonce.should.be.equal(5);
+    });
+    it("can accept data", function() {
+        var subject = new State({data:"test"});
+        subject.data.should.be.equal("test");
+    });
+    it("can accept data as objects", function() {
+        var subject = new State({data:{foo:"test"}});
+        subject.data.should.be.deep.equal({foo:"test"});
+    });
+    it("can serialize and then deserialize", function() {
+        var subject1 = new State({nonce:true,data:{foo:"test"}});
+        
+        var storage = subject1.toStorageString();
+        var subject2 = State.fromStorageString(storage);
 
-    beforeEach(function() {
-        stubCrypto = new StubCrypto();
-        stubCrypto.hashResult = "hash";
-    });
-
-    it("can be verified", function() {
-        var subject = new State("test", stubCrypto);
-        var uriParam = subject.toUriString();
-        var clientStorage = subject.toClientStorageString();
-        
-        State.verify(clientStorage, uriParam, stubCrypto).should.be.ok;
-    });
-    
-    it("should fail if state string is changed", function() {
-        
-        var subject = new State("test", stubCrypto);
-        var uriParam = subject.toUriString();
-        var clientStorage = subject.toClientStorageString();
-        
-        stubCrypto.hashResult = "not hash";
-        
-        State.verify(clientStorage, uriParam, stubCrypto).should.not.be.ok;
-    });
-    
-    it("can store and verify objects", function() {
-        
-        var subject = new State({foo:"test"}, stubCrypto);
-        var uriParam = subject.toUriString();
-        var clientStorage = subject.toClientStorageString();
-        
-        State.verify(clientStorage, uriParam, stubCrypto).should.deep.equal({foo:'test'});
+        subject2.should.be.deep.equal(subject1);
     });
 });
-
-class StubCrypto {
-    hash() {
-        return this.hashResult;
-    }
-}

@@ -69,12 +69,13 @@ describe("OidcClientService", function() {
             });
 
             p.then(request => {
+                request.state.data.should.equal('foo');
+                
                 var url = request.signinUrl;
                 url.should.contain("http://sts/authorize");
-                url.should.contain("foo");
-                url.should.contain("bar");
-                url.should.contain("baz");
-                url.should.contain("quux");
+                url.should.contain("response_type=bar");
+                url.should.contain("scope=baz");
+                url.should.contain("redirect_uri=quux");
                 done();
             });
         });
@@ -120,11 +121,11 @@ describe("OidcClientService", function() {
             });
 
             p.then(request => {
+                request.state.data.should.equal('foo');
                 var url = request.signoutUrl;
                 url.should.contain("http://sts/signout");
-                url.should.contain("foo");
-                url.should.contain("bar");
-                url.should.contain("baz");
+                url.should.contain("post_logout_redirect_uri=bar");
+                url.should.contain("id_token_hint=baz");
                 done();
             });
         });
