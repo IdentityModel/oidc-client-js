@@ -16,7 +16,7 @@ describe("SigninRequest", function() {
             redirect_uri: "http://app", 
             response_type: "id_token", 
             scope: "openid", 
-            state: {data: "test"}
+            data: {data: "test"}
         };
         subject = new SigninRequest(settings);
     });

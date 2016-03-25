@@ -19,7 +19,7 @@ export default class OidcClientService {
         return this._settings;
     }
     
-    createSigninRequest({response_type, scope, redirect_uri, state}={}) {
+    createSigninRequest({response_type, scope, redirect_uri, data}={}) {
         Log.info("OidcClientService.createSigninRequest");
         
         let client_id = this._settings.client_id;
@@ -35,7 +35,7 @@ export default class OidcClientService {
                 redirect_uri,
                 response_type,
                 scope,
-                state});
+                data});
         }, err => {
             Log.error("Failed to create signin request", err);
             throw new Error("Failed to create signin request");
@@ -48,7 +48,7 @@ export default class OidcClientService {
         
     }
     
-    createSignoutRequest({id_token_hint, state, post_logout_redirect_uri}={}){
+    createSignoutRequest({id_token_hint, data, post_logout_redirect_uri}={}){
         Log.info("OidcClientService.createSignoutRequest");
         
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
@@ -59,7 +59,7 @@ export default class OidcClientService {
             return new SignoutRequest({url,
                 id_token_hint,
                 post_logout_redirect_uri,
-                state});
+                data});
         }, err => {
             Log.error("Failed to create signout request", err);
             throw new Error("Failed to create signout request");

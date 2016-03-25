@@ -62,7 +62,7 @@ describe("OidcClientService", function() {
             stubMetadataService.getAuthorizationEndpointResult = Promise.resolve("http://sts/authorize");
 
             var p = subject.createSigninRequest({
-                state: 'foo',
+                data: 'foo',
                 response_type: 'bar',
                 scope: 'baz',
                 redirect_uri: 'quux'
@@ -115,7 +115,7 @@ describe("OidcClientService", function() {
             stubMetadataService.getEndSessionEndpointResult = Promise.resolve("http://sts/signout");
 
             var p = subject.createSignoutRequest({
-                state: 'foo',
+                data: 'foo',
                 post_logout_redirect_uri: "bar",
                 id_token_hint: "baz"
             });

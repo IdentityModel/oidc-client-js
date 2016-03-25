@@ -3,7 +3,7 @@ import UrlUtility from './UrlUtility';
 import State from './State';
 
 export default class SignoutRequest {
-    constructor({url, id_token_hint, post_logout_redirect_uri, state}) {
+    constructor({url, id_token_hint, post_logout_redirect_uri, data}) {
         if (!url) {
             Log.error("No url passed to SignoutRequest");
             throw new Error("url");
@@ -13,7 +13,7 @@ export default class SignoutRequest {
         this._id_token_hint = id_token_hint;
         this._post_logout_redirect_uri = post_logout_redirect_uri;
 
-        this._state = new State({data:state});
+        this._state = new State({data});
     }
 
     get state(){

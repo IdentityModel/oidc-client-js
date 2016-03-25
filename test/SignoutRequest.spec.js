@@ -15,7 +15,7 @@ describe("SignoutRequest", function() {
             url: "http://sts/signout",
             id_token_hint: "hint",
             post_logout_redirect_uri: "loggedout",
-            state: { data: "test" }
+            data: { data: "test" }
         };
         subject = new SignoutRequest(settings);
     });

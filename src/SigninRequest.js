@@ -3,7 +3,7 @@ import UrlUtility from './UrlUtility';
 import State from './State';
 
 export default class SigninRequest {
-    constructor({url, client_id, redirect_uri, response_type, scope, state}) {
+    constructor({url, client_id, redirect_uri, response_type, scope, data}) {
         
         if (!url){
             Log.error("No url passed to SigninRequest");
@@ -31,7 +31,7 @@ export default class SigninRequest {
         this._redirect_uri = redirect_uri;
         this._response_type = response_type;
         this._scope = scope;
-        this._state = new State({nonce:this.isOidc, data:state});
+        this._state = new State({nonce:this.isOidc, data});
     }
     
     get state(){
