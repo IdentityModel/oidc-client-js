@@ -48,6 +48,6 @@ export default class SigninRequest {
     }
     
     get state(){
-        return this._state.toClientStorageString();
+        return this._state;
     }
 }
