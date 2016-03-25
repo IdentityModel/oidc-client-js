@@ -20,7 +20,7 @@ export default class OidcClientService {
     }
     
     createSigninRequest({response_type, scope, redirect_uri, state}={}) {
-        Log.info("createSigninRequest");
+        Log.info("OidcClientService.createSigninRequest");
         
         let client_id = this._settings.client_id;
         response_type = response_type || this._settings.response_type;
@@ -42,12 +42,14 @@ export default class OidcClientService {
         });
     }
     
-    processSigninResponse(){
-        Log.info("processSigninResponse");
+    processSigninResponse(stateString){
+        Log.info("OidcClientService.processSigninResponse");
+        
+        
     }
     
     createSignoutRequest({id_token_hint, state, post_logout_redirect_uri}={}){
-        Log.info("createSignoutRequest");
+        Log.info("OidcClientService.createSignoutRequest");
         
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
         
@@ -64,8 +66,8 @@ export default class OidcClientService {
         });
     }
     
-    processSignoutResponse(){
-        Log.info("processSignoutResponse");
+    processSignoutResponse(stateString){
+        Log.info("OidcClientService.processSignoutResponse");
     }
     
 //     OidcClient.prototype.createTokenRequestAsync = function () {

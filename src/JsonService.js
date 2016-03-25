@@ -7,17 +7,16 @@ export default class JsonService {
     }
     
     getJson(url, token) {
+        Log.info("JsonService.getJson", url);
         
         if (!url){
-            Log.error("No url passed to getJson");
+            Log.error("No url passed");
             throw new Error("url");
         }
         
         return new Promise((resolve, reject) => {
             
             var req = new this._XMLHttpRequest();
-
-            Log.info("getJson from url", url);
             req.open('GET', url);
 
             req.onload = function() {
@@ -27,18 +26,17 @@ export default class JsonService {
                     resolve(JSON.parse(req.response));
                 }
                 else {
-                    Log.error("getJson request failed");
                     reject(Error(req.statusText + " (" + req.status + ")"));
                 }
             };
 
             req.onerror = function() {
-                Log.error("getJson failed with network error");
+                Log.error("network error");
                 reject(Error("Network Error"));
             };
             
             if (token) {
-                Log.error("token passed, setting Authorization header");
+                Log.info("token passed, setting Authorization header");
                 req.setRequestHeader("Authorization", "Bearer " + token);
             }
 
