@@ -12,19 +12,20 @@ describe("ResponseValidator", function() {
     let subject;
     let stubMetadataService;
     let stubUserInfoService;
-    
-    let state;
-    let response;
+
+    let stubState;
+    let stubResponse;
 
     beforeEach(function() {
         Log.setLogger(console);
         Log.level = Log.NONE;
-        
-        state = {
-            id:"state"
+
+        stubState = {
+            id: "the_id",
+            data: { some: 'data' }
         };
-        response = {
-          state:'state'  
+        stubResponse = {
+            state: 'the_id'
         };
 
         settings = {};
@@ -52,24 +53,48 @@ describe("ResponseValidator", function() {
 
         it("should validate that the client state matches response state", function() {
 
-            subject.validateSigninResponse({ id: 1 }, { state: 2 }).then(null, err => {
+            stubResponse.state = "not_the_id";
+            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('match');
                 done();
             });
 
         });
-        
+
         it("should return error response", function(done) {
-            
-            response.error = "test";
-            subject.validateSigninResponse(state, response).then(null, err=>{
-                response.error.should.equal("test");
+
+            stubResponse.error = "some_error";
+            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
+                err.error.should.equal("some_error");
                 done();
             });
 
         });
-        
+
+        it("should return data even for error responses", function(done) {
+
+            stubResponse.error = "some_error";
+            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
+                err.state.should.deep.equal({ some: 'data' });
+                done();
+            });
+
+        });
+
+        it("should fail if request was OIDC but no id_token in response", function(done) {
+
+            stubState.nonce = "some_nonce";
+            delete stubResponse.id_token;
+            
+            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
+                err.message.should.contain("id_token");
+                done();
+            });
+
+        });
+
     });
+
 });
 
 // it("should filter protocol claims", function(done) {
