@@ -14,7 +14,8 @@ export default class OidcClientSettings {
         // optional protocol
         prompt, display, max_age, ui_locales, acr_values,
         // behavior flags
-        filterProtocolClaims = true
+        filterProtocolClaims = true, loadUserInfo = true
+        
     }) {
         if (!client_id) {
             Log.error("No client_id on settings passed to OidcClientSettings");
@@ -39,10 +40,10 @@ export default class OidcClientSettings {
         this._acr_values = acr_values;
 
         this._filterProtocolClaims = !!filterProtocolClaims;
+        this._loadUserInfo = !!loadUserInfo;
     }
 
-    // config values
-    // client
+    // client config
     get client_id() {
         return this._client_id;
     }
@@ -58,6 +59,7 @@ export default class OidcClientSettings {
     get post_logout_redirect_uri() {
         return this._post_logout_redirect_uri;
     }
+    
     
     // optional protocol params
     get prompt(){
@@ -75,6 +77,7 @@ export default class OidcClientSettings {
     get acr_values(){
         return this._acr_values;
     }
+    
     
     // metadata
     get authority() {
@@ -95,12 +98,7 @@ export default class OidcClientSettings {
         return this._metadataUrl;
     }
     
-    // behavior
-    get filterProtocolClaims() {
-        return this._filterProtocolClaims;
-    }
-    
-    // settable/cachable values
+    // settable/cachable metadata values
     get metadata() {
         return this._metadata;
     }
@@ -113,5 +111,14 @@ export default class OidcClientSettings {
     }
     set signingKeys(value) {
         this._signingKeys = value;
+    }
+    
+    
+    // behavior flags
+    get filterProtocolClaims() {
+        return this._filterProtocolClaims;
+    }
+    get loadUserInfo() {
+        return this._loadUserInfo;
     }
 }

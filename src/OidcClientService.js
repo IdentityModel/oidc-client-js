@@ -2,12 +2,15 @@ import Log from './Log';
 import OidcClientSettings from './OidcClientSettings';
 import MetadataService from './MetadataService';
 import SigninRequest from './SigninRequest';
+import SigninResponse from './SigninResponse';
 import SignoutRequest from './SignoutRequest';
 import WebStorageStateStore from './WebStorageStateStore';
+import ResponseValidator from './ResponseValidator';
 
 export default class OidcClientService {
     constructor(settings, 
         stateStore = new WebStorageStateStore(), 
+        ResponseValidatorCtor = ResponseValidator,
         MetadataServiceCtor = MetadataService
     ){
         if (!settings) {
@@ -17,6 +20,7 @@ export default class OidcClientService {
         
         this._settings = new OidcClientSettings(settings);
         this._stateStore = stateStore;
+        this._validator = new ResponseValidatorCtor(this._settings);
         this._metadataService = new MetadataServiceCtor(this._settings);
     }
     
@@ -67,6 +71,28 @@ export default class OidcClientService {
     
     processSigninResponse(url){
         Log.info("OidcClientService.processSigninResponse");
+        
+        var response = new SigninResponse(url);
+        if (!response.state) {
+            Log.error("No state in response");
+            return Promise.reject(new Error("No state in response"));
+        }
+        
+        var stateKey = response.state;
+        
+        return this._stateStore.remove(stateKey).then(state => {
+            if (!state){
+                Log.error("No matching state found in storage");
+                throw new Error("Failed to process response");
+            }
+            
+            Log.info("Received state from storage; validating response");
+            return this._validator.validateSigninResponse(state, response);
+            
+        }, err => {
+            Log.error("Failed to process response", err);
+            return Promise.reject(new Error("Failed to process response"));
+        });
     }
     
     createSignoutRequest({id_token_hint, data, post_logout_redirect_uri}={}){
@@ -95,6 +121,7 @@ export default class OidcClientService {
     
     processSignoutResponse(url){
         Log.info("OidcClientService.processSignoutResponse");
+        
     }
 
 // OidcClient.prototype.processResponseAsync = function (queryString) {

@@ -98,29 +98,5 @@ describe("UserInfoService", function() {
             });
 
         });
-        
-        it("should filter protocol claims", function(done) {
-            stubMetadataService.userInfoEndpointResult = Promise.resolve("http://sts/userinfo");
-            stubJsonService.result = Promise.resolve({
-                foo: 1, bar: 'test',
-                aud:'some_aud', iss:'issuer', 
-                sub:'123', email:'foo@gmail.com',
-                role:['admin', 'dev'],
-                nonce:'nonce', at_hash:"athash", 
-                iat:5, nbf:10, exp:20
-            });
-            settings.filterProtocolClaims = true;
-
-            subject.getClaims("token").then(claims => {
-                claims.should.deep.equal({
-                    foo: 1, bar: 'test',
-                    sub:'123', email:'foo@gmail.com',
-                    role:['admin', 'dev']
-                });
-                done();
-            });
-
-        });
-
     });
 });

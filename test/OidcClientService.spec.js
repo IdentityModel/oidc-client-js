@@ -1,9 +1,8 @@
 import OidcClientService from '../src/OidcClientService';
 import SigninRequest from '../src/SigninRequest';
+import SigninResponse from '../src/SigninResponse';
 import SignoutRequest from '../src/SignoutRequest';
 import Log from '../src/Log';
-import WebStorageStateStore from '../src/WebStorageStateStore';
-import InMemoryWebStorage from '../src/InMemoryWebStorage';
 
 import StubMetadataService from './StubMetadataService';
 
@@ -15,28 +14,29 @@ describe("OidcClientService", function() {
     let settings;
     let subject;
     let stubMetadataService;
-    let store;
-    let db;
+    let stubStore;
+    let stubValidator;
 
     beforeEach(function() {
         Log.setLogger(console);
         Log.level = Log.NONE;
-        
-        db = new InMemoryWebStorage();
-        store = new WebStorageStateStore(db);
 
         settings = {
             client_id: 'client',
             redirect_uri: "http://app"
         };
+
+        stubStore = new StubStateStore();
+        stubValidator = new StubResponseValidator();
         stubMetadataService = new StubMetadataService();
-        subject = new OidcClientService(settings, store, () => stubMetadataService);
+
+        subject = new OidcClientService(settings, stubStore, () => stubValidator, () => stubMetadataService);
     });
 
     describe("constructor", function() {
         it("should require a settings param", function() {
             try {
-                new OidcClientService(undefined, store, stubMetadataService);
+                new OidcClientService(undefined, stubStore, stubMetadataService);
             }
             catch (e) {
                 e.message.should.contain('settings');
@@ -73,18 +73,18 @@ describe("OidcClientService", function() {
                 response_type: 'bar',
                 scope: 'baz',
                 redirect_uri: 'quux',
-                prompt:'p', 
-                display:'d',
-                max_age:'m', 
-                ui_locales:'u', 
-                id_token_hint:'ith', 
-                login_hint:'lh',
-                acr_values:'av'
+                prompt: 'p',
+                display: 'd',
+                max_age: 'm',
+                ui_locales: 'u',
+                id_token_hint: 'ith',
+                login_hint: 'lh',
+                acr_values: 'av'
             });
 
             p.then(request => {
                 request.state.data.should.equal('foo');
-                
+
                 var url = request.signinUrl;
                 url.should.contain("http://sts/authorize");
                 url.should.contain("response_type=bar");
@@ -97,7 +97,7 @@ describe("OidcClientService", function() {
                 url.should.contain("id_token_hint=ith");
                 url.should.contain("login_hint=lh");
                 url.should.contain("acr_values=av");
-                
+
                 done();
             });
         });
@@ -112,14 +112,56 @@ describe("OidcClientService", function() {
                 done();
             });
         });
-        
+
         it("should store state", function(done) {
             stubMetadataService.getAuthorizationEndpointResult = Promise.resolve("http://sts/authorize");
 
             var p = subject.createSigninRequest();
-            
-            p.then(request=>{
-                db.getItem(request.state.id).should.be.ok;
+
+            p.then(request => {
+                stubStore.item.should.be.ok;
+                done();
+            });
+        });
+
+    });
+
+    describe("processSigninResponse", function() {
+
+        it("should return a promise", function() {
+            subject.processSigninResponse("state=state&error=error").should.be.instanceof(Promise);
+        });
+
+        it("should fail if no state on response", function(done) {
+            stubStore.item = "state";
+            subject.processSigninResponse("error=error").then(null, err => {
+                err.message.should.contain('state');
+                done();
+            });
+        });
+        
+        it("should fail if storage fails", function(done) {
+            stubStore.error = "fail";
+            subject.processSigninResponse("state=state&error=error").then(null, err => {
+                err.message.should.contain('response');
+                done();
+            });
+        });
+
+        it("should call validator", function(done) {
+            stubStore.item = "state";
+            subject.processSigninResponse("state=state&error=error").then(response => {
+                stubValidator.state.should.equal('state');
+                stubValidator.response.should.be.deep.equal(response);
+                done();
+            });
+        });
+        
+        it("should return SigninResponse", function(done) {
+            stubStore.item = "state";
+
+            subject.processSigninResponse("state=state&error=error").then(response => {
+                response.should.be.instanceof(SigninResponse);
                 done();
             });
         });
@@ -173,17 +215,45 @@ describe("OidcClientService", function() {
                 done();
             });
         });
-        
+
         it("should store state", function(done) {
             stubMetadataService.getEndSessionEndpointResult = Promise.resolve("http://sts/signout");
 
             var p = subject.createSignoutRequest();
-            
-            p.then(request=>{
-                db.getItem(request.state.id).should.be.ok;
+
+            p.then(request => {
+                stubStore.item.should.be.ok;
                 done();
             });
         });
 
     });
 });
+
+class StubStateStore {
+    set(key, value) {
+        this.item = value;
+        return Promise.resolve();
+    }
+
+    remove(key) {
+        if (this.error) {
+            return Promise.reject(new Error(this.error));
+        }
+        return Promise.resolve(this.item);
+    }
+}
+
+class StubResponseValidator {
+    validateSigninResponse(state, response) {
+        
+        this.state = state;
+        this.response = response;
+        
+        if (this.validateSigninResult) {
+            return this.validateSigninResult;
+        }
+
+        return Promise.resolve(response);
+    }
+}

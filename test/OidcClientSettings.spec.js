@@ -239,5 +239,29 @@ describe("OidcClientSettings", function() {
             subject.filterProtocolClaims.should.equal(false);
         });
     });
+    
+    describe("loadUserInfo", function() {
+
+        it("should use default value", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+            });
+            subject.loadUserInfo.should.equal(true);
+        });
+
+        it("should return value from initial settings", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                loadUserInfo: true
+            });
+            subject.loadUserInfo.should.equal(true);
+
+            subject = new OidcClientSettings({
+                client_id: 'client',
+                loadUserInfo: false
+            });
+            subject.loadUserInfo.should.equal(false);
+        });
+    });
 
 });

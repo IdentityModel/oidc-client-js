@@ -2,8 +2,6 @@ import JsonService from './JsonService';
 import MetadataService from './MetadataService';
 import Log from './Log';
 
-const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "c_hash"];
-
 export default class UserInfoService {
     constructor(settings, JsonServiceCtor = JsonService, MetadataServiceCtor = MetadataService) {
         if (!settings) {
@@ -29,15 +27,6 @@ export default class UserInfoService {
 
             return this._jsonService.getJson(url, token).then(claims => {
                 Log.info("claims received", claims);
-
-                if (claims && this._settings.filterProtocolClaims) {
-                    ProtocolClaims.forEach(type => {
-                        delete claims[type];
-                    });
-
-                    Log.info("protocol claims filtered", claims);
-                }
-
                 return claims;
             });
         }, err => {
