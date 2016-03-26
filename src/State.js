@@ -1,4 +1,3 @@
-import Log from './Log';
 import random from './random';
 
 export default class State {

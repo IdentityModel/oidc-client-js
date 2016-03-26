@@ -7,10 +7,12 @@ export default class WebStorageStateStore {
     }
     
     get(key) {
+        Log.info("WebStorageStateStore.get", key);
         return Promise.resolve(this._store.getItem(key));
     }
     
     set(key, value){
+        Log.info("WebStorageStateStore.set", key);
         try{
             this._store.setItem(key, value);
             return Promise.resolve();
@@ -22,6 +24,7 @@ export default class WebStorageStateStore {
     }   
     
     remove(key){
+        Log.info("WebStorageStateStore.remove", key);
         this._store.removeItem(key);
         return Promise.resolve();
     }   
