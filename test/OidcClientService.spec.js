@@ -16,12 +16,14 @@ describe("OidcClientService", function() {
     let subject;
     let stubMetadataService;
     let store;
+    let db;
 
     beforeEach(function() {
         Log.setLogger(console);
         Log.level = Log.NONE;
         
-        store = new WebStorageStateStore(new InMemoryWebStorage());
+        db = new InMemoryWebStorage();
+        store = new WebStorageStateStore(db);
 
         settings = {
             client_id: 'client',
@@ -110,6 +112,17 @@ describe("OidcClientService", function() {
                 done();
             });
         });
+        
+        it("should store state", function(done) {
+            stubMetadataService.getAuthorizationEndpointResult = Promise.resolve("http://sts/authorize");
+
+            var p = subject.createSigninRequest();
+            
+            p.then(request=>{
+                db.getItem(request.state.id).should.be.ok;
+                done();
+            });
+        });
 
     });
 
@@ -157,6 +170,17 @@ describe("OidcClientService", function() {
 
             p.then(null, err => {
                 err.message.should.contain("signout");
+                done();
+            });
+        });
+        
+        it("should store state", function(done) {
+            stubMetadataService.getEndSessionEndpointResult = Promise.resolve("http://sts/signout");
+
+            var p = subject.createSignoutRequest();
+            
+            p.then(request=>{
+                db.getItem(request.state.id).should.be.ok;
                 done();
             });
         });

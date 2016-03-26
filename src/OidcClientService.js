@@ -45,7 +45,7 @@ export default class OidcClientService {
         return this._metadataService.getAuthorizationEndpoint().then(url => {
             Log.info("Received authorization endpoint", url);
             
-            return new SigninRequest({url, 
+            let request = new SigninRequest({url, 
                 client_id,
                 redirect_uri,
                 response_type,
@@ -53,6 +53,12 @@ export default class OidcClientService {
                 data,
                 prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values
             });
+            
+            var state = request.state;
+            this._stateStore.set(state.id, state.toStorageString());
+            
+            return request;
+            
         }, err => {
             Log.error("Failed to create signin request", err);
             throw new Error("Failed to create signin request");
@@ -71,11 +77,16 @@ export default class OidcClientService {
         return this._metadataService.getEndSessionEndpoint().then(url => {
             Log.info("Received end session endpoint", url);
             
-            return new SignoutRequest({url,
+            let request = new SignoutRequest({url,
                 id_token_hint,
                 post_logout_redirect_uri,
                 data
             });
+            
+            var state = request.state;
+            this._stateStore.set(state.id, state.toStorageString());
+
+            return request;
         }, err => {
             Log.error("Failed to create signout request", err);
             throw new Error("Failed to create signout request");
