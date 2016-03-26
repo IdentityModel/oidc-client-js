@@ -11,6 +11,8 @@ export default class OidcClientSettings {
         // client related
         client_id, response_type = DefaultResponseType, scope = DefaultScope, 
         redirect_uri, post_logout_redirect_uri,
+        // optional protocol
+        prompt, display, max_age, ui_locales, acr_values,
         // behavior flags
         filterProtocolClaims = true
     }) {
@@ -29,6 +31,12 @@ export default class OidcClientSettings {
         this._scope = scope;
         this._redirect_uri = redirect_uri;
         this._post_logout_redirect_uri = post_logout_redirect_uri;
+        
+        this._prompt = prompt;
+        this._display = display;
+        this._max_age = max_age;
+        this._ui_locales = ui_locales;
+        this._acr_values = acr_values;
 
         this._filterProtocolClaims = !!filterProtocolClaims;
     }
@@ -49,6 +57,23 @@ export default class OidcClientSettings {
     }
     get post_logout_redirect_uri() {
         return this._post_logout_redirect_uri;
+    }
+    
+    // optional protocol params
+    get prompt(){
+        return this._prompt;
+    }
+    get display(){
+        return this._display;
+    }
+    get max_age(){
+        return this._max_age;
+    }
+    get ui_locales(){
+        return this._ui_locales;
+    }
+    get acr_values(){
+        return this._acr_values;
     }
     
     // metadata

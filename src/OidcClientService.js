@@ -5,8 +5,6 @@ import SigninRequest from './SigninRequest';
 import SignoutRequest from './SignoutRequest';
 import WebStorageStateStore from './WebStorageStateStore';
 
-// const OidcOptionalParams = ["prompt", "display", "max_age", "ui_locales", "id_token_hint", "login_hint", "acr_values"];
-
 export default class OidcClientService {
     constructor(settings, 
         stateStore = new WebStorageStateStore(), 
@@ -26,13 +24,23 @@ export default class OidcClientService {
         return this._settings;
     }
     
-    createSigninRequest({response_type, scope, redirect_uri, data}={}) {
+    createSigninRequest({
+        response_type, scope, redirect_uri, data, 
+        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values}={}
+    ) {
         Log.info("OidcClientService.createSigninRequest");
         
         let client_id = this._settings.client_id;
         response_type = response_type || this._settings.response_type;
         scope = scope || this._settings.scope;
         redirect_uri = redirect_uri || this._settings.redirect_uri;
+        
+        // id_token_hint, login_hint aren't allowed on _settings
+        prompt = prompt || this._settings.prompt;
+        display = display || this._settings.display;
+        max_age = max_age  || this._settings.max_age ;
+        ui_locales = ui_locales || this._settings.ui_locales;
+        acr_values = acr_values || this._settings.acr_values;
 
         return this._metadataService.getAuthorizationEndpoint().then(url => {
             Log.info("Received authorization endpoint", url);
@@ -42,7 +50,8 @@ export default class OidcClientService {
                 redirect_uri,
                 response_type,
                 scope,
-                data
+                data,
+                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values
             });
         }, err => {
             Log.error("Failed to create signin request", err);
@@ -50,7 +59,7 @@ export default class OidcClientService {
         });
     }
     
-    processSigninResponse(stateString){
+    processSigninResponse(url){
         Log.info("OidcClientService.processSigninResponse");
     }
     
@@ -73,62 +82,9 @@ export default class OidcClientService {
         });
     }
     
-    processSignoutResponse(stateString){
+    processSignoutResponse(url){
         Log.info("OidcClientService.processSignoutResponse");
     }
-    
-//     OidcClient.prototype.createTokenRequestAsync = function () {
-//     log("OidcClient.createTokenRequestAsync");
-
-//     var client = this;
-//     var settings = client._settings;
-
-//     return client.loadAuthorizationEndpoint().then(function (authorization_endpoint) {
-
-//         var state = rand();
-//         var url = authorization_endpoint + "?state=" + encodeURIComponent(state);
-
-//         if (client.isOidc) {
-//             var nonce = rand();
-//             url += "&nonce=" + encodeURIComponent(nonce);
-//         }
-
-//         var required = ["client_id", "redirect_uri", "response_type", "scope"];
-//         required.forEach(function (key) {
-//             var value = settings[key];
-//             if (value) {
-//                 url += "&" + key + "=" + encodeURIComponent(value);
-//             }
-//         });
-
-//         var optional = ["prompt", "display", "max_age", "ui_locales", "id_token_hint", "login_hint", "acr_values"];
-//         optional.forEach(function (key) {
-//             var value = settings[key];
-//             if (value) {
-//                 url += "&" + key + "=" + encodeURIComponent(value);
-//             }
-//         });
-
-//         var request_state = {
-//             oidc: client.isOidc,
-//             oauth: client.isOAuth,
-//             state: state
-//         };
-
-//         if (nonce) {
-//             request_state["nonce"] = nonce;
-//         }
-
-//         settings.request_state_store.setItem(settings.request_state_key, JSON.stringify(request_state));
-
-//         return {
-//             request_state: request_state,
-//             url: url
-//         };
-//     });
-// }
-
-
 
 // OidcClient.prototype.processResponseAsync = function (queryString) {
 //     log("OidcClient.processResponseAsync");

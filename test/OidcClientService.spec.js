@@ -70,17 +70,33 @@ describe("OidcClientService", function() {
                 data: 'foo',
                 response_type: 'bar',
                 scope: 'baz',
-                redirect_uri: 'quux'
+                redirect_uri: 'quux',
+                prompt:'p', 
+                display:'d',
+                max_age:'m', 
+                ui_locales:'u', 
+                id_token_hint:'ith', 
+                login_hint:'lh',
+                acr_values:'av'
             });
 
             p.then(request => {
                 request.state.data.should.equal('foo');
                 
                 var url = request.signinUrl;
+                console.log(url);
                 url.should.contain("http://sts/authorize");
                 url.should.contain("response_type=bar");
                 url.should.contain("scope=baz");
                 url.should.contain("redirect_uri=quux");
+                url.should.contain("prompt=p");
+                url.should.contain("display=d");
+                url.should.contain("max_age=m");
+                url.should.contain("ui_locales=u");
+                url.should.contain("id_token_hint=ith");
+                url.should.contain("login_hint=lh");
+                url.should.contain("acr_values=av");
+                
                 done();
             });
         });

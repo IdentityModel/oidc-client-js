@@ -110,6 +110,48 @@ describe("SigninRequest", function() {
         it("should include state", function() {
             subject.signinUrl.should.contain("state=" + subject.state.id);
         });
+        
+        it("should include prompt", function() {
+            settings.prompt = "foo";
+            subject = new SigninRequest(settings);
+            subject.signinUrl.should.contain("prompt=foo");
+        });
+        
+        it("should include display", function() {
+            settings.display = "foo";
+            subject = new SigninRequest(settings);
+            subject.signinUrl.should.contain("display=foo");
+        });
+        
+        it("should include max_age", function() {
+            settings.max_age = "foo";
+            subject = new SigninRequest(settings);
+            subject.signinUrl.should.contain("max_age=foo");
+        });
+        
+        it("should include ui_locales", function() {
+            settings.ui_locales = "foo";
+            subject = new SigninRequest(settings);
+            subject.signinUrl.should.contain("ui_locales=foo");
+        });
+        
+        it("should include id_token_hint", function() {
+            settings.id_token_hint = "foo";
+            subject = new SigninRequest(settings);
+            subject.signinUrl.should.contain("id_token_hint=foo");
+        });
+        
+        it("should include login_hint", function() {
+            settings.login_hint = "foo";
+            subject = new SigninRequest(settings);
+            subject.signinUrl.should.contain("login_hint=foo");
+        });
+        
+        it("should include acr_values", function() {
+            settings.acr_values = "foo";
+            subject = new SigninRequest(settings);
+            subject.signinUrl.should.contain("acr_values=foo");
+        });
 
     });
 

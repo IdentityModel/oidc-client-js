@@ -93,6 +93,56 @@ describe("OidcClientSettings", function() {
         });
     });
 
+    describe("prompt", function() {
+        it("should return value from initial settings", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                prompt: "foo"
+            });
+            subject.prompt.should.equal("foo");
+        });
+    });
+    
+    describe("display", function() {
+        it("should return value from initial settings", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                display: "foo"
+            });
+            subject.display.should.equal("foo");
+        });
+    });
+
+    describe("max_age", function() {
+        it("should return value from initial settings", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                max_age: "foo"
+            });
+            subject.max_age.should.equal("foo");
+        });
+    });
+
+    describe("ui_locales", function() {
+        it("should return value from initial settings", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                ui_locales: "foo"
+            });
+            subject.ui_locales.should.equal("foo");
+        });
+    });
+
+    describe("acr_values", function() {
+        it("should return value from initial settings", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                acr_values: "foo"
+            });
+            subject.acr_values.should.equal("foo");
+        });
+    });
+
     describe("authority", function() {
         it("should return value from initial settings", function() {
             let subject = new OidcClientSettings({
