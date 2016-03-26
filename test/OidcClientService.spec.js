@@ -84,7 +84,6 @@ describe("OidcClientService", function() {
                 request.state.data.should.equal('foo');
                 
                 var url = request.signinUrl;
-                console.log(url);
                 url.should.contain("http://sts/authorize");
                 url.should.contain("response_type=bar");
                 url.should.contain("scope=baz");
