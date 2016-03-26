@@ -1,5 +1,5 @@
 module.exports = {
-    entry:  './src/index.js',
+    entry:  './src/_index.js',
     output: {
         path:     'build',
         filename: 'OidcClient.js',
