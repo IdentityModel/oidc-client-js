@@ -7,15 +7,25 @@ import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 
-describe("OidcClientService", function() {
+describe("ResponseValidator", function() {
     let settings;
     let subject;
     let stubMetadataService;
     let stubUserInfoService;
+    
+    let state;
+    let response;
 
     beforeEach(function() {
         Log.setLogger(console);
         Log.level = Log.NONE;
+        
+        state = {
+            id:"state"
+        };
+        response = {
+          state:'state'  
+        };
 
         settings = {};
         stubMetadataService = new StubMetadataService();
@@ -24,17 +34,41 @@ describe("OidcClientService", function() {
     });
 
     describe("constructor", function() {
-        // it("should require a settings param", function() {
-        //     try {
-        //         new OidcClientService(undefined, stubStore, stubMetadataService);
-        //     }
-        //     catch (e) {
-        //         e.message.should.contain('settings');
-        //         return;
-        //     }
-        //     assert.fail();
-        // });
 
+        it("should require a settings param", function() {
+            try {
+                new ResponseValidator(undefined, () => stubMetadataService, () => stubUserInfoService);
+            }
+            catch (e) {
+                e.message.should.contain('settings');
+                return;
+            }
+            assert.fail();
+        });
+
+    });
+
+    describe("validateSigninResponse", function(done) {
+
+        it("should validate that the client state matches response state", function() {
+
+            subject.validateSigninResponse({ id: 1 }, { state: 2 }).then(null, err => {
+                err.message.should.contain('match');
+                done();
+            });
+
+        });
+        
+        it("should return error response", function(done) {
+            
+            response.error = "test";
+            subject.validateSigninResponse(state, response).then(null, err=>{
+                response.error.should.equal("test");
+                done();
+            });
+
+        });
+        
     });
 });
 
@@ -62,8 +96,8 @@ describe("OidcClientService", function() {
 //         });
 
 
-class StubUserInfoService{
-    getClaims(){
+class StubUserInfoService {
+    getClaims() {
         return this.getClaimsResult;
     }
 }

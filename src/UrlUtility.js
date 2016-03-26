@@ -21,7 +21,9 @@ export default class UrlUtility {
     static parseUrlFragment(value, window = Window) {
         Log.info("UrlUtility.parseUrlFragment");
 
-        value = value || window.location.hash;
+        if (typeof value !== 'string'){
+            value = window.location.hash;
+        }
 
         var idx = value.lastIndexOf("#");
         if (idx >= 0) {
@@ -46,5 +48,7 @@ export default class UrlUtility {
         for (var prop in params) {
             return params;
         }
+        
+        return {};
     }
 }

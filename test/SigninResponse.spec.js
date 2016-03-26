@@ -1,5 +1,6 @@
 import Log from '../src/Log';
 import SigninResponse from '../src/SigninResponse';
+import SigninResponseError from '../src/SigninResponseError';
 
 import chai from 'chai';
 chai.should();
@@ -14,38 +15,16 @@ describe("SigninResponse", function() {
             subject.state.should.equal("foo");
         });
         
-        it("should read error", function() {
+        it("should return SigninResponse if no error", function() {
+            let subject = new SigninResponse("");
+            subject.should.be.instanceof(SigninResponse);
+        });
+        
+        it("should return SigninResponseError if error", function() {
             let subject = new SigninResponse("error=foo");
-            subject.error.should.equal("foo");
+            subject.should.be.instanceof(SigninResponseError);
         });
         
-        it("should read error_description", function() {
-            let subject = new SigninResponse("error=error&error_description=foo");
-            subject.error_description.should.equal("foo");
-        });
-        
-        it("should read error_uri", function() {
-            let subject = new SigninResponse("error=error&error_uri=foo");
-            subject.error_uri.should.equal("foo");
-        });
-        
-        it("should only read error info if error", function() {
-            let subject = new SigninResponse("error_description=foo");
-            expect(subject.error_description).to.be.undefined;
-            
-            subject = new SigninResponse("error_uri=foo");
-            expect(subject.error_uri).to.be.undefined;
-            
-            subject = new SigninResponse("error=error&id_token=foo&session_state=foo&access_token=foo&token_type=foo&scope=foo&expires_in=10");
-            expect(subject.id_token).to.be.undefined;
-            expect(subject.session_state).to.be.undefined;
-            expect(subject.access_token).to.be.undefined;
-            expect(subject.token_type).to.be.undefined;
-            expect(subject.scope).to.be.undefined;
-            expect(subject.expires_in).to.be.undefined;
-            expect(subject.expires_at).to.be.undefined;
-        });
-
         it("should read id_token", function() {
             let subject = new SigninResponse("id_token=foo");
             subject.id_token.should.equal("foo");

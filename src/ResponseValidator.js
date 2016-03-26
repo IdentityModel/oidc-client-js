@@ -16,7 +16,7 @@ export default class ResponseValidator {
         this._metadataService = new MetadataServiceCtor(this._settings);
         this._userInfoService = new UserInfoServiceCtor(this._settings);
     }
-
+   
     validateSigninResponse(state, response) {
         Log.info("ResponseValidator.validateSigninResponse");
 
@@ -32,7 +32,7 @@ export default class ResponseValidator {
 
         if (response.error) {
             Log.warn("Response was error", response.error);
-            return Promise.resolve(response);
+            return Promise.reject(response);
         }
 
         if (state.nonce && !response.id_token) {

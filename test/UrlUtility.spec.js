@@ -56,6 +56,11 @@ describe("UrlUtility", function() {
             let result = UrlUtility.parseUrlFragment(null, w);
             result.should.deep.equal({ a: "apple", b: "banana", c: "carrot" });
         });
+        
+        it("should return empty object for empty string", function() {
+            let result = UrlUtility.parseUrlFragment("");
+            result.should.deep.equal({});
+        });
     });
 
 });

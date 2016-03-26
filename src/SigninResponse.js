@@ -1,30 +1,27 @@
 import Log from './Log';
 import UrlUtility from './UrlUtility';
+import SigninResponseError from './SigninResponseError';
 
 export default class SigninResponse {
     constructor(url) {
         
         var values = UrlUtility.parseUrlFragment(url);
         
-        this._state = values.state;
-        
         if (values.error){
-            this._error = values.error;
-            this._error_description = values.error_description;
-            this._error_uri = values.error_uri;
+            return new SigninResponseError(values);
         }
-        else {
-            this._id_token = values.id_token;
-            this._session_state = values.session_state;
-            this._access_token = values.access_token;
-            this._token_type = values.token_type;
-            this._scope = values.scope;
-            
-            let expires_in = parseInt(values.expires_in);
-            if (typeof expires_in === 'number' && expires_in > 0){
-                let now = parseInt(Date.now() / 1000);
-                this._expires_at = now + expires_in;
-            }
+        
+        this._state = values.state;
+        this._id_token = values.id_token;
+        this._session_state = values.session_state;
+        this._access_token = values.access_token;
+        this._token_type = values.token_type;
+        this._scope = values.scope;
+        
+        let expires_in = parseInt(values.expires_in);
+        if (typeof expires_in === 'number' && expires_in > 0){
+            let now = parseInt(Date.now() / 1000);
+            this._expires_at = now + expires_in;
         }
     }
     
@@ -35,16 +32,6 @@ export default class SigninResponse {
         this._state = value;
     }
     
-    get error(){
-        return this._error;
-    }
-    get error_description(){
-        return this._error_description;
-    }
-    get error_uri(){
-        return this._error_uri;
-    }
-
     get id_token(){
         return this._id_token;
     }

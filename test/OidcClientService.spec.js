@@ -1,6 +1,7 @@
 import OidcClientService from '../src/OidcClientService';
 import SigninRequest from '../src/SigninRequest';
 import SigninResponse from '../src/SigninResponse';
+import SigninResponseError from '../src/SigninResponseError';
 import SignoutRequest from '../src/SignoutRequest';
 import Log from '../src/Log';
 
@@ -129,12 +130,12 @@ describe("OidcClientService", function() {
     describe("processSigninResponse", function() {
 
         it("should return a promise", function() {
-            subject.processSigninResponse("state=state&error=error").should.be.instanceof(Promise);
+            subject.processSigninResponse("state=state").should.be.instanceof(Promise);
         });
 
         it("should fail if no state on response", function(done) {
             stubStore.item = "state";
-            subject.processSigninResponse("error=error").then(null, err => {
+            subject.processSigninResponse("").then(null, err => {
                 err.message.should.contain('state');
                 done();
             });
@@ -142,7 +143,7 @@ describe("OidcClientService", function() {
         
         it("should fail if storage fails", function(done) {
             stubStore.error = "fail";
-            subject.processSigninResponse("state=state&error=error").then(null, err => {
+            subject.processSigninResponse("state=state").then(null, err => {
                 err.message.should.contain('response');
                 done();
             });
@@ -150,22 +151,13 @@ describe("OidcClientService", function() {
 
         it("should call validator", function(done) {
             stubStore.item = "state";
-            subject.processSigninResponse("state=state&error=error").then(response => {
+            subject.processSigninResponse("state=state").then(response => {
                 stubValidator.state.should.equal('state');
                 stubValidator.response.should.be.deep.equal(response);
                 done();
             });
         });
         
-        it("should return SigninResponse", function(done) {
-            stubStore.item = "state";
-
-            subject.processSigninResponse("state=state&error=error").then(response => {
-                response.should.be.instanceof(SigninResponse);
-                done();
-            });
-        });
-
     });
 
     describe("createSignoutRequest", function() {
