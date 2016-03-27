@@ -6,6 +6,50 @@ import StubMetadataService from './StubMetadataService';
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
+let expect = chai.expect;
+
+class MockResponseValidator extends ResponseValidator {
+    constructor(settings, MetadataServiceCtor, UserInfoServiceCtor) {
+        super(settings, MetadataServiceCtor, UserInfoServiceCtor);
+    }
+
+    _mock(name, ...args) {
+        Log.info("mock called", name);
+        this[name + "WasCalled"] = true;
+        
+        if (this[name + "Result"]) {
+            Log.info("mock returning result", this[name + "Result"]);
+            return this[name + "Result"];
+        }
+        
+        Log.info("mock calling super");
+        return super[name](...args);
+    }
+
+    processState(...args) {
+        return this._mock("processState", ...args);
+    }
+    validateTokens(...args) {
+        return this._mock("validateTokens", ...args);
+    }
+    processClaims(...args) {
+        return this._mock("processClaims", ...args);
+    }
+
+    validateIdTokenAndAccessToken(...args) {
+        return this._mock("validateIdTokenAndAccessToken", ...args);
+    }
+    validateIdToken(...args) {
+        return this._mock("validateIdToken", ...args);
+    }
+    validateAccessToken(...args) {
+        return this._mock("validateAccessToken", ...args);
+    }
+
+    filterProtocolClaims(...args) {
+        return this._mock("filterProtocolClaims", ...args);
+    }
+}
 
 describe("ResponseValidator", function() {
     let settings;
@@ -31,7 +75,7 @@ describe("ResponseValidator", function() {
         settings = {};
         stubMetadataService = new StubMetadataService();
         stubUserInfoService = new StubUserInfoService();
-        subject = new ResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService);
+        subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService);
     });
 
     describe("constructor", function() {
@@ -48,8 +92,140 @@ describe("ResponseValidator", function() {
         });
 
     });
+
+    describe("validateSigninResponse", function(done) {
+
+        it("should process state", function(done) {
+
+            subject.processStateResult = Promise.resolve(stubResponse);
+            subject.validateTokensResult = Promise.resolve(stubResponse);
+
+            subject.validateSigninResponse(stubState, stubResponse).then(response => {
+                subject.processStateWasCalled.should.be.true;
+                done();
+            });
+
+        });
+
+        it("should validate tokens", function(done) {
+
+            subject.processStateResult = Promise.resolve(stubResponse);
+            subject.validateTokensResult = Promise.resolve(stubResponse);
+
+            subject.validateSigninResponse(stubState, stubResponse).then(response => {
+                subject.validateTokensWasCalled.should.be.true;
+                done();
+            });
+
+        });
+        
+         it("should not validate tokens if state fails", function(done) {
+            
+            subject.processStateResult = Promise.reject("error");
+            subject.validateTokensResult = Promise.resolve(stubResponse);
+
+            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
+                expect(subject.validateTokensWasCalled).to.be.undefined;
+                done();
+            });
+
+        });
+
+        it("should process claims", function(done) {
+
+            subject.processStateResult = Promise.resolve(stubResponse);
+            subject.validateTokensResult = Promise.resolve(stubResponse);
+
+            subject.validateSigninResponse(stubState, stubResponse).then(response => {
+                subject.processClaimsWasCalled.should.be.true;
+                done();
+            });
+
+        });
+        
+        it("should not process claims if state fails", function(done) {
+
+            subject.processStateResult = Promise.resolve(stubResponse);
+            subject.validateTokensResult = Promise.reject("error");
+
+            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
+                expect(subject.processClaimsWasCalled).to.be.undefined;
+                done();
+            });
+
+        });
+
+    });
     
-    describe("filterProtocolClaims", function(done) {
+    describe("processState", function() {
+
+        it("should validate that the client state matches response state", function() {
+
+            stubResponse.state = "not_the_id";
+            subject.processState(stubState, stubResponse).then(null, err => {
+                err.message.should.contain('match');
+                done();
+            });
+
+        });
+
+        it("should fail on error response", function(done) {
+
+            stubResponse.error = "some_error";
+            subject.processState(stubState, stubResponse).then(null, err => {
+                err.error.should.equal("some_error");
+                done();
+            });
+
+        });
+
+        it("should return data even for error responses", function(done) {
+
+            stubResponse.error = "some_error";
+            subject.processState(stubState, stubResponse).then(null, err => {
+                err.state.should.deep.equal({ some: 'data' });
+                done();
+            });
+
+        });
+
+        it("should fail if request was OIDC but no id_token in response", function(done) {
+
+            stubState.nonce = "some_nonce";
+            delete stubResponse.id_token;
+
+            subject.processState(stubState, stubResponse).then(null, err => {
+                err.message.should.contain("id_token");
+                done();
+            });
+
+        });
+
+        it("should fail if request was not OIDC but id_token in response", function(done) {
+
+            stubResponse.id_token = "id_token";
+
+            subject.processState(stubState, stubResponse).then(null, err => {
+                err.message.should.contain("id_token");
+                done();
+            });
+
+        });
+    });
+
+    describe("processClaims", function() {
+        
+        it("should filter protocol claims", function(done) {
+            
+            subject.processClaims(stubState, stubResponse).then(response => {
+                subject.filterProtocolClaimsWasCalled.should.be.true;
+                done();
+            });
+
+        });
+    });
+
+    describe("filterProtocolClaims", function() {
 
         it("should filter protocol claims if enabled on settings", function() {
 
@@ -97,99 +273,46 @@ describe("ResponseValidator", function() {
         });
     });
 
-    describe("validateSigninResponse", function(done) {
+    describe("validateTokens", function() {
 
-        it("should validate that the client state matches response state", function() {
+        it("should validate id_token and access_token", function(done) {
 
-            stubResponse.state = "not_the_id";
-            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
-                err.message.should.contain('match');
+            stubResponse.id_token = "id_token";
+            stubResponse.access_token = "access_token";
+            subject.validateIdTokenAndAccessTokenResult = Promise.resolve(stubResponse);
+
+            subject.validateTokens(stubState, stubResponse).then(response => {
+                subject.validateIdTokenAndAccessTokenWasCalled.should.be.true;
+                expect(subject.validateIdTokenWasCalled).to.be.undefined;
                 done();
             });
 
         });
 
-        it("should fail on error response", function(done) {
+        it("should validate just id_token", function(done) {
 
-            stubResponse.error = "some_error";
-            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
-                err.error.should.equal("some_error");
+            stubResponse.id_token = "id_token";
+            subject.validateIdTokenResult = Promise.resolve(stubResponse);
+
+            subject.validateTokens(stubState, stubResponse).then(response => {
+                subject.validateIdTokenWasCalled.should.be.true;
+                expect(subject.validateIdTokenAndAccessTokenWasCalled).to.be.undefined;
                 done();
             });
 
         });
 
-        it("should return data even for error responses", function(done) {
+        it("should not validate if only access_token", function(done) {
 
-            stubResponse.error = "some_error";
-            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
-                err.state.should.deep.equal({ some: 'data' });
+            stubResponse.access_token = "access_token";
+
+            subject.validateTokens(stubState, stubResponse).then(response => {
+                expect(subject.validateIdTokenWasCalled).to.be.undefined;
+                expect(subject.validateIdTokenAndAccessTokenWasCalled).to.be.undefined;
                 done();
             });
 
         });
-
-        it("should fail if request was OIDC but no id_token in response", function(done) {
-
-            stubState.nonce = "some_nonce";
-            delete stubResponse.id_token;
-
-            subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
-                err.message.should.contain("id_token");
-                done();
-            });
-
-        });
-
-        it("should filter protocol claims if enabled on settings", function(done) {
-
-            settings.filterProtocolClaims = true;
-            stubResponse.profile = {
-                foo: 1, bar: 'test',
-                aud: 'some_aud', iss: 'issuer',
-                sub: '123', email: 'foo@gmail.com',
-                role: ['admin', 'dev'],
-                nonce: 'nonce', at_hash: "athash",
-                iat: 5, nbf: 10, exp: 20
-            };
-
-            subject.validateSigninResponse(stubState, stubResponse).then(response => {
-                response.profile.should.deep.equal({
-                    foo: 1, bar: 'test',
-                    sub: '123', email: 'foo@gmail.com',
-                    role: ['admin', 'dev']
-                });
-                done();
-            });
-
-        });
-
-        it("should not filter protocol claims if not enabled on settings", function(done) {
-
-            settings.filterProtocolClaims = false;
-            stubResponse.profile = {
-                foo: 1, bar: 'test',
-                aud: 'some_aud', iss: 'issuer',
-                sub: '123', email: 'foo@gmail.com',
-                role: ['admin', 'dev'],
-                nonce: 'nonce', at_hash: "athash",
-                iat: 5, nbf: 10, exp: 20
-            };
-
-            subject.validateSigninResponse(stubState, stubResponse).then(response => {
-                response.profile.should.deep.equal({
-                    foo: 1, bar: 'test',
-                    aud: 'some_aud', iss: 'issuer',
-                    sub: '123', email: 'foo@gmail.com',
-                    role: ['admin', 'dev'],
-                    nonce: 'nonce', at_hash: "athash",
-                    iat: 5, nbf: 10, exp: 20
-                });
-                done();
-            });
-
-        });
-
     });
 
 });

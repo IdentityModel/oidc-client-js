@@ -16,10 +16,23 @@ export default class ResponseValidator {
         this._metadataService = new MetadataServiceCtor(this._settings);
         this._userInfoService = new UserInfoServiceCtor(this._settings);
     }
-   
+
     validateSigninResponse(state, response) {
         Log.info("ResponseValidator.validateSigninResponse");
 
+        return this.processState(state, response).then(response => {
+            Log.info("state processed");
+            return this.validateTokens(state, response).then(response => {
+                Log.info("tokens validated");
+                return this.processClaims(response).then(response=>{
+                    Log.info("claims processed");
+                    return response;
+                });
+            });
+        });
+    }
+    
+    processState(state, response){
         if (state.id !== response.state) {
             Log.error("State does not match");
             return Promise.reject(new Error("State does not match"));
@@ -28,6 +41,7 @@ export default class ResponseValidator {
         // now that we know the state matches, take the stored data
         // and set it into the response so callers can get their state
         // this is important for both success & error outcomes
+        Log.info("state validated");
         response.state = state.data;
 
         if (response.error) {
@@ -40,47 +54,53 @@ export default class ResponseValidator {
             return Promise.reject(new Error("No id_token in response"));
         }
 
-        let p;
-
-        if (response.id_token) {
-            if (response.access_token) {
-                Log.info("Validating id_token and access_token");
-                p = validateIdTokenAndAccessToken(state, response);
-            }
-            else {
-                Log.info("Validating id_token");
-                p = validateIdToken(state, response);
-            }
+        if (!state.nonce && response.id_token) {
+            Log.error("Not expecting id_token in response");
+            return Promise.reject(new Error("Unexpected id_token in response"));
         }
-        else {
-            Log.info("No id_token to validate");
-            p = Promise.resolve(response);
-        }
-
-        return p.then(response => {
-            response.profile = this.filterProtocolClaims(response.profile);
-
-            // if (this._settings.loadUserInfo) {
-
-            //     Log.info("loading user info");
-            //     return this._userInfoService.getClaims(response.access_token).then(claims => {
-                    
-            //         Log.info("user info claims received");
-            //         response.profile = this.mergeClaims(response.profile, claims);
-                    
-            //         return response;
-            //     });
-            // }
-            
-            return response;
-        });
+        
+        return Promise.resolve(response);
     }
     
+    processClaims(response){
+        response.profile = this.filterProtocolClaims(response.profile);
+
+        // if (this._settings.loadUserInfo) {
+
+        //     Log.info("loading user info");
+        //     return this._userInfoService.getClaims(response.access_token).then(claims => {
+
+        //         Log.info("user info claims received");
+        //         response.profile = this.mergeClaims(response.profile, claims);
+
+        //         return response;
+        //     });
+        // }
+
+        return Promise.resolve(response);
+    }
+
+    validateTokens(state, response) {
+        if (response.id_token) {
+
+            if (response.access_token) {
+                Log.info("Validating id_token and access_token");
+                return this.validateIdTokenAndAccessToken(state, response);
+            }
+
+            Log.info("Validating id_token");
+            return this.validateIdToken(state, response);
+        }
+        
+        Log.info("No id_token to validate");
+        return Promise.resolve(response);
+    }
+
     // mergeClaims(claims1, claims2){
     //     return claims1;
     // }
 
-    filterProtocolClaims(claims){
+    filterProtocolClaims(claims) {
         if (claims && this._settings.filterProtocolClaims) {
             ProtocolClaims.forEach(type => {
                 delete claims[type];
@@ -99,7 +119,7 @@ export default class ResponseValidator {
 
     validateIdToken(state, response) {
         return Promise.resolve(response);
-        
+
         //     log("OidcClient.validateIdTokenAsync");
 
         //     var client = this;
