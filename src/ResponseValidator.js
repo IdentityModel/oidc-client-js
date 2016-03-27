@@ -87,7 +87,7 @@ export default class ResponseValidator {
     }
 
     processClaims(response) {
-        Log.info("ResponseValidator.processClaims, incoming claims");
+        Log.info("ResponseValidator.processClaims");
 
         response.profile = this.filterProtocolClaims(response.profile);
 
@@ -114,6 +114,7 @@ export default class ResponseValidator {
             if (!Array.isArray(values)) {
                 values = [values];
             }
+            
             for (let value of values) {
                 if (!result[name]) {
                     result[name] = value;
@@ -143,7 +144,7 @@ export default class ResponseValidator {
             Log.info("protocol claims filtered", result);
         }
         else {
-            Log.info("protocol claims filtered")
+            Log.info("protocol claims not filtered")
         }
 
         return result;

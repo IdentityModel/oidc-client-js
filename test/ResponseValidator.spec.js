@@ -328,7 +328,7 @@ describe("ResponseValidator", function() {
 
         });
         
-        it("should merge sample claim types into array", function() {
+        it("should merge same claim types into array", function() {
             
             var c1 = {a:'apple', b:'banana'};
             var c2 = {a:'carrot'};
@@ -338,7 +338,7 @@ describe("ResponseValidator", function() {
 
         });
         
-        it("should merge arrays of sample claim types into array", function() {
+        it("should merge arrays of same claim types into array", function() {
             
             var c1 = {a:'apple', b:'banana'};
             var c2 = {a:['carrot', 'durian']};
