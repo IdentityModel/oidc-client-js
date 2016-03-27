@@ -33,6 +33,8 @@ export default class ResponseValidator {
     }
     
     processState(state, response){
+        Log.info("ResponseValidator.processState");
+        
         if (state.id !== response.state) {
             Log.error("State does not match");
             return Promise.reject(new Error("State does not match"));
@@ -63,6 +65,8 @@ export default class ResponseValidator {
     }
     
     processClaims(response){
+        Log.info("ResponseValidator.processClaims");
+        
         response.profile = this.filterProtocolClaims(response.profile);
 
         // if (this._settings.loadUserInfo) {
@@ -81,6 +85,8 @@ export default class ResponseValidator {
     }
 
     validateTokens(state, response) {
+        Log.info("ResponseValidator.validateTokens");
+        
         if (response.id_token) {
 
             if (response.access_token) {
@@ -101,6 +107,8 @@ export default class ResponseValidator {
     // }
 
     filterProtocolClaims(claims) {
+        Log.info("ResponseValidator.filterProtocolClaims");
+
         if (claims && this._settings.filterProtocolClaims) {
             ProtocolClaims.forEach(type => {
                 delete claims[type];
@@ -112,12 +120,16 @@ export default class ResponseValidator {
     }
 
     validateIdTokenAndAccessToken(state, response) {
+        Log.info("ResponseValidator.validateIdTokenAndAccessToken");
+        
         return this.validateIdToken(state, response).then(response => {
             return this.validateAccessToken(response);
         });
     }
 
     validateIdToken(state, response) {
+        Log.info("ResponseValidator.validateIdToken");
+        
         return Promise.resolve(response);
 
         //     log("OidcClient.validateIdTokenAsync");
@@ -178,6 +190,8 @@ export default class ResponseValidator {
     }
 
     validateAccessToken(response) {
+        Log.info("ResponseValidator.validateAccessToken");
+
         return Promise.resolve(response);
 
         //     log("OidcClient.validateAccessTokenAsync");
