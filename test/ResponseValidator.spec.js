@@ -48,6 +48,54 @@ describe("ResponseValidator", function() {
         });
 
     });
+    
+    describe("filterProtocolClaims", function(done) {
+
+        it("should filter protocol claims if enabled on settings", function() {
+
+            settings.filterProtocolClaims = true;
+            let claims = {
+                foo: 1, bar: 'test',
+                aud: 'some_aud', iss: 'issuer',
+                sub: '123', email: 'foo@gmail.com',
+                role: ['admin', 'dev'],
+                nonce: 'nonce', at_hash: "athash",
+                iat: 5, nbf: 10, exp: 20
+            };
+
+            var result = subject.filterProtocolClaims(claims);
+            result.should.deep.equal({
+                foo: 1, bar: 'test',
+                sub: '123', email: 'foo@gmail.com',
+                role: ['admin', 'dev']
+            });
+
+        });
+
+        it("should not filter protocol claims if not enabled on settings", function() {
+
+            settings.filterProtocolClaims = false;
+            let claims = {
+                foo: 1, bar: 'test',
+                aud: 'some_aud', iss: 'issuer',
+                sub: '123', email: 'foo@gmail.com',
+                role: ['admin', 'dev'],
+                nonce: 'nonce', at_hash: "athash",
+                iat: 5, nbf: 10, exp: 20
+            };
+
+            var result = subject.filterProtocolClaims(claims);
+            result.should.deep.equal({
+                foo: 1, bar: 'test',
+                aud: 'some_aud', iss: 'issuer',
+                sub: '123', email: 'foo@gmail.com',
+                role: ['admin', 'dev'],
+                nonce: 'nonce', at_hash: "athash",
+                iat: 5, nbf: 10, exp: 20
+            });
+
+        });
+    });
 
     describe("validateSigninResponse", function(done) {
 
@@ -61,7 +109,7 @@ describe("ResponseValidator", function() {
 
         });
 
-        it("should return error response", function(done) {
+        it("should fail on error response", function(done) {
 
             stubResponse.error = "some_error";
             subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
@@ -85,9 +133,58 @@ describe("ResponseValidator", function() {
 
             stubState.nonce = "some_nonce";
             delete stubResponse.id_token;
-            
+
             subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
                 err.message.should.contain("id_token");
+                done();
+            });
+
+        });
+
+        it("should filter protocol claims if enabled on settings", function(done) {
+
+            settings.filterProtocolClaims = true;
+            stubResponse.profile = {
+                foo: 1, bar: 'test',
+                aud: 'some_aud', iss: 'issuer',
+                sub: '123', email: 'foo@gmail.com',
+                role: ['admin', 'dev'],
+                nonce: 'nonce', at_hash: "athash",
+                iat: 5, nbf: 10, exp: 20
+            };
+
+            subject.validateSigninResponse(stubState, stubResponse).then(response => {
+                response.profile.should.deep.equal({
+                    foo: 1, bar: 'test',
+                    sub: '123', email: 'foo@gmail.com',
+                    role: ['admin', 'dev']
+                });
+                done();
+            });
+
+        });
+
+        it("should not filter protocol claims if not enabled on settings", function(done) {
+
+            settings.filterProtocolClaims = false;
+            stubResponse.profile = {
+                foo: 1, bar: 'test',
+                aud: 'some_aud', iss: 'issuer',
+                sub: '123', email: 'foo@gmail.com',
+                role: ['admin', 'dev'],
+                nonce: 'nonce', at_hash: "athash",
+                iat: 5, nbf: 10, exp: 20
+            };
+
+            subject.validateSigninResponse(stubState, stubResponse).then(response => {
+                response.profile.should.deep.equal({
+                    foo: 1, bar: 'test',
+                    aud: 'some_aud', iss: 'issuer',
+                    sub: '123', email: 'foo@gmail.com',
+                    role: ['admin', 'dev'],
+                    nonce: 'nonce', at_hash: "athash",
+                    iat: 5, nbf: 10, exp: 20
+                });
                 done();
             });
 
@@ -96,30 +193,6 @@ describe("ResponseValidator", function() {
     });
 
 });
-
-// it("should filter protocol claims", function(done) {
-//             stubMetadataService.userInfoEndpointResult = Promise.resolve("http://sts/userinfo");
-//             stubJsonService.result = Promise.resolve({
-//                 foo: 1, bar: 'test',
-//                 aud:'some_aud', iss:'issuer', 
-//                 sub:'123', email:'foo@gmail.com',
-//                 role:['admin', 'dev'],
-//                 nonce:'nonce', at_hash:"athash", 
-//                 iat:5, nbf:10, exp:20
-//             });
-//             settings.filterProtocolClaims = true;
-
-//             subject.getClaims("token").then(claims => {
-//                 claims.should.deep.equal({
-//                     foo: 1, bar: 'test',
-//                     sub:'123', email:'foo@gmail.com',
-//                     role:['admin', 'dev']
-//                 });
-//                 done();
-//             });
-
-//         });
-
 
 class StubUserInfoService {
     getClaims() {

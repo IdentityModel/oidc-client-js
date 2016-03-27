@@ -40,7 +40,7 @@ export default class ResponseValidator {
             return Promise.reject(new Error("No id_token in response"));
         }
 
-        let p = null;
+        let p;
 
         if (response.id_token) {
             if (response.access_token) {
@@ -79,7 +79,7 @@ export default class ResponseValidator {
     // mergeClaims(claims1, claims2){
     //     return claims1;
     // }
-    
+
     filterProtocolClaims(claims){
         if (claims && this._settings.filterProtocolClaims) {
             ProtocolClaims.forEach(type => {
