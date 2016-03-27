@@ -20,11 +20,11 @@ export default class ResponseValidator {
     validateSigninResponse(state, response) {
         Log.info("ResponseValidator.validateSigninResponse");
 
-        return this.processState(state, response).then(response => {
+        return this.processSigninParams(state, response).then(response => {
             Log.info("state processed");
             return this.validateTokens(state, response).then(response => {
                 Log.info("tokens validated");
-                return this.processClaims(response).then(response=>{
+                return this.processClaims(response).then(response => {
                     Log.info("claims processed");
                     return response;
                 });
@@ -32,9 +32,31 @@ export default class ResponseValidator {
         });
     }
     
-    processState(state, response){
-        Log.info("ResponseValidator.processState");
+    validateSignoutResponse(state, response) {
+        Log.info("ResponseValidator.validateSignoutResponse");
+
+        if (state.id !== response.state) {
+            Log.error("State does not match");
+            return Promise.reject(new Error("State does not match"));
+        }
+
+        // now that we know the state matches, take the stored data
+        // and set it into the response so callers can get their state
+        // this is important for both success & error outcomes
+        Log.info("state validated");
+        response.state = state.data;
+
+        if (response.error) {
+            Log.warn("Response was error", response.error);
+            return Promise.reject(response);
+        }
         
+        return Promise.resolve(response);
+    }
+    
+    processSigninParams(state, response) {
+        Log.info("ResponseValidator.processSigninParams");
+
         if (state.id !== response.state) {
             Log.error("State does not match");
             return Promise.reject(new Error("State does not match"));
@@ -60,13 +82,13 @@ export default class ResponseValidator {
             Log.error("Not expecting id_token in response");
             return Promise.reject(new Error("Unexpected id_token in response"));
         }
-        
+
         return Promise.resolve(response);
     }
-    
-    processClaims(response){
+
+    processClaims(response) {
         Log.info("ResponseValidator.processClaims");
-        
+
         response.profile = this.filterProtocolClaims(response.profile);
 
         // if (this._settings.loadUserInfo) {
@@ -81,24 +103,6 @@ export default class ResponseValidator {
         //     });
         // }
 
-        return Promise.resolve(response);
-    }
-
-    validateTokens(state, response) {
-        Log.info("ResponseValidator.validateTokens");
-        
-        if (response.id_token) {
-
-            if (response.access_token) {
-                Log.info("Validating id_token and access_token");
-                return this.validateIdTokenAndAccessToken(state, response);
-            }
-
-            Log.info("Validating id_token");
-            return this.validateIdToken(state, response);
-        }
-        
-        Log.info("No id_token to validate");
         return Promise.resolve(response);
     }
 
@@ -119,9 +123,27 @@ export default class ResponseValidator {
         return claims;
     }
 
+    validateTokens(state, response) {
+        Log.info("ResponseValidator.validateTokens");
+
+        if (response.id_token) {
+
+            if (response.access_token) {
+                Log.info("Validating id_token and access_token");
+                return this.validateIdTokenAndAccessToken(state, response);
+            }
+
+            Log.info("Validating id_token");
+            return this.validateIdToken(state, response);
+        }
+
+        Log.info("No id_token to validate");
+        return Promise.resolve(response);
+    }
+
     validateIdTokenAndAccessToken(state, response) {
         Log.info("ResponseValidator.validateIdTokenAndAccessToken");
-        
+
         return this.validateIdToken(state, response).then(response => {
             return this.validateAccessToken(response);
         });
@@ -129,7 +151,7 @@ export default class ResponseValidator {
 
     validateIdToken(state, response) {
         Log.info("ResponseValidator.validateIdToken");
-        
+
         return Promise.resolve(response);
 
         //     log("OidcClient.validateIdTokenAsync");

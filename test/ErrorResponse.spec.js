@@ -1,18 +1,18 @@
 import Log from '../src/Log';
-import SigninResponseError from '../src/SigninResponseError';
+import ErrorResponse from '../src/ErrorResponse';
 
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 let expect = chai.expect;
 
-describe("SigninResponseError", function() {
+describe("ErrorResponse", function() {
 
     describe("constructor", function() {
 
         it("should require a error param", function() {
             try {
-                new SigninResponseError({});
+                new ErrorResponse({});
             }
             catch (e) {
                 e.message.should.contain('error');
@@ -22,34 +22,34 @@ describe("SigninResponseError", function() {
         });
 
         it("should read error", function() {
-            let subject = new SigninResponseError({error:"foo"});
+            let subject = new ErrorResponse({error:"foo"});
             subject.error.should.equal("foo");
         });
 
         it("should read error_description", function() {
-            let subject = new SigninResponseError({error:"error", error_description:"foo"});
+            let subject = new ErrorResponse({error:"error", error_description:"foo"});
             subject.error_description.should.equal("foo");
         });
 
         it("should read error_uri", function() {
-            let subject = new SigninResponseError({error:"error", error_uri:"foo"});
+            let subject = new ErrorResponse({error:"error", error_uri:"foo"});
             subject.error_uri.should.equal("foo");
         });
 
         it("should read state", function() {
-            let subject = new SigninResponseError({error:"error", state:"foo"});
+            let subject = new ErrorResponse({error:"error", state:"foo"});
             subject.state.should.equal("foo");
         });
     });
 
     describe("message", function() {
         it("should be description if set", function() {
-            let subject = new SigninResponseError({error:"error", error_description:"foo"});
+            let subject = new ErrorResponse({error:"error", error_description:"foo"});
             subject.message.should.equal("foo");
         });
 
         it("should be error if description not set", function() {
-            let subject = new SigninResponseError({error:"error"});
+            let subject = new ErrorResponse({error:"error"});
             subject.message.should.equal("error");
         });
 
@@ -57,8 +57,8 @@ describe("SigninResponseError", function() {
 
     describe("name", function() {
         it("should be class name", function() {
-            let subject = new SigninResponseError({error:"error"});
-            subject.name.should.equal("SigninResponseError");
+            let subject = new ErrorResponse({error:"error"});
+            subject.name.should.equal("ErrorResponse");
         });
 
     });
@@ -66,7 +66,7 @@ describe("SigninResponseError", function() {
     describe("stack", function() {
         
         it("should be set", function() {
-            let subject = new SigninResponseError({error:"error"});
+            let subject = new ErrorResponse({error:"error"});
             subject.stack.should.be.ok;
         });
 

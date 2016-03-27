@@ -1,11 +1,11 @@
 import Log from './Log';
 import UrlUtility from './UrlUtility';
 
-export default class SigninResponseError {
+export default class ErrorResponse {
     constructor({error, error_description, error_uri, state}={}
     ) {
          if (!error){
-            Log.error("No error passed to SigninResponseError");
+            Log.error("No error passed to ErrorResponse");
             throw new Error("error");
         }
         
@@ -21,7 +21,7 @@ export default class SigninResponseError {
         return this.error_description || this.error;
     }
     get name(){
-        return "SigninResponseError";
+        return "ErrorResponse";
     }
     get stack(){
         return this._stack;

@@ -4,6 +4,7 @@ import MetadataService from './MetadataService';
 import SigninRequest from './SigninRequest';
 import SigninResponse from './SigninResponse';
 import SignoutRequest from './SignoutRequest';
+import SignoutResponse from './SignoutResponse';
 import WebStorageStateStore from './WebStorageStateStore';
 import ResponseValidator from './ResponseValidator';
 
@@ -122,6 +123,27 @@ export default class OidcClientService {
     processSignoutResponse(url){
         Log.info("OidcClientService.processSignoutResponse");
         
+        var response = new SignoutResponse(url);
+        if (!response.state) {
+            Log.error("No state in response");
+            return Promise.reject(new Error("No state in response"));
+        }
+        
+        var stateKey = response.state;
+        
+        return this._stateStore.remove(stateKey).then(state => {
+            if (!state){
+                Log.error("No matching state found in storage");
+                throw new Error("Failed to process response");
+            }
+            
+            Log.info("Received state from storage; validating response");
+            return this._validator.validateSignoutResponse(state, response);
+            
+        }, err => {
+            Log.error("Failed to process response", err);
+            return Promise.reject(new Error("Failed to process response"));
+        });
     }
 
 // OidcClient.prototype.processResponseAsync = function (queryString) {

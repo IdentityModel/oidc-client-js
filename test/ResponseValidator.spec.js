@@ -16,18 +16,18 @@ class MockResponseValidator extends ResponseValidator {
     _mock(name, ...args) {
         Log.info("mock called", name);
         this[name + "WasCalled"] = true;
-        
+
         if (this[name + "Result"]) {
             Log.info("mock returning result", this[name + "Result"]);
             return this[name + "Result"];
         }
-        
+
         Log.info("mock calling super");
         return super[name](...args);
     }
-
-    processState(...args) {
-        return this._mock("processState", ...args);
+    
+    processSigninParams(...args) {
+        return this._mock("processSigninParams", ...args);
     }
     validateTokens(...args) {
         return this._mock("validateTokens", ...args);
@@ -93,15 +93,58 @@ describe("ResponseValidator", function() {
 
     });
 
+    describe("validateSignoutResponse", function(done) {
+        
+        it("should validate that the client state matches response state", function() {
+
+            stubResponse.state = "not_the_id";
+            subject.validateSignoutResponse(stubState, stubResponse).then(null, err => {
+                err.message.should.contain('match');
+                done();
+            });
+
+        });
+
+        it("should fail on error response", function(done) {
+
+            stubResponse.error = "some_error";
+            subject.validateSignoutResponse(stubState, stubResponse).then(null, err => {
+                err.error.should.equal("some_error");
+                done();
+            });
+
+        });
+
+        it("should return data for error responses", function(done) {
+
+            stubResponse.error = "some_error";
+            subject.validateSignoutResponse(stubState, stubResponse).then(null, err => {
+                err.state.should.deep.equal({ some: 'data' });
+                done();
+            });
+
+        });
+        
+        it("should return data for successful responses", function(done) {
+
+            subject.validateSignoutResponse(stubState, stubResponse).then(response => {
+                response.state.should.deep.equal({ some: 'data' });
+                done();
+            });
+
+        });
+
+    });
+
     describe("validateSigninResponse", function(done) {
 
-        it("should process state", function(done) {
+        it("should process signin params", function(done) {
 
-            subject.processStateResult = Promise.resolve(stubResponse);
+            subject.processSigninParamsResult = Promise.resolve(stubResponse);
             subject.validateTokensResult = Promise.resolve(stubResponse);
 
             subject.validateSigninResponse(stubState, stubResponse).then(response => {
-                subject.processStateWasCalled.should.be.true;
+                subject.processSigninParamsWasCalled.should.be.true;
                 done();
             });
 
@@ -109,7 +152,7 @@ describe("ResponseValidator", function() {
 
         it("should validate tokens", function(done) {
 
-            subject.processStateResult = Promise.resolve(stubResponse);
+            subject.processSigninParamsResult = Promise.resolve(stubResponse);
             subject.validateTokensResult = Promise.resolve(stubResponse);
 
             subject.validateSigninResponse(stubState, stubResponse).then(response => {
@@ -118,10 +161,10 @@ describe("ResponseValidator", function() {
             });
 
         });
-        
-         it("should not validate tokens if state fails", function(done) {
-            
-            subject.processStateResult = Promise.reject("error");
+
+        it("should not validate tokens if state fails", function(done) {
+
+            subject.processSigninParamsResult = Promise.reject("error");
             subject.validateTokensResult = Promise.resolve(stubResponse);
 
             subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
@@ -133,7 +176,7 @@ describe("ResponseValidator", function() {
 
         it("should process claims", function(done) {
 
-            subject.processStateResult = Promise.resolve(stubResponse);
+            subject.processSigninParamsResult = Promise.resolve(stubResponse);
             subject.validateTokensResult = Promise.resolve(stubResponse);
 
             subject.validateSigninResponse(stubState, stubResponse).then(response => {
@@ -142,10 +185,10 @@ describe("ResponseValidator", function() {
             });
 
         });
-        
+
         it("should not process claims if state fails", function(done) {
 
-            subject.processStateResult = Promise.resolve(stubResponse);
+            subject.processSigninParamsResult = Promise.resolve(stubResponse);
             subject.validateTokensResult = Promise.reject("error");
 
             subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
@@ -156,13 +199,13 @@ describe("ResponseValidator", function() {
         });
 
     });
-    
-    describe("processState", function() {
+
+    describe("processSigninParams", function() {
 
         it("should validate that the client state matches response state", function() {
 
             stubResponse.state = "not_the_id";
-            subject.processState(stubState, stubResponse).then(null, err => {
+            subject.processSigninParams(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('match');
                 done();
             });
@@ -172,17 +215,17 @@ describe("ResponseValidator", function() {
         it("should fail on error response", function(done) {
 
             stubResponse.error = "some_error";
-            subject.processState(stubState, stubResponse).then(null, err => {
+            subject.processSigninParams(stubState, stubResponse).then(null, err => {
                 err.error.should.equal("some_error");
                 done();
             });
 
         });
 
-        it("should return data even for error responses", function(done) {
+        it("should return data for error responses", function(done) {
 
             stubResponse.error = "some_error";
-            subject.processState(stubState, stubResponse).then(null, err => {
+            subject.processSigninParams(stubState, stubResponse).then(null, err => {
                 err.state.should.deep.equal({ some: 'data' });
                 done();
             });
@@ -194,7 +237,7 @@ describe("ResponseValidator", function() {
             stubState.nonce = "some_nonce";
             delete stubResponse.id_token;
 
-            subject.processState(stubState, stubResponse).then(null, err => {
+            subject.processSigninParams(stubState, stubResponse).then(null, err => {
                 err.message.should.contain("id_token");
                 done();
             });
@@ -205,8 +248,17 @@ describe("ResponseValidator", function() {
 
             stubResponse.id_token = "id_token";
 
-            subject.processState(stubState, stubResponse).then(null, err => {
+            subject.processSigninParams(stubState, stubResponse).then(null, err => {
                 err.message.should.contain("id_token");
+                done();
+            });
+
+        });
+
+        it("should return data for successful responses", function(done) {
+
+            subject.processSigninParams(stubState, stubResponse).then(response => {
+                response.state.should.deep.equal({ some: 'data' });
                 done();
             });
 
@@ -214,9 +266,9 @@ describe("ResponseValidator", function() {
     });
 
     describe("processClaims", function() {
-        
+
         it("should filter protocol claims", function(done) {
-            
+
             subject.processClaims(stubState, stubResponse).then(response => {
                 subject.filterProtocolClaimsWasCalled.should.be.true;
                 done();

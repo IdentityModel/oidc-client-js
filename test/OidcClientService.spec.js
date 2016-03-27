@@ -1,8 +1,10 @@
 import OidcClientService from '../src/OidcClientService';
 import SigninRequest from '../src/SigninRequest';
 import SigninResponse from '../src/SigninResponse';
-import SigninResponseError from '../src/SigninResponseError';
+import ErrorResponse from '../src/ErrorResponse';
 import SignoutRequest from '../src/SignoutRequest';
+import SignoutResponse from '../src/SignoutResponse';
+
 import Log from '../src/Log';
 
 import StubMetadataService from './StubMetadataService';
@@ -10,6 +12,38 @@ import StubMetadataService from './StubMetadataService';
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
+
+class StubStateStore {
+    set(key, value) {
+        this.item = value;
+        return Promise.resolve();
+    }
+
+    remove(key) {
+        if (this.error) {
+            return Promise.reject(new Error(this.error));
+        }
+        return Promise.resolve(this.item);
+    }
+}
+
+class StubResponseValidator {
+    validateSigninResponse(state, response) {
+
+        this.signinState = state;
+        this.signinResponse = response;
+
+        return Promise.resolve(response);
+    }
+    
+    validateSignoutResponse(state, response) {
+
+        this.signoutState = state;
+        this.signoutResponse = response;
+        
+        return Promise.resolve(response);
+    }
+}
 
 describe("OidcClientService", function() {
     let settings;
@@ -140,7 +174,7 @@ describe("OidcClientService", function() {
                 done();
             });
         });
-        
+
         it("should fail if storage fails", function(done) {
             stubStore.error = "fail";
             subject.processSigninResponse("state=state").then(null, err => {
@@ -152,8 +186,8 @@ describe("OidcClientService", function() {
         it("should call validator", function(done) {
             stubStore.item = "state";
             subject.processSigninResponse("state=state").then(response => {
-                stubValidator.state.should.equal('state');
-                stubValidator.response.should.be.deep.equal(response);
+                stubValidator.signinState.should.equal('state');
+                stubValidator.signinResponse.should.be.deep.equal(response);
                 done();
             });
         });
@@ -220,32 +254,38 @@ describe("OidcClientService", function() {
         });
 
     });
+
+    describe("processSignoutResponse", function() {
+
+        it("should return a promise", function() {
+            subject.processSignoutResponse("state=state").should.be.instanceof(Promise);
+        });
+
+        it("should fail if no state on response", function(done) {
+            stubStore.item = "state";
+            subject.processSignoutResponse("").then(null, err => {
+                err.message.should.contain('state');
+                done();
+            });
+        });
+
+        it("should fail if storage fails", function(done) {
+            stubStore.error = "fail";
+            subject.processSignoutResponse("state=state").then(null, err => {
+                err.message.should.contain('response');
+                done();
+            });
+        });
+
+        it("should call validator", function(done) {
+            stubStore.item = "state";
+            subject.processSignoutResponse("state=state").then(response => {
+                stubValidator.signoutState.should.equal('state');
+                stubValidator.signoutResponse.should.be.deep.equal(response);
+                done();
+            });
+        });
+        
+    });
+
 });
-
-class StubStateStore {
-    set(key, value) {
-        this.item = value;
-        return Promise.resolve();
-    }
-
-    remove(key) {
-        if (this.error) {
-            return Promise.reject(new Error(this.error));
-        }
-        return Promise.resolve(this.item);
-    }
-}
-
-class StubResponseValidator {
-    validateSigninResponse(state, response) {
-        
-        this.state = state;
-        this.response = response;
-        
-        if (this.validateSigninResult) {
-            return this.validateSigninResult;
-        }
-
-        return Promise.resolve(response);
-    }
-}

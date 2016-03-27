@@ -1,6 +1,6 @@
 import Log from './Log';
 import UrlUtility from './UrlUtility';
-import SigninResponseError from './SigninResponseError';
+import ErrorResponse from './ErrorResponse';
 
 export default class SigninResponse {
     constructor(url) {
@@ -8,7 +8,7 @@ export default class SigninResponse {
         var values = UrlUtility.parseUrlFragment(url);
         
         if (values.error){
-            return new SigninResponseError(values);
+            return new ErrorResponse(values);
         }
         
         this._state = values.state;

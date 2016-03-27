@@ -1,6 +1,6 @@
 import Log from '../src/Log';
 import SigninResponse from '../src/SigninResponse';
-import SigninResponseError from '../src/SigninResponseError';
+import ErrorResponse from '../src/ErrorResponse';
 
 import chai from 'chai';
 chai.should();
@@ -20,9 +20,9 @@ describe("SigninResponse", function() {
             subject.should.be.instanceof(SigninResponse);
         });
         
-        it("should return SigninResponseError if error", function() {
+        it("should return ErrorResponse if error", function() {
             let subject = new SigninResponse("error=foo");
-            subject.should.be.instanceof(SigninResponseError);
+            subject.should.be.instanceof(ErrorResponse);
         });
         
         it("should read id_token", function() {
