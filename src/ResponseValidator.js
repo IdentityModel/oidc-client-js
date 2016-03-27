@@ -31,7 +31,7 @@ export default class ResponseValidator {
             });
         });
     }
-    
+
     validateSignoutResponse(state, response) {
         Log.info("ResponseValidator.validateSignoutResponse");
 
@@ -50,10 +50,10 @@ export default class ResponseValidator {
             Log.warn("Response was error", response.error);
             return Promise.reject(response);
         }
-        
+
         return Promise.resolve(response);
     }
-    
+
     processSigninParams(state, response) {
         Log.info("ResponseValidator.processSigninParams");
 
@@ -87,40 +87,66 @@ export default class ResponseValidator {
     }
 
     processClaims(response) {
-        Log.info("ResponseValidator.processClaims");
+        Log.info("ResponseValidator.processClaims, incoming claims");
 
         response.profile = this.filterProtocolClaims(response.profile);
 
-        // if (this._settings.loadUserInfo) {
+        if (this._settings.loadUserInfo) {
 
-        //     Log.info("loading user info");
-        //     return this._userInfoService.getClaims(response.access_token).then(claims => {
+            Log.info("loading user info");
+            return this._userInfoService.getClaims(response.access_token).then(claims => {
 
-        //         Log.info("user info claims received");
-        //         response.profile = this.mergeClaims(response.profile, claims);
+                response.profile = this.mergeClaims(response.profile, claims);
+                Log.info("user info claims received, updated profile:", response.profile);
 
-        //         return response;
-        //     });
-        // }
+                return response;
+            });
+        }
 
         return Promise.resolve(response);
     }
 
-    // mergeClaims(claims1, claims2){
-    //     return claims1;
-    // }
+    mergeClaims(claims1, claims2) {
+        var result = Object.assign({}, claims1);
+
+        for (let name in claims2) {
+            var values = claims2[name];
+            if (!Array.isArray(values)) {
+                values = [values];
+            }
+            for (let value of values) {
+                if (!result[name]) {
+                    result[name] = value;
+                }
+                else if (Array.isArray(result[name])) {
+                    result[name].push(value);
+                }
+                else {
+                    result[name] = [result[name], value];
+                }
+            }
+        }
+
+        return result;
+    }
 
     filterProtocolClaims(claims) {
-        Log.info("ResponseValidator.filterProtocolClaims");
+        Log.info("ResponseValidator.filterProtocolClaims, incoming claims:", claims);
 
-        if (claims && this._settings.filterProtocolClaims) {
+        var result = Object.assign({}, claims);
+
+        if (this._settings.filterProtocolClaims) {
             ProtocolClaims.forEach(type => {
-                delete claims[type];
+                delete result[type];
             });
 
-            Log.info("protocol claims filtered", claims);
+            Log.info("protocol claims filtered", result);
         }
-        return claims;
+        else {
+            Log.info("protocol claims filtered")
+        }
+
+        return result;
     }
 
     validateTokens(state, response) {

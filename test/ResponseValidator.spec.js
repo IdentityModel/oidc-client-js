@@ -8,6 +8,12 @@ chai.should();
 let assert = chai.assert;
 let expect = chai.expect;
 
+class StubUserInfoService {
+    getClaims() {
+        this.getClaimsWasCalled = true;
+        return this.getClaimsResult;
+    }
+}
 class MockResponseValidator extends ResponseValidator {
     constructor(settings, MetadataServiceCtor, UserInfoServiceCtor) {
         super(settings, MetadataServiceCtor, UserInfoServiceCtor);
@@ -34,6 +40,9 @@ class MockResponseValidator extends ResponseValidator {
     }
     processClaims(...args) {
         return this._mock("processClaims", ...args);
+    }
+    mergeClaims(...args){
+        return this._mock("mergeClaims", ...args);
     }
 
     validateIdTokenAndAccessToken(...args) {
@@ -275,6 +284,77 @@ describe("ResponseValidator", function() {
             });
 
         });
+        
+        it("should load and merge user info claims when loadUserInfo configured", function(done) {
+            
+            settings.loadUserInfo = true;
+            stubResponse.profile = {a:'apple', b:'banana'};
+            stubUserInfoService.getClaimsResult = Promise.resolve({c:'carrot'});
+            
+            subject.processClaims(stubResponse).then(response => {
+                stubUserInfoService.getClaimsWasCalled.should.be.true;
+                subject.mergeClaimsWasCalled.should.be.true;
+                done();
+            });
+
+        });
+        
+        it("should not load and merge user info claims when loadUserInfo not configured", function(done) {
+            
+            settings.loadUserInfo = false;
+            stubResponse.profile = {a:'apple', b:'banana'};
+            stubUserInfoService.getClaimsResult = Promise.resolve({c:'carrot'});
+            
+            subject.processClaims(stubResponse).then(response => {
+                expect(stubUserInfoService.getClaimsWasCalled).to.be.undefined;
+                expect(subject.mergeClaimsWasCalled).to.be.undefined;
+                done();
+            });
+
+        });
+        
+    });
+    
+    
+    describe("mergeClaims", function(){
+        
+         it("should merge claims", function() {
+            
+            var c1 = {a:'apple', b:'banana'};
+            var c2 = {c:'carrot'};
+            
+            var result = subject.mergeClaims(c1, c2);
+            result.should.deep.equal({a:'apple', c:'carrot', b:'banana'});
+
+        });
+        
+        it("should merge sample claim types into array", function() {
+            
+            var c1 = {a:'apple', b:'banana'};
+            var c2 = {a:'carrot'};
+            
+            var result = subject.mergeClaims(c1, c2);
+            result.should.deep.equal({a:['apple', 'carrot'], b:'banana'});
+
+        });
+        
+        it("should merge arrays of sample claim types into array", function() {
+            
+            var c1 = {a:'apple', b:'banana'};
+            var c2 = {a:['carrot', 'durian']};
+            var result = subject.mergeClaims(c1, c2);
+            result.should.deep.equal({a:['apple', 'carrot', 'durian'], b:'banana'});
+
+            var c1 = {a:['apple', 'carrot'], b:'banana'};
+            var c2 = {a:['durian']};
+            var result = subject.mergeClaims(c1, c2);
+            result.should.deep.equal({a:['apple', 'carrot', 'durian'], b:'banana'});
+
+            var c1 = {a:['apple', 'carrot'], b:'banana'};
+            var c2 = {a:'durian'};
+            var result = subject.mergeClaims(c1, c2);
+            result.should.deep.equal({a:['apple', 'carrot', 'durian'], b:'banana'});
+        });
     });
 
     describe("filterProtocolClaims", function() {
@@ -366,11 +446,5 @@ describe("ResponseValidator", function() {
 
         });
     });
-
+    
 });
-
-class StubUserInfoService {
-    getClaims() {
-        return this.getClaimsResult;
-    }
-}
