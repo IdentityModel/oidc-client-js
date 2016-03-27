@@ -31,7 +31,7 @@ class MockResponseValidator extends ResponseValidator {
         Log.info("mock calling super");
         return super[name](...args);
     }
-    
+
     processSigninParams(...args) {
         return this._mock("processSigninParams", ...args);
     }
@@ -41,7 +41,7 @@ class MockResponseValidator extends ResponseValidator {
     processClaims(...args) {
         return this._mock("processClaims", ...args);
     }
-    mergeClaims(...args){
+    mergeClaims(...args) {
         return this._mock("mergeClaims", ...args);
     }
 
@@ -103,7 +103,7 @@ describe("ResponseValidator", function() {
     });
 
     describe("validateSignoutResponse", function(done) {
-        
+
         it("should validate that the client state matches response state", function() {
 
             stubResponse.state = "not_the_id";
@@ -133,7 +133,7 @@ describe("ResponseValidator", function() {
             });
 
         });
-        
+
         it("should return data for successful responses", function(done) {
 
             subject.validateSignoutResponse(stubState, stubResponse).then(response => {
@@ -284,13 +284,13 @@ describe("ResponseValidator", function() {
             });
 
         });
-        
+
         it("should load and merge user info claims when loadUserInfo configured", function(done) {
-            
+
             settings.loadUserInfo = true;
-            stubResponse.profile = {a:'apple', b:'banana'};
-            stubUserInfoService.getClaimsResult = Promise.resolve({c:'carrot'});
-            
+            stubResponse.profile = { a: 'apple', b: 'banana' };
+            stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
+
             subject.processClaims(stubResponse).then(response => {
                 stubUserInfoService.getClaimsWasCalled.should.be.true;
                 subject.mergeClaimsWasCalled.should.be.true;
@@ -298,13 +298,13 @@ describe("ResponseValidator", function() {
             });
 
         });
-        
+
         it("should not load and merge user info claims when loadUserInfo not configured", function(done) {
-            
+
             settings.loadUserInfo = false;
-            stubResponse.profile = {a:'apple', b:'banana'};
-            stubUserInfoService.getClaimsResult = Promise.resolve({c:'carrot'});
-            
+            stubResponse.profile = { a: 'apple', b: 'banana' };
+            stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
+
             subject.processClaims(stubResponse).then(response => {
                 expect(stubUserInfoService.getClaimsWasCalled).to.be.undefined;
                 expect(subject.mergeClaimsWasCalled).to.be.undefined;
@@ -312,48 +312,48 @@ describe("ResponseValidator", function() {
             });
 
         });
-        
+
     });
-    
-    
-    describe("mergeClaims", function(){
-        
-         it("should merge claims", function() {
-            
-            var c1 = {a:'apple', b:'banana'};
-            var c2 = {c:'carrot'};
-            
+
+
+    describe("mergeClaims", function() {
+
+        it("should merge claims", function() {
+
+            var c1 = { a: 'apple', b: 'banana' };
+            var c2 = { c: 'carrot' };
+
             var result = subject.mergeClaims(c1, c2);
-            result.should.deep.equal({a:'apple', c:'carrot', b:'banana'});
+            result.should.deep.equal({ a: 'apple', c: 'carrot', b: 'banana' });
 
         });
-        
+
         it("should merge same claim types into array", function() {
-            
-            var c1 = {a:'apple', b:'banana'};
-            var c2 = {a:'carrot'};
-            
+
+            var c1 = { a: 'apple', b: 'banana' };
+            var c2 = { a: 'carrot' };
+
             var result = subject.mergeClaims(c1, c2);
-            result.should.deep.equal({a:['apple', 'carrot'], b:'banana'});
+            result.should.deep.equal({ a: ['apple', 'carrot'], b: 'banana' });
 
         });
-        
+
         it("should merge arrays of same claim types into array", function() {
-            
-            var c1 = {a:'apple', b:'banana'};
-            var c2 = {a:['carrot', 'durian']};
-            var result = subject.mergeClaims(c1, c2);
-            result.should.deep.equal({a:['apple', 'carrot', 'durian'], b:'banana'});
 
-            var c1 = {a:['apple', 'carrot'], b:'banana'};
-            var c2 = {a:['durian']};
+            var c1 = { a: 'apple', b: 'banana' };
+            var c2 = { a: ['carrot', 'durian'] };
             var result = subject.mergeClaims(c1, c2);
-            result.should.deep.equal({a:['apple', 'carrot', 'durian'], b:'banana'});
+            result.should.deep.equal({ a: ['apple', 'carrot', 'durian'], b: 'banana' });
 
-            var c1 = {a:['apple', 'carrot'], b:'banana'};
-            var c2 = {a:'durian'};
+            var c1 = { a: ['apple', 'carrot'], b: 'banana' };
+            var c2 = { a: ['durian'] };
             var result = subject.mergeClaims(c1, c2);
-            result.should.deep.equal({a:['apple', 'carrot', 'durian'], b:'banana'});
+            result.should.deep.equal({ a: ['apple', 'carrot', 'durian'], b: 'banana' });
+
+            var c1 = { a: ['apple', 'carrot'], b: 'banana' };
+            var c2 = { a: 'durian' };
+            var result = subject.mergeClaims(c1, c2);
+            result.should.deep.equal({ a: ['apple', 'carrot', 'durian'], b: 'banana' });
         });
     });
 
@@ -446,5 +446,44 @@ describe("ResponseValidator", function() {
 
         });
     });
+
+    describe("validateIdTokenAndAccessToken", function() {
+
+        it("should validate id_token and access_token", function(done) {
+
+            stubResponse.id_token = "id_token";
+            stubResponse.access_token = "access_token";
+            subject.validateIdTokenResult = Promise.resolve(stubResponse);
+
+            subject.validateIdTokenAndAccessToken(stubState, stubResponse).then(response => {
+                subject.validateIdTokenWasCalled.should.be.true;
+                subject.validateAccessTokenWasCalled.should.be.true;
+                done();
+            });
+
+        });
+
+        it("should not access_token if id_token validation fails", function(done) {
+
+            stubResponse.id_token = "id_token";
+            stubResponse.access_token = "access_token";
+            subject.validateIdTokenResult = Promise.reject(new Error("error"));
+
+            subject.validateIdTokenAndAccessToken(stubState, stubResponse).then(null, err => {
+                subject.validateIdTokenWasCalled.should.be.true;
+                expect(subject.validateAccessTokenWasCalled).to.be.undefined;
+                done();
+            });
+
+        });
+
+    });
+
+    describe("validateIdToken", function() {
+        
+    });
     
+    describe("validateAccessToken", function() {
+        
+    });
 });
