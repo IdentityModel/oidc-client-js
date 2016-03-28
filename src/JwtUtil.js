@@ -39,7 +39,7 @@ export default class JwtUtil {
         Log.info("JwtUtil.validateJwt");
 
         try {
-            if (key.kty === "RSA"){
+            if (key.kty === "RSA") {
                 if (key.e && key.n) {
                     key = __global.KEYUTIL.getKey(key);
                 }
@@ -51,7 +51,7 @@ export default class JwtUtil {
                     return false;
                 }
             }
-            else if (key.kty === "EC"){
+            else if (key.kty === "EC") {
                 if (key.crv && key.x && key.y) {
                     key = __global.KEYUTIL.getKey(key);
                 }
@@ -71,13 +71,13 @@ export default class JwtUtil {
                     alg: ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'ES256', 'ES384', 'ES512'],
                     iss: [issuer],
                     aud: [audience],
-                    verifyAt : now
+                    verifyAt: now
                 });
         }
         catch (e) {
             Log.error(e);
         }
-        
+
         return false;
     }
 

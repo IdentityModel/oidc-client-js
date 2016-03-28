@@ -18,7 +18,9 @@ describe("JwtUtil", function() {
 
     const expectedIssuer = "https://localhost:44333/core";
     const expectedAudience = "js.tokenmanager";
-    const expectedNow = 1459129901;
+    const expires = 1459130201;
+    const notBefore = 1459129901;
+    const expectedNow = notBefore;
 
     beforeEach(function() {
         Log.setLogger(console);
@@ -136,6 +138,35 @@ describe("JwtUtil", function() {
             result.should.be.false;
 
         });
+
+        it("should not validate after exp", function() {
+
+            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expires + 1);
+            result.should.be.false;
+
+        });
+
+        it("should not validate before nbf", function() {
+
+            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, notBefore - 1);
+            result.should.be.false;
+
+        });
+
+        it("should not validate for invalid audience", function() {
+
+            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, "invalid aud", expectedNow);
+            result.should.be.false;
+
+        });
+
+        it("should not validate for invalid issuer", function() {
+
+            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, "invalid issuer", expectedAudience, expectedNow);
+            result.should.be.false;
+
+        });
+
 
     });
 
