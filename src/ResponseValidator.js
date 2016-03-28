@@ -16,7 +16,7 @@ export default class ResponseValidator {
         this._settings = settings;
         this._metadataService = new MetadataServiceCtor(this._settings);
         this._userInfoService = new UserInfoServiceCtor(this._settings);
-        this._jwtUtil = JwtUtil;
+        this._jwtUtil = jwtUtil;
     }
 
     validateSigninResponse(state, response) {
@@ -247,34 +247,49 @@ export default class ResponseValidator {
             Log.error("No profile loaded from id_token");
             return Promise.reject(new Error("No profile loaded from id_token"));
         }
-        
-        if (!response.profile || !response.profile.at_hash) {
+
+        if (!response.profile.at_hash) {
             Log.error("No at_hash in id_token");
             return Promise.reject(new Error("No at_hash in id_token"));
         }
-        
-        var hashAlg = this._jwtUtil.getAlg(response.id_token);
-        if (hashAlg.length !== 5) {
-            Log.error("Unsupported alg: " + hashAlg);
-            return Promise.reject("Unsupported alg: " + hashAlg);
-        }
-        
-        var hashBits = hashAlg.substr(2, 3);
-        hashBits = parseInt(hashBits);
-        if (hashBits !== 256 && hashBits !== 384 && hashBits !== 512){
-            Log.error("Unsupported alg: " + hashAlg, hashBits);
-            return Promise.reject("Unsupported alg: " + hashAlg);
+
+        if (!response.id_token) {
+            Log.error("No id_token");
+            return Promise.reject(new Error("No id_token"));
         }
 
-        var hash = this._jwtUtil.hashString(response.access_token, "sha" + hashBits);
+        var hashAlg = this._jwtUtil.getAlg(response.id_token);
+        if (!hashAlg || hashAlg.length !== 5) {
+            Log.error("Unsupported alg:", hashAlg);
+            return Promise.reject(new Error("Unsupported alg: " + hashAlg));
+        }
+
+        var hashBits = hashAlg.substr(2, 3);
+        if (!hashBits) {
+            Log.error("Unsupported alg:", hashAlg, hashBits);
+            return Promise.reject(new Error("Unsupported alg: " + hashAlg));
+        }
+
+        hashBits = parseInt(hashBits);
+        if (hashBits !== 256 && hashBits !== 384 && hashBits !== 512) {
+            Log.error("Unsupported alg:", hashAlg, hashBits);
+            return Promise.reject(new Error("Unsupported alg: " + hashAlg));
+        }
+
+        let sha = "sha" + hashBits;
+        var hash = this._jwtUtil.hashString(response.access_token, sha);
+        if (!hash) {
+            Log.error("access_token hash failed:", sha);
+            return Promise.reject(new Error("Failed to validate at_hash"));
+        }
+
         var left = hash.substr(0, hash.length / 2);
         var left_b64u = this._jwtUtil.hexToBase64Url(left);
-
         if (left_b64u !== response.profile.at_hash) {
-            Log.error("Failed to validate at_hash");
-            return Promise.reject("Failed to validate at_hash");
+            Log.error("Failed to validate at_hash", left_b64u, response.profile.at_hash);
+            return Promise.reject(new Error("Failed to validate at_hash"));
         }
-        
+
         return Promise.resolve(response);
     }
 }
