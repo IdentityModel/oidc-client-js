@@ -1,7 +1,7 @@
 module.exports = {
-    entry:  './src/_index.js',
+    entry: './src/_index.js',
     output: {
-        path:     'build',
+        path: 'build',
         filename: 'OidcClient.js',
         libraryTarget: 'umd',
         library: 'OidcClient'
@@ -9,8 +9,8 @@ module.exports = {
     module: {
         loaders: [
             {
-                test:   /\.js/,
-                loader: 'babel'
+                test: /\.js/,
+                loader: 'babel-loader'
             }
         ]
     }
