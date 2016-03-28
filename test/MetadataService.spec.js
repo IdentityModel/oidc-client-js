@@ -13,6 +13,9 @@ describe("MetadataService", function() {
     let stubJsonService;
 
     beforeEach(function() {
+        Log.setLogger(console);
+        Log.level = Log.NONE;
+        
         settings = {};
         stubJsonService = new StubJsonService();
         subject = new MetadataService(settings, ()=>stubJsonService);
@@ -263,7 +266,10 @@ describe("MetadataService", function() {
             settings.metadata = {
                 jwks_uri: "http://sts/metadata/keys"
             };
-            stubJsonService.result = Promise.resolve({keys:"test"});
+            stubJsonService.result = Promise.resolve({keys:[{
+                kty:'sig',
+                kid:"test"
+            }]});
 
             let p = subject.getSigningKeys();
 
@@ -274,15 +280,22 @@ describe("MetadataService", function() {
         });
 
         it("should return keys from jwks_uri", function(done) {
+            
             settings.metadata = {
                 jwks_uri: "http://sts/metadata/keys"
             };
-            stubJsonService.result = Promise.resolve({keys:"test"});
+            stubJsonService.result = Promise.resolve({keys:[{
+                kty:'sig',
+                kid:"test"
+            }]});
 
             let p = subject.getSigningKeys();
 
             p.then(keys => {
-                keys.should.equal("test");
+                keys.should.deep.equal([{
+                    kty:'sig',
+                    kid:"test"
+                }]);
                 done();
             });
         });
@@ -291,12 +304,45 @@ describe("MetadataService", function() {
             settings.metadata = {
                 jwks_uri: "http://sts/metadata/keys"
             };
-            stubJsonService.result = Promise.resolve({keys:"test"});
+            stubJsonService.result = Promise.resolve({keys:[{
+                kty:'sig',
+                kid:"test"
+            }]});
 
             let p = subject.getSigningKeys();
 
             p.then(keys => {
-                settings.signingKeys.should.equal("test");
+                settings.signingKeys.should.deep.equal([{
+                    kty:'sig',
+                    kid:"test"
+                }]);
+                done();
+            })
+        });
+        
+        it("should filter signing keys", function(done) {
+            settings.metadata = {
+                jwks_uri: "http://sts/metadata/keys"
+            };
+            stubJsonService.result = Promise.resolve({
+                keys:[
+                {
+                    kty:'sig',
+                    kid:"test"
+                },
+                {
+                    kty:'enc',
+                    kid:"test"
+                }]
+            });
+
+            let p = subject.getSigningKeys();
+
+            p.then(keys => {
+                keys.should.deep.equal([{
+                    kty:'sig',
+                    kid:"test"
+                }]);
                 done();
             })
         });

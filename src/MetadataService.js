@@ -37,25 +37,25 @@ export default class MetadataService {
                 throw new Error("Failed to load metadata");
             });
     }
-    
-    getAuthorizationEndpoint(){
+
+    getAuthorizationEndpoint() {
         Log.info("MetadataService.getAuthorizationEndpoint");
         return this.getMetadataProperty("authorization_endpoint");
     }
-    
-    getUserInfoEndpoint(){
+
+    getUserInfoEndpoint() {
         Log.info("MetadataService.getUserInfoEndpoint");
         return this.getMetadataProperty("userinfo_endpoint");
     }
-    
-    getEndSessionEndpoint(){
+
+    getEndSessionEndpoint() {
         Log.info("MetadataService.getEndSessionEndpoint");
         return this.getMetadataProperty("end_session_endpoint");
     }
-    
-    getMetadataProperty(name){
+
+    getMetadataProperty(name) {
         Log.info("MetadataService.getMetadataProperty", name);
-        
+
         return this.getMetadata().then(metadata => {
             Log.info("metadata recieved");
 
@@ -63,14 +63,14 @@ export default class MetadataService {
                 Log.error("Metadata does not contain property " + name);
                 throw new Error("Metadata does not contain property " + name);
             }
-            
+
             return metadata[name];
         }, err => {
             Log.error("Failed to load metadata property " + name, err);
             throw new Error("Failed to load metadata property " + name)
         });
     }
-    
+
     getSigningKeys() {
         Log.info("MetadataService.getSigningKeys");
 
@@ -84,18 +84,29 @@ export default class MetadataService {
 
             return this._jsonService.getJson(jwks_uri).then(keySet => {
                 Log.info("key set received", keySet);
-                
-                if (!keySet.keys){
+
+                if (!keySet.keys) {
                     Log.error("Missing keys on keyset");
                     throw new Error("Missing keys on keyset");
                 }
-                
-                this._settings.signingKeys = keySet.keys;
+
+                var filteredKeys = this.filterSigningKeys(keySet.keys);
+                Log.info("filtered keys", filteredKeys);
+
+                this._settings.signingKeys = filteredKeys;
                 return this._settings.signingKeys;
             });
         }, err => {
             Log.error("Failed to load signing keys", err);
             throw new Error("Failed to load signing keys");
+        });
+    }
+
+    filterSigningKeys(keys) {
+        Log.info("MetadataService.filterSigningKeys", keys);
+
+        return keys.filter(item => {
+            return item.use === "sig";
         });
     }
 }
