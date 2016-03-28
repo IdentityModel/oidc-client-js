@@ -191,6 +191,11 @@ export default class ResponseValidator {
             Log.error("Failed to parse id_token", jwt);
             return Promise.reject(new Error("Failed to parse id_token"));
         }
+        
+        if (state.nonce !== jwt.payload.nonce){
+            Log.error("Invalid nonce in id_token");
+            return Promise.reject(new Error("Invalid nonce in id_token"));
+        }
 
         var kid = jwt.header.kid;
         if (!kid) {

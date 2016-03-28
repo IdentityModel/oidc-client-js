@@ -128,6 +128,7 @@ describe("ResponseValidator", function() {
 
         stubState = {
             id: "the_id",
+            nonce: "7221005209972382",
             data: { some: 'data' }
         };
         stubResponse = {
@@ -300,7 +301,6 @@ describe("ResponseValidator", function() {
 
         it("should fail if request was OIDC but no id_token in response", function(done) {
 
-            stubState.nonce = "some_nonce";
             delete stubResponse.id_token;
 
             subject.processSigninParams(stubState, stubResponse).then(null, err => {
@@ -312,7 +312,8 @@ describe("ResponseValidator", function() {
 
         it("should fail if request was not OIDC but id_token in response", function(done) {
 
-            stubResponse.id_token = "id_token";
+            delete stubState.nonce;
+            stubResponse.id_token = id_token;
 
             subject.processSigninParams(stubState, stubResponse).then(null, err => {
                 err.message.should.contain("id_token");
@@ -322,6 +323,8 @@ describe("ResponseValidator", function() {
         });
 
         it("should return data for successful responses", function(done) {
+
+            stubResponse.id_token = id_token;
 
             subject.processSigninParams(stubState, stubResponse).then(response => {
                 response.state.should.deep.equal({ some: 'data' });
@@ -543,7 +546,6 @@ describe("ResponseValidator", function() {
 
         it("should fail if no client/audience", function(done) {
 
-            stubState.nonce = "nonce";
             stubResponse.id_token = id_token;
             delete settings.client_id;
 
@@ -566,17 +568,25 @@ describe("ResponseValidator", function() {
         
         it("should fail if invalid id_token", function(done) {
 
-            stubState.nonce = "nonce";
-
             subject.validateIdToken(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('id_token');
+                done();
+            });
+        });
+        
+        it("should fail if nonce doesn't match id_token", function(done) {
+
+            stubState.nonce = "invalid nonce";
+            stubResponse.id_token = id_token;
+
+            subject.validateIdToken(stubState, stubResponse).then(null, err => {
+                err.message.should.contain('nonce');
                 done();
             });
         });
 
         it("should fail if issuer fails", function(done) {
             stubResponse.id_token = id_token;
-            stubState.nonce = "nonce";
             stubMetadataService.getIssuerResult = Promise.reject(new Error("issuer"));
 
             subject.validateIdToken(stubState, stubResponse).then(null, err => {
@@ -588,7 +598,6 @@ describe("ResponseValidator", function() {
         it("should fail if loading keys fails", function(done) {
 
             stubResponse.id_token = id_token;
-            stubState.nonce = "nonce";
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.reject(new Error("keys"));
 
@@ -601,7 +610,6 @@ describe("ResponseValidator", function() {
         it("should fail if no matching key found in signing keys", function(done) {
 
             stubResponse.id_token = id_token;
-            stubState.nonce = "nonce";
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.resolve([]);
 
@@ -614,7 +622,6 @@ describe("ResponseValidator", function() {
         it("should validate JWT", function(done) {
             
             stubResponse.id_token = id_token;
-            stubState.nonce = "nonce";
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.resolve([{kid:'a3rMUgMFv9tPclLa6yF3zAkfquE'}]);
 
@@ -629,7 +636,6 @@ describe("ResponseValidator", function() {
         it("should set profile on result if successful", function(done) {
 
             stubResponse.id_token = id_token;
-            stubState.nonce = "nonce";
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.resolve([{kid:'a3rMUgMFv9tPclLa6yF3zAkfquE'}]);
             
