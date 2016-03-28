@@ -267,7 +267,7 @@ describe("MetadataService", function() {
                 jwks_uri: "http://sts/metadata/keys"
             };
             stubJsonService.result = Promise.resolve({keys:[{
-                kty:'sig',
+                use:'sig',
                 kid:"test"
             }]});
 
@@ -285,7 +285,7 @@ describe("MetadataService", function() {
                 jwks_uri: "http://sts/metadata/keys"
             };
             stubJsonService.result = Promise.resolve({keys:[{
-                kty:'sig',
+                use:'sig',
                 kid:"test"
             }]});
 
@@ -293,7 +293,7 @@ describe("MetadataService", function() {
 
             p.then(keys => {
                 keys.should.deep.equal([{
-                    kty:'sig',
+                    use:'sig',
                     kid:"test"
                 }]);
                 done();
@@ -305,7 +305,7 @@ describe("MetadataService", function() {
                 jwks_uri: "http://sts/metadata/keys"
             };
             stubJsonService.result = Promise.resolve({keys:[{
-                kty:'sig',
+                use:'sig',
                 kid:"test"
             }]});
 
@@ -313,7 +313,7 @@ describe("MetadataService", function() {
 
             p.then(keys => {
                 settings.signingKeys.should.deep.equal([{
-                    kty:'sig',
+                    use:'sig',
                     kid:"test"
                 }]);
                 done();
@@ -327,11 +327,11 @@ describe("MetadataService", function() {
             stubJsonService.result = Promise.resolve({
                 keys:[
                 {
-                    kty:'sig',
+                    use:'sig',
                     kid:"test"
                 },
                 {
-                    kty:'enc',
+                    use:'enc',
                     kid:"test"
                 }]
             });
@@ -340,7 +340,7 @@ describe("MetadataService", function() {
 
             p.then(keys => {
                 keys.should.deep.equal([{
-                    kty:'sig',
+                    use:'sig',
                     kid:"test"
                 }]);
                 done();
