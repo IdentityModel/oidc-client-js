@@ -37,6 +37,11 @@ export default class MetadataService {
                 throw new Error("Failed to load metadata");
             });
     }
+    
+    getIssuer() {
+        Log.info("MetadataService.getIssuer");
+        return this.getMetadataProperty("issuer");
+    }
 
     getAuthorizationEndpoint() {
         Log.info("MetadataService.getAuthorizationEndpoint");

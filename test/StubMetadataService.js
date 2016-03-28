@@ -1,4 +1,10 @@
 export default class StubMetadataService{
+    getMetadata(){
+        return this.getMetadataResult;
+    }
+    getIssuer(){
+        return this.getIssuerResult;
+    }
     getAuthorizationEndpoint(){
         return this.getAuthorizationEndpointResult;
     }
@@ -7,5 +13,8 @@ export default class StubMetadataService{
     }
     getUserInfoEndpoint(){
         return this.userInfoEndpointResult;
+    }
+    getSigningKeys(){
+        return this.getSigningKeysResult;
     }
 }

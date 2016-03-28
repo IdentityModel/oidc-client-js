@@ -181,63 +181,73 @@ export default class ResponseValidator {
     validateIdToken(state, response) {
         Log.info("ResponseValidator.validateIdToken");
 
-        return Promise.resolve(response);
+        if (!state.nonce) {
+            Log.error("No nonce on state");
+            return Promise.reject(new Error("No nonce on state"));
+        }
 
-        //     log("OidcClient.validateIdTokenAsync");
+        let jwt = this._jwtUtil.parseJwt(response.id_token);
+        if (!jwt || !jwt.header || !jwt.payload) {
+            Log.error("Failed to parse id_token", jwt);
+            return Promise.reject(new Error("Failed to parse id_token"));
+        }
 
-        //     var client = this;
-        //     var settings = client._settings;
+        var kid = jwt.header.kid;
+        if (!kid) {
+            Log.error("No kid found in id_token");
+            return Promise.reject(new Error("No kid found in id_token"));
+        }
 
-        //     return client.loadX509SigningKeyAsync().then(function (cert) {
+        let audience = this._settings.client_id;
+        if (!audience) {
+            Log.error("Invalid audience/client_id value");
+            return Promise.reject(new Error("Invalid audience/client_id value"));
+        }
 
-        //         var jws = new KJUR.jws.JWS();
-        //         if (jws.verifyJWSByPemX509Cert(id_token, cert)) {
-        //             var id_token_contents = JSON.parse(jws.parsedJWS.payloadS);
+        return this._metadataService.getIssuer().then(issuer => {
+            Log.info("Received issuer");
 
-        //             if (nonce !== id_token_contents.nonce) {
-        //                 return error("Invalid nonce");
-        //             }
+            return this._metadataService.getSigningKeys().then(keys => {
+                if (!keys){
+                    Log.error("No signing keys from metadata");
+                    return Promise.reject(new Error("No signing keys from metadata"));
+                }
+                
+                Log.info("Received signing keys");
 
-        //             return client.loadMetadataAsync().then(function (metadata) {
+                let key = keys.filter(key => {
+                    return key.kid === kid;
+                })[0];
 
-        //                 if (id_token_contents.iss !== metadata.issuer) {
-        //                     return error("Invalid issuer");
-        //                 }
+                if (!key) {
+                    Log.error("No key matching kid found in signing keys");
+                    return Promise.reject(new Error("No key matching kid found in signing keys"));
+                }
 
-        //                 if (id_token_contents.aud !== settings.client_id) {
-        //                     return error("Invalid audience");
-        //                 }
+                if (!this.validateJwt(response.id_token, key, issuer, audience)) {
+                    Log.error("Signature failed to validate");
+                    return Promise.reject(new Error("Signature failed to validate"));
+                }
 
-        //                 var now = parseInt(Date.now() / 1000);
+                response.profile = jwt.payload;
+                return response;
+            });
+        });
+    }
 
-        //                 // accept tokens issues up to 5 mins ago
-        //                 var diff = now - id_token_contents.iat;
-        //                 if (diff > (5 * 60)) {
-        //                     return error("Token issued too long ago");
-        //                 }
-
-        //                 if (id_token_contents.exp < now) {
-        //                     return error("Token expired");
-        //                 }
-
-        //                 if (access_token && settings.load_user_profile) {
-        //                     // if we have an access token, then call user info endpoint
-        //                     return client.loadUserProfile(access_token, id_token_contents).then(function (profile) {
-        //                         return copy(profile, id_token_contents);
-        //                     });
-        //                 }
-        //                 else {
-        //                     // no access token, so we have all our claims
-        //                     return id_token_contents;
-        //                 }
-
-        //             });
-        //         }
-        //         else {
-        //             return error("JWT failed to validate");
-        //         }
-
-        //     });
+    validateJwt(id_token, key, issuer, audience) {
+        Log.info("ResponseValidator.validateJwt");
+        
+        if (key.kty === "RSA") {
+            return this._jwtUtil.validateJwtRsa(id_token, key, issuer, audience);
+        }
+        else if (key.kty === "EC") {
+            return this._jwtUtil.validateJwtEc(id_token, key, issuer, audience);
+        }
+        else {
+            Log.error("Unsupported key type:", key.kty);
+            return false;
+        }
     }
 
     validateAccessToken(response) {
@@ -258,7 +268,13 @@ export default class ResponseValidator {
             return Promise.reject(new Error("No id_token"));
         }
 
-        var hashAlg = this._jwtUtil.getAlg(response.id_token);
+        let jwt = this._jwtUtil.parseJwt(response.id_token);
+        if (!jwt || !jwt.header) {
+            Log.error("Failed to parse id_token", jwt);
+            return Promise.reject(new Error("Failed to parse id_token"));
+        }
+
+        var hashAlg = jwt.header.alg;
         if (!hashAlg || hashAlg.length !== 5) {
             Log.error("Unsupported alg:", hashAlg);
             return Promise.reject(new Error("Unsupported alg: " + hashAlg));

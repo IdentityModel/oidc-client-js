@@ -220,6 +220,23 @@ describe("MetadataService", function() {
 
     });
     
+    describe("getIssuer", function() {
+
+        it("should return value from", function(done) {
+            settings.metadata = {
+                issuer: "http://sts"
+            };
+
+            let p = subject.getIssuer();
+
+            p.then(result => {
+                result.should.equal("http://sts");
+                done();
+            });
+        });
+
+    });
+    
     describe("getSigningKeys", function() {
 
         it("should return a promise", function() {
