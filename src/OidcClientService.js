@@ -63,10 +63,6 @@ export default class OidcClientService {
             this._stateStore.set(state.id, state.toStorageString());
             
             return request;
-            
-        }, err => {
-            Log.error("Failed to create signin request", err);
-            throw new Error("Failed to create signin request");
         });
     }
     
@@ -84,15 +80,11 @@ export default class OidcClientService {
         return this._stateStore.remove(stateKey).then(state => {
             if (!state){
                 Log.error("No matching state found in storage");
-                throw new Error("Failed to process response");
+                throw new Error("No matching state found in storage");
             }
             
             Log.info("Received state from storage; validating response");
             return this._validator.validateSigninResponse(state, response);
-            
-        }, err => {
-            Log.error("Failed to process response", err);
-            return Promise.reject(new Error("Failed to process response"));
         });
     }
     
@@ -114,9 +106,6 @@ export default class OidcClientService {
             this._stateStore.set(state.id, state.toStorageString());
 
             return request;
-        }, err => {
-            Log.error("Failed to create signout request", err);
-            throw new Error("Failed to create signout request");
         });
     }
     
@@ -139,10 +128,6 @@ export default class OidcClientService {
             
             Log.info("Received state from storage; validating response");
             return this._validator.validateSignoutResponse(state, response);
-            
-        }, err => {
-            Log.error("Failed to process response", err);
-            return Promise.reject(new Error("Failed to process response"));
         });
     }
 }

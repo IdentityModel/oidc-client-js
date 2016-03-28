@@ -63,11 +63,11 @@ describe("UserInfoService", function() {
         });
 
         it("should fail when dependencies fail", function(done) {
-            stubMetadataService.userInfoEndpointResult = Promise.reject("test");
+            stubMetadataService.userInfoEndpointResult = Promise.reject(new Error("test"));
 
             subject.getClaims("token").then(null,
                 err => {
-                    err.message.should.contain('claims');
+                    err.message.should.contain('test');
                     done();
                 }
             );

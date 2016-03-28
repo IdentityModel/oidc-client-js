@@ -110,12 +110,12 @@ describe("MetadataService", function() {
 
         it("should fail if json call fails", function(done) {
             settings.metadataUrl = "http://sts/metadata";
-            stubJsonService.result = Promise.reject("test");
+            stubJsonService.result = Promise.reject(new Error("test"));
 
             let p = subject.getMetadata();
 
             p.then(null, err => {
-                err.message.should.contain("metadata");
+                err.message.should.contain("test");
                 done();
             });
         });
@@ -154,15 +154,14 @@ describe("MetadataService", function() {
         });
         
          it("should fail if json call to load metadata fails", function(done) {
-            settings.metadata = {
-                metadataUrl:"http://sts/metadata"
-            };
-            stubJsonService.result = Promise.reject("test");
+             
+            settings.metadataUrl = "http://sts/metadata";
+            stubJsonService.result = Promise.reject(new Error("test"));
 
             let p = subject.getMetadataProperty("foo");
 
             p.then(null, err => {
-                err.message.should.contain("foo");
+                err.message.should.contain("test");
                 done();
             });
         });
@@ -260,7 +259,7 @@ describe("MetadataService", function() {
             let p = subject.getSigningKeys();
 
             p.then(null, err => {
-                err.message.should.contain('signing keys');
+                err.message.should.contain('jwks_uri');
                 done();
             });
         });

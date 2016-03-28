@@ -29,9 +29,6 @@ export default class UserInfoService {
                 Log.info("claims received", claims);
                 return claims;
             });
-        }, err => {
-            Log.error("Failed to get claims", err);
-            throw new Error("Failed to get claims");
         });
     }
 }

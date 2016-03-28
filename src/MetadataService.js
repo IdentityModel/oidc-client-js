@@ -32,9 +32,6 @@ export default class MetadataService {
                 Log.info("metadata received", metadata);
                 this._settings.metadata = metadata;
                 return metadata;
-            }, err => {
-                Log.error("MetadataService.getMetadata", err);
-                throw new Error("Failed to load metadata");
             });
     }
     
@@ -70,9 +67,6 @@ export default class MetadataService {
             }
 
             return metadata[name];
-        }, err => {
-            Log.error("Failed to load metadata property " + name, err);
-            throw new Error("Failed to load metadata property " + name)
         });
     }
 
@@ -101,9 +95,6 @@ export default class MetadataService {
                 this._settings.signingKeys = filteredKeys;
                 return this._settings.signingKeys;
             });
-        }, err => {
-            Log.error("Failed to load signing keys", err);
-            throw new Error("Failed to load signing keys");
         });
     }
 

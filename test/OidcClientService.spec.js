@@ -138,12 +138,13 @@ describe("OidcClientService", function() {
         });
 
         it("should fail if metadata fails", function(done) {
-            stubMetadataService.getAuthorizationEndpointResult = Promise.reject("test");
+            
+            stubMetadataService.getAuthorizationEndpointResult = Promise.reject(new Error("test"));
 
             var p = subject.createSigninRequest();
 
             p.then(null, err => {
-                err.message.should.contain("signin");
+                err.message.should.contain("test");
                 done();
             });
         });
@@ -178,7 +179,7 @@ describe("OidcClientService", function() {
         it("should fail if storage fails", function(done) {
             stubStore.error = "fail";
             subject.processSigninResponse("state=state").then(null, err => {
-                err.message.should.contain('response');
+                err.message.should.contain('fail');
                 done();
             });
         });
@@ -232,12 +233,12 @@ describe("OidcClientService", function() {
         });
 
         it("should fail if metadata fails", function(done) {
-            stubMetadataService.getEndSessionEndpointResult = Promise.reject("test");
+            stubMetadataService.getEndSessionEndpointResult = Promise.reject(new Error("test"));
 
             var p = subject.createSignoutRequest();
 
             p.then(null, err => {
-                err.message.should.contain("signout");
+                err.message.should.contain("test");
                 done();
             });
         });
@@ -272,7 +273,7 @@ describe("OidcClientService", function() {
         it("should fail if storage fails", function(done) {
             stubStore.error = "fail";
             subject.processSignoutResponse("state=state").then(null, err => {
-                err.message.should.contain('response');
+                err.message.should.contain('fail');
                 done();
             });
         });
