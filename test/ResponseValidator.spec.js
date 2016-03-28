@@ -1,7 +1,11 @@
 import ResponseValidator from '../src/ResponseValidator';
 import Log from '../src/Log';
+import JwtUtil from '../src/JwtUtil';
 
 import StubMetadataService from './StubMetadataService';
+
+var KJUR = require("jsrsasign");
+JwtUtil.init(KJUR);
 
 import chai from 'chai';
 chai.should();
@@ -480,10 +484,62 @@ describe("ResponseValidator", function() {
     });
 
     describe("validateIdToken", function() {
-        
+
     });
-    
+
     describe("validateAccessToken", function() {
+        let id_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSIsImtpZCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo0NDMzMy9jb3JlIiwiYXVkIjoianMudG9rZW5tYW5hZ2VyIiwiZXhwIjoxNDU5MTMwMjAxLCJuYmYiOjE0NTkxMjk5MDEsIm5vbmNlIjoiNzIyMTAwNTIwOTk3MjM4MiIsImlhdCI6MTQ1OTEyOTkwMSwiYXRfaGFzaCI6IkpnRFVDeW9hdEp5RW1HaWlXYndPaEEiLCJzaWQiOiIwYzVmMDYxZTYzOThiMWVjNmEwYmNlMmM5NDFlZTRjNSIsInN1YiI6Ijg4NDIxMTEzIiwiYXV0aF90aW1lIjoxNDU5MTI5ODk4LCJpZHAiOiJpZHNydiIsImFtciI6WyJwYXNzd29yZCJdfQ.f6S1Fdd0UQScZAFBzXwRiVsUIPQnWZLSe07kdtjANRZDZXf5A7yDtxOftgCx5W0ONQcDFVpLGPgTdhp7agZkPpCFutzmwr0Rr9G7E7mUN4xcIgAABhmRDfzDayFBEu6VM8wEWTChezSWtx2xG_2zmVJxxmNV0jvkaz0bu7iin-C_UZg6T-aI9FZDoKRGXZP9gF65FQ5pQ4bCYQxhKcvjjUfs0xSHGboL7waN6RfDpO4vvVR1Kz-PQhIRyFAJYRuoH4PdMczHYtFCb-k94r-7TxEU0vp61ww4WntbPvVWwUbCUgsEtmDzAZT-NEJVhWztNk1ip9wDPXzZ2hEhDAPJ7A";
         
+        let access_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSIsImtpZCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo0NDMzMy9jb3JlIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzMzMvY29yZS9yZXNvdXJjZXMiLCJleHAiOjE0NTkxMzM1MDEsIm5iZiI6MTQ1OTEyOTkwMSwiY2xpZW50X2lkIjoianMudG9rZW5tYW5hZ2VyIiwic2NvcGUiOlsib3BlbmlkIiwicHJvZmlsZSIsImVtYWlsIiwicmVhZCIsIndyaXRlIl0sInN1YiI6Ijg4NDIxMTEzIiwiYXV0aF90aW1lIjoxNDU5MTI5ODk4LCJpZHAiOiJpZHNydiIsImFtciI6WyJwYXNzd29yZCJdfQ.ldCBx4xF_WIj6S9unppYAzXFKMs5ce7sKuse-nleFbzwRbZ-VNubLOlnpsFzquJIyTlGLekqLWnsfpAmaORQBtv5ZoaUHxC_s5APLWGC9Io19tF8NxWVmX2OK3cwHWQ5HtFkILQdYR9l3Bf5RIQK4ixbrKJN7OyzoLAen0FgEXDn-dXMAhFJDl123G7pBaayQb8ic44y808cfKlu3wwP2QkDEzgW-L0avvjN95zji5528c32L2LBMveRklcOXO6Gb0alcFw6PysfJotsNo9WahJWu404mSl3Afc-4jCWjoTL7PBL-xciPmq9iCNAgqVS7GN1s1WsnBW2R4kGLy-kcQ";
+
+        let at_hash = "JgDUCyoatJyEmGiiWbwOhA";
+
+        it("should require profile", function(done) {
+
+            stubResponse.profile = null;
+
+            subject.validateAccessToken(stubResponse).then(null, err => {
+                err.message.should.contain("profile");
+                done();
+            });
+        });
+
+        it("should require at_hash on profile", function(done) {
+
+            stubResponse.profile = {
+            };
+
+            subject.validateAccessToken(stubResponse).then(null, err => {
+                err.message.should.contain("at_hash");
+                done();
+            });
+        });
+        
+        it("should require proper alg on id_token", function(done) {
+
+            stubResponse.id_token = id_token;
+            stubResponse.profile = {
+            };
+
+            subject.validateAccessToken(stubResponse).then(null, err => {
+                err.message.should.contain("at_hash");
+                done();
+            });
+        });
+        
+        it.only("should validate at_hash", function(done) {
+            
+            stubResponse.id_token = id_token;
+            stubResponse.access_token = access_token;
+            stubResponse.profile = {
+                at_hash:at_hash
+            };
+
+            subject.validateAccessToken(stubResponse).then(response => {
+                response.should.be.deep.equal(stubResponse);
+                done();
+            });
+        });
+
     });
 });

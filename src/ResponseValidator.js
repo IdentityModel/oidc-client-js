@@ -1,12 +1,13 @@
 import Log from './Log';
 import MetadataService from './MetadataService';
 import UserInfoService from './UserInfoService';
+import JwtUtil from './JwtUtil';
 
 const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "c_hash"];
 
 export default class ResponseValidator {
 
-    constructor(settings, MetadataServiceCtor = MetadataService, UserInfoServiceCtor = UserInfoService) {
+    constructor(settings, MetadataServiceCtor = MetadataService, UserInfoServiceCtor = UserInfoService, jwtUtil = JwtUtil) {
         if (!settings) {
             Log.error("No settings passed to ResponseValidator");
             throw new Error("settings");
@@ -15,6 +16,7 @@ export default class ResponseValidator {
         this._settings = settings;
         this._metadataService = new MetadataServiceCtor(this._settings);
         this._userInfoService = new UserInfoServiceCtor(this._settings);
+        this._jwtUtil = JwtUtil;
     }
 
     validateSigninResponse(state, response) {
@@ -114,7 +116,7 @@ export default class ResponseValidator {
             if (!Array.isArray(values)) {
                 values = [values];
             }
-            
+
             for (let value of values) {
                 if (!result[name]) {
                     result[name] = value;
@@ -241,22 +243,38 @@ export default class ResponseValidator {
     validateAccessToken(response) {
         Log.info("ResponseValidator.validateAccessToken");
 
+        if (!response.profile) {
+            Log.error("No profile loaded from id_token");
+            return Promise.reject(new Error("No profile loaded from id_token"));
+        }
+        
+        if (!response.profile || !response.profile.at_hash) {
+            Log.error("No at_hash in id_token");
+            return Promise.reject(new Error("No at_hash in id_token"));
+        }
+        
+        var hashAlg = this._jwtUtil.getAlg(response.id_token);
+        if (hashAlg.length !== 5) {
+            Log.error("Unsupported alg: " + hashAlg);
+            return Promise.reject("Unsupported alg: " + hashAlg);
+        }
+        
+        var hashBits = hashAlg.substr(2, 3);
+        hashBits = parseInt(hashBits);
+        if (hashBits !== 256 && hashBits !== 384 && hashBits !== 512){
+            Log.error("Unsupported alg: " + hashAlg, hashBits);
+            return Promise.reject("Unsupported alg: " + hashAlg);
+        }
+
+        var hash = this._jwtUtil.hashString(response.access_token, "sha" + hashBits);
+        var left = hash.substr(0, hash.length / 2);
+        var left_b64u = this._jwtUtil.hexToBase64Url(left);
+
+        if (left_b64u !== response.profile.at_hash) {
+            Log.error("Failed to validate at_hash");
+            return Promise.reject("Failed to validate at_hash");
+        }
+        
         return Promise.resolve(response);
-
-        //     log("OidcClient.validateAccessTokenAsync");
-
-        //     if (!id_token_contents.at_hash) {
-        //         return error("No at_hash in id_token");
-        //     }
-
-        //     var hash = KJUR.crypto.Util.sha256(access_token);
-        //     var left = hash.substr(0, hash.length / 2);
-        //     var left_b64u = hextob64u(left);
-
-        //     if (left_b64u !== id_token_contents.at_hash) {
-        //         return error("at_hash failed to validate");
-        //     }
-
-        //     return resolve();
     }
 }
