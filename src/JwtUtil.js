@@ -27,34 +27,60 @@ export default class JwtUtil {
             var token = __global.jws.JWS.parse(jwt);
             return {
                 header: token.headerObj,
-                payload : token.payloadObj
+                payload: token.payloadObj
             }
         }
         catch (e) {
             Log.error(e);
         }
     }
-    
-    static validateJwtRsa(jwt, key) {
-        Log.info("JwtUtil.validateJwtRsa");
+
+    static validateJwt(jwt, key, issuer, audience, now) {
+        Log.info("JwtUtil.validateJwt");
+
         try {
-            return true;
+            if (key.kty === "RSA"){
+                if (key.e && key.n) {
+                    key = __global.KEYUTIL.getKey(key);
+                }
+                else if (key.x5c && key.x5c.length) {
+                    key = __global.KEYUTIL.getKey(__global.X509.getPublicKeyFromCertPEM(key.x5c[0]));
+                }
+                else {
+                    Log.error("RSA key missing key material", key);
+                    return false;
+                }
+            }
+            else if (key.kty === "EC"){
+                if (key.crv && key.x && key.y) {
+                    key = __global.KEYUTIL.getKey(key);
+                }
+                else {
+                    Log.error("EC key missing key material", key);
+                    return false;
+                }
+            }
+            else {
+                Log.error("Unsupported key type", key.kty);
+                return false;
+            }
+
+            return __global.jws.JWS.verifyJWT(jwt,
+                key,
+                {
+                    alg: ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'ES256', 'ES384', 'ES512'],
+                    iss: [issuer],
+                    aud: [audience],
+                    verifyAt : now
+                });
         }
         catch (e) {
             Log.error(e);
         }
+        
+        return false;
     }
-    
-    static validateJwtEc(jwt, key) {
-        Log.info("JwtUtil.validateJwtEc");
-        try {
-            return true;
-        }
-        catch (e) {
-            Log.error(e);
-        }
-    }
-    
+
     static hashString(value, alg) {
         Log.info("JwtUtil.hashString", value, alg);
         try {

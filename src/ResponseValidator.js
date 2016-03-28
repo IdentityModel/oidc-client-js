@@ -224,7 +224,7 @@ export default class ResponseValidator {
                     return Promise.reject(new Error("No key matching kid found in signing keys"));
                 }
 
-                if (!this.validateJwt(response.id_token, key, issuer, audience)) {
+                if (!this._jwtUtil.validateJwt(response.id_token, key, issuer, audience)) {
                     Log.error("Signature failed to validate");
                     return Promise.reject(new Error("Signature failed to validate"));
                 }
@@ -233,21 +233,6 @@ export default class ResponseValidator {
                 return response;
             });
         });
-    }
-
-    validateJwt(id_token, key, issuer, audience) {
-        Log.info("ResponseValidator.validateJwt");
-        
-        if (key.kty === "RSA") {
-            return this._jwtUtil.validateJwtRsa(id_token, key, issuer, audience);
-        }
-        else if (key.kty === "EC") {
-            return this._jwtUtil.validateJwtEc(id_token, key, issuer, audience);
-        }
-        else {
-            Log.error("Unsupported key type:", key.kty);
-            return false;
-        }
     }
 
     validateAccessToken(response) {

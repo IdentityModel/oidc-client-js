@@ -12,32 +12,41 @@ chai.should();
 let assert = chai.assert;
 let expect = chai.expect;
 
-class StubJwtUtility {
-    parseJwt() {
-        Log.info("StubJwtUtility.getAlg", this.parseJwtResult)
-        return this.parseJwtResult;
+class MockJwtUtility {
+    parseJwt(...args) {
+        this.parseJwtWasCalled = true;
+        if (this.parseJwtResult){
+            Log.info("MockJwtUtility.parseJwt", this.parseJwtResult)
+            return this.parseJwtResult;
+        }
+        return JwtUtil.parseJwt(...args);
     }
 
-    validateJwtRsa() {
-        Log.info("StubJwtUtility.validateJwtRsa");
-        this.validateJwtRsaWasCalled = true;
-        return this.validateJwtRsaResult;
+    validateJwt(...args) {
+        this.validateJwtWasCalled = true;
+        if (this.validateJwtResult){
+            Log.info("MockJwtUtility.validateJwt", this.validateJwtResult)
+            return this.validateJwtResult;
+        }
+        return JwtUtil.validateJwt(...args);
     }
 
-    validateJwtEc() {
-        Log.info("StubJwtUtility.validateJwtEc");
-        this.validateJwtEcWasCalled = true;
-        return this.validateJwtEcResult;
+    hashString(...args) {
+        this.hashStringWasCalled = true;
+        if (this.hashStringResult){
+            Log.info("MockJwtUtility.hashString", this.hashStringResult)
+            return this.hashStringResult;
+        }
+        return JwtUtil.hashString(...args);
     }
 
-    hashString() {
-        Log.info("StubJwtUtility.hashString", this.hashStringResult)
-        return this.hashStringResult;
-    }
-
-    hexToBase64Url(value) {
-        Log.info("StubJwtUtility.hexToBase64Url", this.hexToBase64UrlResult)
-        return this.hexToBase64UrlResult;
+    hexToBase64Url(...args) {
+        this.hexToBase64UrlCalled = true;
+        if (this.hexToBase64UrlResult){
+            Log.info("MockJwtUtility.hexToBase64Url", this.hexToBase64UrlResult)
+            return this.hexToBase64UrlResult;
+        }
+        return JwtUtil.hexToBase64Url(...args);
     }
 }
 
@@ -49,8 +58,8 @@ class StubUserInfoService {
 }
 
 class MockResponseValidator extends ResponseValidator {
-    constructor(settings, MetadataServiceCtor, UserInfoServiceCtor, stubJwtUtility) {
-        super(settings, MetadataServiceCtor, UserInfoServiceCtor, stubJwtUtility);
+    constructor(settings, MetadataServiceCtor, UserInfoServiceCtor, jwtUtility) {
+        super(settings, MetadataServiceCtor, UserInfoServiceCtor, jwtUtility);
     }
 
     _mock(name, ...args) {
@@ -108,6 +117,7 @@ describe("ResponseValidator", function() {
     let subject;
     let stubMetadataService;
     let stubUserInfoService;
+    let mockJwtUtility;
 
     let stubState;
     let stubResponse;
@@ -129,7 +139,9 @@ describe("ResponseValidator", function() {
         };
         stubMetadataService = new StubMetadataService();
         stubUserInfoService = new StubUserInfoService();
-        subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService);
+        mockJwtUtility = new MockJwtUtility();
+        
+        subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, mockJwtUtility);
     });
 
     describe("constructor", function() {
@@ -600,16 +612,16 @@ describe("ResponseValidator", function() {
         });
         
         it("should validate JWT", function(done) {
-
+            
             stubResponse.id_token = id_token;
             stubState.nonce = "nonce";
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.resolve([{kid:'a3rMUgMFv9tPclLa6yF3zAkfquE'}]);
 
-            subject.validateJwtResult = true;
+            mockJwtUtility.validateJwtResult = true;
             
             subject.validateIdToken(stubState, stubResponse).then(response => {
-                 subject.validateJwtWasCalled.should.be.true;
+                 mockJwtUtility.validateJwtWasCalled.should.be.true;
                 done();
             });
         });
@@ -621,43 +633,12 @@ describe("ResponseValidator", function() {
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.resolve([{kid:'a3rMUgMFv9tPclLa6yF3zAkfquE'}]);
             
-            subject.validateJwtResult = true;
+            mockJwtUtility.validateJwtResult = true;
 
             subject.validateIdToken(stubState, stubResponse).then(response => {
                 response.profile.should.be.ok;
                 done();
             });
-        });
-
-    });
-
-    describe("validateJwt", function() {
-
-        it("should allow RSA", function() {
-            let stubJwtUtility = new StubJwtUtility();
-            subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, stubJwtUtility);
-
-            subject.validateJwt("id_token", { kty: "RSA" }, "issuer", "audience");
-            stubJwtUtility.validateJwtRsaWasCalled.should.be.true;
-        });
-
-        it("should allow EC", function() {
-            let stubJwtUtility = new StubJwtUtility();
-            subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, stubJwtUtility);
-
-            subject.validateJwt("id_token", { kty: "EC" }, "issuer", "audience");
-            stubJwtUtility.validateJwtEcWasCalled.should.be.true;
-        });
-
-        it("should prevent unsupported key types", function() {
-            let stubJwtUtility = new StubJwtUtility();
-            subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, stubJwtUtility);
-
-            stubJwtUtility.validateJwtRsaResult = true;
-            stubJwtUtility.validateJwtEcResult = true;
-
-            var result = subject.validateJwt("id_token", { kty: "foo" }, "issuer", "audience");
-            result.should.be.false;
         });
 
     });
@@ -716,14 +697,11 @@ describe("ResponseValidator", function() {
 
         it("should require proper alg on id_token", function(done) {
 
-            let stubJwtUtility = new StubJwtUtility();
-            subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, stubJwtUtility);
-
             stubResponse.id_token = "bad";
             stubResponse.profile = {
                 at_hash: at_hash
             };
-            stubJwtUtility.parseJwtResult = { header: { alg: "bad" } };
+            mockJwtUtility.parseJwtResult = { header: { alg: "bad" } };
 
             subject.validateAccessToken(stubResponse).then(null, err => {
                 Log.info(err);
@@ -734,16 +712,13 @@ describe("ResponseValidator", function() {
 
         it("should fail for invalid algs of incorrect bit lengths", function(done) {
 
-            let stubJwtUtility = new StubJwtUtility();
-            subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, stubJwtUtility);
-
             stubResponse.id_token = id_token;
             stubResponse.access_token = access_token;
             stubResponse.profile = {
                 at_hash: at_hash
             };
 
-            stubJwtUtility.parseJwtResult = { header: { alg: "HS123" } };
+            mockJwtUtility.parseJwtResult = { header: { alg: "HS123" } };
             subject.validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("alg");
                 done();
@@ -752,16 +727,13 @@ describe("ResponseValidator", function() {
 
         it("should fail for algs of not correct string length", function(done) {
 
-            let stubJwtUtility = new StubJwtUtility();
-            subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, stubJwtUtility);
-
             stubResponse.id_token = id_token;
             stubResponse.access_token = access_token;
             stubResponse.profile = {
                 at_hash: at_hash
             };
 
-            stubJwtUtility.parseJwtResult = { header: { alg: "abc" } };
+            mockJwtUtility.parseJwtResult = { header: { alg: "abc" } };
             subject.validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("alg");
                 done();
@@ -771,17 +743,14 @@ describe("ResponseValidator", function() {
 
         it("should fail if at_hash does not match", function(done) {
 
-            let stubJwtUtility = new StubJwtUtility();
-            subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, stubJwtUtility);
-
             stubResponse.id_token = id_token;
             stubResponse.access_token = access_token;
             stubResponse.profile = {
                 at_hash: at_hash
             };
-            stubJwtUtility.parseJwtResult = { header: { alg: "RS256" } };
-            stubJwtUtility.hashStringResult = "hash";
-            stubJwtUtility.hexToBase64UrlResult = "wrong";
+            mockJwtUtility.parseJwtResult = { header: { alg: "RS256" } };
+            mockJwtUtility.hashStringResult = "hash";
+            mockJwtUtility.hexToBase64UrlResult = "wrong";
 
             subject.validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("at_hash");
