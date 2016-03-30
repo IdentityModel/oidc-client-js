@@ -4,6 +4,7 @@ import SigninResponse from '../src/SigninResponse';
 import ErrorResponse from '../src/ErrorResponse';
 import SignoutRequest from '../src/SignoutRequest';
 import SignoutResponse from '../src/SignoutResponse';
+import State from '../src/State';
 
 import Log from '../src/Log';
 
@@ -205,10 +206,13 @@ describe("OidcClientService", function() {
             });
         });
 
-        it("should call validator", function(done) {
-            stubStore.item = "state";
-            subject.processSigninResponse("state=state").then(response => {
-                stubValidator.signinState.should.equal('state');
+        it("should deserialize stored state and call validator", function(done) {
+            
+            stubStore.item = new State({id:'1', nonce:'2'}).toStorageString();
+            
+            subject.processSigninResponse("state=1").then(response => {
+                stubValidator.signinState.id.should.equal('1');
+                stubValidator.signinState.nonce.should.equal('2');
                 stubValidator.signinResponse.should.be.deep.equal(response);
                 done();
             });

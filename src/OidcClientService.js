@@ -7,6 +7,7 @@ import SignoutRequest from './SignoutRequest';
 import SignoutResponse from './SignoutResponse';
 import WebStorageStateStore from './WebStorageStateStore';
 import ResponseValidator from './ResponseValidator';
+import State from './State';
 
 export default class OidcClientService {
     // logging
@@ -96,11 +97,13 @@ export default class OidcClientService {
         
         var stateKey = response.state;
         
-        return this._stateStore.remove(stateKey).then(state => {
-            if (!state){
+        return this._stateStore.remove(stateKey).then(storedStateString => {
+            if (!storedStateString){
                 Log.error("No matching state found in storage");
                 throw new Error("No matching state found in storage");
             }
+            
+            let state = State.fromStorageString(storedStateString);
             
             Log.info("Received state from storage; validating response");
             return this._validator.validateSigninResponse(state, response);
