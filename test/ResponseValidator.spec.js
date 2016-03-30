@@ -430,6 +430,22 @@ describe("ResponseValidator", function() {
             var result = subject.mergeClaims(c1, c2);
             result.should.deep.equal({ a: ['apple', 'carrot', 'durian'], b: 'banana' });
         });
+        
+        it("should remove duplicates when producing arrays", function() {
+
+            var c1 = { a: 'apple', b: 'banana' };
+            var c2 = { a: ['apple', 'durian'] };
+            var result = subject.mergeClaims(c1, c2);
+            result.should.deep.equal({ a: ['apple', 'durian'], b: 'banana' });
+        });
+        
+        it("should not add if already present in array", function() {
+
+            var c1 = { a: ['apple', 'durian'], b: 'banana' };
+            var c2 = { a: 'apple' };
+            var result = subject.mergeClaims(c1, c2);
+            result.should.deep.equal({ a: ['apple', 'durian'], b: 'banana' });
+        });
     });
 
     describe("filterProtocolClaims", function() {

@@ -122,9 +122,11 @@ export default class ResponseValidator {
                     result[name] = value;
                 }
                 else if (Array.isArray(result[name])) {
-                    result[name].push(value);
+                    if (result[name].indexOf(value) < 0) {
+                        result[name].push(value);
+                    }
                 }
-                else {
+                else if (result[name] !== value) {
                     result[name] = [result[name], value];
                 }
             }
