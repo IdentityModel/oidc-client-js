@@ -3,10 +3,10 @@
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
-	else if(typeof exports === 'object')
-		exports["OidcClient"] = factory();
-	else
-		root["OidcClient"] = factory();
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -57,16 +57,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
+	exports.WebStorageStateStore = exports.default = undefined;
 
 	var _OidcClientService = __webpack_require__(1);
 
 	var _OidcClientService2 = _interopRequireDefault(_OidcClientService);
 
+	var _WebStorageStateStore = __webpack_require__(15);
+
+	var _WebStorageStateStore2 = _interopRequireDefault(_WebStorageStateStore);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	// import InMemoryWebStorage from './InMemoryWebStorage';
+
+	// class Container extends OidcClientService {
+	//     constructor(...args){
+	//         super(...args);
+	//     }
+
+	//     static get OidcClientSettings(){return OidcClientSettings};
+	//     static get WebStorageStateStore(){return WebStorageStateStore};
+	//     static get InMemoryWebStorage(){return InMemoryWebStorage};
+	// }
+
 	exports.default = _OidcClientService2.default;
+	exports.WebStorageStateStore = _WebStorageStateStore2.default;
 	module.exports = exports['default'];
 
 /***/ },

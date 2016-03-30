@@ -14,16 +14,16 @@ OidcClient.logLevel = 'INFO';
 
 var settings = {
     authority: 'https://localhost:44333/core',
-    client_id: 'js.manual',
-    redirect_uri: 'http://localhost:37046/index.html',
-    post_logout_redirect_uri: 'http://localhost:37046/index.html',
+    client_id: 'js.tokenmanager',
+    redirect_uri: 'http://localhost:21575/index.html',
+    post_logout_redirect_uri: 'http://localhost:21575/index.html',
     response_type: 'id_token token',
     scope: 'openid email roles',
     
     filterProtocolClaims : true,
     loadUserInfo:true
 };
-var oidcClient = new OidcClient(settings);
+var oidcClient = new OidcClient(settings, new WebStorageStateStore(sessionStorage));
 
 ///////////////////////////////
 // functions for UI elements
@@ -62,7 +62,6 @@ function processSignoutResponse() {
         log(err.message);
     });
 }
-
 
 ///////////////////////////////
 // debugging helpers
