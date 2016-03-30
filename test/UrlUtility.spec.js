@@ -47,13 +47,13 @@ describe("UrlUtility", function() {
             result.should.have.property('error');
         });
 
-        it("should use window.location.hash when no value is passed", function() {
+        it("should use window.location when no value is passed", function() {
             let w = {
                 location: {
-                    hash: "a=apple&b=banana&c=carrot"
+                    href : "a=apple&b=banana&c=carrot" 
                 }
             };
-            let result = UrlUtility.parseUrlFragment(null, w);
+            let result = UrlUtility.parseUrlFragment(null, "#", w);
             result.should.deep.equal({ a: "apple", b: "banana", c: "carrot" });
         });
         

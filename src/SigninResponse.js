@@ -5,7 +5,7 @@ import ErrorResponse from './ErrorResponse';
 export default class SigninResponse {
     constructor(url) {
         
-        var values = UrlUtility.parseUrlFragment(url);
+        var values = UrlUtility.parseUrlFragment(url, "#");
         
         if (values.error){
             return new ErrorResponse(values);

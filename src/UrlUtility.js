@@ -18,14 +18,14 @@ export default class UrlUtility {
         return url;
     }
 
-    static parseUrlFragment(value, window = Window) {
+    static parseUrlFragment(value, delimiter = "#", window = Window) {
         Log.info("UrlUtility.parseUrlFragment");
 
         if (typeof value !== 'string'){
-            value = window.location.hash;
+            value = window.location.href;
         }
 
-        var idx = value.lastIndexOf("#");
+        var idx = value.lastIndexOf(delimiter);
         if (idx >= 0) {
             value = value.substr(idx + 1);
         }
