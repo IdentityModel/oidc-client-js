@@ -145,7 +145,7 @@ export default class OidcClientService {
         return this._stateStore.remove(stateKey).then(storedStateString => {
             if (!storedStateString){
                 Log.error("No matching state found in storage");
-                throw new Error("Failed to process response");
+                throw new Error("No matching state found in storage");
             }
             
             let state = State.fromStorageString(storedStateString);
