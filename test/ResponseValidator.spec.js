@@ -344,11 +344,12 @@ describe("ResponseValidator", function() {
             });
 
         });
-
+        
         it("should load and merge user info claims when loadUserInfo configured", function(done) {
 
             settings.loadUserInfo = true;
             stubResponse.profile = { a: 'apple', b: 'banana' };
+            stubResponse.access_token = "access_token";
             stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
 
             subject.processClaims(stubResponse).then(response => {
@@ -362,6 +363,20 @@ describe("ResponseValidator", function() {
         it("should not load and merge user info claims when loadUserInfo not configured", function(done) {
 
             settings.loadUserInfo = false;
+            stubResponse.profile = { a: 'apple', b: 'banana' };
+            stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
+
+            subject.processClaims(stubResponse).then(response => {
+                expect(stubUserInfoService.getClaimsWasCalled).to.be.undefined;
+                expect(subject.mergeClaimsWasCalled).to.be.undefined;
+                done();
+            });
+
+        });
+        
+        it("should not load user info claims if no access token", function(done) {
+
+            settings.loadUserInfo = true;
             stubResponse.profile = { a: 'apple', b: 'banana' };
             stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
 

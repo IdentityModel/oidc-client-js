@@ -93,7 +93,7 @@ export default class ResponseValidator {
 
         response.profile = this.filterProtocolClaims(response.profile);
 
-        if (this._settings.loadUserInfo) {
+        if (this._settings.loadUserInfo && response.access_token) {
 
             Log.info("loading user info");
             return this._userInfoService.getClaims(response.access_token).then(claims => {
