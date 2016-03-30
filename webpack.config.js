@@ -2,7 +2,7 @@ module.exports = {
     entry: './src/_index.js',
     output: {
         path: 'build',
-        filename: 'OidcClient.js',
+        filename: 'oidc-client.js',
         libraryTarget: 'umd',
         library: 'OidcClient'
     },
