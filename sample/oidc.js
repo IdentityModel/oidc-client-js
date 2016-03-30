@@ -46,7 +46,7 @@ var claims = {
 var access_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSIsImtpZCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo0NDMzMy9jb3JlIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzMzMvY29yZS9yZXNvdXJjZXMiLCJleHAiOjE0NTkzNzgxNjksIm5iZiI6MTQ1OTM3NDU2OSwiY2xpZW50X2lkIjoianMudG9rZW5tYW5hZ2VyIiwic2NvcGUiOlsib3BlbmlkIiwicHJvZmlsZSIsImVtYWlsIiwicmVhZCIsIndyaXRlIl0sInN1YiI6IjgxODcyNyIsImF1dGhfdGltZSI6MTQ1OTM3NDUyMCwiaWRwIjoiaWRzcnYiLCJhbXIiOlsicGFzc3dvcmQiXX0.Sbr9FcCkx2vMdfCmetF0KzVU-qZlQEXc_Nvp85DSBTX8Cdrh5EpyRn3smN6mzGGq96nDNElIwRsqqEdFImewSMEpPueyXtHEG6rzlIBYvgXo4rhCLroCrDg_DTUCyHoniKHtwz1-MUoxDhef0VVyUWavZ5KmZx-U7-3yN_NlU3CxnDUxq_BLK2IHna3ZldeIhSVFqP9005BUuLsxiyVPV-EJtGaQ8-6VHCLKcmSHqsmwUNzrZoCjdUTm17_YkcLWtAx_dp0vq56mGjwqVREz_ykMMJqBA7Q1S33QHV9L6K_CFYyFLBBhtlzmrgI5QyIBJltd3H5AOKPz1LFKVKToMQ";
 var at_hash = "H-4BBL3VfBLNSBcwQuwkuQ";
 
-function genIdToken(aud, nonce, access_token) {
+function genIdToken(aud, nonce, isOAuth) {
     var now = parseInt(Date.now()/1000);
     var payload = {
         aud : aud,
@@ -60,13 +60,15 @@ function genIdToken(aud, nonce, access_token) {
         amr : [ "password" ]
     };
 
-    if (access_token) {
+    if (isOAuth) {
         payload.at_hash = at_hash;
+        payload.sub = claims.sub;
     }
-    
-    for(var key in claims){
-        payload[key] = claims[key];
-    }    
+    else {
+        for(var key in claims){
+            payload[key] = claims[key];
+        }    
+    }
     
     return jsrsasign.jws.JWS.sign(null, {alg: "RS256", kid: "1"}, payload, rsaKey.prvKeyObj);
 }
@@ -118,15 +120,14 @@ module.exports = function(baseUrl, app) {
         var url = req.query.redirect_uri;
         
         if (isOAuth(response_type)){
-            var access_token = Math.random();
-            url = addFragment(url, "token", access_token);
+            url = addFragment(url, "access_token", access_token);
             url = addFragment(url, "token_type", "Bearer");
             url = addFragment(url, "expires_in", "3600");
             url = addFragment(url, "scope", req.query.scope);
         }
         
         if (isOidc(response_type)){
-            url = addFragment(url, "id_token", genIdToken(req.query.client_id, req.query.nonce, access_token));
+            url = addFragment(url, "id_token", genIdToken(req.query.client_id, req.query.nonce, isOAuth(response_type)));
             url = addFragment(url, "session_state", "123");
         }
         

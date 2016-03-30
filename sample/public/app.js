@@ -17,7 +17,7 @@ var settings = {
     client_id: 'js.tokenmanager',
     redirect_uri: 'http://localhost:5000/index.html',
     post_logout_redirect_uri: 'http://localhost:5000/index.html',
-    response_type: 'id_token',
+    response_type: 'id_token token',
     scope: 'openid email roles',
     
     filterProtocolClaims : true,
