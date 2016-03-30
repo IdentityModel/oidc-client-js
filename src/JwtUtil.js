@@ -1,11 +1,11 @@
 import Log from './Log';
 
-let __global;
+let __jwtModule;
 
 try {
     // this is assuming we have a reference to 
     // the jsrsasign library loaded in the browser
-    __global = window;
+    __jwtModule = window.KJUR;
 }
 catch (e) {
     // this will certainly throw in our unit tests
@@ -18,13 +18,13 @@ export default class JwtUtil {
     // this is used to configure jsrsasign loaded via
     // require in our unit tests
     static init(global) {
-        __global = global;
+        __jwtModule = global;
     }
 
     static parseJwt(jwt) {
         Log.info("JwtUtil.parseJwt");
         try {
-            var token = __global.jws.JWS.parse(jwt);
+            var token = __jwtModule.jws.JWS.parse(jwt);
             return {
                 header: token.headerObj,
                 payload: token.payloadObj
@@ -41,10 +41,10 @@ export default class JwtUtil {
         try {
             if (key.kty === "RSA") {
                 if (key.e && key.n) {
-                    key = __global.KEYUTIL.getKey(key);
+                    key = __jwtModule.KEYUTIL.getKey(key);
                 }
                 else if (key.x5c && key.x5c.length) {
-                    key = __global.KEYUTIL.getKey(__global.X509.getPublicKeyFromCertPEM(key.x5c[0]));
+                    key = __jwtModule.KEYUTIL.getKey(__jwtModule.X509.getPublicKeyFromCertPEM(key.x5c[0]));
                 }
                 else {
                     Log.error("RSA key missing key material", key);
@@ -53,7 +53,7 @@ export default class JwtUtil {
             }
             else if (key.kty === "EC") {
                 if (key.crv && key.x && key.y) {
-                    key = __global.KEYUTIL.getKey(key);
+                    key = __jwtModule.KEYUTIL.getKey(key);
                 }
                 else {
                     Log.error("EC key missing key material", key);
@@ -65,7 +65,7 @@ export default class JwtUtil {
                 return false;
             }
 
-            return __global.jws.JWS.verifyJWT(jwt,
+            return __jwtModule.jws.JWS.verifyJWT(jwt,
                 key,
                 {
                     alg: ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'ES256', 'ES384', 'ES512'],
@@ -84,7 +84,7 @@ export default class JwtUtil {
     static hashString(value, alg) {
         Log.info("JwtUtil.hashString", value, alg);
         try {
-            return __global.crypto.Util.hashString(value, alg);
+            return __jwtModule.crypto.Util.hashString(value, alg);
         }
         catch (e) {
             Log.error(e);
@@ -94,7 +94,7 @@ export default class JwtUtil {
     static hexToBase64Url(value) {
         Log.info("JwtUtil.hexToBase64Url", value);
         try {
-            return __global.hextob64u(value);
+            return __jwtModule.hextob64u(value);
         }
         catch (e) {
             Log.error(e);
