@@ -87,7 +87,7 @@ export default class JwtUtil {
     static hashString(value, alg) {
         Log.info("JwtUtil.hashString", value, alg);
         try {
-            return __global.crypto.Util.hashString(value, alg);
+            return __jwtModule.crypto.Util.hashString(value, alg);
         }
         catch (e) {
             Log.error(e);
