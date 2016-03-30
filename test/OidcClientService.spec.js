@@ -70,7 +70,7 @@ describe("OidcClientService", function() {
     });
 
     describe("logging", function() {
-        
+
         it("should set logger and log level", function() {
             Log.level = Log.NONE;
             Log.logger = console;
@@ -207,9 +207,9 @@ describe("OidcClientService", function() {
         });
 
         it("should deserialize stored state and call validator", function(done) {
-            
-            stubStore.item = new State({id:'1', nonce:'2'}).toStorageString();
-            
+
+            stubStore.item = new State({ id: '1', nonce: '2' }).toStorageString();
+
             subject.processSigninResponse("state=1").then(response => {
                 stubValidator.signinState.id.should.equal('1');
                 stubValidator.signinState.nonce.should.equal('2');
@@ -303,10 +303,12 @@ describe("OidcClientService", function() {
             });
         });
 
-        it("should call validator", function(done) {
-            stubStore.item = "state";
-            subject.processSignoutResponse("state=state").then(response => {
-                stubValidator.signoutState.should.equal('state');
+        it("should deserialize stored state and call validator", function(done) {
+
+            stubStore.item = new State({ id: '1' }).toStorageString();
+
+            subject.processSignoutResponse("state=1").then(response => {
+                stubValidator.signoutState.id.should.equal('1');
                 stubValidator.signoutResponse.should.be.deep.equal(response);
                 done();
             });
