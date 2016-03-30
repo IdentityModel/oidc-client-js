@@ -8,7 +8,7 @@ let assert = chai.assert;
 describe("OidcClientSettings", function() {
 
     beforeEach(function() {
-        Log.setLogger(console);
+        Log.logger = console;
         Log.level = Log.NONE;
     });
 
@@ -102,7 +102,7 @@ describe("OidcClientSettings", function() {
             subject.prompt.should.equal("foo");
         });
     });
-    
+
     describe("display", function() {
         it("should return value from initial settings", function() {
             let subject = new OidcClientSettings({
@@ -239,7 +239,7 @@ describe("OidcClientSettings", function() {
             subject.filterProtocolClaims.should.equal(false);
         });
     });
-    
+
     describe("loadUserInfo", function() {
 
         it("should use default value", function() {

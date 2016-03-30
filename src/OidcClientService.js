@@ -9,6 +9,25 @@ import WebStorageStateStore from './WebStorageStateStore';
 import ResponseValidator from './ResponseValidator';
 
 export default class OidcClientService {
+    // logging
+    static get logger(){
+        return Log.logger;
+    }
+    static set logger(value){
+        Log.logger = value;
+    }
+    static get logLevel(){
+        return Log.level;
+    }
+    static set logLevel(value){
+        if (typeof value === 'string'){
+            Log.level = Log[value];
+        }
+        else {
+            Log.level = value;
+        }
+    }
+    
     constructor(settings, 
         stateStore = new WebStorageStateStore(), 
         ResponseValidatorCtor = ResponseValidator,

@@ -14,8 +14,7 @@ export default class OidcClientSettings {
         // optional protocol
         prompt, display, max_age, ui_locales, acr_values,
         // behavior flags
-        filterProtocolClaims = true, loadUserInfo = true
-        
+        filterProtocolClaims = true, loadUserInfo = true,
     }) {
         if (!client_id) {
             Log.error("No client_id on settings passed to OidcClientSettings");
@@ -42,7 +41,7 @@ export default class OidcClientSettings {
         this._filterProtocolClaims = !!filterProtocolClaims;
         this._loadUserInfo = !!loadUserInfo;
     }
-
+    
     // client config
     get client_id() {
         return this._client_id;

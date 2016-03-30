@@ -13,7 +13,7 @@ describe("MetadataService", function() {
     let stubJsonService;
 
     beforeEach(function() {
-        Log.setLogger(console);
+        Log.logger = console;
         Log.level = Log.NONE;
         
         settings = {};

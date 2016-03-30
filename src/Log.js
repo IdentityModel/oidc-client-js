@@ -30,10 +30,21 @@ export default class Log {
         if (NONE <= value && value <= INFO){
             level = value;
         }
+        else {
+            throw new Error("Invalid log level");
+        }
     }
     
-    static setLogger(value){
-        logger = value;
+    static get logger(){
+        return logger;
+    }
+    static set logger(value){
+        if (value.info && value.warn && value.error){
+            logger = value;
+        }
+        else {
+            throw new Error("Invalid logger");
+        }
     }
     
     static info(...args){

@@ -35,12 +35,12 @@ class StubResponseValidator {
 
         return Promise.resolve(response);
     }
-    
+
     validateSignoutResponse(state, response) {
 
         this.signoutState = state;
         this.signoutResponse = response;
-        
+
         return Promise.resolve(response);
     }
 }
@@ -53,7 +53,7 @@ describe("OidcClientService", function() {
     let stubValidator;
 
     beforeEach(function() {
-        Log.setLogger(console);
+        Log.logger = console;
         Log.level = Log.NONE;
 
         settings = {
@@ -66,6 +66,27 @@ describe("OidcClientService", function() {
         stubMetadataService = new StubMetadataService();
 
         subject = new OidcClientService(settings, stubStore, () => stubValidator, () => stubMetadataService);
+    });
+
+    describe("logging", function() {
+        
+        it("should set logger and log level", function() {
+            Log.level = Log.NONE;
+            Log.logger = console;
+
+            let testLogger = {
+                info() { },
+                warn() { },
+                error() { }
+            };
+
+            OidcClientService.logger = testLogger;
+            OidcClientService.logLevel = 'WARN';
+
+            Log.level.should.equal(Log.WARN);
+            Log.logger.should.equal(testLogger);
+        });
+
     });
 
     describe("constructor", function() {
@@ -138,7 +159,7 @@ describe("OidcClientService", function() {
         });
 
         it("should fail if metadata fails", function(done) {
-            
+
             stubMetadataService.getAuthorizationEndpointResult = Promise.reject(new Error("test"));
 
             var p = subject.createSigninRequest();
@@ -192,7 +213,7 @@ describe("OidcClientService", function() {
                 done();
             });
         });
-        
+
     });
 
     describe("createSignoutRequest", function() {
@@ -286,7 +307,7 @@ describe("OidcClientService", function() {
                 done();
             });
         });
-        
+
     });
 
 });

@@ -15,7 +15,7 @@ describe("Log", function() {
 
         it("should not log when set to NONE", function() {
             let stub = new StubLog();
-            Log.setLogger(stub);
+            Log.logger = stub;
             Log.level = Log.NONE;
 
             Log.info("test info");
@@ -30,7 +30,7 @@ describe("Log", function() {
         it("should not log info or warn for ERROR level", function() {
             let stub = new StubLog();
 
-            Log.setLogger(stub);
+            Log.logger = stub;
             Log.level = Log.ERROR;
 
             Log.info("test info");
@@ -45,7 +45,7 @@ describe("Log", function() {
         it("should not log info for WARN level", function() {
             let stub = new StubLog();
 
-            Log.setLogger(stub);
+            Log.logger =stub;
             Log.level = Log.WARN;
 
             Log.info("test info");
@@ -60,7 +60,7 @@ describe("Log", function() {
         it("should log to all for INFO level", function() {
             let stub = new StubLog();
 
-            Log.setLogger(stub);
+            Log.logger = stub;
             Log.level = Log.INFO;
 
             Log.info("test info");
@@ -74,11 +74,11 @@ describe("Log", function() {
 
     });
 
-    describe("setLogger", function() {
+    describe("logger", function() {
 
         it("should use the logger specified", function() {
             let stub = new StubLog();
-            Log.setLogger(stub);
+            Log.logger = stub;
 
             Log.info("test info");
             Log.warn("test warn");
