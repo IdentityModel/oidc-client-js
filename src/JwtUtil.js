@@ -1,10 +1,12 @@
 import Log from './Log';
 
+let __global;
 let __jwtModule;
 
 try {
     // this is assuming we have a reference to 
     // the jsrsasign library loaded in the browser
+    __global = window;
     __jwtModule = window.KJUR;
 }
 catch (e) {
@@ -18,6 +20,7 @@ export default class JwtUtil {
     // this is used to configure jsrsasign loaded via
     // require in our unit tests
     static init(global) {
+        __global = global;
         __jwtModule = global;
     }
 
@@ -41,10 +44,10 @@ export default class JwtUtil {
         try {
             if (key.kty === "RSA") {
                 if (key.e && key.n) {
-                    key = __jwtModule.KEYUTIL.getKey(key);
+                    key = __global.KEYUTIL.getKey(key);
                 }
                 else if (key.x5c && key.x5c.length) {
-                    key = __jwtModule.KEYUTIL.getKey(__jwtModule.X509.getPublicKeyFromCertPEM(key.x5c[0]));
+                    key = __global.KEYUTIL.getKey(__global.X509.getPublicKeyFromCertPEM(key.x5c[0]));
                 }
                 else {
                     Log.error("RSA key missing key material", key);
@@ -53,7 +56,7 @@ export default class JwtUtil {
             }
             else if (key.kty === "EC") {
                 if (key.crv && key.x && key.y) {
-                    key = __jwtModule.KEYUTIL.getKey(key);
+                    key = __global.KEYUTIL.getKey(key);
                 }
                 else {
                     Log.error("EC key missing key material", key);
@@ -84,7 +87,7 @@ export default class JwtUtil {
     static hashString(value, alg) {
         Log.info("JwtUtil.hashString", value, alg);
         try {
-            return __jwtModule.crypto.Util.hashString(value, alg);
+            return __global.crypto.Util.hashString(value, alg);
         }
         catch (e) {
             Log.error(e);
@@ -94,7 +97,7 @@ export default class JwtUtil {
     static hexToBase64Url(value) {
         Log.info("JwtUtil.hexToBase64Url", value);
         try {
-            return __jwtModule.hextob64u(value);
+            return __global.hextob64u(value);
         }
         catch (e) {
             Log.error(e);
