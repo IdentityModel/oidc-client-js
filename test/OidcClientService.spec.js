@@ -142,7 +142,7 @@ describe("OidcClientService", function() {
             p.then(request => {
                 request.state.data.should.equal('foo');
 
-                var url = request.signinUrl;
+                var url = request.url;
                 url.should.contain("http://sts/authorize");
                 url.should.contain("response_type=bar");
                 url.should.contain("scope=baz");
@@ -249,7 +249,7 @@ describe("OidcClientService", function() {
 
             p.then(request => {
                 request.state.data.should.equal('foo');
-                var url = request.signoutUrl;
+                var url = request.url;
                 url.should.contain("http://sts/signout");
                 url.should.contain("post_logout_redirect_uri=bar");
                 url.should.contain("id_token_hint=baz");

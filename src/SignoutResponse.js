@@ -11,13 +11,6 @@ export default class SignoutResponse {
             return new ErrorResponse(values);
         }
         
-        this._state = values.state;
-    }
-    
-    get state(){
-        return this._state;
-    }
-    set state(value){
-        this._state = value;
+        this.state = values.state;
     }
 }

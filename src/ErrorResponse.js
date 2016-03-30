@@ -9,34 +9,14 @@ export default class ErrorResponse {
             throw new Error("error");
         }
         
-        this._error = error;
-        this._error_description = error_description;
-        this._error_uri = error_uri;
-        this._state = state;
+        this.message = error_description || error;
+        this.name = "ErrorResponse"; 
+        this.stack = (new Error()).stack;
         
-        this._stack = (new Error()).stack;
-    }
-    
-    get message(){
-        return this.error_description || this.error;
-    }
-    get name(){
-        return "ErrorResponse";
-    }
-    get stack(){
-        return this._stack;
-    }
-    
-    get error(){
-        return this._error;
-    }
-    get error_description(){
-        return this._error_description;
-    }
-    get error_uri(){
-        return this._error_uri;
-    }
-    get state(){
-        return this._state;
+        this.error = error;
+        this.error_description = error_description;
+        this.error_uri = error_uri;
+        
+        this.state = state;
     }
 }

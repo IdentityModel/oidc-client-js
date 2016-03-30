@@ -85,113 +85,91 @@ describe("SigninRequest", function() {
 
     });
 
-    describe("signinUrl", function() {
+    describe("url", function() {
 
         it("should include url", function() {
-            subject.signinUrl.indexOf("http://sts/signin").should.equal(0);
+            subject.url.indexOf("http://sts/signin").should.equal(0);
         });
         
         it("should include client_id", function() {
-            subject.signinUrl.should.contain("client_id=client");
+            subject.url.should.contain("client_id=client");
         });
         
         it("should include redirect_uri", function() {
-            subject.signinUrl.should.contain("redirect_uri=" + encodeURIComponent("http://app"));
+            subject.url.should.contain("redirect_uri=" + encodeURIComponent("http://app"));
         });
         
         it("should include response_type", function() {
-            subject.signinUrl.should.contain("response_type=id_token");
+            subject.url.should.contain("response_type=id_token");
         });
         
         it("should include scope", function() {
-            subject.signinUrl.should.contain("scope=openid");
+            subject.url.should.contain("scope=openid");
         });
         
         it("should include state", function() {
-            subject.signinUrl.should.contain("state=" + subject.state.id);
+            subject.url.should.contain("state=" + subject.state.id);
         });
         
         it("should include prompt", function() {
             settings.prompt = "foo";
             subject = new SigninRequest(settings);
-            subject.signinUrl.should.contain("prompt=foo");
+            subject.url.should.contain("prompt=foo");
         });
         
         it("should include display", function() {
             settings.display = "foo";
             subject = new SigninRequest(settings);
-            subject.signinUrl.should.contain("display=foo");
+            subject.url.should.contain("display=foo");
         });
         
         it("should include max_age", function() {
             settings.max_age = "foo";
             subject = new SigninRequest(settings);
-            subject.signinUrl.should.contain("max_age=foo");
+            subject.url.should.contain("max_age=foo");
         });
         
         it("should include ui_locales", function() {
             settings.ui_locales = "foo";
             subject = new SigninRequest(settings);
-            subject.signinUrl.should.contain("ui_locales=foo");
+            subject.url.should.contain("ui_locales=foo");
         });
         
         it("should include id_token_hint", function() {
             settings.id_token_hint = "foo";
             subject = new SigninRequest(settings);
-            subject.signinUrl.should.contain("id_token_hint=foo");
+            subject.url.should.contain("id_token_hint=foo");
         });
         
         it("should include login_hint", function() {
             settings.login_hint = "foo";
             subject = new SigninRequest(settings);
-            subject.signinUrl.should.contain("login_hint=foo");
+            subject.url.should.contain("login_hint=foo");
         });
         
         it("should include acr_values", function() {
             settings.acr_values = "foo";
             subject = new SigninRequest(settings);
-            subject.signinUrl.should.contain("acr_values=foo");
+            subject.url.should.contain("acr_values=foo");
         });
 
     });
 
     describe("isOidc", function() {
         it("should indicate if response_type is oidc", function() {
-            settings.response_type = "id_token";
-            subject = new SigninRequest(settings);
-            subject.isOidc.should.be.true;
-            
-            settings.response_type = "id_token token";
-            subject = new SigninRequest(settings);
-            subject.isOidc.should.be.true;
-            
-            settings.response_type = "token id_token";
-            subject = new SigninRequest(settings);
-            subject.isOidc.should.be.true;
-
-            settings.response_type = "token";
-            subject = new SigninRequest(settings);
-            subject.isOidc.should.be.false;
+            SigninRequest.isOidc("id_token").should.be.true;
+            SigninRequest.isOidc("id_token token").should.be.true;
+            SigninRequest.isOidc("token id_token").should.be.true;
+            SigninRequest.isOidc("token").should.be.false;
         });
     });
 
     describe("isOAuth", function() {
         it("should indicate if response_type is oauth", function() {
-            settings.response_type = "token";
-            subject = new SigninRequest(settings);
-            subject.isOAuth.should.be.true;
-            
-            settings.response_type = "id_token token";
-            subject = new SigninRequest(settings);
-            subject.isOAuth.should.be.true;
-            
-            settings.response_type = "token id_token";
-            subject = new SigninRequest(settings);
-            subject.isOAuth.should.be.true;
-
-            settings.response_type = "id_token";
-            subject = new SigninRequest(settings);
-            subject.isOAuth.should.be.false;
+            SigninRequest.isOAuth("token").should.be.true;
+            SigninRequest.isOAuth("id_token token").should.be.true;
+            SigninRequest.isOAuth("token id_token").should.be.true;
+            SigninRequest.isOAuth("id_token").should.be.false;
         });
     });
 

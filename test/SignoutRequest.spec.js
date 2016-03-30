@@ -36,26 +36,26 @@ describe("SignoutRequest", function() {
 
     });
 
-    describe("signoutUrl", function() {
+    describe("url", function() {
 
         it("should include url", function() {
-            subject.signoutUrl.indexOf("http://sts/signout").should.equal(0);
+            subject.url.indexOf("http://sts/signout").should.equal(0);
         });
 
         it("should include state", function() {
-            subject.signoutUrl.should.contain("state=" + subject.state.id);
+            subject.url.should.contain("state=" + subject.state.id);
         });
 
         it("should include id_token_hint", function() {
-            subject.signoutUrl.should.contain("id_token_hint=hint");
+            subject.url.should.contain("id_token_hint=hint");
         });
 
         it("should include post_logout_redirect_uri", function() {
-            subject.signoutUrl.should.contain("post_logout_redirect_uri=loggedout");
+            subject.url.should.contain("post_logout_redirect_uri=loggedout");
         });
 
         it("should include id_token_hint, post_logout_redirect_uri, and state", function() {
-            var url = subject.signoutUrl;
+            var url = subject.url;
             url.indexOf('http://sts/signout?').should.equal(0);
             url.should.contain("id_token_hint=hint");
             url.should.contain("post_logout_redirect_uri=loggedout");
