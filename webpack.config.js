@@ -2,9 +2,9 @@ module.exports = {
     entry: './src/_index.js',
     output: {
         path: 'build',
-        filename: 'oidc-client.js',
+        filename: 'IdentityModel.js',
         libraryTarget: 'umd',
-        library: 'OidcClient'
+        library: 'IdentityModel'
     },
     module: {
         loaders: [

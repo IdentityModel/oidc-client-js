@@ -9,7 +9,7 @@ import WebStorageStateStore from './WebStorageStateStore';
 import ResponseValidator from './ResponseValidator';
 import State from './State';
 
-export default class OidcClientService {
+export default class OidcClient {
     // logging
     static get logger(){
         return Log.logger;
@@ -35,7 +35,7 @@ export default class OidcClientService {
         MetadataServiceCtor = MetadataService
     ){
         if (!settings) {
-            Log.error("No settings passed to OidcClientService");
+            Log.error("No settings passed to OidcClient");
             throw new Error("settings");
         }
         
@@ -53,7 +53,7 @@ export default class OidcClientService {
         response_type, scope, redirect_uri, data, 
         prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values}={}
     ) {
-        Log.info("OidcClientService.createSigninRequest");
+        Log.info("OidcClient.createSigninRequest");
         
         let client_id = this._settings.client_id;
         response_type = response_type || this._settings.response_type;
@@ -87,7 +87,7 @@ export default class OidcClientService {
     }
     
     processSigninResponse(url){
-        Log.info("OidcClientService.processSigninResponse");
+        Log.info("OidcClient.processSigninResponse");
         
         var response = new SigninResponse(url);
         if (!response.state) {
@@ -111,7 +111,7 @@ export default class OidcClientService {
     }
     
     createSignoutRequest({id_token_hint, data, post_logout_redirect_uri}={}){
-        Log.info("OidcClientService.createSignoutRequest");
+        Log.info("OidcClient.createSignoutRequest");
         
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
         
@@ -132,7 +132,7 @@ export default class OidcClientService {
     }
     
     processSignoutResponse(url){
-        Log.info("OidcClientService.processSignoutResponse");
+        Log.info("OidcClient.processSignoutResponse");
         
         var response = new SignoutResponse(url);
         if (!response.state) {

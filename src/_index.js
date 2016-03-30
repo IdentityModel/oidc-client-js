@@ -1,2 +1,9 @@
-import OidcClientService from './OidcClientService';
-export default OidcClientService;
+import OidcClient from './OidcClient';
+import WebStorageStateStore from './WebStorageStateStore';
+import InMemoryWebStorage from './InMemoryWebStorage';
+
+export {
+    OidcClient, 
+    WebStorageStateStore,
+    InMemoryWebStorage
+};

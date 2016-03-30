@@ -9,21 +9,21 @@ document.getElementById('processSignout').addEventListener("click", processSigno
 ///////////////////////////////
 // OidcClient config
 ///////////////////////////////
-OidcClient.logger = console;
-OidcClient.logLevel = 'INFO';
+IdentityModel.OidcClient.logger = console;
+IdentityModel.OidcClient.logLevel = 'INFO';
 
 var settings = {
-    authority: 'https://localhost:44333/core',
+    authority: 'http://localhost:5000/oidc',
     client_id: 'js.tokenmanager',
-    redirect_uri: 'http://localhost:21575/index.html',
-    post_logout_redirect_uri: 'http://localhost:21575/index.html',
-    response_type: 'id_token token',
+    redirect_uri: 'http://localhost:5000/index.html',
+    post_logout_redirect_uri: 'http://localhost:5000/index.html',
+    response_type: 'id_token',
     scope: 'openid email roles',
     
     filterProtocolClaims : true,
     loadUserInfo:true
 };
-var oidcClient = new OidcClient(settings, new WebStorageStateStore(sessionStorage));
+var oidcClient = new IdentityModel.OidcClient(settings);
 
 ///////////////////////////////
 // functions for UI elements

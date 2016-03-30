@@ -9,7 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "jsrsasign": "^5.0.7"
   },
   "devDependencies": {
     "bower": "^1.7.7"

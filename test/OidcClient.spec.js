@@ -1,4 +1,4 @@
-import OidcClientService from '../src/OidcClientService';
+import OidcClient from '../src/OidcClient';
 import SigninRequest from '../src/SigninRequest';
 import SigninResponse from '../src/SigninResponse';
 import ErrorResponse from '../src/ErrorResponse';
@@ -46,7 +46,7 @@ class StubResponseValidator {
     }
 }
 
-describe("OidcClientService", function() {
+describe("OidcClient", function() {
     let settings;
     let subject;
     let stubMetadataService;
@@ -66,7 +66,7 @@ describe("OidcClientService", function() {
         stubValidator = new StubResponseValidator();
         stubMetadataService = new StubMetadataService();
 
-        subject = new OidcClientService(settings, stubStore, () => stubValidator, () => stubMetadataService);
+        subject = new OidcClient(settings, stubStore, () => stubValidator, () => stubMetadataService);
     });
 
     describe("logging", function() {
@@ -81,8 +81,8 @@ describe("OidcClientService", function() {
                 error() { }
             };
 
-            OidcClientService.logger = testLogger;
-            OidcClientService.logLevel = 'WARN';
+            OidcClient.logger = testLogger;
+            OidcClient.logLevel = 'WARN';
 
             Log.level.should.equal(Log.WARN);
             Log.logger.should.equal(testLogger);
@@ -93,7 +93,7 @@ describe("OidcClientService", function() {
     describe("constructor", function() {
         it("should require a settings param", function() {
             try {
-                new OidcClientService(undefined, stubStore, stubMetadataService);
+                new OidcClient(undefined, stubStore, stubMetadataService);
             }
             catch (e) {
                 e.message.should.contain('settings');

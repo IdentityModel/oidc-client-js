@@ -3,10 +3,10 @@
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
+	else if(typeof exports === 'object')
+		exports["IdentityModel"] = factory();
+	else
+		root["IdentityModel"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -59,33 +59,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.WebStorageStateStore = exports.default = undefined;
+	exports.InMemoryWebStorage = exports.WebStorageStateStore = exports.OidcClient = undefined;
 
-	var _OidcClientService = __webpack_require__(1);
+	var _OidcClient = __webpack_require__(1);
 
-	var _OidcClientService2 = _interopRequireDefault(_OidcClientService);
+	var _OidcClient2 = _interopRequireDefault(_OidcClient);
 
 	var _WebStorageStateStore = __webpack_require__(15);
 
 	var _WebStorageStateStore2 = _interopRequireDefault(_WebStorageStateStore);
 
+	var _InMemoryWebStorage = __webpack_require__(19);
+
+	var _InMemoryWebStorage2 = _interopRequireDefault(_InMemoryWebStorage);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	// import InMemoryWebStorage from './InMemoryWebStorage';
-
-	// class Container extends OidcClientService {
-	//     constructor(...args){
-	//         super(...args);
-	//     }
-
-	//     static get OidcClientSettings(){return OidcClientSettings};
-	//     static get WebStorageStateStore(){return WebStorageStateStore};
-	//     static get InMemoryWebStorage(){return InMemoryWebStorage};
-	// }
-
-	exports.default = _OidcClientService2.default;
+	exports.OidcClient = _OidcClient2.default;
 	exports.WebStorageStateStore = _WebStorageStateStore2.default;
-	module.exports = exports['default'];
+	exports.InMemoryWebStorage = _InMemoryWebStorage2.default;
 
 /***/ },
 /* 1 */
@@ -143,8 +135,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var OidcClientService = function () {
-	    _createClass(OidcClientService, null, [{
+	var OidcClient = function () {
+	    _createClass(OidcClient, null, [{
 	        key: 'logger',
 
 	        // logging
@@ -168,15 +160,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }]);
 
-	    function OidcClientService(settings) {
+	    function OidcClient(settings) {
 	        var stateStore = arguments.length <= 1 || arguments[1] === undefined ? new _WebStorageStateStore2.default() : arguments[1];
 	        var ResponseValidatorCtor = arguments.length <= 2 || arguments[2] === undefined ? _ResponseValidator2.default : arguments[2];
 	        var MetadataServiceCtor = arguments.length <= 3 || arguments[3] === undefined ? _MetadataService2.default : arguments[3];
 
-	        _classCallCheck(this, OidcClientService);
+	        _classCallCheck(this, OidcClient);
 
 	        if (!settings) {
-	            _Log2.default.error("No settings passed to OidcClientService");
+	            _Log2.default.error("No settings passed to OidcClient");
 	            throw new Error("settings");
 	        }
 
@@ -186,7 +178,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._metadataService = new MetadataServiceCtor(this._settings);
 	    }
 
-	    _createClass(OidcClientService, [{
+	    _createClass(OidcClient, [{
 	        key: 'createSigninRequest',
 	        value: function createSigninRequest() {
 	            var _this = this;
@@ -205,7 +197,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var login_hint = _ref.login_hint;
 	            var acr_values = _ref.acr_values;
 
-	            _Log2.default.info("OidcClientService.createSigninRequest");
+	            _Log2.default.info("OidcClient.createSigninRequest");
 
 	            var client_id = this._settings.client_id;
 	            response_type = response_type || this._settings.response_type;
@@ -242,7 +234,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function processSigninResponse(url) {
 	            var _this2 = this;
 
-	            _Log2.default.info("OidcClientService.processSigninResponse");
+	            _Log2.default.info("OidcClient.processSigninResponse");
 
 	            var response = new _SigninResponse2.default(url);
 	            if (!response.state) {
@@ -275,7 +267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var data = _ref2.data;
 	            var post_logout_redirect_uri = _ref2.post_logout_redirect_uri;
 
-	            _Log2.default.info("OidcClientService.createSignoutRequest");
+	            _Log2.default.info("OidcClient.createSignoutRequest");
 
 	            post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
 
@@ -299,7 +291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function processSignoutResponse(url) {
 	            var _this4 = this;
 
-	            _Log2.default.info("OidcClientService.processSignoutResponse");
+	            _Log2.default.info("OidcClient.processSignoutResponse");
 
 	            var response = new _SignoutResponse2.default(url);
 	            if (!response.state) {
@@ -328,10 +320,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }]);
 
-	    return OidcClientService;
+	    return OidcClient;
 	}();
 
-	exports.default = OidcClientService;
+	exports.default = OidcClient;
 	module.exports = exports['default'];
 
 /***/ },
@@ -2151,6 +2143,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 	exports.default = JwtUtil;
+	module.exports = exports['default'];
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _Log = __webpack_require__(2);
+
+	var _Log2 = _interopRequireDefault(_Log);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var InMemoryWebStorage = function () {
+	    function InMemoryWebStorage() {
+	        _classCallCheck(this, InMemoryWebStorage);
+
+	        this._data = {};
+	    }
+
+	    _createClass(InMemoryWebStorage, [{
+	        key: "getItem",
+	        value: function getItem(key) {
+	            _Log2.default.info("InMemoryWebStorage.getItem", key);
+	            return this._data[key];
+	        }
+	    }, {
+	        key: "setItem",
+	        value: function setItem(key, value) {
+	            _Log2.default.info("InMemoryWebStorage.setItem", key);
+	            this._data[key] = value;
+	        }
+	    }, {
+	        key: "removeItem",
+	        value: function removeItem(key) {
+	            _Log2.default.info("InMemoryWebStorage.removeItem", key);
+	            delete this._data[key];
+	        }
+	    }]);
+
+	    return InMemoryWebStorage;
+	}();
+
+	exports.default = InMemoryWebStorage;
 	module.exports = exports['default'];
 
 /***/ }
