@@ -80,6 +80,11 @@ describe("OidcClient", function() {
             }
             assert.fail();
         });
+        
+         it("should expose settings", function() {
+             subject.settings.should.be.ok;
+             subject.settings.client_id.should.equal("client");
+        });
 
     });
 
