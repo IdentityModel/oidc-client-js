@@ -1,6 +1,6 @@
-import Log from '../src/Log';
-import SigninResponse from '../src/SigninResponse';
-import ErrorResponse from '../src/ErrorResponse';
+import Log from '../../src/Log';
+import SigninResponse from '../../src/SigninResponse';
+import ErrorResponse from '../../src/ErrorResponse';
 
 import chai from 'chai';
 chai.should();

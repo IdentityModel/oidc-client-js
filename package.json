@@ -5,7 +5,7 @@
   "main": "src/_index.js",
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "test": "mocha --compilers js:babel-register test/*.spec.js"
+    "test": "mocha --compilers js:babel-register test/unit/*.spec.js"
   },
   "repository": {
     "type": "git",

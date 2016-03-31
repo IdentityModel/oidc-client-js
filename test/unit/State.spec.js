@@ -1,5 +1,5 @@
-import Log from '../src/Log';
-import State from '../src/State';
+import Log from '../../src/Log';
+import State from '../../src/State';
 
 import chai from 'chai';
 chai.should();

@@ -1,5 +1,5 @@
-import Log from '../src/Log';
-import SigninRequest from '../src/SigninRequest';
+import Log from '../../src/Log';
+import SigninRequest from '../../src/SigninRequest';
 
 import chai from 'chai';
 chai.should();

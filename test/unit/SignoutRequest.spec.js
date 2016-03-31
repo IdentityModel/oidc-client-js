@@ -1,5 +1,5 @@
-import Log from '../src/Log';
-import SignoutRequest from '../src/SignoutRequest';
+import Log from '../../src/Log';
+import SignoutRequest from '../../src/SignoutRequest';
 
 import chai from 'chai';
 chai.should();

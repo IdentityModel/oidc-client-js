@@ -1,5 +1,5 @@
-import Log from '../src/Log';
-import UserInfoService from '../src/UserInfoService';
+import Log from '../../src/Log';
+import UserInfoService from '../../src/UserInfoService';
 
 import StubJsonService from './StubJsonService';
 import StubMetadataService from './StubMetadataService';

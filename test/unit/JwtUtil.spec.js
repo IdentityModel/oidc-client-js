@@ -1,5 +1,5 @@
-import JwtUtil from '../src/JwtUtil';
-import Log from '../src/Log';
+import JwtUtil from '../../src/JwtUtil';
+import Log from '../../src/Log';
 
 import chai from 'chai';
 chai.should();

@@ -1,12 +1,12 @@
-import OidcClient from '../src/OidcClient';
-import SigninRequest from '../src/SigninRequest';
-import SigninResponse from '../src/SigninResponse';
-import ErrorResponse from '../src/ErrorResponse';
-import SignoutRequest from '../src/SignoutRequest';
-import SignoutResponse from '../src/SignoutResponse';
-import State from '../src/State';
+import OidcClient from '../../src/OidcClient';
+import SigninRequest from '../../src/SigninRequest';
+import SigninResponse from '../../src/SigninResponse';
+import ErrorResponse from '../../src/ErrorResponse';
+import SignoutRequest from '../../src/SignoutRequest';
+import SignoutResponse from '../../src/SignoutResponse';
+import State from '../../src/State';
 
-import Log from '../src/Log';
+import Log from '../../src/Log';
 
 import StubMetadataService from './StubMetadataService';
 

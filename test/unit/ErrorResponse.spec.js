@@ -1,5 +1,5 @@
-import Log from '../src/Log';
-import ErrorResponse from '../src/ErrorResponse';
+import Log from '../../src/Log';
+import ErrorResponse from '../../src/ErrorResponse';
 
 import chai from 'chai';
 chai.should();

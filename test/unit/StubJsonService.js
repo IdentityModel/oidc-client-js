@@ -1,4 +1,4 @@
-import Log from '../src/Log';
+import Log from '../../src/Log';
 
 export default class StubJsonService {
     getJson(url, token) {

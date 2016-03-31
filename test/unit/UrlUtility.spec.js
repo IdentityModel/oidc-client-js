@@ -1,4 +1,4 @@
-import UrlUtility from '../src/UrlUtility';
+import UrlUtility from '../../src/UrlUtility';
 
 import chai from 'chai';
 chai.should();

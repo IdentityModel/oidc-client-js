@@ -1,5 +1,5 @@
-import OidcClientSettings from '../src/OidcClientSettings';
-import Log from '../src/Log';
+import OidcClientSettings from '../../src/OidcClientSettings';
+import Log from '../../src/Log';
 
 import chai from 'chai';
 chai.should();

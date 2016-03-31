@@ -1,6 +1,6 @@
-import ResponseValidator from '../src/ResponseValidator';
-import Log from '../src/Log';
-import JwtUtil from '../src/JwtUtil';
+import ResponseValidator from '../../src/ResponseValidator';
+import Log from '../../src/Log';
+import JwtUtil from '../../src/JwtUtil';
 
 import StubMetadataService from './StubMetadataService';
 

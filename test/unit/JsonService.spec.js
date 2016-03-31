@@ -1,4 +1,4 @@
-import JsonService from '../src/JsonService';
+import JsonService from '../../src/JsonService';
 
 import chai from 'chai';
 chai.should();

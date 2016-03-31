@@ -1,7 +1,7 @@
 module.exports = {
     entry: './src/_index.js',
     output: {
-        path: 'build',
+        path: 'dist',
         filename: 'IdentityModel.js',
         libraryTarget: 'umd',
         library: 'IdentityModel'
