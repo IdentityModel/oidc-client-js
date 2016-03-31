@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/IdentityModel/oidc-client.git"
+    "url": "https://github.com/IdentityModel/oidc-client-js.git"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/IdentityModel/oidc-client/issues"
+    "url": "https://github.com/IdentityModel/oidc-client-js/issues"
   },
-  "homepage": "https://github.com/IdentityModel/oidc-client",
+  "homepage": "https://github.com/IdentityModel/oidc-client-js",
   "devDependencies": {
     "babel-core": "^6.7.2",
     "babel-loader": "^6.2.4",
