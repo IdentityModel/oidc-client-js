@@ -4,9 +4,6 @@ import JwtUtil from '../../src/JwtUtil';
 
 import StubMetadataService from './StubMetadataService';
 
-var KJUR = require("jsrsasign");
-JwtUtil.init(KJUR);
-
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;

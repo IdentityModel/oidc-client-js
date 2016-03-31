@@ -6,9 +6,6 @@ chai.should();
 let assert = chai.assert;
 let expect = chai.expect;
 
-var KJUR = require("jsrsasign");
-JwtUtil.init(KJUR);
-
 describe("JwtUtil", function() {
 
     let jwt;

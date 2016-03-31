@@ -1,16 +1,27 @@
+var path = require('path');
+var webpack = require('webpack');
+
 module.exports = {
-    entry: './src/_index.js',
+    entry: [
+        'babel-polyfill',
+        './src/_index.js'
+    ],
     output: {
-        path: 'dist',
+        path: path.join(__dirname, 'dist'),
         filename: 'IdentityModel.js',
-        libraryTarget: 'umd',
+        libraryTarget: 'var',
         library: 'IdentityModel'
+    },
+    node: {
+        fs: 'empty', // Because of jsrsasign usage of fs
     },
     module: {
         loaders: [
             {
-                test: /\.js/,
-                loader: 'babel-loader'
+                test: /\.js$/,
+                loaders: ['babel'],
+                exclude: /node_modules/,
+                include: __dirname,
             }
         ]
     }
