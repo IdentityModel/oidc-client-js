@@ -69,27 +69,6 @@ describe("OidcClient", function() {
         subject = new OidcClient(settings, stubStore, () => stubValidator, () => stubMetadataService);
     });
 
-    describe("logging", function() {
-
-        it("should set logger and log level", function() {
-            Log.level = Log.NONE;
-            Log.logger = console;
-
-            let testLogger = {
-                info() { },
-                warn() { },
-                error() { }
-            };
-
-            OidcClient.logger = testLogger;
-            OidcClient.logLevel = 'WARN';
-
-            Log.level.should.equal(Log.WARN);
-            Log.logger.should.equal(testLogger);
-        });
-
-    });
-
     describe("constructor", function() {
         it("should require a settings param", function() {
             try {

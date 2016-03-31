@@ -10,8 +10,8 @@ document.getElementById('links').addEventListener('change', toggleLinks, false);
 ///////////////////////////////
 // OidcClient config
 ///////////////////////////////
-IdentityModel.OidcClient.logger = console;
-IdentityModel.OidcClient.logLevel = 'INFO';
+IdentityModel.Log.logger = console;
+IdentityModel.Log.logLevel = IdentityModel.Log.INFO;
 
 var settings = {
     authority: 'http://localhost:5000/oidc',
