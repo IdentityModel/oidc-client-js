@@ -1,3 +1,4 @@
+
 IdentityModel.Log.logger = console;
 
 window.sessionStorage.clear();
