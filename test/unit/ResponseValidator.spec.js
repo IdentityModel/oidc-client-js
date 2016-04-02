@@ -72,34 +72,34 @@ class MockResponseValidator extends ResponseValidator {
         return super[name](...args);
     }
 
-    processSigninParams(...args) {
-        return this._mock("processSigninParams", ...args);
+    _processSigninParams(...args) {
+        return this._mock("_processSigninParams", ...args);
     }
-    validateTokens(...args) {
-        return this._mock("validateTokens", ...args);
+    _validateTokens(...args) {
+        return this._mock("_validateTokens", ...args);
     }
-    processClaims(...args) {
-        return this._mock("processClaims", ...args);
+    _processClaims(...args) {
+        return this._mock("_processClaims", ...args);
     }
-    mergeClaims(...args) {
-        return this._mock("mergeClaims", ...args);
+    _mergeClaims(...args) {
+        return this._mock("_mergeClaims", ...args);
     }
 
-    validateIdTokenAndAccessToken(...args) {
-        return this._mock("validateIdTokenAndAccessToken", ...args);
+    __validateIdTokenAndAccessToken(...args) {
+        return this._mock("__validateIdTokenAndAccessToken", ...args);
     }
-    validateIdToken(...args) {
-        return this._mock("validateIdToken", ...args);
+    _validateIdToken(...args) {
+        return this._mock("_validateIdToken", ...args);
     }
     validateJwt(...args){
         return this._mock("validateJwt", ...args);
     }
-    validateAccessToken(...args) {
-        return this._mock("validateAccessToken", ...args);
+    _validateAccessToken(...args) {
+        return this._mock("_validateAccessToken", ...args);
     }
 
-    filterProtocolClaims(...args) {
-        return this._mock("filterProtocolClaims", ...args);
+    _filterProtocolClaims(...args) {
+        return this._mock("_filterProtocolClaims", ...args);
     }
 }
 
@@ -204,11 +204,11 @@ describe("ResponseValidator", function() {
 
         it("should process signin params", function(done) {
 
-            subject.processSigninParamsResult = Promise.resolve(stubResponse);
-            subject.validateTokensResult = Promise.resolve(stubResponse);
+            subject._processSigninParamsResult = Promise.resolve(stubResponse);
+            subject._validateTokensResult = Promise.resolve(stubResponse);
 
             subject.validateSigninResponse(stubState, stubResponse).then(response => {
-                subject.processSigninParamsWasCalled.should.be.true;
+                subject._processSigninParamsWasCalled.should.be.true;
                 done();
             });
 
@@ -216,11 +216,11 @@ describe("ResponseValidator", function() {
 
         it("should validate tokens", function(done) {
 
-            subject.processSigninParamsResult = Promise.resolve(stubResponse);
-            subject.validateTokensResult = Promise.resolve(stubResponse);
+            subject._processSigninParamsResult = Promise.resolve(stubResponse);
+            subject._validateTokensResult = Promise.resolve(stubResponse);
 
             subject.validateSigninResponse(stubState, stubResponse).then(response => {
-                subject.validateTokensWasCalled.should.be.true;
+                subject._validateTokensWasCalled.should.be.true;
                 done();
             });
 
@@ -228,11 +228,11 @@ describe("ResponseValidator", function() {
 
         it("should not validate tokens if state fails", function(done) {
 
-            subject.processSigninParamsResult = Promise.reject("error");
-            subject.validateTokensResult = Promise.resolve(stubResponse);
+            subject._processSigninParamsResult = Promise.reject("error");
+            subject._validateTokensResult = Promise.resolve(stubResponse);
 
             subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
-                expect(subject.validateTokensWasCalled).to.be.undefined;
+                expect(subject._validateTokensWasCalled).to.be.undefined;
                 done();
             });
 
@@ -240,11 +240,11 @@ describe("ResponseValidator", function() {
 
         it("should process claims", function(done) {
 
-            subject.processSigninParamsResult = Promise.resolve(stubResponse);
-            subject.validateTokensResult = Promise.resolve(stubResponse);
+            subject._processSigninParamsResult = Promise.resolve(stubResponse);
+            subject._validateTokensResult = Promise.resolve(stubResponse);
 
             subject.validateSigninResponse(stubState, stubResponse).then(response => {
-                subject.processClaimsWasCalled.should.be.true;
+                subject._processClaimsWasCalled.should.be.true;
                 done();
             });
 
@@ -252,11 +252,11 @@ describe("ResponseValidator", function() {
 
         it("should not process claims if state fails", function(done) {
 
-            subject.processSigninParamsResult = Promise.resolve(stubResponse);
-            subject.validateTokensResult = Promise.reject("error");
+            subject._processSigninParamsResult = Promise.resolve(stubResponse);
+            subject._validateTokensResult = Promise.reject("error");
 
             subject.validateSigninResponse(stubState, stubResponse).then(null, err => {
-                expect(subject.processClaimsWasCalled).to.be.undefined;
+                expect(subject._processClaimsWasCalled).to.be.undefined;
                 done();
             });
 
@@ -264,12 +264,12 @@ describe("ResponseValidator", function() {
 
     });
 
-    describe("processSigninParams", function() {
+    describe("_processSigninParams", function() {
 
         it("should validate that the client state matches response state", function() {
 
             stubResponse.state = "not_the_id";
-            subject.processSigninParams(stubState, stubResponse).then(null, err => {
+            subject._processSigninParams(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('match');
                 done();
             });
@@ -279,7 +279,7 @@ describe("ResponseValidator", function() {
         it("should fail on error response", function(done) {
 
             stubResponse.error = "some_error";
-            subject.processSigninParams(stubState, stubResponse).then(null, err => {
+            subject._processSigninParams(stubState, stubResponse).then(null, err => {
                 err.error.should.equal("some_error");
                 done();
             });
@@ -289,7 +289,7 @@ describe("ResponseValidator", function() {
         it("should return data for error responses", function(done) {
 
             stubResponse.error = "some_error";
-            subject.processSigninParams(stubState, stubResponse).then(null, err => {
+            subject._processSigninParams(stubState, stubResponse).then(null, err => {
                 err.state.should.deep.equal({ some: 'data' });
                 done();
             });
@@ -300,7 +300,7 @@ describe("ResponseValidator", function() {
 
             delete stubResponse.id_token;
 
-            subject.processSigninParams(stubState, stubResponse).then(null, err => {
+            subject._processSigninParams(stubState, stubResponse).then(null, err => {
                 err.message.should.contain("id_token");
                 done();
             });
@@ -312,7 +312,7 @@ describe("ResponseValidator", function() {
             delete stubState.nonce;
             stubResponse.id_token = id_token;
 
-            subject.processSigninParams(stubState, stubResponse).then(null, err => {
+            subject._processSigninParams(stubState, stubResponse).then(null, err => {
                 err.message.should.contain("id_token");
                 done();
             });
@@ -323,7 +323,7 @@ describe("ResponseValidator", function() {
 
             stubResponse.id_token = id_token;
 
-            subject.processSigninParams(stubState, stubResponse).then(response => {
+            subject._processSigninParams(stubState, stubResponse).then(response => {
                 response.state.should.deep.equal({ some: 'data' });
                 done();
             });
@@ -331,12 +331,12 @@ describe("ResponseValidator", function() {
         });
     });
 
-    describe("processClaims", function() {
+    describe("_processClaims", function() {
 
         it("should filter protocol claims", function(done) {
 
-            subject.processClaims(stubState, stubResponse).then(response => {
-                subject.filterProtocolClaimsWasCalled.should.be.true;
+            subject._processClaims(stubState, stubResponse).then(response => {
+                subject._filterProtocolClaimsWasCalled.should.be.true;
                 done();
             });
 
@@ -349,9 +349,9 @@ describe("ResponseValidator", function() {
             stubResponse.access_token = "access_token";
             stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
 
-            subject.processClaims(stubResponse).then(response => {
+            subject._processClaims(stubResponse).then(response => {
                 stubUserInfoService.getClaimsWasCalled.should.be.true;
-                subject.mergeClaimsWasCalled.should.be.true;
+                subject._mergeClaimsWasCalled.should.be.true;
                 done();
             });
 
@@ -363,9 +363,9 @@ describe("ResponseValidator", function() {
             stubResponse.profile = { a: 'apple', b: 'banana' };
             stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
 
-            subject.processClaims(stubResponse).then(response => {
+            subject._processClaims(stubResponse).then(response => {
                 expect(stubUserInfoService.getClaimsWasCalled).to.be.undefined;
-                expect(subject.mergeClaimsWasCalled).to.be.undefined;
+                expect(subject._mergeClaimsWasCalled).to.be.undefined;
                 done();
             });
 
@@ -377,9 +377,9 @@ describe("ResponseValidator", function() {
             stubResponse.profile = { a: 'apple', b: 'banana' };
             stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
 
-            subject.processClaims(stubResponse).then(response => {
+            subject._processClaims(stubResponse).then(response => {
                 expect(stubUserInfoService.getClaimsWasCalled).to.be.undefined;
-                expect(subject.mergeClaimsWasCalled).to.be.undefined;
+                expect(subject._mergeClaimsWasCalled).to.be.undefined;
                 done();
             });
 
@@ -388,14 +388,14 @@ describe("ResponseValidator", function() {
     });
 
 
-    describe("mergeClaims", function() {
+    describe("_mergeClaims", function() {
 
         it("should merge claims", function() {
 
             var c1 = { a: 'apple', b: 'banana' };
             var c2 = { c: 'carrot' };
 
-            var result = subject.mergeClaims(c1, c2);
+            var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ a: 'apple', c: 'carrot', b: 'banana' });
 
         });
@@ -405,7 +405,7 @@ describe("ResponseValidator", function() {
             var c1 = { a: 'apple', b: 'banana' };
             var c2 = { a: 'carrot' };
 
-            var result = subject.mergeClaims(c1, c2);
+            var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ a: ['apple', 'carrot'], b: 'banana' });
 
         });
@@ -414,17 +414,17 @@ describe("ResponseValidator", function() {
 
             var c1 = { a: 'apple', b: 'banana' };
             var c2 = { a: ['carrot', 'durian'] };
-            var result = subject.mergeClaims(c1, c2);
+            var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ a: ['apple', 'carrot', 'durian'], b: 'banana' });
 
             var c1 = { a: ['apple', 'carrot'], b: 'banana' };
             var c2 = { a: ['durian'] };
-            var result = subject.mergeClaims(c1, c2);
+            var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ a: ['apple', 'carrot', 'durian'], b: 'banana' });
 
             var c1 = { a: ['apple', 'carrot'], b: 'banana' };
             var c2 = { a: 'durian' };
-            var result = subject.mergeClaims(c1, c2);
+            var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ a: ['apple', 'carrot', 'durian'], b: 'banana' });
         });
         
@@ -432,7 +432,7 @@ describe("ResponseValidator", function() {
 
             var c1 = { a: 'apple', b: 'banana' };
             var c2 = { a: ['apple', 'durian'] };
-            var result = subject.mergeClaims(c1, c2);
+            var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ a: ['apple', 'durian'], b: 'banana' });
         });
         
@@ -440,16 +440,16 @@ describe("ResponseValidator", function() {
 
             var c1 = { a: ['apple', 'durian'], b: 'banana' };
             var c2 = { a: 'apple' };
-            var result = subject.mergeClaims(c1, c2);
+            var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ a: ['apple', 'durian'], b: 'banana' });
         });
     });
 
-    describe("filterProtocolClaims", function() {
+    describe("_filterProtocolClaims", function() {
 
         it("should filter protocol claims if enabled on settings", function() {
 
-            settings.filterProtocolClaims = true;
+            settings._filterProtocolClaims = true;
             let claims = {
                 foo: 1, bar: 'test',
                 aud: 'some_aud', iss: 'issuer',
@@ -459,7 +459,7 @@ describe("ResponseValidator", function() {
                 iat: 5, nbf: 10, exp: 20
             };
 
-            var result = subject.filterProtocolClaims(claims);
+            var result = subject._filterProtocolClaims(claims);
             result.should.deep.equal({
                 foo: 1, bar: 'test',
                 sub: '123', email: 'foo@gmail.com',
@@ -470,7 +470,7 @@ describe("ResponseValidator", function() {
 
         it("should not filter protocol claims if not enabled on settings", function() {
 
-            settings.filterProtocolClaims = false;
+            settings._filterProtocolClaims = false;
             let claims = {
                 foo: 1, bar: 'test',
                 aud: 'some_aud', iss: 'issuer',
@@ -480,7 +480,7 @@ describe("ResponseValidator", function() {
                 iat: 5, nbf: 10, exp: 20
             };
 
-            var result = subject.filterProtocolClaims(claims);
+            var result = subject._filterProtocolClaims(claims);
             result.should.deep.equal({
                 foo: 1, bar: 'test',
                 aud: 'some_aud', iss: 'issuer',
@@ -493,17 +493,17 @@ describe("ResponseValidator", function() {
         });
     });
 
-    describe("validateTokens", function() {
+    describe("_validateTokens", function() {
 
         it("should validate id_token and access_token", function(done) {
 
             stubResponse.id_token = "id_token";
             stubResponse.access_token = "access_token";
-            subject.validateIdTokenAndAccessTokenResult = Promise.resolve(stubResponse);
+            subject.__validateIdTokenAndAccessTokenResult = Promise.resolve(stubResponse);
 
-            subject.validateTokens(stubState, stubResponse).then(response => {
-                subject.validateIdTokenAndAccessTokenWasCalled.should.be.true;
-                expect(subject.validateIdTokenWasCalled).to.be.undefined;
+            subject._validateTokens(stubState, stubResponse).then(response => {
+                subject.__validateIdTokenAndAccessTokenWasCalled.should.be.true;
+                expect(subject._validateIdTokenWasCalled).to.be.undefined;
                 done();
             });
 
@@ -512,11 +512,11 @@ describe("ResponseValidator", function() {
         it("should validate just id_token", function(done) {
 
             stubResponse.id_token = "id_token";
-            subject.validateIdTokenResult = Promise.resolve(stubResponse);
+            subject._validateIdTokenResult = Promise.resolve(stubResponse);
 
-            subject.validateTokens(stubState, stubResponse).then(response => {
-                subject.validateIdTokenWasCalled.should.be.true;
-                expect(subject.validateIdTokenAndAccessTokenWasCalled).to.be.undefined;
+            subject._validateTokens(stubState, stubResponse).then(response => {
+                subject._validateIdTokenWasCalled.should.be.true;
+                expect(subject.__validateIdTokenAndAccessTokenWasCalled).to.be.undefined;
                 done();
             });
 
@@ -526,16 +526,16 @@ describe("ResponseValidator", function() {
 
             stubResponse.access_token = "access_token";
 
-            subject.validateTokens(stubState, stubResponse).then(response => {
-                expect(subject.validateIdTokenWasCalled).to.be.undefined;
-                expect(subject.validateIdTokenAndAccessTokenWasCalled).to.be.undefined;
+            subject._validateTokens(stubState, stubResponse).then(response => {
+                expect(subject._validateIdTokenWasCalled).to.be.undefined;
+                expect(subject.__validateIdTokenAndAccessTokenWasCalled).to.be.undefined;
                 done();
             });
 
         });
     });
 
-    describe("validateIdTokenAndAccessToken", function() {
+    describe("__validateIdTokenAndAccessToken", function() {
 
         it("should validate id_token and access_token", function(done) {
 
@@ -544,11 +544,11 @@ describe("ResponseValidator", function() {
             stubResponse.profile = {
                 at_hash: at_hash
             };
-            subject.validateIdTokenResult = Promise.resolve(stubResponse);
+            subject._validateIdTokenResult = Promise.resolve(stubResponse);
 
-            subject.validateIdTokenAndAccessToken(stubState, stubResponse).then(response => {
-                subject.validateIdTokenWasCalled.should.be.true;
-                subject.validateAccessTokenWasCalled.should.be.true;
+            subject.__validateIdTokenAndAccessToken(stubState, stubResponse).then(response => {
+                subject._validateIdTokenWasCalled.should.be.true;
+                subject._validateAccessTokenWasCalled.should.be.true;
                 done();
             });
 
@@ -558,11 +558,11 @@ describe("ResponseValidator", function() {
 
             stubResponse.id_token = "id_token";
             stubResponse.access_token = "access_token";
-            subject.validateIdTokenResult = Promise.reject(new Error("error"));
+            subject._validateIdTokenResult = Promise.reject(new Error("error"));
 
-            subject.validateIdTokenAndAccessToken(stubState, stubResponse).then(null, err => {
-                subject.validateIdTokenWasCalled.should.be.true;
-                expect(subject.validateAccessTokenWasCalled).to.be.undefined;
+            subject.__validateIdTokenAndAccessToken(stubState, stubResponse).then(null, err => {
+                subject._validateIdTokenWasCalled.should.be.true;
+                expect(subject._validateAccessTokenWasCalled).to.be.undefined;
                 done();
             });
 
@@ -570,14 +570,14 @@ describe("ResponseValidator", function() {
 
     });
 
-    describe("validateIdToken", function() {
+    describe("_validateIdToken", function() {
 
         it("should fail if no client/audience", function(done) {
 
             stubResponse.id_token = id_token;
             delete settings.client_id;
 
-            subject.validateIdToken(stubState, stubResponse).then(null, err => {
+            subject._validateIdToken(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('audience');
                 done();
             });
@@ -588,7 +588,7 @@ describe("ResponseValidator", function() {
             delete stubState.nonce;
             stubResponse.id_token = id_token;
 
-            subject.validateIdToken(stubState, stubResponse).then(null, err => {
+            subject._validateIdToken(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('nonce');
                 done();
             });
@@ -596,7 +596,7 @@ describe("ResponseValidator", function() {
         
         it("should fail if invalid id_token", function(done) {
 
-            subject.validateIdToken(stubState, stubResponse).then(null, err => {
+            subject._validateIdToken(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('id_token');
                 done();
             });
@@ -607,7 +607,7 @@ describe("ResponseValidator", function() {
             stubState.nonce = "invalid nonce";
             stubResponse.id_token = id_token;
 
-            subject.validateIdToken(stubState, stubResponse).then(null, err => {
+            subject._validateIdToken(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('nonce');
                 done();
             });
@@ -617,7 +617,7 @@ describe("ResponseValidator", function() {
             stubResponse.id_token = id_token;
             stubMetadataService.getIssuerResult = Promise.reject(new Error("issuer"));
 
-            subject.validateIdToken(stubState, stubResponse).then(null, err => {
+            subject._validateIdToken(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('issuer');
                 done();
             });
@@ -629,7 +629,7 @@ describe("ResponseValidator", function() {
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.reject(new Error("keys"));
 
-            subject.validateIdToken(stubState, stubResponse).then(null, err => {
+            subject._validateIdToken(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('keys');
                 done();
             });
@@ -641,7 +641,7 @@ describe("ResponseValidator", function() {
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.resolve([]);
 
-            subject.validateIdToken(stubState, stubResponse).then(null, err => {
+            subject._validateIdToken(stubState, stubResponse).then(null, err => {
                 err.message.should.contain('kid');
                 done();
             });
@@ -655,7 +655,7 @@ describe("ResponseValidator", function() {
 
             mockJwtUtility.validateJwtResult = true;
             
-            subject.validateIdToken(stubState, stubResponse).then(response => {
+            subject._validateIdToken(stubState, stubResponse).then(response => {
                  mockJwtUtility.validateJwtWasCalled.should.be.true;
                 done();
             });
@@ -669,7 +669,7 @@ describe("ResponseValidator", function() {
             
             mockJwtUtility.validateJwtResult = true;
 
-            subject.validateIdToken(stubState, stubResponse).then(response => {
+            subject._validateIdToken(stubState, stubResponse).then(response => {
                 response.profile.should.be.ok;
                 done();
             });
@@ -677,7 +677,7 @@ describe("ResponseValidator", function() {
 
     });
 
-    describe("validateAccessToken", function() {
+    describe("_validateAccessToken", function() {
 
         it("should require id_token", function(done) {
 
@@ -686,7 +686,7 @@ describe("ResponseValidator", function() {
                 at_hash: at_hash
             };
 
-            subject.validateAccessToken(stubResponse).then(null, err => {
+            subject._validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("id_token");
                 done();
             });
@@ -697,7 +697,7 @@ describe("ResponseValidator", function() {
             stubResponse.id_token = id_token;
             stubResponse.profile = null;
 
-            subject.validateAccessToken(stubResponse).then(null, err => {
+            subject._validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("profile");
                 done();
             });
@@ -709,7 +709,7 @@ describe("ResponseValidator", function() {
             stubResponse.profile = {
             };
 
-            subject.validateAccessToken(stubResponse).then(null, err => {
+            subject._validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("at_hash");
                 done();
             });
@@ -722,7 +722,7 @@ describe("ResponseValidator", function() {
                 at_hash: at_hash
             };
 
-            subject.validateAccessToken(stubResponse).then(null, err => {
+            subject._validateAccessToken(stubResponse).then(null, err => {
                 Log.info(err);
                 err.message.should.contain("id_token");
                 done();
@@ -737,7 +737,7 @@ describe("ResponseValidator", function() {
             };
             mockJwtUtility.parseJwtResult = { header: { alg: "bad" } };
 
-            subject.validateAccessToken(stubResponse).then(null, err => {
+            subject._validateAccessToken(stubResponse).then(null, err => {
                 Log.info(err);
                 err.message.should.contain("alg");
                 done();
@@ -753,7 +753,7 @@ describe("ResponseValidator", function() {
             };
 
             mockJwtUtility.parseJwtResult = { header: { alg: "HS123" } };
-            subject.validateAccessToken(stubResponse).then(null, err => {
+            subject._validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("alg");
                 done();
             });
@@ -768,7 +768,7 @@ describe("ResponseValidator", function() {
             };
 
             mockJwtUtility.parseJwtResult = { header: { alg: "abc" } };
-            subject.validateAccessToken(stubResponse).then(null, err => {
+            subject._validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("alg");
                 done();
             });
@@ -786,7 +786,7 @@ describe("ResponseValidator", function() {
             mockJwtUtility.hashStringResult = "hash";
             mockJwtUtility.hexToBase64UrlResult = "wrong";
 
-            subject.validateAccessToken(stubResponse).then(null, err => {
+            subject._validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("at_hash");
                 done();
             });
@@ -800,7 +800,7 @@ describe("ResponseValidator", function() {
                 at_hash: at_hash
             };
 
-            subject.validateAccessToken(stubResponse).then(response => {
+            subject._validateAccessToken(stubResponse).then(response => {
                 response.should.be.deep.equal(stubResponse);
                 done();
             });

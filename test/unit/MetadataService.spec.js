@@ -122,10 +122,10 @@ describe("MetadataService", function() {
 
     });
     
-     describe("getMetadataProperty", function() {
+     describe("_getMetadataProperty", function() {
 
         it("should return a promise", function() {
-            subject.getMetadataProperty().should.be.instanceof(Promise);
+            subject._getMetadataProperty().should.be.instanceof(Promise);
         });
 
         it("should use metadata on settings", function(done) {
@@ -133,7 +133,7 @@ describe("MetadataService", function() {
                 foo: "test"
             };
 
-            let p = subject.getMetadataProperty("foo");
+            let p = subject._getMetadataProperty("foo");
 
             p.then(result => {
                 result.should.equal("test");
@@ -145,7 +145,7 @@ describe("MetadataService", function() {
             settings.metadata = {
             };
 
-            let p = subject.getMetadataProperty("foo");
+            let p = subject._getMetadataProperty("foo");
 
             p.then(null, err => {
                 err.message.should.contain("foo");
@@ -158,7 +158,7 @@ describe("MetadataService", function() {
             settings.metadataUrl = "http://sts/metadata";
             stubJsonService.result = Promise.reject(new Error("test"));
 
-            let p = subject.getMetadataProperty("foo");
+            let p = subject._getMetadataProperty("foo");
 
             p.then(null, err => {
                 err.message.should.contain("test");

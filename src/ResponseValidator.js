@@ -22,11 +22,11 @@ export default class ResponseValidator {
     validateSigninResponse(state, response) {
         Log.info("ResponseValidator.validateSigninResponse");
 
-        return this.processSigninParams(state, response).then(response => {
+        return this._processSigninParams(state, response).then(response => {
             Log.info("state processed");
-            return this.validateTokens(state, response).then(response => {
+            return this._validateTokens(state, response).then(response => {
                 Log.info("tokens validated");
-                return this.processClaims(response).then(response => {
+                return this._processClaims(response).then(response => {
                     Log.info("claims processed");
                     return response;
                 });
@@ -56,8 +56,8 @@ export default class ResponseValidator {
         return Promise.resolve(response);
     }
 
-    processSigninParams(state, response) {
-        Log.info("ResponseValidator.processSigninParams");
+    _processSigninParams(state, response) {
+        Log.info("ResponseValidator._processSigninParams");
 
         if (state.id !== response.state) {
             Log.error("State does not match");
@@ -88,17 +88,17 @@ export default class ResponseValidator {
         return Promise.resolve(response);
     }
 
-    processClaims(response) {
-        Log.info("ResponseValidator.processClaims");
+    _processClaims(response) {
+        Log.info("ResponseValidator._processClaims");
 
-        response.profile = this.filterProtocolClaims(response.profile);
+        response.profile = this._filterProtocolClaims(response.profile);
 
         if (this._settings.loadUserInfo && response.access_token) {
 
             Log.info("loading user info");
             return this._userInfoService.getClaims(response.access_token).then(claims => {
 
-                response.profile = this.mergeClaims(response.profile, claims);
+                response.profile = this._mergeClaims(response.profile, claims);
                 Log.info("user info claims received, updated profile:", response.profile);
 
                 return response;
@@ -108,7 +108,7 @@ export default class ResponseValidator {
         return Promise.resolve(response);
     }
 
-    mergeClaims(claims1, claims2) {
+    _mergeClaims(claims1, claims2) {
         var result = Object.assign({}, claims1);
 
         for (let name in claims2) {
@@ -135,12 +135,12 @@ export default class ResponseValidator {
         return result;
     }
 
-    filterProtocolClaims(claims) {
-        Log.info("ResponseValidator.filterProtocolClaims, incoming claims:", claims);
+    _filterProtocolClaims(claims) {
+        Log.info("ResponseValidator._filterProtocolClaims, incoming claims:", claims);
 
         var result = Object.assign({}, claims);
 
-        if (this._settings.filterProtocolClaims) {
+        if (this._settings._filterProtocolClaims) {
             ProtocolClaims.forEach(type => {
                 delete result[type];
             });
@@ -154,34 +154,34 @@ export default class ResponseValidator {
         return result;
     }
 
-    validateTokens(state, response) {
-        Log.info("ResponseValidator.validateTokens");
+    _validateTokens(state, response) {
+        Log.info("ResponseValidator._validateTokens");
 
         if (response.id_token) {
 
             if (response.access_token) {
                 Log.info("Validating id_token and access_token");
-                return this.validateIdTokenAndAccessToken(state, response);
+                return this.__validateIdTokenAndAccessToken(state, response);
             }
 
             Log.info("Validating id_token");
-            return this.validateIdToken(state, response);
+            return this._validateIdToken(state, response);
         }
 
         Log.info("No id_token to validate");
         return Promise.resolve(response);
     }
 
-    validateIdTokenAndAccessToken(state, response) {
-        Log.info("ResponseValidator.validateIdTokenAndAccessToken");
+    __validateIdTokenAndAccessToken(state, response) {
+        Log.info("ResponseValidator.__validateIdTokenAndAccessToken");
 
-        return this.validateIdToken(state, response).then(response => {
-            return this.validateAccessToken(response);
+        return this._validateIdToken(state, response).then(response => {
+            return this._validateAccessToken(response);
         });
     }
 
-    validateIdToken(state, response) {
-        Log.info("ResponseValidator.validateIdToken");
+    _validateIdToken(state, response) {
+        Log.info("ResponseValidator._validateIdToken");
 
         if (!state.nonce) {
             Log.error("No nonce on state");
@@ -242,8 +242,8 @@ export default class ResponseValidator {
         });
     }
 
-    validateAccessToken(response) {
-        Log.info("ResponseValidator.validateAccessToken");
+    _validateAccessToken(response) {
+        Log.info("ResponseValidator._validateAccessToken");
 
         if (!response.profile) {
             Log.error("No profile loaded from id_token");

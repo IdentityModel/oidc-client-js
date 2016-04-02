@@ -37,26 +37,26 @@ export default class MetadataService {
     
     getIssuer() {
         Log.info("MetadataService.getIssuer");
-        return this.getMetadataProperty("issuer");
+        return this._getMetadataProperty("issuer");
     }
 
     getAuthorizationEndpoint() {
         Log.info("MetadataService.getAuthorizationEndpoint");
-        return this.getMetadataProperty("authorization_endpoint");
+        return this._getMetadataProperty("authorization_endpoint");
     }
 
     getUserInfoEndpoint() {
         Log.info("MetadataService.getUserInfoEndpoint");
-        return this.getMetadataProperty("userinfo_endpoint");
+        return this._getMetadataProperty("userinfo_endpoint");
     }
 
     getEndSessionEndpoint() {
         Log.info("MetadataService.getEndSessionEndpoint");
-        return this.getMetadataProperty("end_session_endpoint");
+        return this._getMetadataProperty("end_session_endpoint");
     }
 
-    getMetadataProperty(name) {
-        Log.info("MetadataService.getMetadataProperty", name);
+    _getMetadataProperty(name) {
+        Log.info("MetadataService._getMetadataProperty", name);
 
         return this.getMetadata().then(metadata => {
             Log.info("metadata recieved");
@@ -78,7 +78,7 @@ export default class MetadataService {
             return Promise.resolve(this._settings.signingKeys);
         }
 
-        return this.getMetadataProperty("jwks_uri").then(jwks_uri => {
+        return this._getMetadataProperty("jwks_uri").then(jwks_uri => {
             Log.info("jwks_uri received", jwks_uri);
 
             return this._jsonService.getJson(jwks_uri).then(keySet => {
@@ -89,7 +89,7 @@ export default class MetadataService {
                     throw new Error("Missing keys on keyset");
                 }
 
-                var filteredKeys = this.filterSigningKeys(keySet.keys);
+                var filteredKeys = this._filterSigningKeys(keySet.keys);
                 Log.info("filtered keys", filteredKeys);
 
                 this._settings.signingKeys = filteredKeys;
@@ -98,8 +98,8 @@ export default class MetadataService {
         });
     }
 
-    filterSigningKeys(keys) {
-        Log.info("MetadataService.filterSigningKeys", keys);
+    _filterSigningKeys(keys) {
+        Log.info("MetadataService._filterSigningKeys", keys);
 
         return keys.filter(item => {
             return item.use === "sig";
