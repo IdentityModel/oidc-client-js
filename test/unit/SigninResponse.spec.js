@@ -87,6 +87,7 @@ describe("SigninResponse", function() {
 
     describe("expires_in", function() {
         it("should calculate how much time left", function() {
+            var oldNow = Date.now;
             Date.now = function() {
                 return 1000 * 1000; // ms
             }
@@ -94,14 +95,16 @@ describe("SigninResponse", function() {
             subject.expires_in.should.equal(100);
             
             Date.now = function() {
-                return 1050 * 1000;
+                return 1050 * 1000; // ms
             }
             subject.expires_in.should.equal(50);
+            Date.now = oldNow;
         });
     });
     
     describe("expired", function() {
         it("should calculate how much time left", function() {
+            var oldNow = Date.now;
             Date.now = function() {
                 return 1000 * 1000; // ms
             }
@@ -112,6 +115,7 @@ describe("SigninResponse", function() {
                 return 1100 * 1000; // ms
             }
             subject.expired.should.be.true;
+            Date.now = oldNow;
         });
     });
 
