@@ -8,12 +8,14 @@ let assert = chai.assert;
 let expect = chai.expect;
 
 describe("WebStorageStateStore", function() {
+    let prefix;
     let subject;
     let store;
 
     beforeEach(function() {
+        prefix = "";
         store = new InMemoryWebStorage();
-        subject = new WebStorageStateStore(store);
+        subject = new WebStorageStateStore({prefix:prefix, store:store});
     });
 
     describe("set", function() {
@@ -25,6 +27,16 @@ describe("WebStorageStateStore", function() {
         it("should store item", function(done) {
             subject.set("key", "value").then(()=>{
                 store.getItem("key").should.equal("value");
+                done();
+            })
+        });
+        
+        it("should use prefix if specified", function(){
+            prefix = "foo.";
+            subject = new WebStorageStateStore({prefix:prefix, store:store});
+
+            subject.set("key", "value").then(()=>{
+                store.getItem(prefix + "key").should.equal("value");
                 done();
             })
         });
@@ -61,6 +73,19 @@ describe("WebStorageStateStore", function() {
                 done();
             });
         });
+
+        it("should use prefix if specified", function(done){
+            prefix = "foo.";
+            subject = new WebStorageStateStore({prefix:prefix, store:store});
+
+            store.setItem("foo.key", "value");
+
+            subject.remove("key").then(item => {
+                expect(store.getItem("foo.key")).to.be.undefined;
+                done();
+            });
+        });
+
     });
 
 });

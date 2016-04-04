@@ -2,12 +2,15 @@ import Log from './Log';
 import Window from './Window';
 
 export default class WebStorageStateStore {
-    constructor(store = Window.localStorage){
+    constructor({prefix = "oidc.", store = Window.localStorage} = {}){
         this._store = store;
+        this._prefix = prefix;
     }
     
     set(key, value){
         Log.info("WebStorageStateStore.set", key);
+        
+        key = this._prefix + key;
         
         try{
             this._store.setItem(key, value);
@@ -22,6 +25,8 @@ export default class WebStorageStateStore {
     remove(key){
         Log.info("WebStorageStateStore.remove", key);
         
+        key = this._prefix + key;
+
         var item = this._store.getItem(key);
         this._store.removeItem(key);
         
