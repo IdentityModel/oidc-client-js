@@ -1,14 +1,14 @@
 export default class Window {
     static get location(){
-        return window.location;
+        return location;
     }
     static get localStorage() {
-        return window.localStorage;
+        return localStorage;
     }
     static get sessionStorage() {
-        return window.sessionStorage;
+        return sessionStorage;
     }
     static get XMLHttpRequest(){
-        return window.XMLHttpRequest;
+        return XMLHttpRequest;
     }
 };
