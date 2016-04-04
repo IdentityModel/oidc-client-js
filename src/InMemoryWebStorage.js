@@ -18,5 +18,13 @@ export default class InMemoryWebStorage{
     removeItem(key){
         Log.info("InMemoryWebStorage.removeItem", key);
         delete this._data[key];
-    }   
+    }
+    
+    get length() {
+        return Object.getOwnPropertyNames(this._data).length;
+    }
+    
+    key(index) {
+        return Object.getOwnPropertyNames(this._data)[index];
+    }
 }
