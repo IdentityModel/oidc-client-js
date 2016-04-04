@@ -1,15 +1,23 @@
 import random from './random';
 
 export default class State {
-    constructor({id, nonce, data}={}) {
+    constructor({id, nonce, data, created}={}) {
         this._id = id || random();
+        this._data = data;
+        
         if (nonce === true){
             this._nonce = random();
         }
         else if (nonce){
             this._nonce = nonce;
         }
-        this._data = data;
+        
+        if (typeof created === 'number' && created > 0) {
+            this._created =  created;
+        }
+        else {
+            this._created =  parseInt(Date.now() / 1000);
+        }
     }
     
     get id() {
@@ -21,12 +29,16 @@ export default class State {
     get data() {
         return this._data;
     }
+    get created() {
+        return this._created;
+    }
 
     toStorageString() {
         return JSON.stringify({
             id:this.id,
             nonce:this.nonce,
-            data:this.data
+            data:this.data,
+            created:this.created
         });
     }
     
