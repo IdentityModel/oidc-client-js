@@ -39,13 +39,15 @@ export default class WebStorageStateStore {
     }
 
     getAllKeys() {
+        Log.info("WebStorageStateStore.getAllKeys");
+
         var keys = [];
 
         for (let index = 0; index < this._store.length; index++) {
             let key = this._store.key(index);
             
             if (key.indexOf(this._prefix) === 0) {
-                keys.push(key);
+                keys.push(key.substr(this._prefix.length));
             }
         }
         

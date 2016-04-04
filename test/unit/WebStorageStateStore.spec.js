@@ -140,6 +140,19 @@ describe("WebStorageStateStore", function() {
             });
         });
         
+        it("should return keys without prefix", function(done) {
+            prefix = "foo.";
+            subject = new WebStorageStateStore({ prefix: prefix, store: store });
+
+            store.setItem("foo.key1", "test");
+            store.setItem("foo.key2", "test");
+
+            subject.getAllKeys().then(keys => {
+                keys.should.deep.equal(["key1", "key2"]);
+                done();
+            });
+        });
+        
         it("should return empty keys when empty", function(done) {
             subject.getAllKeys().then(keys => {
                 keys.should.deep.equal([]);
