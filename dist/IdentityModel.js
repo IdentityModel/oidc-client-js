@@ -7782,6 +7782,9 @@ var IdentityModel =
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
 	exports.Log = _Log2.default;
 	exports.OidcClient = _OidcClient2.default;
 	exports.WebStorageStateStore = _WebStorageStateStore2.default;
@@ -7800,6 +7803,9 @@ var IdentityModel =
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var nopLogger = {
 	    info: function info() {},
@@ -7924,7 +7930,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _Log = __webpack_require__(292);
 
@@ -7983,7 +7990,11 @@ var IdentityModel =
 	            throw new Error("settings");
 	        }
 
-	        this._settings = new _OidcClientSettings2.default(settings);
+	        if (settings instanceof _OidcClientSettings2.default) {
+	            this._settings = settings;
+	        } else {
+	            this._settings = new _OidcClientSettings2.default(settings);
+	        }
 	        this._stateStore = stateStore;
 	        this._validator = new ResponseValidatorCtor(this._settings);
 	        this._metadataService = new MetadataServiceCtor(this._settings);
@@ -8147,7 +8158,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _Log = __webpack_require__(292);
 
@@ -8350,7 +8362,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _JsonService = __webpack_require__(296);
 
@@ -8408,30 +8421,30 @@ var IdentityModel =
 	        key: 'getIssuer',
 	        value: function getIssuer() {
 	            _Log2.default.info("MetadataService.getIssuer");
-	            return this.getMetadataProperty("issuer");
+	            return this._getMetadataProperty("issuer");
 	        }
 	    }, {
 	        key: 'getAuthorizationEndpoint',
 	        value: function getAuthorizationEndpoint() {
 	            _Log2.default.info("MetadataService.getAuthorizationEndpoint");
-	            return this.getMetadataProperty("authorization_endpoint");
+	            return this._getMetadataProperty("authorization_endpoint");
 	        }
 	    }, {
 	        key: 'getUserInfoEndpoint',
 	        value: function getUserInfoEndpoint() {
 	            _Log2.default.info("MetadataService.getUserInfoEndpoint");
-	            return this.getMetadataProperty("userinfo_endpoint");
+	            return this._getMetadataProperty("userinfo_endpoint");
 	        }
 	    }, {
 	        key: 'getEndSessionEndpoint',
 	        value: function getEndSessionEndpoint() {
 	            _Log2.default.info("MetadataService.getEndSessionEndpoint");
-	            return this.getMetadataProperty("end_session_endpoint");
+	            return this._getMetadataProperty("end_session_endpoint");
 	        }
 	    }, {
-	        key: 'getMetadataProperty',
-	        value: function getMetadataProperty(name) {
-	            _Log2.default.info("MetadataService.getMetadataProperty", name);
+	        key: '_getMetadataProperty',
+	        value: function _getMetadataProperty(name) {
+	            _Log2.default.info("MetadataService._getMetadataProperty", name);
 
 	            return this.getMetadata().then(function (metadata) {
 	                _Log2.default.info("metadata recieved");
@@ -8456,7 +8469,7 @@ var IdentityModel =
 	                return Promise.resolve(this._settings.signingKeys);
 	            }
 
-	            return this.getMetadataProperty("jwks_uri").then(function (jwks_uri) {
+	            return this._getMetadataProperty("jwks_uri").then(function (jwks_uri) {
 	                _Log2.default.info("jwks_uri received", jwks_uri);
 
 	                return _this2._jsonService.getJson(jwks_uri).then(function (keySet) {
@@ -8467,7 +8480,7 @@ var IdentityModel =
 	                        throw new Error("Missing keys on keyset");
 	                    }
 
-	                    var filteredKeys = _this2.filterSigningKeys(keySet.keys);
+	                    var filteredKeys = _this2._filterSigningKeys(keySet.keys);
 	                    _Log2.default.info("filtered keys", filteredKeys);
 
 	                    _this2._settings.signingKeys = filteredKeys;
@@ -8476,9 +8489,9 @@ var IdentityModel =
 	            });
 	        }
 	    }, {
-	        key: 'filterSigningKeys',
-	        value: function filterSigningKeys(keys) {
-	            _Log2.default.info("MetadataService.filterSigningKeys", keys);
+	        key: '_filterSigningKeys',
+	        value: function _filterSigningKeys(keys) {
+	            _Log2.default.info("MetadataService._filterSigningKeys", keys);
 
 	            return keys.filter(function (item) {
 	                return item.use === "sig";
@@ -8502,7 +8515,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _Log = __webpack_require__(292);
 
@@ -8587,6 +8601,9 @@ var IdentityModel =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
 	var Window = function () {
 	    function Window() {
 	        _classCallCheck(this, Window);
@@ -8595,22 +8612,22 @@ var IdentityModel =
 	    _createClass(Window, null, [{
 	        key: "location",
 	        get: function get() {
-	            return window.location;
+	            return location;
 	        }
 	    }, {
 	        key: "localStorage",
 	        get: function get() {
-	            return window.localStorage;
+	            return localStorage;
 	        }
 	    }, {
 	        key: "sessionStorage",
 	        get: function get() {
-	            return window.sessionStorage;
+	            return sessionStorage;
 	        }
 	    }, {
 	        key: "XMLHttpRequest",
 	        get: function get() {
-	            return window.XMLHttpRequest;
+	            return XMLHttpRequest;
 	        }
 	    }]);
 
@@ -8631,7 +8648,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _Log = __webpack_require__(292);
 
@@ -8749,7 +8767,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _Log = __webpack_require__(292);
 
@@ -8841,7 +8860,12 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+	var _Log = __webpack_require__(292);
+
+	var _Log2 = _interopRequireDefault(_Log);
 
 	var _random = __webpack_require__(301);
 
@@ -8858,25 +8882,35 @@ var IdentityModel =
 	        var id = _ref.id;
 	        var nonce = _ref.nonce;
 	        var data = _ref.data;
+	        var created = _ref.created;
 
 	        _classCallCheck(this, State);
 
 	        this._id = id || (0, _random2.default)();
+	        this._data = data;
+
 	        if (nonce === true) {
 	            this._nonce = (0, _random2.default)();
 	        } else if (nonce) {
 	            this._nonce = nonce;
 	        }
-	        this._data = data;
+
+	        if (typeof created === 'number' && created > 0) {
+	            this._created = created;
+	        } else {
+	            this._created = parseInt(Date.now() / 1000);
+	        }
 	    }
 
 	    _createClass(State, [{
 	        key: 'toStorageString',
 	        value: function toStorageString() {
+	            _Log2.default.info("State.toStorageString");
 	            return JSON.stringify({
 	                id: this.id,
 	                nonce: this.nonce,
-	                data: this.data
+	                data: this.data,
+	                created: this.created
 	            });
 	        }
 	    }, {
@@ -8894,10 +8928,73 @@ var IdentityModel =
 	        get: function get() {
 	            return this._data;
 	        }
+	    }, {
+	        key: 'created',
+	        get: function get() {
+	            return this._created;
+	        }
 	    }], [{
 	        key: 'fromStorageString',
 	        value: function fromStorageString(storageString) {
+	            _Log2.default.info("State.fromStorageString");
 	            return new State(JSON.parse(storageString));
+	        }
+	    }, {
+	        key: 'clearStaleState',
+	        value: function clearStaleState(storage, age) {
+	            _Log2.default.info("State.clearStaleState");
+
+	            var cutoff = Date.now() / 1000 - age;
+
+	            return storage.getAllKeys().then(function (keys) {
+	                _Log2.default.info("got keys", keys);
+
+	                var promises = [];
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    var _loop = function _loop() {
+	                        var key = _step.value;
+	                        p = storage.get(key).then(function (item) {
+	                            _Log2.default.info("got item from key", key, item);
+
+	                            var state = State.fromStorageString(item);
+
+	                            if (state.created <= cutoff) {
+	                                _Log2.default.info("key being removed", key);
+	                                return storage.remove(key);
+	                            }
+	                        });
+
+
+	                        promises.push(p);
+	                    };
+
+	                    for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var p;
+
+	                        _loop();
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+
+	                _Log2.default.info("waiting on promise count:", promises.length);
+	                return Promise.all(promises);
+	            });
 	        }
 	    }]);
 
@@ -8917,8 +9014,6 @@ var IdentityModel =
 	    value: true
 	});
 	exports.default = random;
-	// NOTICE: the code in this file originally developed by Microsoft
-
 	//----------------------------------------------------------------------
 	// AdalJS v1.0.8
 	// @preserve Copyright (c) Microsoft Open Technologies, Inc.
@@ -8937,7 +9032,7 @@ var IdentityModel =
 	// See the License for the specific language governing permissions and
 	// limitations under the License.
 	//----------------------------------------------------------------------
-
+	// NOTICE: the code in this file originally developed by Microsoft
 	// source: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/lib/adal.js#L1029
 	// original license: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/LICENSE.txt
 
@@ -8977,7 +9072,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _Log = __webpack_require__(292);
 
@@ -9027,6 +9123,20 @@ var IdentityModel =
 	                return this.expires_at - now;
 	            }
 	            return undefined;
+	        }
+	    }, {
+	        key: 'expired',
+	        get: function get() {
+	            var expires_in = this.expires_in;
+	            if (expires_in !== undefined) {
+	                return expires_in <= 0;
+	            }
+	            return undefined;
+	        }
+	    }, {
+	        key: 'scopes',
+	        get: function get() {
+	            return (this.scope || "").split(" ");
 	        }
 	    }]);
 
@@ -9111,7 +9221,8 @@ var IdentityModel =
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } } // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var SignoutRequest = function SignoutRequest(_ref) {
 	    var url = _ref.url;
@@ -9165,7 +9276,8 @@ var IdentityModel =
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } } // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var SignoutResponse = function SignoutResponse(url) {
 	    _classCallCheck(this, SignoutResponse);
@@ -9192,7 +9304,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _Log = __webpack_require__(292);
 
@@ -9208,11 +9321,17 @@ var IdentityModel =
 
 	var WebStorageStateStore = function () {
 	    function WebStorageStateStore() {
-	        var store = arguments.length <= 0 || arguments[0] === undefined ? _Window2.default.localStorage : arguments[0];
+	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	        var _ref$prefix = _ref.prefix;
+	        var prefix = _ref$prefix === undefined ? "oidc." : _ref$prefix;
+	        var _ref$store = _ref.store;
+	        var store = _ref$store === undefined ? _Window2.default.localStorage : _ref$store;
 
 	        _classCallCheck(this, WebStorageStateStore);
 
 	        this._store = store;
+	        this._prefix = prefix;
 	    }
 
 	    _createClass(WebStorageStateStore, [{
@@ -9220,23 +9339,51 @@ var IdentityModel =
 	        value: function set(key, value) {
 	            _Log2.default.info("WebStorageStateStore.set", key);
 
-	            try {
-	                this._store.setItem(key, value);
-	                return Promise.resolve();
-	            } catch (e) {
-	                _Log2.default.error("storage exception", e);
-	                return Promise.reject(new Error("Failed to store item", key));
-	            }
+	            key = this._prefix + key;
+
+	            this._store.setItem(key, value);
+
+	            return Promise.resolve();
+	        }
+	    }, {
+	        key: 'get',
+	        value: function get(key) {
+	            _Log2.default.info("WebStorageStateStore.get", key);
+
+	            key = this._prefix + key;
+
+	            var item = this._store.getItem(key);
+
+	            return Promise.resolve(item);
 	        }
 	    }, {
 	        key: 'remove',
 	        value: function remove(key) {
 	            _Log2.default.info("WebStorageStateStore.remove", key);
 
+	            key = this._prefix + key;
+
 	            var item = this._store.getItem(key);
 	            this._store.removeItem(key);
 
 	            return Promise.resolve(item);
+	        }
+	    }, {
+	        key: 'getAllKeys',
+	        value: function getAllKeys() {
+	            _Log2.default.info("WebStorageStateStore.getAllKeys");
+
+	            var keys = [];
+
+	            for (var index = 0; index < this._store.length; index++) {
+	                var key = this._store.key(index);
+
+	                if (key.indexOf(this._prefix) === 0) {
+	                    keys.push(key.substr(this._prefix.length));
+	                }
+	            }
+
+	            return Promise.resolve(keys);
 	        }
 	    }]);
 
@@ -9256,7 +9403,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _Log = __webpack_require__(292);
 
@@ -9306,11 +9454,11 @@ var IdentityModel =
 
 	            _Log2.default.info("ResponseValidator.validateSigninResponse");
 
-	            return this.processSigninParams(state, response).then(function (response) {
+	            return this._processSigninParams(state, response).then(function (response) {
 	                _Log2.default.info("state processed");
-	                return _this.validateTokens(state, response).then(function (response) {
+	                return _this._validateTokens(state, response).then(function (response) {
 	                    _Log2.default.info("tokens validated");
-	                    return _this.processClaims(response).then(function (response) {
+	                    return _this._processClaims(response).then(function (response) {
 	                        _Log2.default.info("claims processed");
 	                        return response;
 	                    });
@@ -9341,9 +9489,9 @@ var IdentityModel =
 	            return Promise.resolve(response);
 	        }
 	    }, {
-	        key: 'processSigninParams',
-	        value: function processSigninParams(state, response) {
-	            _Log2.default.info("ResponseValidator.processSigninParams");
+	        key: '_processSigninParams',
+	        value: function _processSigninParams(state, response) {
+	            _Log2.default.info("ResponseValidator._processSigninParams");
 
 	            if (state.id !== response.state) {
 	                _Log2.default.error("State does not match");
@@ -9374,20 +9522,20 @@ var IdentityModel =
 	            return Promise.resolve(response);
 	        }
 	    }, {
-	        key: 'processClaims',
-	        value: function processClaims(response) {
+	        key: '_processClaims',
+	        value: function _processClaims(response) {
 	            var _this2 = this;
 
-	            _Log2.default.info("ResponseValidator.processClaims");
+	            _Log2.default.info("ResponseValidator._processClaims");
 
-	            response.profile = this.filterProtocolClaims(response.profile);
+	            response.profile = this._filterProtocolClaims(response.profile);
 
 	            if (this._settings.loadUserInfo && response.access_token) {
 
 	                _Log2.default.info("loading user info");
 	                return this._userInfoService.getClaims(response.access_token).then(function (claims) {
 
-	                    response.profile = _this2.mergeClaims(response.profile, claims);
+	                    response.profile = _this2._mergeClaims(response.profile, claims);
 	                    _Log2.default.info("user info claims received, updated profile:", response.profile);
 
 	                    return response;
@@ -9397,8 +9545,8 @@ var IdentityModel =
 	            return Promise.resolve(response);
 	        }
 	    }, {
-	        key: 'mergeClaims',
-	        value: function mergeClaims(claims1, claims2) {
+	        key: '_mergeClaims',
+	        value: function _mergeClaims(claims1, claims2) {
 	            var result = Object.assign({}, claims1);
 
 	            for (var name in claims2) {
@@ -9444,13 +9592,13 @@ var IdentityModel =
 	            return result;
 	        }
 	    }, {
-	        key: 'filterProtocolClaims',
-	        value: function filterProtocolClaims(claims) {
-	            _Log2.default.info("ResponseValidator.filterProtocolClaims, incoming claims:", claims);
+	        key: '_filterProtocolClaims',
+	        value: function _filterProtocolClaims(claims) {
+	            _Log2.default.info("ResponseValidator._filterProtocolClaims, incoming claims:", claims);
 
 	            var result = Object.assign({}, claims);
 
-	            if (this._settings.filterProtocolClaims) {
+	            if (this._settings._filterProtocolClaims) {
 	                ProtocolClaims.forEach(function (type) {
 	                    delete result[type];
 	                });
@@ -9463,41 +9611,41 @@ var IdentityModel =
 	            return result;
 	        }
 	    }, {
-	        key: 'validateTokens',
-	        value: function validateTokens(state, response) {
-	            _Log2.default.info("ResponseValidator.validateTokens");
+	        key: '_validateTokens',
+	        value: function _validateTokens(state, response) {
+	            _Log2.default.info("ResponseValidator._validateTokens");
 
 	            if (response.id_token) {
 
 	                if (response.access_token) {
 	                    _Log2.default.info("Validating id_token and access_token");
-	                    return this.validateIdTokenAndAccessToken(state, response);
+	                    return this.__validateIdTokenAndAccessToken(state, response);
 	                }
 
 	                _Log2.default.info("Validating id_token");
-	                return this.validateIdToken(state, response);
+	                return this._validateIdToken(state, response);
 	            }
 
 	            _Log2.default.info("No id_token to validate");
 	            return Promise.resolve(response);
 	        }
 	    }, {
-	        key: 'validateIdTokenAndAccessToken',
-	        value: function validateIdTokenAndAccessToken(state, response) {
+	        key: '__validateIdTokenAndAccessToken',
+	        value: function __validateIdTokenAndAccessToken(state, response) {
 	            var _this3 = this;
 
-	            _Log2.default.info("ResponseValidator.validateIdTokenAndAccessToken");
+	            _Log2.default.info("ResponseValidator.__validateIdTokenAndAccessToken");
 
-	            return this.validateIdToken(state, response).then(function (response) {
-	                return _this3.validateAccessToken(response);
+	            return this._validateIdToken(state, response).then(function (response) {
+	                return _this3._validateAccessToken(response);
 	            });
 	        }
 	    }, {
-	        key: 'validateIdToken',
-	        value: function validateIdToken(state, response) {
+	        key: '_validateIdToken',
+	        value: function _validateIdToken(state, response) {
 	            var _this4 = this;
 
-	            _Log2.default.info("ResponseValidator.validateIdToken");
+	            _Log2.default.info("ResponseValidator._validateIdToken");
 
 	            if (!state.nonce) {
 	                _Log2.default.error("No nonce on state");
@@ -9558,9 +9706,9 @@ var IdentityModel =
 	            });
 	        }
 	    }, {
-	        key: 'validateAccessToken',
-	        value: function validateAccessToken(response) {
-	            _Log2.default.info("ResponseValidator.validateAccessToken");
+	        key: '_validateAccessToken',
+	        value: function _validateAccessToken(response) {
+	            _Log2.default.info("ResponseValidator._validateAccessToken");
 
 	            if (!response.profile) {
 	                _Log2.default.error("No profile loaded from id_token");
@@ -9635,7 +9783,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _JsonService = __webpack_require__(296);
 
@@ -9709,7 +9858,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _jsrsasign = __webpack_require__(310);
 
@@ -11964,7 +12114,8 @@ var IdentityModel =
 	    value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var _Log = __webpack_require__(292);
 
@@ -11998,6 +12149,16 @@ var IdentityModel =
 	        value: function removeItem(key) {
 	            _Log2.default.info("InMemoryWebStorage.removeItem", key);
 	            delete this._data[key];
+	        }
+	    }, {
+	        key: "key",
+	        value: function key(index) {
+	            return Object.getOwnPropertyNames(this._data)[index];
+	        }
+	    }, {
+	        key: "length",
+	        get: function get() {
+	            return Object.getOwnPropertyNames(this._data).length;
 	        }
 	    }]);
 

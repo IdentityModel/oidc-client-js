@@ -1,5 +1,3 @@
-// NOTICE: the code in this file originally developed by Microsoft
-
 //----------------------------------------------------------------------
 // AdalJS v1.0.8
 // @preserve Copyright (c) Microsoft Open Technologies, Inc.
@@ -18,7 +16,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //----------------------------------------------------------------------
-
+// NOTICE: the code in this file originally developed by Microsoft
 // source: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/lib/adal.js#L1029
 // original license: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/LICENSE.txt
 
