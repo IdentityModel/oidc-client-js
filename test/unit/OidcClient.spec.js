@@ -5,6 +5,7 @@ import ErrorResponse from '../../src/ErrorResponse';
 import SignoutRequest from '../../src/SignoutRequest';
 import SignoutResponse from '../../src/SignoutResponse';
 import State from '../../src/State';
+import OidcClientSettings from '../../src/OidcClientSettings';
 
 import Log from '../../src/Log';
 
@@ -80,12 +81,20 @@ describe("OidcClient", function() {
             }
             assert.fail();
         });
-        
-         it("should expose settings", function() {
-             subject.settings.should.be.ok;
-             subject.settings.client_id.should.equal("client");
-        });
 
+        it("should expose settings", function() {
+            subject.settings.should.be.ok;
+            subject.settings.client_id.should.equal("client");
+        });
+        
+        it("should accept OidcClientSettings", function() {
+            let settings = new OidcClientSettings({client_id:"client"});
+
+            let subject = new OidcClient(settings, stubStore, () => stubValidator, () => stubMetadataService);
+
+            subject.settings.should.equal(settings);
+        });
+        
     });
 
     describe("createSigninRequest", function() {

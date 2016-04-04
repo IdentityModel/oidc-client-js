@@ -20,7 +20,12 @@ export default class OidcClient {
             throw new Error("settings");
         }
         
-        this._settings = new OidcClientSettings(settings);
+        if (settings instanceof OidcClientSettings){
+            this._settings = settings;
+        }
+        else {
+            this._settings = new OidcClientSettings(settings);
+        }
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this._settings);
         this._metadataService = new MetadataServiceCtor(this._settings);
