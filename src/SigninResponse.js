@@ -20,6 +20,7 @@ export default class SigninResponse {
         this.access_token = values.access_token;
         this.token_type = values.token_type;
         this.scope = values.scope;
+        this.profile = undefined; // will be set from ResponseValidator
 
         let expires_in = parseInt(values.expires_in);
         if (typeof expires_in === 'number' && expires_in > 0) {

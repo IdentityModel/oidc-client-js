@@ -32,7 +32,7 @@ export default class MetadataService {
 
         return this._jsonService.getJson(this._settings.metadataUrl)
             .then(metadata => {
-                Log.info("metadata received", metadata);
+                Log.info("json received");
                 this._settings.metadata = metadata;
                 return metadata;
             });
