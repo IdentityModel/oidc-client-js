@@ -42,9 +42,12 @@ export default class OidcClient {
     
     createSigninRequest({
         response_type, scope, redirect_uri, data, 
-        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values}={}
+        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values}={},
+        stateStore
     ) {
         Log.info("OidcClient.createSigninRequest");
+        
+        stateStore = stateStore || this._stateStore;
         
         let client_id = this._settings.client_id;
         response_type = response_type || this._settings.response_type;
@@ -71,14 +74,16 @@ export default class OidcClient {
             });
             
             var state = request.state;
-            this._stateStore.set(state.id, state.toStorageString());
+            stateStore.set(state.id, state.toStorageString());
             
             return request;
         });
     }
     
-    processSigninResponse(url){
+    processSigninResponse(url, stateStore){
         Log.info("OidcClient.processSigninResponse");
+        
+        stateStore = stateStore || this._stateStore;
         
         var response = new SigninResponse(url);
         if (!response.state) {
@@ -88,7 +93,7 @@ export default class OidcClient {
         
         var stateKey = response.state;
         
-        return this._stateStore.remove(stateKey).then(storedStateString => {
+        return stateStore.remove(stateKey).then(storedStateString => {
             if (!storedStateString){
                 Log.error("No matching state found in storage");
                 throw new Error("No matching state found in storage");
@@ -101,8 +106,12 @@ export default class OidcClient {
         });
     }
     
-    createSignoutRequest({id_token_hint, data, post_logout_redirect_uri}={}){
+    createSignoutRequest({id_token_hint, data, post_logout_redirect_uri}={},
+        stateStore
+    ){
         Log.info("OidcClient.createSignoutRequest");
+        
+        stateStore = stateStore || this._stateStore;
         
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
         
@@ -116,14 +125,16 @@ export default class OidcClient {
             });
             
             var state = request.state;
-            this._stateStore.set(state.id, state.toStorageString());
+            stateStore.set(state.id, state.toStorageString());
 
             return request;
         });
     }
     
-    processSignoutResponse(url){
+    processSignoutResponse(url, stateStore){
         Log.info("OidcClient.processSignoutResponse");
+        
+        stateStore = stateStore || this._stateStore;
         
         var response = new SignoutResponse(url);
         if (!response.state) {
@@ -133,7 +144,7 @@ export default class OidcClient {
         
         var stateKey = response.state;
         
-        return this._stateStore.remove(stateKey).then(storedStateString => {
+        return stateStore.remove(stateKey).then(storedStateString => {
             if (!storedStateString){
                 Log.error("No matching state found in storage");
                 throw new Error("No matching state found in storage");
@@ -146,8 +157,11 @@ export default class OidcClient {
         });
     }
     
-    clearStaleState(){
+    clearStaleState(stateStore){
         Log.info("OidcClient.clearStaleState");
-        return State.clearStaleState(this._stateStore, this.settings.staleStateAge);
+        
+        stateStore = stateStore || this._stateStore;
+        
+        return State.clearStaleState(stateStore, this.settings.staleStateAge);
     }
 }
