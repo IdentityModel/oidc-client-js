@@ -1,0 +1,156 @@
+// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+import Log from './Log';
+import OidcClient from './OidcClient';
+import OidcClientSettings from './OidcClientSettings';
+import WebStorageStateStore from './WebStorageStateStore';
+import Global from './Global';
+import User from './User';
+import RedirectNavigator from './RedirectNavigator';
+import PopupNavigator from './PopupNavigator';
+import IFrameNavigator from './IFrameNavigator';
+
+export default class UserManager extends OidcClient {
+    constructor(settings,
+        args = {
+            redirectNavigator: new RedirectNavigator(),
+            popupNavigator: new PopupNavigator(),
+            iframeNavigator: new IFrameNavigator(),
+            userStore: new WebStorageStateStore({ store: Global.sessionStorage })
+        }
+    ) {
+        super(settings, args);
+
+        this._redirectNavigator = args.redirectNavigator;
+        this._popupNavigator = args.popupNavigator;
+        this._iframeNavigator = args.iframeNavigator;
+
+        this._userStore = args.userStore;
+    }
+
+    get user() {
+        return this._user;
+    }
+
+    getUser(data) {
+        Log.info("UserManager.getUser");
+
+        if (!this._user) {
+            Log.info("no user in-memory");
+
+            return this._loadUser().then(user => {
+                this._user = user;
+                return user;
+            });
+        }
+
+        if (this._user && !this._user.expired) {
+            Log.info("user is in-memory and not expired");
+            return Promise.resolve(this._user);
+        }
+
+        Log.info("no user");
+        return Promise.resolve(null);
+    }
+
+    signinPopup(data) {
+        Log.info("UserManager.signinPopup");
+        return this._signin({ data: data }, this._popupNavigator);
+    }
+
+    signinSilent(data) {
+        Log.info("UserManager.signinSilent");
+        return this._signin({ data: data }, this._iframeNavigator);
+    }
+
+    _signin(args, navigator) {
+        return this._signinStart(args, this._popupNavigator).then(navResponse => {
+            return this._signinEnd(navResponse.url);
+        });
+    }
+
+    signinStartRedirect(data) {
+        Log.info("UserManager.signinStartRedirect");
+        return this._signinStart({data:data}, this._redirectNavigator);
+    }
+    signinCompleteRedirect(url) {
+        Log.info("UserManager.signinCompleteRedirect");
+        return this._signinEnd(url);
+    }
+
+    _signinStart(args, navigator) {
+        return this.createSigninRequest(args).then(signinRequest => {
+            Log.info("got signin request");
+            return navigator.navigate(signinRequest.url);
+        });
+    }
+
+    _signinEnd(url) {
+        return this.processSigninResponse(url).then(signinResponse => {
+            Log.info("got signin response");
+            
+            let user = new User(signinResponse);
+            
+            return this._storeUser(user).then(()=>{
+                Log.info("user stored");
+                
+                this._user = user;
+                
+                return user;
+            });
+        });
+    }
+
+    // signout(data) {
+    //     Log.info("UserManager.signout");
+
+    //     var id_token = this._user && this._user.id_token;
+    //     this._user = null;
+
+    //     return this._storeUser(null).then(() => {
+    //         Log.info("user removed from storage");
+
+    //         return this.createSignoutRequest({ data: data, id_token_hint: id_token }).then(signoutRequest => {
+    //             Log.info("got signout request");
+
+    //             return this._navigator.navigate(signoutRequest.url).then(navigateResponse => {
+    //                 Log.info("got navigate response");
+
+    //                 return this.processSignoutResponse(navigateResponse.url);
+    //             });
+    //         });
+    //     });
+    // }
+
+    get _userStoreKey() {
+        return `user:${this.settings.authority}:${this.settings.client_id}`;
+    }
+
+    _loadUser() {
+        Log.info("_loadUser");
+
+        return this._userStore.get(this._userStoreKey).then(storageString => {
+            if (storageString) {
+                Log.info("user storageString loaded");
+                return User.fromStorageString(storageString);
+            }
+
+            Log.info("no user storageString");
+            return null;
+        });
+    }
+
+    _storeUser(user) {
+        if (user) {
+            Log.info("_storeUser storing user");
+
+            var storageString = user.toStorageString();
+            return this._userStore.set(this._userStoreKey, storageString);
+        }
+        else {
+            Log.info("_storeUser removing user storage");
+            return this._userStore.remove(this._userStoreKey);
+        }
+    }
+}

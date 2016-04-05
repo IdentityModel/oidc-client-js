@@ -5,10 +5,12 @@ import Log from './Log';
 import OidcClient from './OidcClient';
 import WebStorageStateStore from './WebStorageStateStore';
 import InMemoryWebStorage from './InMemoryWebStorage';
+import UserManager from './UserManager';
 
 export {
     Log,
     OidcClient, 
     WebStorageStateStore,
-    InMemoryWebStorage
+    InMemoryWebStorage,
+    UserManager
 };
