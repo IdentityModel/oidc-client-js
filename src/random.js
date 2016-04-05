@@ -17,8 +17,7 @@
 // limitations under the License.
 //----------------------------------------------------------------------
 // NOTICE: the code in this file originally developed by Microsoft
-// source: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/lib/adal.js#L1029
-// original license: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/LICENSE.txt
+// original source: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/lib/adal.js#L1029
 
 export default function random() {
     var guidHolder = 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx';
