@@ -266,5 +266,23 @@ describe("OidcClientSettings", function() {
             subject.loadUserInfo.should.equal(false);
         });
     });
+    
+    describe("staleStateAge", function() {
+
+        it("should use default value", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+            });
+            subject.staleStateAge.should.equal(60);
+        });
+
+        it("should return value from initial settings", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                staleStateAge: 100
+            });
+            subject.staleStateAge.should.equal(100);
+        });
+    });
 
 });

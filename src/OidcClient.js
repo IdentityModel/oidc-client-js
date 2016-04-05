@@ -14,9 +14,11 @@ import State from './State';
 
 export default class OidcClient {
     constructor(settings, 
-        stateStore = new WebStorageStateStore(), 
-        ResponseValidatorCtor = ResponseValidator,
-        MetadataServiceCtor = MetadataService
+        {
+            stateStore = new WebStorageStateStore(), 
+            ResponseValidatorCtor = ResponseValidator,
+            MetadataServiceCtor = MetadataService
+        }
     ){
         if (!settings) {
             Log.error("No settings passed to OidcClient");
@@ -142,5 +144,10 @@ export default class OidcClient {
             Log.info("Received state from storage; validating response");
             return this._validator.validateSignoutResponse(state, response);
         });
+    }
+    
+    clearStaleState(){
+        Log.info("OidcClient.clearStaleState");
+        return State.clearStaleState(this._stateStore, this.settings.staleStateAge);
     }
 }

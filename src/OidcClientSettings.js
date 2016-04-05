@@ -4,20 +4,22 @@
 import Log from './Log';
 
 const OidcMetadataUrlPath = '.well-known/openid-configuration';
+
 const DefaultResponseType = "id_token";
 const DefaultScope = "openid";
+const DefaultStaleStateAge = 60; // seconds
 
 export default class OidcClientSettings {
     constructor({
         // metadata related
-        authority, metadataUrl, metadata, signingKeys, 
+        authority, metadataUrl, metadata, signingKeys,
         // client related
-        client_id, response_type = DefaultResponseType, scope = DefaultScope, 
+        client_id, response_type = DefaultResponseType, scope = DefaultScope,
         redirect_uri, post_logout_redirect_uri,
         // optional protocol
         prompt, display, max_age, ui_locales, acr_values,
         // behavior flags
-        filterProtocolClaims = true, loadUserInfo = true,
+        filterProtocolClaims = true, loadUserInfo = true, staleStateAge = DefaultStaleStateAge
     }) {
         if (!client_id) {
             Log.error("No client_id on settings passed to OidcClientSettings");
@@ -34,7 +36,7 @@ export default class OidcClientSettings {
         this._scope = scope;
         this._redirect_uri = redirect_uri;
         this._post_logout_redirect_uri = post_logout_redirect_uri;
-        
+
         this._prompt = prompt;
         this._display = display;
         this._max_age = max_age;
@@ -43,8 +45,9 @@ export default class OidcClientSettings {
 
         this._filterProtocolClaims = !!filterProtocolClaims;
         this._loadUserInfo = !!loadUserInfo;
+        this._staleStateAge = staleStateAge;
     }
-    
+
     // client config
     get client_id() {
         return this._client_id;
@@ -61,26 +64,26 @@ export default class OidcClientSettings {
     get post_logout_redirect_uri() {
         return this._post_logout_redirect_uri;
     }
-    
-    
+
+
     // optional protocol params
-    get prompt(){
+    get prompt() {
         return this._prompt;
     }
-    get display(){
+    get display() {
         return this._display;
     }
-    get max_age(){
+    get max_age() {
         return this._max_age;
     }
-    get ui_locales(){
+    get ui_locales() {
         return this._ui_locales;
     }
-    get acr_values(){
+    get acr_values() {
         return this._acr_values;
     }
-    
-    
+
+
     // metadata
     get authority() {
         return this._authority;
@@ -99,7 +102,7 @@ export default class OidcClientSettings {
 
         return this._metadataUrl;
     }
-    
+
     // settable/cachable metadata values
     get metadata() {
         return this._metadata;
@@ -114,13 +117,16 @@ export default class OidcClientSettings {
     set signingKeys(value) {
         this._signingKeys = value;
     }
-    
-    
+
+
     // behavior flags
     get filterProtocolClaims() {
         return this._filterProtocolClaims;
     }
     get loadUserInfo() {
         return this._loadUserInfo;
+    }
+    get staleStateAge() {
+        return this._staleStateAge;
     }
 }

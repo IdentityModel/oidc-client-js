@@ -13,42 +13,13 @@ import OidcClientSettings from '../../src/OidcClientSettings';
 import Log from '../../src/Log';
 
 import StubMetadataService from './StubMetadataService';
+import StubStateStore from './StubStateStore';
+import StubResponseValidator from './StubResponseValidator';
 
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 
-class StubStateStore {
-    set(key, value) {
-        this.item = value;
-        return Promise.resolve();
-    }
-
-    remove(key) {
-        if (this.error) {
-            return Promise.reject(new Error(this.error));
-        }
-        return Promise.resolve(this.item);
-    }
-}
-
-class StubResponseValidator {
-    validateSigninResponse(state, response) {
-
-        this.signinState = state;
-        this.signinResponse = response;
-
-        return Promise.resolve(response);
-    }
-
-    validateSignoutResponse(state, response) {
-
-        this.signoutState = state;
-        this.signoutResponse = response;
-
-        return Promise.resolve(response);
-    }
-}
 
 describe("OidcClient", function() {
     let settings;
@@ -70,13 +41,21 @@ describe("OidcClient", function() {
         stubValidator = new StubResponseValidator();
         stubMetadataService = new StubMetadataService();
 
-        subject = new OidcClient(settings, stubStore, () => stubValidator, () => stubMetadataService);
+        subject = new OidcClient(settings, {
+            stateStore:stubStore, 
+            ResponseValidatorCtor : () => stubValidator, 
+            MetadataServiceCtor : () => stubMetadataService
+        });
     });
 
     describe("constructor", function() {
         it("should require a settings param", function() {
             try {
-                new OidcClient(undefined, stubStore, stubMetadataService);
+                new OidcClient(undefined, {
+                    stateStore:stubStore, 
+                    ResponseValidatorCtor : () => stubValidator, 
+                    MetadataServiceCtor : () => stubMetadataService
+                });
             }
             catch (e) {
                 e.message.should.contain('settings');
@@ -89,15 +68,19 @@ describe("OidcClient", function() {
             subject.settings.should.be.ok;
             subject.settings.client_id.should.equal("client");
         });
-        
-        it("should accept OidcClientSettings", function() {
-            let settings = new OidcClientSettings({client_id:"client"});
 
-            let subject = new OidcClient(settings, stubStore, () => stubValidator, () => stubMetadataService);
+        it("should accept OidcClientSettings", function() {
+            let settings = new OidcClientSettings({ client_id: "client" });
+
+            let subject = new OidcClient(settings, {
+                stateStore:stubStore, 
+                ResponseValidatorCtor : () => stubValidator, 
+                MetadataServiceCtor : () => stubMetadataService
+            });
 
             subject.settings.should.equal(settings);
         });
-        
+
     });
 
     describe("createSigninRequest", function() {
@@ -310,6 +293,31 @@ describe("OidcClient", function() {
             });
         });
 
+    });
+
+    describe("clearStaleState", function() {
+
+       it("should return a promise", function() {
+            subject.clearStaleState().should.be.instanceof(Promise);
+        });
+        
+        it("should call State.clearStaleState", function() {
+            var oldState = State.clearStaleState;
+            
+            State.clearStaleState = function(store, age){
+                State.clearStaleState.wasCalled = true;
+                State.clearStaleState.store = store;
+                State.clearStaleState.age = age;
+            };
+            subject.clearStaleState();
+            
+            State.clearStaleState.wasCalled.should.be.true;
+            State.clearStaleState.store.should.equal(subject._stateStore);
+            State.clearStaleState.age.should.equal(subject.settings.staleStateAge);
+            
+            State.clearStaleState = oldState;
+        });
+        
     });
 
 });
