@@ -8522,9 +8522,9 @@ var IdentityModel =
 
 	var _Log2 = _interopRequireDefault(_Log);
 
-	var _Window = __webpack_require__(297);
+	var _Global = __webpack_require__(297);
 
-	var _Window2 = _interopRequireDefault(_Window);
+	var _Global2 = _interopRequireDefault(_Global);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8532,7 +8532,7 @@ var IdentityModel =
 
 	var JsonService = function () {
 	    function JsonService() {
-	        var XMLHttpRequestCtor = arguments.length <= 0 || arguments[0] === undefined ? _Window2.default.XMLHttpRequest : arguments[0];
+	        var XMLHttpRequestCtor = arguments.length <= 0 || arguments[0] === undefined ? _Global2.default.XMLHttpRequest : arguments[0];
 
 	        _classCallCheck(this, JsonService);
 
@@ -8604,12 +8604,12 @@ var IdentityModel =
 	// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-	var Window = function () {
-	    function Window() {
-	        _classCallCheck(this, Window);
+	var Global = function () {
+	    function Global() {
+	        _classCallCheck(this, Global);
 	    }
 
-	    _createClass(Window, null, [{
+	    _createClass(Global, null, [{
 	        key: "location",
 	        get: function get() {
 	            return location;
@@ -8631,10 +8631,10 @@ var IdentityModel =
 	        }
 	    }]);
 
-	    return Window;
+	    return Global;
 	}();
 
-	exports.default = Window;
+	exports.default = Global;
 	;
 	module.exports = exports['default'];
 
@@ -8774,9 +8774,9 @@ var IdentityModel =
 
 	var _Log2 = _interopRequireDefault(_Log);
 
-	var _Window = __webpack_require__(297);
+	var _Global = __webpack_require__(297);
 
-	var _Window2 = _interopRequireDefault(_Window);
+	var _Global2 = _interopRequireDefault(_Global);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8808,12 +8808,12 @@ var IdentityModel =
 	        key: 'parseUrlFragment',
 	        value: function parseUrlFragment(value) {
 	            var delimiter = arguments.length <= 1 || arguments[1] === undefined ? "#" : arguments[1];
-	            var window = arguments.length <= 2 || arguments[2] === undefined ? _Window2.default : arguments[2];
+	            var global = arguments.length <= 2 || arguments[2] === undefined ? _Global2.default : arguments[2];
 
 	            _Log2.default.info("UrlUtility.parseUrlFragment");
 
 	            if (typeof value !== 'string') {
-	                value = window.location.href;
+	                value = global.location.href;
 	            }
 
 	            var idx = value.lastIndexOf(delimiter);
@@ -9033,8 +9033,7 @@ var IdentityModel =
 	// limitations under the License.
 	//----------------------------------------------------------------------
 	// NOTICE: the code in this file originally developed by Microsoft
-	// source: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/lib/adal.js#L1029
-	// original license: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/LICENSE.txt
+	// original source: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/lib/adal.js#L1029
 
 	function random() {
 	    var guidHolder = 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx';
@@ -9166,7 +9165,8 @@ var IdentityModel =
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } } // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 	var ErrorResponse = function ErrorResponse() {
 	    var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -9311,9 +9311,9 @@ var IdentityModel =
 
 	var _Log2 = _interopRequireDefault(_Log);
 
-	var _Window = __webpack_require__(297);
+	var _Global = __webpack_require__(297);
 
-	var _Window2 = _interopRequireDefault(_Window);
+	var _Global2 = _interopRequireDefault(_Global);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9326,7 +9326,7 @@ var IdentityModel =
 	        var _ref$prefix = _ref.prefix;
 	        var prefix = _ref$prefix === undefined ? "oidc." : _ref$prefix;
 	        var _ref$store = _ref.store;
-	        var store = _ref$store === undefined ? _Window2.default.localStorage : _ref$store;
+	        var store = _ref$store === undefined ? _Global2.default.localStorage : _ref$store;
 
 	        _classCallCheck(this, WebStorageStateStore);
 

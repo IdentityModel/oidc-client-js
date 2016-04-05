@@ -50,7 +50,7 @@ describe("UrlUtility", function() {
             result.should.have.property('error');
         });
 
-        it("should use window.location when no value is passed", function() {
+        it("should use Global.location when no value is passed", function() {
             let w = {
                 location: {
                     href : "a=apple&b=banana&c=carrot" 

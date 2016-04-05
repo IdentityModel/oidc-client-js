@@ -2,10 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 import Log from './Log';
-import Window from './Window';
+import Global from './Global';
 
 export default class JsonService {
-    constructor(XMLHttpRequestCtor = Window.XMLHttpRequest) {
+    constructor(XMLHttpRequestCtor = Global.XMLHttpRequest) {
         this._XMLHttpRequest = XMLHttpRequestCtor;
     }
     
