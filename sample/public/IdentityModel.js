@@ -7981,7 +7981,9 @@ var IdentityModel =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var OidcClient = function () {
-	    function OidcClient(settings, _ref) {
+	    function OidcClient(settings) {
+	        var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
 	        var _ref$stateStore = _ref.stateStore;
 	        var stateStore = _ref$stateStore === undefined ? new _WebStorageStateStore2.default() : _ref$stateStore;
 	        var _ref$ResponseValidato = _ref.ResponseValidatorCtor;
@@ -8192,7 +8194,9 @@ var IdentityModel =
 	var DefaultStaleStateAge = 60; // seconds
 
 	var OidcClientSettings = function () {
-	    function OidcClientSettings(_ref) {
+	    function OidcClientSettings() {
+	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
 	        var
 	        // metadata related
 	        authority = _ref.authority;
@@ -8979,9 +8983,9 @@ var IdentityModel =
 	                    var _loop = function _loop() {
 	                        var key = _step.value;
 	                        p = storage.get(key).then(function (item) {
-	                            _Log2.default.info("got item from key", key, item.created);
-
 	                            var state = State.fromStorageString(item);
+
+	                            _Log2.default.info("got item from key", key, state.created);
 
 	                            if (state.created <= cutoff) {
 	                                _Log2.default.info("key being removed", key);
@@ -12234,7 +12238,7 @@ var IdentityModel =
 
 	var _PopupNavigator2 = _interopRequireDefault(_PopupNavigator);
 
-	var _IFrameNavigator = __webpack_require__(322);
+	var _IFrameNavigator = __webpack_require__(323);
 
 	var _IFrameNavigator2 = _interopRequireDefault(_IFrameNavigator);
 
@@ -12251,12 +12255,16 @@ var IdentityModel =
 	    _inherits(UserManager, _OidcClient);
 
 	    function UserManager(settings) {
-	        var args = arguments.length <= 1 || arguments[1] === undefined ? {
-	            redirectNavigator: new _RedirectNavigator2.default(),
-	            popupNavigator: new _PopupNavigator2.default(),
-	            iframeNavigator: new _IFrameNavigator2.default(),
-	            userStore: new _WebStorageStateStore2.default({ store: _Global2.default.sessionStorage })
-	        } : arguments[1];
+	        var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+	        var _ref$redirectNavigato = _ref.redirectNavigator;
+	        var redirectNavigator = _ref$redirectNavigato === undefined ? new _RedirectNavigator2.default() : _ref$redirectNavigato;
+	        var _ref$popupNavigator = _ref.popupNavigator;
+	        var popupNavigator = _ref$popupNavigator === undefined ? new _PopupNavigator2.default() : _ref$popupNavigator;
+	        var _ref$iframeNavigator = _ref.iframeNavigator;
+	        var iframeNavigator = _ref$iframeNavigator === undefined ? new _IFrameNavigator2.default() : _ref$iframeNavigator;
+	        var _ref$userStore = _ref.userStore;
+	        var userStore = _ref$userStore === undefined ? new _WebStorageStateStore2.default({ store: _Global2.default.sessionStorage }) : _ref$userStore;
 
 	        _classCallCheck(this, UserManager);
 
@@ -12264,13 +12272,13 @@ var IdentityModel =
 	            settings = new _UserManagerSettings2.default(settings);
 	        }
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UserManager).call(this, settings, args));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UserManager).call(this, settings, arguments[1]));
 
-	        _this._redirectNavigator = args.redirectNavigator;
-	        _this._popupNavigator = args.popupNavigator;
-	        _this._iframeNavigator = args.iframeNavigator;
+	        _this._redirectNavigator = redirectNavigator;
+	        _this._popupNavigator = popupNavigator;
+	        _this._iframeNavigator = iframeNavigator;
 
-	        _this._userStore = args.userStore;
+	        _this._userStore = userStore;
 	        return _this;
 	    }
 
@@ -12302,7 +12310,20 @@ var IdentityModel =
 	        key: 'signinPopup',
 	        value: function signinPopup(data) {
 	            _Log2.default.info("UserManager.signinPopup");
-	            return this._signin({ data: data, display: "popup" }, this._popupNavigator);
+
+	            var url = this.settings.popup_redirect_uri || this.settings.redirect_uri;
+	            if (!url) {
+	                _Log2.default.error("No popup_redirect_uri or redirect_uri configured");
+	                return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
+	            }
+
+	            var args = {
+	                data: data,
+	                redirect_uri: url,
+	                display: "popup"
+	            };
+
+	            return this._signin(args, this._popupNavigator, { startUrl: url });
 	        }
 	    }, {
 	        key: 'signinPopupCallback',
@@ -12316,6 +12337,7 @@ var IdentityModel =
 	            _Log2.default.info("UserManager.signinSilent");
 
 	            if (!this.settings.silent_redirect_uri) {
+	                _Log2.default.error("No silent_redirect_uri configured");
 	                return Promise.reject(new Error("No silent_redirect_uri configured"));
 	            }
 
@@ -12337,8 +12359,10 @@ var IdentityModel =
 	        value: function _signin(args, navigator) {
 	            var _this3 = this;
 
+	            var navigatorParams = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
 	            _Log2.default.info("_signin");
-	            return this._signinStart(args, navigator).then(function (navResponse) {
+	            return this._signinStart(args, navigator, navigatorParams).then(function (navResponse) {
 	                return _this3._signinEnd(navResponse.url);
 	            });
 	        }
@@ -12363,27 +12387,39 @@ var IdentityModel =
 	    }, {
 	        key: '_signinStart',
 	        value: function _signinStart(args, navigator) {
+	            var _this4 = this;
+
+	            var navigatorParams = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
 	            _Log2.default.info("_signinStart");
-	            return this.createSigninRequest(args).then(function (signinRequest) {
-	                _Log2.default.info("got signin request");
-	                return navigator.navigate(signinRequest.url);
+
+	            return navigator.prepare().then(function (handle) {
+	                _Log2.default.info("got navigator window handle");
+
+	                return _this4.createSigninRequest(args).then(function (signinRequest) {
+	                    _Log2.default.info("got signin request");
+
+	                    navigatorParams.url = signinRequest.url;
+	                    return handle.navigate(navigatorParams);
+	                });
 	            });
 	        }
 	    }, {
 	        key: '_signinEnd',
 	        value: function _signinEnd(url) {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            _Log2.default.info("_signinEnd");
+
 	            return this.processSigninResponse(url).then(function (signinResponse) {
 	                _Log2.default.info("got signin response");
 
 	                var user = new _User2.default(signinResponse);
 
-	                return _this4._storeUser(user).then(function () {
+	                return _this5._storeUser(user).then(function () {
 	                    _Log2.default.info("user stored");
 
-	                    _this4._user = user;
+	                    _this5._user = user;
 
 	                    return user;
 	                });
@@ -12490,21 +12526,29 @@ var IdentityModel =
 	    _inherits(UserManagerSettings, _OidcClientSettings);
 
 	    function UserManagerSettings() {
-	        var args = arguments.length <= 0 || arguments[0] === undefined ? {
-	            silent_redirect_uri: undefined,
-	            enableAutomaticSilentRenew: true
-	        } : arguments[0];
+	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	        var popup_redirect_uri = _ref.popup_redirect_uri;
+	        var silent_redirect_uri = _ref.silent_redirect_uri;
+	        var _ref$enableAutomaticS = _ref.enableAutomaticSilentRenew;
+	        var enableAutomaticSilentRenew = _ref$enableAutomaticS === undefined ? true : _ref$enableAutomaticS;
 
 	        _classCallCheck(this, UserManagerSettings);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UserManagerSettings).call(this, args));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UserManagerSettings).call(this, arguments[0]));
 
-	        _this._silent_redirect_uri = args.silent_redirect_uri;
-	        _this._enableAutomaticSilentRenew = !!args.enableAutomaticSilentRenew;
+	        _this._popup_redirect_uri = popup_redirect_uri;
+	        _this._silent_redirect_uri = silent_redirect_uri;
+	        _this._enableAutomaticSilentRenew = !!enableAutomaticSilentRenew;
 	        return _this;
 	    }
 
 	    _createClass(UserManagerSettings, [{
+	        key: 'popup_redirect_uri',
+	        get: function get() {
+	            return this._popup_redirect_uri;
+	        }
+	    }, {
 	        key: 'silent_redirect_uri',
 	        get: function get() {
 	            return this._silent_redirect_uri;
@@ -12644,10 +12688,22 @@ var IdentityModel =
 	    }
 
 	    _createClass(RedirectNavigator, [{
+	        key: "prepare",
+	        value: function prepare() {
+	            return Promise.resolve(this);
+	        }
+	    }, {
 	        key: "navigate",
-	        value: function navigate(url) {
+	        value: function navigate(params) {
 	            _Log2.default.info("RedirectNavigator.navigate");
-	            window.location = url;
+
+	            if (!params || !params.url) {
+	                _Log2.default.error("No url provided");
+	                return Promise.reject(new Error("No url provided"));
+	            }
+
+	            window.location = params.url;
+
 	            return Promise.resolve();
 	        }
 	    }, {
@@ -12668,6 +12724,62 @@ var IdentityModel =
 /* 321 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+	var _Log = __webpack_require__(292);
+
+	var _Log2 = _interopRequireDefault(_Log);
+
+	var _PopupWindow = __webpack_require__(322);
+
+	var _PopupWindow2 = _interopRequireDefault(_PopupWindow);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var PopupNavigator = function () {
+	    function PopupNavigator() {
+	        _classCallCheck(this, PopupNavigator);
+	    }
+
+	    _createClass(PopupNavigator, [{
+	        key: 'prepare',
+	        value: function prepare() {
+	            var popup = new _PopupWindow2.default();
+	            return Promise.resolve(popup);
+	        }
+	    }, {
+	        key: 'callback',
+	        value: function callback(url) {
+	            _Log2.default.info("PopupNavigator.callback");
+
+	            try {
+	                _PopupWindow2.default.notifyOpener(url);
+	                return Promise.resolve();
+	            } catch (e) {
+	                return Promise.reject(e);
+	            }
+	        }
+	    }]);
+
+	    return PopupNavigator;
+	}();
+
+	exports.default = PopupNavigator;
+	module.exports = exports['default'];
+
+/***/ },
+/* 322 */
+/***/ function(module, exports, __webpack_require__) {
+
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
@@ -12685,40 +12797,150 @@ var IdentityModel =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var PopupNavigator = function () {
-	    function PopupNavigator() {
-	        _classCallCheck(this, PopupNavigator);
+	var CheckForPopupClosedInterval = 500;
+	var PopupScript = "<script>function setUrl(url){window.location=url;}</script>";
+
+	var PopupWindow = function () {
+	    function PopupWindow() {
+	        var _this = this;
+
+	        _classCallCheck(this, PopupWindow);
+
+	        _Log2.default.info("PopupWindow.ctor");
+
+	        this._promise = new Promise(function (resolve, reject) {
+	            _this._resolve = resolve;
+	            _this._reject = reject;
+	        });
+
+	        this._boundMessageEvent = this._message.bind(this);
+	        window.addEventListener("message", this._boundMessageEvent, false);
+
+	        this._popup = window.open('', '_blank', 'location=no,toolbar=no,width=500,height=500');
+	        if (this._popup) {
+	            _Log2.default.info("popup successfully created");
+
+	            this._popup.document.write(PopupScript);
+
+	            if (this._popup.setUrl) {
+	                _Log2.default.info("popup successfully initialized");
+	            }
+
+	            this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);
+	        }
 	    }
 
-	    _createClass(PopupNavigator, [{
+	    _createClass(PopupWindow, [{
 	        key: "navigate",
-	        value: function navigate(url) {
-	            _Log2.default.info("PopupNavigator.navigate");
+	        value: function navigate(params) {
+	            _Log2.default.info("PopupWindow.navigate");
 
-	            return Promise.resolve();
+	            if (!this._popup) {
+	                this._error("Error opening popup window");
+	            } else if (!this._popup.setUrl) {
+	                this._error("popup not properly initialized");
+	            } else if (!params || !params.url) {
+	                this._error("No url provided");
+	            } else {
+	                _Log2.default.info("Setting URL in popup");
+
+	                this._popup.focus();
+	                this._popup.setUrl(params.url);
+	            }
+
+	            return this.promise;
 	        }
 	    }, {
-	        key: "callback",
-	        value: function callback(url) {
-	            _Log2.default.info("PopupNavigator.callback");
+	        key: "_success",
+	        value: function _success(data) {
+	            this._cleanup();
 
-	            try {
-	                PopupWindow.notifyOpener(url);
-	                return Promose.resolve();
-	            } catch (e) {
-	                return Promose.reject(e);
+	            _Log2.default.info("Successful response from popup window");
+	            this._resolve(data);
+	        }
+	    }, {
+	        key: "_error",
+	        value: function _error(message) {
+	            this._cleanup();
+
+	            _Log2.default.error(message);
+	            this._reject(new Error(message));
+	        }
+	    }, {
+	        key: "_cleanup",
+	        value: function _cleanup() {
+	            _Log2.default.info("PopupWindow._cleanup");
+
+	            window.removeEventListener("message", this._boundMessageEvent, false);
+	            window.clearInterval(this._checkForPopupClosedTimer);
+
+	            this._checkForPopupClosedTimer = null;
+	            this._boundMessageEventssage = null;
+	            this._popup = null;
+	        }
+	    }, {
+	        key: "_checkForPopupClosed",
+	        value: function _checkForPopupClosed() {
+	            _Log2.default.info("PopupWindow._checkForPopupClosed");
+
+	            if (!this._popup.window) {
+	                this._error("Popup window closed");
+	            }
+	        }
+	    }, {
+	        key: "_message",
+	        value: function _message(e) {
+	            _Log2.default.info("PopupWindow._message");
+
+	            if (e.origin === this._origin && e.source === this._popup.window) {
+	                _Log2.default.info("processing message");
+
+	                var url = e.data.url;
+
+	                this._cleanup();
+
+	                if (url) {
+	                    this._success({ url: url });
+	                } else {
+	                    this._error("Invalid response from popup");
+	                }
+	            }
+	        }
+	    }, {
+	        key: "promise",
+	        get: function get() {
+	            return this._promise;
+	        }
+	    }, {
+	        key: "_origin",
+	        get: function get() {
+	            return location.protocol + "//" + location.host;
+	        }
+	    }], [{
+	        key: "notifyOpener",
+	        value: function notifyOpener(url) {
+	            _Log2.default.info("PopupWindow.notifyOpener");
+
+	            if (window.opener) {
+	                url = url || window.location.href;
+	                if (url) {
+	                    _Log2.default.info("posting url message to opener");
+
+	                    window.opener.postMessage({ url: url }, location.protocol + "//" + location.host);
+	                    window.close();
+	                }
 	            }
 	        }
 	    }]);
 
-	    return PopupNavigator;
+	    return PopupWindow;
 	}();
 
-	exports.default = PopupNavigator;
+	exports.default = PopupWindow;
 	module.exports = exports['default'];
 
 /***/ },
-/* 322 */
+/* 323 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12734,40 +12956,24 @@ var IdentityModel =
 
 	var _Log2 = _interopRequireDefault(_Log);
 
-	var _IFrameLoader = __webpack_require__(323);
+	var _IFrameWindow = __webpack_require__(324);
 
-	var _IFrameLoader2 = _interopRequireDefault(_IFrameLoader);
+	var _IFrameWindow2 = _interopRequireDefault(_IFrameWindow);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var DefaultTimeout = 5000;
-
 	var IFrameNavigator = function () {
 	    function IFrameNavigator() {
-	        var timeout = arguments.length <= 0 || arguments[0] === undefined ? DefaultTimeout : arguments[0];
-
 	        _classCallCheck(this, IFrameNavigator);
-
-	        this._timeout = timeout;
 	    }
 
 	    _createClass(IFrameNavigator, [{
-	        key: 'navigate',
-	        value: function navigate(url) {
-	            var _this = this;
-
-	            _Log2.default.info("IFrameNavigator.navigate");
-
-	            if (!url) {
-	                _Log2.default.error("No url provided");
-	                return Promise.reject(new Error("No url provided"));
-	            }
-
-	            return new Promise(function (resolve, reject) {
-	                new _IFrameLoader2.default(resolve, reject, _this._timeout, url);
-	            });
+	        key: 'prepare',
+	        value: function prepare() {
+	            var frame = new _IFrameWindow2.default();
+	            return Promise.resolve(frame);
 	        }
 	    }, {
 	        key: 'callback',
@@ -12775,17 +12981,11 @@ var IdentityModel =
 	            _Log2.default.info("IFrameNavigator.callback");
 
 	            try {
-	                _IFrameLoader2.default.notifyParent(url);
-	                return Promose.resolve();
+	                _IFrameWindow2.default.notifyParent(url);
+	                return Promise.resolve();
 	            } catch (e) {
-	                return Promose.reject(e);
+	                return Promise.reject(e);
 	            }
-	        }
-	    }, {
-	        key: 'url',
-	        get: function get() {
-	            _Log2.default.error("url should not be used with IFrameNavigator");
-	            throw new Error("url should not be used with IFrameNavigator");
 	        }
 	    }]);
 
@@ -12796,7 +12996,7 @@ var IdentityModel =
 	module.exports = exports['default'];
 
 /***/ },
-/* 323 */
+/* 324 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12816,31 +13016,63 @@ var IdentityModel =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var IFrameLoader = function () {
-	    function IFrameLoader(resolve, reject, timeout, url) {
-	        _classCallCheck(this, IFrameLoader);
+	var DefaultTimeout = 5000;
 
-	        _Log2.default.info("IFrameLoader.ctor");
+	var IFrameWindow = function () {
+	    function IFrameWindow() {
+	        var _this = this;
 
-	        this._resolve = resolve;
-	        this._reject = reject;
+	        _classCallCheck(this, IFrameWindow);
 
-	        this._frame = window.document.createElement("iframe");
-	        this._frame.style.display = "none";
+	        _Log2.default.info("IFrameWindow.ctor");
+
+	        this._promise = new Promise(function (resolve, reject) {
+	            _this._resolve = resolve;
+	            _this._reject = reject;
+	        });
 
 	        this._boundMessageEvent = this._message.bind(this);
 	        window.addEventListener("message", this._boundMessageEvent, false);
 
-	        this._timer = window.setTimeout(this._timeout.bind(this), timeout);
-
+	        this._frame = window.document.createElement("iframe");
+	        this._frame.style.display = "none";
 	        window.document.body.appendChild(this._frame);
-	        this._frame.src = url;
 	    }
 
-	    _createClass(IFrameLoader, [{
+	    _createClass(IFrameWindow, [{
+	        key: "navigate",
+	        value: function navigate(params) {
+	            _Log2.default.info("IFrameWindow.navigate");
+
+	            if (!params || !params.url) {
+	                this._error("No url provided");
+	            } else {
+	                this._timer = window.setTimeout(this._timeout.bind(this), DefaultTimeout);
+	                this._frame.src = params.url;
+	            }
+
+	            return this.promise;
+	        }
+	    }, {
+	        key: "_success",
+	        value: function _success(data) {
+	            this._cleanup();
+
+	            _Log2.default.info("Successful response from frame window");
+	            this._resolve(data);
+	        }
+	    }, {
+	        key: "_error",
+	        value: function _error(message) {
+	            this._cleanup();
+
+	            _Log2.default.error(message);
+	            this._reject(new Error(message));
+	        }
+	    }, {
 	        key: "_cleanup",
 	        value: function _cleanup() {
-	            _Log2.default.info("IFrameLoader._cleanup");
+	            _Log2.default.info("IFrameWindow._cleanup");
 
 	            window.removeEventListener("message", this._boundMessageEvent, false);
 	            window.clearTimeout(this._timer);
@@ -12853,31 +13085,27 @@ var IdentityModel =
 	    }, {
 	        key: "_timeout",
 	        value: function _timeout() {
-	            _Log2.default.info("IFrameLoader._timeout");
-
-	            this._cleanup();
-
-	            _Log2.default.error("Frame loader timed out");
-	            this._reject(new Error("Frame loader timed out"));
+	            _Log2.default.info("IFrameWindow._timeout");
+	            this._error("Frame window timed out");
 	        }
 	    }, {
 	        key: "_message",
 	        value: function _message(e) {
-	            _Log2.default.info("IFrameLoader._message");
+	            _Log2.default.info("IFrameWindow._message");
 
 	            if (this._timer && e.origin === this._origin && e.source === this._frame.contentWindow) {
 	                var url = e.data.url;
-
-	                this._cleanup();
-
 	                if (url) {
-	                    _Log2.default.info("Successful response from frame");
-	                    this._resolve({ url: url });
+	                    this._success({ url: url });
 	                } else {
-	                    _Log2.default.error("Invalid response from frame", e.data);
-	                    this._reject(new Error("Invalid response from frame"));
+	                    this._error("Invalid response from frame");
 	                }
 	            }
+	        }
+	    }, {
+	        key: "promise",
+	        get: function get() {
+	            return this._promise;
 	        }
 	    }, {
 	        key: "_origin",
@@ -12887,19 +13115,22 @@ var IdentityModel =
 	    }], [{
 	        key: "notifyParent",
 	        value: function notifyParent(url) {
+	            _Log2.default.info("IFrameWindow.notifyParent");
+
 	            if (window.parent && window !== window.parent) {
 	                url = url || window.location.href;
 	                if (url) {
+	                    _Log2.default.info("posting url message to parent");
 	                    window.parent.postMessage({ url: url }, location.protocol + "//" + location.host);
 	                }
 	            }
 	        }
 	    }]);
 
-	    return IFrameLoader;
+	    return IFrameWindow;
 	}();
 
-	exports.default = IFrameLoader;
+	exports.default = IFrameWindow;
 	module.exports = exports['default'];
 
 /***/ }

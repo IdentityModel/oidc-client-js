@@ -20,7 +20,7 @@ export default class OidcClientSettings {
         prompt, display, max_age, ui_locales, acr_values,
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true, staleStateAge = DefaultStaleStateAge
-    }) {
+    } = {}) {
         
         this._authority = authority;
         this._metadataUrl = metadataUrl;

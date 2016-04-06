@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>user-manager test</title>
+    <link rel='stylesheet' href='app.css'>
+</head>
+
+<body>
+    <script src='IdentityModel.js'></script>
+    <script>
+        IdentityModel.Log.logger = console;
+        IdentityModel.Log.logLevel = IdentityModel.Log.INFO;
+        new IdentityModel.UserManager().signinPopupCallback();
+    </script>
+</body>
+
+</html>

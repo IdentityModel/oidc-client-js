@@ -63,9 +63,9 @@ export default class State {
             var promises = [];
             for(let key of keys){
                 var p = storage.get(key).then(item => {
-                    Log.info("got item from key", key, item.created);
-
                     var state = State.fromStorageString(item)
+                    
+                    Log.info("got item from key", key, state.created);
                     
                     if (state.created <= cutoff) {
                         Log.info("key being removed", key);

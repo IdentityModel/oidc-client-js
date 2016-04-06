@@ -5,14 +5,20 @@ import Log from './Log';
 import OidcClientSettings from './OidcClientSettings';
 
 export default class UserManagerSettings extends OidcClientSettings {
-    constructor(args = {
-        silent_redirect_uri : undefined,
-        enableAutomaticSilentRenew : true
-    }) {
-        super(args);
+    constructor({
+        popup_redirect_uri,
+        silent_redirect_uri,
+        enableAutomaticSilentRenew = true
+    } = {}) {
+        super(arguments[0]);
         
-        this._silent_redirect_uri = args.silent_redirect_uri;
-        this._enableAutomaticSilentRenew = !!args.enableAutomaticSilentRenew;
+        this._popup_redirect_uri = popup_redirect_uri;
+        this._silent_redirect_uri = silent_redirect_uri;
+        this._enableAutomaticSilentRenew = !!enableAutomaticSilentRenew;
+    }
+    
+    get popup_redirect_uri(){
+        return this._popup_redirect_uri;
     }
 
     get silent_redirect_uri() {

@@ -13,13 +13,11 @@ import ResponseValidator from './ResponseValidator';
 import State from './State';
 
 export default class OidcClient {
-    constructor(settings,
-        {
-            stateStore = new WebStorageStateStore(), 
-            ResponseValidatorCtor = ResponseValidator,
-            MetadataServiceCtor = MetadataService
-        }
-    ){
+    constructor(settings, {
+        stateStore = new WebStorageStateStore(), 
+        ResponseValidatorCtor = ResponseValidator,
+        MetadataServiceCtor = MetadataService
+    } = {}){
         if (settings instanceof OidcClientSettings){
             this._settings = settings;
         }

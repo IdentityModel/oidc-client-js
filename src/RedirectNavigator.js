@@ -4,10 +4,21 @@
 import Log from './Log';
 
 export default class RedirectNavigator {
+    
+    prepare() {
+        return Promise.resolve(this);
+    }
 
-    navigate(url) {
+    navigate(params) {
         Log.info("RedirectNavigator.navigate");
-        window.location = url;
+        
+        if (!params || !params.url) {
+            Log.error("No url provided");
+            return Promise.reject(new Error("No url provided"));
+        }
+
+        window.location = params.url;
+        
         return Promise.resolve();
     }
 

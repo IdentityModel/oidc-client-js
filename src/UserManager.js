@@ -13,24 +13,22 @@ import IFrameNavigator from './IFrameNavigator';
 
 
 export default class UserManager extends OidcClient {
-    constructor(settings,
-        args = {
-            redirectNavigator: new RedirectNavigator(),
-            popupNavigator: new PopupNavigator(),
-            iframeNavigator: new IFrameNavigator(),
-            userStore: new WebStorageStateStore({ store: Global.sessionStorage })
-        }
-    ) {
+    constructor(settings, {
+        redirectNavigator = new RedirectNavigator(),
+        popupNavigator = new PopupNavigator(),
+        iframeNavigator = new IFrameNavigator(),
+        userStore = new WebStorageStateStore({ store: Global.sessionStorage })
+    } = {}) {
         if (!(settings instanceof UserManagerSettings)) {
             settings = new UserManagerSettings(settings);
         }
-        super(settings, args);
+        super(settings, arguments[1]);
 
-        this._redirectNavigator = args.redirectNavigator;
-        this._popupNavigator = args.popupNavigator;
-        this._iframeNavigator = args.iframeNavigator;
+        this._redirectNavigator = redirectNavigator;
+        this._popupNavigator = popupNavigator;
+        this._iframeNavigator = iframeNavigator;
 
-        this._userStore = args.userStore;
+        this._userStore = userStore;
     }
 
     get user() {
@@ -60,7 +58,20 @@ export default class UserManager extends OidcClient {
 
     signinPopup(data) {
         Log.info("UserManager.signinPopup");
-        return this._signin({ data: data, display: "popup" }, this._popupNavigator);
+
+        let url = this.settings.popup_redirect_uri || this.settings.redirect_uri;
+        if (!url) {
+            Log.error("No popup_redirect_uri or redirect_uri configured");
+            return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
+        }
+
+        let args = {
+            data: data,
+            redirect_uri: url,
+            display: "popup"
+        };
+
+        return this._signin(args, this._popupNavigator, { startUrl: url });
     }
     signinPopupCallback(url) {
         Log.info("UserManager.signinPopupCallback");
@@ -71,6 +82,7 @@ export default class UserManager extends OidcClient {
         Log.info("UserManager.signinSilent");
 
         if (!this.settings.silent_redirect_uri) {
+            Log.error("No silent_redirect_uri configured");
             return Promise.reject(new Error("No silent_redirect_uri configured"));
         }
 
@@ -86,9 +98,9 @@ export default class UserManager extends OidcClient {
         return this._signinCallback(url, this._iframeNavigator);
     }
 
-    _signin(args, navigator) {
+    _signin(args, navigator, navigatorParams = {}) {
         Log.info("_signin");
-        return this._signinStart(args, navigator).then(navResponse => {
+        return this._signinStart(args, navigator, navigatorParams).then(navResponse => {
             return this._signinEnd(navResponse.url);
         });
     }
@@ -106,20 +118,28 @@ export default class UserManager extends OidcClient {
         return this._signinEnd(url || this._redirectNavigator.url);
     }
 
-    _signinStart(args, navigator) {
+    _signinStart(args, navigator, navigatorParams = {}) {
         Log.info("_signinStart");
-        return this.createSigninRequest(args).then(signinRequest => {
-            Log.info("got signin request");
-            return navigator.navigate(signinRequest.url);
+        
+        return navigator.prepare().then(handle => {
+            Log.info("got navigator window handle");
+            
+            return this.createSigninRequest(args).then(signinRequest => {
+                Log.info("got signin request");
+        
+                navigatorParams.url = signinRequest.url;
+                return handle.navigate(navigatorParams);
+            });
         });
     }
     _signinEnd(url) {
         Log.info("_signinEnd");
+        
         return this.processSigninResponse(url).then(signinResponse => {
             Log.info("got signin response");
 
             let user = new User(signinResponse);
-
+            
             return this._storeUser(user).then(() => {
                 Log.info("user stored");
 

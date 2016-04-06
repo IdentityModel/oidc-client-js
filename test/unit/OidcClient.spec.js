@@ -42,13 +42,17 @@ describe("OidcClient", function() {
         stubMetadataService = new StubMetadataService();
 
         subject = new OidcClient(settings, {
-            stateStore:stubStore, 
-            ResponseValidatorCtor : () => stubValidator, 
-            MetadataServiceCtor : () => stubMetadataService
+            stateStore: stubStore,
+            ResponseValidatorCtor: () => stubValidator,
+            MetadataServiceCtor: () => stubMetadataService
         });
     });
 
     describe("constructor", function() {
+
+        it("should allow no settings", function() {
+            let subject = new OidcClientSettings();
+        });
 
         it("should expose settings", function() {
             subject.settings.should.be.ok;
@@ -59,9 +63,9 @@ describe("OidcClient", function() {
             let settings = new OidcClientSettings({ client_id: "client" });
 
             let subject = new OidcClient(settings, {
-                stateStore:stubStore, 
-                ResponseValidatorCtor : () => stubValidator, 
-                MetadataServiceCtor : () => stubMetadataService
+                stateStore: stubStore,
+                ResponseValidatorCtor: () => stubValidator,
+                MetadataServiceCtor: () => stubMetadataService
             });
 
             subject.settings.should.equal(settings);
@@ -70,11 +74,11 @@ describe("OidcClient", function() {
     });
 
     describe("settings", function() {
-        
-        it("should be OidcClientSettings", function(){
+
+        it("should be OidcClientSettings", function() {
             subject.settings.should.be.instanceof(OidcClientSettings);
         });
-        
+
     });
 
     describe("createSigninRequest", function() {
@@ -291,27 +295,27 @@ describe("OidcClient", function() {
 
     describe("clearStaleState", function() {
 
-       it("should return a promise", function() {
+        it("should return a promise", function() {
             subject.clearStaleState().should.be.instanceof(Promise);
         });
-        
+
         it("should call State.clearStaleState", function() {
             var oldState = State.clearStaleState;
-            
-            State.clearStaleState = function(store, age){
+
+            State.clearStaleState = function(store, age) {
                 State.clearStaleState.wasCalled = true;
                 State.clearStaleState.store = store;
                 State.clearStaleState.age = age;
             };
             subject.clearStaleState();
-            
+
             State.clearStaleState.wasCalled.should.be.true;
             State.clearStaleState.store.should.equal(subject._stateStore);
             State.clearStaleState.age.should.equal(subject.settings.staleStateAge);
-            
+
             State.clearStaleState = oldState;
         });
-        
+
     });
 
 });

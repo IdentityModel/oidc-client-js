@@ -17,6 +17,10 @@ describe("UserManagerSettings", function() {
 
     describe("constructor", function() {
 
+        it("should allow no settings", function() {
+            let subject = new UserManagerSettings();
+        });
+        
         it("should pass settings to base class", function() {
             let subject = new UserManagerSettings({ client_id: 'client' });
             subject.client_id.should.equal('client');
@@ -24,6 +28,15 @@ describe("UserManagerSettings", function() {
 
     });
 
+    describe("popup_redirect_uri", function() {
+
+        it("should return value from initial settings", function() {
+            let subject = new UserManagerSettings({ popup_redirect_uri: 'test' });
+            subject.popup_redirect_uri.should.equal('test');
+        });
+
+    });
+    
     describe("silent_redirect_uri", function() {
 
         it("should return value from initial settings", function() {
@@ -41,6 +54,13 @@ describe("UserManagerSettings", function() {
                 enableAutomaticSilentRenew: false 
             });
             subject.automaticSilentRenewEnabled.should.be.false;
+        });
+        
+        it("should use default value", function() {
+            let subject = new UserManagerSettings({ 
+                silent_redirect_uri: 'test' 
+            });
+            subject.automaticSilentRenewEnabled.should.be.true;
         });
         
         it("should be false if no silent redirect uri", function() {

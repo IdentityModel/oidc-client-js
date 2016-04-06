@@ -8,6 +8,7 @@ document.getElementById('clearState').addEventListener("click", clearState, fals
 document.getElementById('getUser').addEventListener("click", getUser, false);
 document.getElementById('startSigninMainWindow').addEventListener("click", startSigninMainWindow, false);
 document.getElementById('endSigninMainWindow').addEventListener("click", endSigninMainWindow, false);
+document.getElementById('popupSignin').addEventListener("click", popupSignin, false);
 document.getElementById('iframeSignin').addEventListener("click", iframeSignin, false);
 document.getElementById('signoutMainWindow').addEventListener("click", signoutMainWindow, false);
 
@@ -24,6 +25,8 @@ var settings = {
     post_logout_redirect_uri: 'http://localhost:5000/user-manager-sample.html',
     response_type: 'id_token token',
     scope: 'openid email roles',
+    
+    popup_redirect_uri:'http://localhost:5000/user-manager-sample-popup.html',
     
     silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
     enableSilentRedirect:true,
@@ -62,6 +65,14 @@ function startSigninMainWindow() {
 
 function endSigninMainWindow() {
     mgr.signinRedirectCallback().then(function(user) {
+        log("signed in", user);
+    }, function(err) {
+        log(err);
+    });
+}
+
+function popupSignin() {
+    mgr.signinPopup().then(function(user) {
         log("signed in", user);
     }, function(err) {
         log(err);
