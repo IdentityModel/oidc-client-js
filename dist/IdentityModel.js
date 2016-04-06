@@ -12798,7 +12798,6 @@ var IdentityModel =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var CheckForPopupClosedInterval = 500;
-	var PopupScript = "<script>function setUrl(url){window.location=url;}</script>";
 
 	var PopupWindow = function () {
 	    function PopupWindow() {
@@ -12819,13 +12818,6 @@ var IdentityModel =
 	        this._popup = window.open('', '_blank', 'location=no,toolbar=no,width=500,height=500');
 	        if (this._popup) {
 	            _Log2.default.info("popup successfully created");
-
-	            this._popup.document.write(PopupScript);
-
-	            if (this._popup.setUrl) {
-	                _Log2.default.info("popup successfully initialized");
-	            }
-
 	            this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);
 	        }
 	    }
@@ -12845,7 +12837,7 @@ var IdentityModel =
 	                _Log2.default.info("Setting URL in popup");
 
 	                this._popup.focus();
-	                this._popup.setUrl(params.url);
+	                this._popup.window.location = params.url;
 	            }
 
 	            return this.promise;

@@ -4,7 +4,6 @@
 import Log from './Log';
 
 const CheckForPopupClosedInterval = 500;
-const PopupScript = "<script>function setUrl(url){window.location=url;}</script>";
 
 export default class PopupWindow {
 
@@ -22,13 +21,6 @@ export default class PopupWindow {
         this._popup = window.open('', '_blank', 'location=no,toolbar=no,width=500,height=500');
         if (this._popup) {
             Log.info("popup successfully created");
-
-            this._popup.document.write(PopupScript);
-
-            if (this._popup.setUrl) {
-                Log.info("popup successfully initialized");
-            }
-            
             this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);
         }
     }
@@ -49,7 +41,7 @@ export default class PopupWindow {
             Log.info("Setting URL in popup");
 
             this._popup.focus();
-            this._popup.setUrl(params.url);
+            this._popup.window.location = params.url;
         }
 
         return this.promise;
