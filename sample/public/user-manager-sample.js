@@ -8,6 +8,7 @@ document.getElementById('clearState').addEventListener("click", clearState, fals
 document.getElementById('getUser').addEventListener("click", getUser, false);
 document.getElementById('startSigninMainWindow').addEventListener("click", startSigninMainWindow, false);
 document.getElementById('endSigninMainWindow').addEventListener("click", endSigninMainWindow, false);
+document.getElementById('iframeSignin').addEventListener("click", iframeSignin, false);
 document.getElementById('signoutMainWindow').addEventListener("click", signoutMainWindow, false);
 
 ///////////////////////////////
@@ -23,6 +24,9 @@ var settings = {
     post_logout_redirect_uri: 'http://localhost:5000/user-manager-sample.html',
     response_type: 'id_token token',
     scope: 'openid email roles',
+    
+    silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
+    enableSilentRedirect:true,
 
     filterProtocolClaims: true,
     loadUserInfo: true
@@ -49,7 +53,7 @@ function getUser() {
 }
 
 function startSigninMainWindow() {
-    mgr.signinStartRedirect().then(function() {
+    mgr.signinRedirect().then(function() {
         log("signinRedirect done");
     }, function(err) {
         log(err);
@@ -57,7 +61,15 @@ function startSigninMainWindow() {
 }
 
 function endSigninMainWindow() {
-    mgr.signinCompleteRedirect().then(function(user) {
+    mgr.signinRedirectCallback().then(function(user) {
+        log("signed in", user);
+    }, function(err) {
+        log(err);
+    });
+}
+
+function iframeSignin() {
+    mgr.signinSilent().then(function(user) {
         log("signed in", user);
     }, function(err) {
         log(err);
@@ -65,11 +77,11 @@ function endSigninMainWindow() {
 }
 
 function signoutMainWindow() {
-    mgr.signout().then(function() {
-        log("signed out");
-    }, function(err) {
-        log(err);
-    });
+    // mgr.signout().then(function() {
+    //     log("signed out");
+    // }, function(err) {
+    //     log(err);
+    // });
 }
 
 ///////////////////////////////
@@ -79,10 +91,12 @@ function log() {
     document.getElementById('out').innerText = '';
 
     Array.prototype.forEach.call(arguments, function(msg) {
-        if (typeof msg !== 'string') {
+        if (msg instanceof Error){
+            msg = "Error: " + msg.message;
+        }
+        else if (typeof msg !== 'string') {
             msg = JSON.stringify(msg, null, 2);
         }
         document.getElementById('out').innerHTML += msg + '\r\n';
-
     });
 }

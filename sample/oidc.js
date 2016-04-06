@@ -63,7 +63,7 @@ function genIdToken(aud, nonce, access_token) {
         aud : aud,
         iss : metadata.issuer,
         nonce : nonce,
-        sid : Math.random(),
+        sid : "37889234079034890",
         nbf : now,
         iat : now,
         exp : now + 300,

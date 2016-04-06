@@ -21,11 +21,7 @@ export default class OidcClientSettings {
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true, staleStateAge = DefaultStaleStateAge
     }) {
-        if (!client_id) {
-            Log.error("No client_id on settings passed to OidcClientSettings");
-            throw new Error("client_id");
-        }
-
+        
         this._authority = authority;
         this._metadataUrl = metadataUrl;
         this._metadata = metadata;

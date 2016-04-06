@@ -49,20 +49,6 @@ describe("OidcClient", function() {
     });
 
     describe("constructor", function() {
-        it("should require a settings param", function() {
-            try {
-                new OidcClient(undefined, {
-                    stateStore:stubStore, 
-                    ResponseValidatorCtor : () => stubValidator, 
-                    MetadataServiceCtor : () => stubMetadataService
-                });
-            }
-            catch (e) {
-                e.message.should.contain('settings');
-                return;
-            }
-            assert.fail();
-        });
 
         it("should expose settings", function() {
             subject.settings.should.be.ok;
@@ -81,6 +67,14 @@ describe("OidcClient", function() {
             subject.settings.should.equal(settings);
         });
 
+    });
+
+    describe("settings", function() {
+        
+        it("should be OidcClientSettings", function(){
+            subject.settings.should.be.instanceof(OidcClientSettings);
+        });
+        
     });
 
     describe("createSigninRequest", function() {

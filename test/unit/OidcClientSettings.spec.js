@@ -15,21 +15,6 @@ describe("OidcClientSettings", function() {
         Log.level = Log.NONE;
     });
 
-    describe("constructor", function() {
-
-        it("should require client_id on settings", function() {
-            try {
-                new OidcClientSettings({});
-            }
-            catch (e) {
-                e.message.should.contain('client_id');
-                return;
-            }
-            assert.fail();
-        });
-
-    });
-
     describe("client_id", function() {
         it("should return value from initial settings", function() {
             let subject = new OidcClientSettings({

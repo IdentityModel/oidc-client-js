@@ -7991,11 +7991,6 @@ var IdentityModel =
 
 	        _classCallCheck(this, OidcClient);
 
-	        if (!settings) {
-	            _Log2.default.error("No settings passed to OidcClient");
-	            throw new Error("settings");
-	        }
-
 	        if (settings instanceof _OidcClientSettings2.default) {
 	            this._settings = settings;
 	        } else {
@@ -8230,11 +8225,6 @@ var IdentityModel =
 	        var staleStateAge = _ref$staleStateAge === undefined ? DefaultStaleStateAge : _ref$staleStateAge;
 
 	        _classCallCheck(this, OidcClientSettings);
-
-	        if (!client_id) {
-	            _Log2.default.error("No client_id on settings passed to OidcClientSettings");
-	            throw new Error("client_id");
-	        }
 
 	        this._authority = authority;
 	        this._metadataUrl = metadataUrl;
@@ -8993,7 +8983,7 @@ var IdentityModel =
 
 	                            var state = State.fromStorageString(item);
 
-	                            if (state.created && state.created <= cutoff) {
+	                            if (state.created <= cutoff) {
 	                                _Log2.default.info("key being removed", key);
 	                                return storage.remove(key);
 	                            }
@@ -12220,9 +12210,9 @@ var IdentityModel =
 
 	var _OidcClient3 = _interopRequireDefault(_OidcClient2);
 
-	var _OidcClientSettings = __webpack_require__(294);
+	var _UserManagerSettings = __webpack_require__(318);
 
-	var _OidcClientSettings2 = _interopRequireDefault(_OidcClientSettings);
+	var _UserManagerSettings2 = _interopRequireDefault(_UserManagerSettings);
 
 	var _WebStorageStateStore = __webpack_require__(306);
 
@@ -12232,19 +12222,19 @@ var IdentityModel =
 
 	var _Global2 = _interopRequireDefault(_Global);
 
-	var _User = __webpack_require__(318);
+	var _User = __webpack_require__(319);
 
 	var _User2 = _interopRequireDefault(_User);
 
-	var _RedirectNavigator = __webpack_require__(319);
+	var _RedirectNavigator = __webpack_require__(320);
 
 	var _RedirectNavigator2 = _interopRequireDefault(_RedirectNavigator);
 
-	var _PopupNavigator = __webpack_require__(320);
+	var _PopupNavigator = __webpack_require__(321);
 
 	var _PopupNavigator2 = _interopRequireDefault(_PopupNavigator);
 
-	var _IFrameNavigator = __webpack_require__(321);
+	var _IFrameNavigator = __webpack_require__(322);
 
 	var _IFrameNavigator2 = _interopRequireDefault(_IFrameNavigator);
 
@@ -12269,6 +12259,10 @@ var IdentityModel =
 	        } : arguments[1];
 
 	        _classCallCheck(this, UserManager);
+
+	        if (!(settings instanceof _UserManagerSettings2.default)) {
+	            settings = new _UserManagerSettings2.default(settings);
+	        }
 
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UserManager).call(this, settings, args));
 
@@ -12308,38 +12302,68 @@ var IdentityModel =
 	        key: 'signinPopup',
 	        value: function signinPopup(data) {
 	            _Log2.default.info("UserManager.signinPopup");
-	            return this._signin({ data: data }, this._popupNavigator);
+	            return this._signin({ data: data, display: "popup" }, this._popupNavigator);
+	        }
+	    }, {
+	        key: 'signinPopupCallback',
+	        value: function signinPopupCallback(url) {
+	            _Log2.default.info("UserManager.signinPopupCallback");
+	            return this._signinCallback(url, this._popupNavigator);
 	        }
 	    }, {
 	        key: 'signinSilent',
 	        value: function signinSilent(data) {
 	            _Log2.default.info("UserManager.signinSilent");
-	            return this._signin({ data: data }, this._iframeNavigator);
+
+	            if (!this.settings.silent_redirect_uri) {
+	                return Promise.reject(new Error("No silent_redirect_uri configured"));
+	            }
+
+	            var args = {
+	                data: data,
+	                redirect_uri: this.settings.silent_redirect_uri,
+	                prompt: "none"
+	            };
+	            return this._signin(args, this._iframeNavigator);
+	        }
+	    }, {
+	        key: 'signinSilentCallback',
+	        value: function signinSilentCallback(url) {
+	            _Log2.default.info("UserManager.signinSilentCallback");
+	            return this._signinCallback(url, this._iframeNavigator);
 	        }
 	    }, {
 	        key: '_signin',
 	        value: function _signin(args, navigator) {
 	            var _this3 = this;
 
-	            return this._signinStart(args, this._popupNavigator).then(function (navResponse) {
+	            _Log2.default.info("_signin");
+	            return this._signinStart(args, navigator).then(function (navResponse) {
 	                return _this3._signinEnd(navResponse.url);
 	            });
 	        }
 	    }, {
-	        key: 'signinStartRedirect',
-	        value: function signinStartRedirect(data) {
-	            _Log2.default.info("UserManager.signinStartRedirect");
+	        key: '_signinCallback',
+	        value: function _signinCallback(url, navigator) {
+	            _Log2.default.info("_signinCallback");
+	            return navigator.callback(url);
+	        }
+	    }, {
+	        key: 'signinRedirect',
+	        value: function signinRedirect(data) {
+	            _Log2.default.info("UserManager.signinRedirect");
 	            return this._signinStart({ data: data }, this._redirectNavigator);
 	        }
 	    }, {
-	        key: 'signinCompleteRedirect',
-	        value: function signinCompleteRedirect(url) {
-	            _Log2.default.info("UserManager.signinCompleteRedirect");
-	            return this._signinEnd(url);
+	        key: 'signinRedirectCallback',
+	        value: function signinRedirectCallback(url) {
+	            _Log2.default.info("UserManager.signinRedirectCallback");
+	            return this._signinEnd(url || this._redirectNavigator.url);
 	        }
 	    }, {
 	        key: '_signinStart',
 	        value: function _signinStart(args, navigator) {
+	            _Log2.default.info("_signinStart");
 	            return this.createSigninRequest(args).then(function (signinRequest) {
 	                _Log2.default.info("got signin request");
 	                return navigator.navigate(signinRequest.url);
@@ -12350,6 +12374,7 @@ var IdentityModel =
 	        value: function _signinEnd(url) {
 	            var _this4 = this;
 
+	            _Log2.default.info("_signinEnd");
 	            return this.processSigninResponse(url).then(function (signinResponse) {
 	                _Log2.default.info("got signin response");
 
@@ -12434,6 +12459,71 @@ var IdentityModel =
 
 /***/ },
 /* 318 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _Log = __webpack_require__(292);
+
+	var _Log2 = _interopRequireDefault(_Log);
+
+	var _OidcClientSettings2 = __webpack_require__(294);
+
+	var _OidcClientSettings3 = _interopRequireDefault(_OidcClientSettings2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+	var UserManagerSettings = function (_OidcClientSettings) {
+	    _inherits(UserManagerSettings, _OidcClientSettings);
+
+	    function UserManagerSettings() {
+	        var args = arguments.length <= 0 || arguments[0] === undefined ? {
+	            silent_redirect_uri: undefined,
+	            enableAutomaticSilentRenew: true
+	        } : arguments[0];
+
+	        _classCallCheck(this, UserManagerSettings);
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UserManagerSettings).call(this, args));
+
+	        _this._silent_redirect_uri = args.silent_redirect_uri;
+	        _this._enableAutomaticSilentRenew = !!args.enableAutomaticSilentRenew;
+	        return _this;
+	    }
+
+	    _createClass(UserManagerSettings, [{
+	        key: 'silent_redirect_uri',
+	        get: function get() {
+	            return this._silent_redirect_uri;
+	        }
+	    }, {
+	        key: 'automaticSilentRenewEnabled',
+	        get: function get() {
+	            return !!(this.silent_redirect_uri && this._enableAutomaticSilentRenew);
+	        }
+	    }]);
+
+	    return UserManagerSettings;
+	}(_OidcClientSettings3.default);
+
+	exports.default = UserManagerSettings;
+	module.exports = exports['default'];
+
+/***/ },
+/* 319 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12528,7 +12618,7 @@ var IdentityModel =
 	module.exports = exports['default'];
 
 /***/ },
-/* 319 */
+/* 320 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12558,10 +12648,12 @@ var IdentityModel =
 	        value: function navigate(url) {
 	            _Log2.default.info("RedirectNavigator.navigate");
 	            window.location = url;
+	            return Promise.resolve();
 	        }
 	    }, {
 	        key: "url",
 	        get: function get() {
+	            _Log2.default.info("RedirectNavigator.url");
 	            return window.location.href;
 	        }
 	    }]);
@@ -12573,10 +12665,10 @@ var IdentityModel =
 	module.exports = exports['default'];
 
 /***/ },
-/* 320 */
+/* 321 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -12599,14 +12691,23 @@ var IdentityModel =
 	    }
 
 	    _createClass(PopupNavigator, [{
-	        key: 'navigate',
+	        key: "navigate",
 	        value: function navigate(url) {
-	            return Promise.resolve({ url: url });
+	            _Log2.default.info("PopupNavigator.navigate");
+
+	            return Promise.resolve();
 	        }
 	    }, {
-	        key: 'url',
-	        get: function get() {
-	            return window.location.href;
+	        key: "callback",
+	        value: function callback(url) {
+	            _Log2.default.info("PopupNavigator.callback");
+
+	            try {
+	                PopupWindow.notifyOpener(url);
+	                return Promose.resolve();
+	            } catch (e) {
+	                return Promose.reject(e);
+	            }
 	        }
 	    }]);
 
@@ -12617,10 +12718,88 @@ var IdentityModel =
 	module.exports = exports['default'];
 
 /***/ },
-/* 321 */
+/* 322 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+	// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+	var _Log = __webpack_require__(292);
+
+	var _Log2 = _interopRequireDefault(_Log);
+
+	var _IFrameLoader = __webpack_require__(323);
+
+	var _IFrameLoader2 = _interopRequireDefault(_IFrameLoader);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var DefaultTimeout = 5000;
+
+	var IFrameNavigator = function () {
+	    function IFrameNavigator() {
+	        var timeout = arguments.length <= 0 || arguments[0] === undefined ? DefaultTimeout : arguments[0];
+
+	        _classCallCheck(this, IFrameNavigator);
+
+	        this._timeout = timeout;
+	    }
+
+	    _createClass(IFrameNavigator, [{
+	        key: 'navigate',
+	        value: function navigate(url) {
+	            var _this = this;
+
+	            _Log2.default.info("IFrameNavigator.navigate");
+
+	            if (!url) {
+	                _Log2.default.error("No url provided");
+	                return Promise.reject(new Error("No url provided"));
+	            }
+
+	            return new Promise(function (resolve, reject) {
+	                new _IFrameLoader2.default(resolve, reject, _this._timeout, url);
+	            });
+	        }
+	    }, {
+	        key: 'callback',
+	        value: function callback(url) {
+	            _Log2.default.info("IFrameNavigator.callback");
+
+	            try {
+	                _IFrameLoader2.default.notifyParent(url);
+	                return Promose.resolve();
+	            } catch (e) {
+	                return Promose.reject(e);
+	            }
+	        }
+	    }, {
+	        key: 'url',
+	        get: function get() {
+	            _Log2.default.error("url should not be used with IFrameNavigator");
+	            throw new Error("url should not be used with IFrameNavigator");
+	        }
+	    }]);
+
+	    return IFrameNavigator;
+	}();
+
+	exports.default = IFrameNavigator;
+	module.exports = exports['default'];
+
+/***/ },
+/* 323 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -12637,27 +12816,90 @@ var IdentityModel =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var IFrameNavigator = function () {
-	    function IFrameNavigator() {
-	        _classCallCheck(this, IFrameNavigator);
+	var IFrameLoader = function () {
+	    function IFrameLoader(resolve, reject, timeout, url) {
+	        _classCallCheck(this, IFrameLoader);
+
+	        _Log2.default.info("IFrameLoader.ctor");
+
+	        this._resolve = resolve;
+	        this._reject = reject;
+
+	        this._frame = window.document.createElement("iframe");
+	        this._frame.style.display = "none";
+
+	        this._boundMessageEvent = this._message.bind(this);
+	        window.addEventListener("message", this._boundMessageEvent, false);
+
+	        this._timer = window.setTimeout(this._timeout.bind(this), timeout);
+
+	        window.document.body.appendChild(this._frame);
+	        this._frame.src = url;
 	    }
 
-	    _createClass(IFrameNavigator, [{
-	        key: 'navigate',
-	        value: function navigate(url) {
-	            return Promise.resolve({ url: url });
+	    _createClass(IFrameLoader, [{
+	        key: "_cleanup",
+	        value: function _cleanup() {
+	            _Log2.default.info("IFrameLoader._cleanup");
+
+	            window.removeEventListener("message", this._boundMessageEvent, false);
+	            window.clearTimeout(this._timer);
+	            window.document.body.removeChild(this._frame);
+
+	            this._timer = null;
+	            this._frame = null;
+	            this._boundMessageEventssage = null;
 	        }
 	    }, {
-	        key: 'url',
+	        key: "_timeout",
+	        value: function _timeout() {
+	            _Log2.default.info("IFrameLoader._timeout");
+
+	            this._cleanup();
+
+	            _Log2.default.error("Frame loader timed out");
+	            this._reject(new Error("Frame loader timed out"));
+	        }
+	    }, {
+	        key: "_message",
+	        value: function _message(e) {
+	            _Log2.default.info("IFrameLoader._message");
+
+	            if (this._timer && e.origin === this._origin && e.source === this._frame.contentWindow) {
+	                var url = e.data.url;
+
+	                this._cleanup();
+
+	                if (url) {
+	                    _Log2.default.info("Successful response from frame");
+	                    this._resolve({ url: url });
+	                } else {
+	                    _Log2.default.error("Invalid response from frame", e.data);
+	                    this._reject(new Error("Invalid response from frame"));
+	                }
+	            }
+	        }
+	    }, {
+	        key: "_origin",
 	        get: function get() {
-	            return window.location.href;
+	            return location.protocol + "//" + location.host;
+	        }
+	    }], [{
+	        key: "notifyParent",
+	        value: function notifyParent(url) {
+	            if (window.parent && window !== window.parent) {
+	                url = url || window.location.href;
+	                if (url) {
+	                    window.parent.postMessage({ url: url }, location.protocol + "//" + location.host);
+	                }
+	            }
 	        }
 	    }]);
 
-	    return IFrameNavigator;
+	    return IFrameLoader;
 	}();
 
-	exports.default = IFrameNavigator;
+	exports.default = IFrameLoader;
 	module.exports = exports['default'];
 
 /***/ }

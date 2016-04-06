@@ -8,9 +8,11 @@ export default class RedirectNavigator {
     navigate(url) {
         Log.info("RedirectNavigator.navigate");
         window.location = url;
+        return Promise.resolve();
     }
-    
-    get url(){
+
+    get url() {
+        Log.info("RedirectNavigator.url");
         return window.location.href;
     }
 }

@@ -3,13 +3,14 @@
 
 import Log from './Log';
 import OidcClient from './OidcClient';
-import OidcClientSettings from './OidcClientSettings';
+import UserManagerSettings from './UserManagerSettings';
 import WebStorageStateStore from './WebStorageStateStore';
 import Global from './Global';
 import User from './User';
 import RedirectNavigator from './RedirectNavigator';
 import PopupNavigator from './PopupNavigator';
 import IFrameNavigator from './IFrameNavigator';
+
 
 export default class UserManager extends OidcClient {
     constructor(settings,
@@ -20,6 +21,9 @@ export default class UserManager extends OidcClient {
             userStore: new WebStorageStateStore({ store: Global.sessionStorage })
         }
     ) {
+        if (!(settings instanceof UserManagerSettings)) {
+            settings = new UserManagerSettings(settings);
+        }
         super(settings, args);
 
         this._redirectNavigator = args.redirectNavigator;
@@ -56,47 +60,71 @@ export default class UserManager extends OidcClient {
 
     signinPopup(data) {
         Log.info("UserManager.signinPopup");
-        return this._signin({ data: data }, this._popupNavigator);
+        return this._signin({ data: data, display: "popup" }, this._popupNavigator);
+    }
+    signinPopupCallback(url) {
+        Log.info("UserManager.signinPopupCallback");
+        return this._signinCallback(url, this._popupNavigator);
     }
 
     signinSilent(data) {
         Log.info("UserManager.signinSilent");
-        return this._signin({ data: data }, this._iframeNavigator);
+
+        if (!this.settings.silent_redirect_uri) {
+            return Promise.reject(new Error("No silent_redirect_uri configured"));
+        }
+
+        var args = {
+            data: data,
+            redirect_uri: this.settings.silent_redirect_uri,
+            prompt: "none"
+        };
+        return this._signin(args, this._iframeNavigator);
+    }
+    signinSilentCallback(url) {
+        Log.info("UserManager.signinSilentCallback");
+        return this._signinCallback(url, this._iframeNavigator);
     }
 
     _signin(args, navigator) {
-        return this._signinStart(args, this._popupNavigator).then(navResponse => {
+        Log.info("_signin");
+        return this._signinStart(args, navigator).then(navResponse => {
             return this._signinEnd(navResponse.url);
         });
     }
-
-    signinStartRedirect(data) {
-        Log.info("UserManager.signinStartRedirect");
-        return this._signinStart({data:data}, this._redirectNavigator);
+    _signinCallback(url, navigator) {
+        Log.info("_signinCallback");
+        return navigator.callback(url);
     }
-    signinCompleteRedirect(url) {
-        Log.info("UserManager.signinCompleteRedirect");
-        return this._signinEnd(url);
+
+    signinRedirect(data) {
+        Log.info("UserManager.signinRedirect");
+        return this._signinStart({ data: data }, this._redirectNavigator);
+    }
+    signinRedirectCallback(url) {
+        Log.info("UserManager.signinRedirectCallback");
+        return this._signinEnd(url || this._redirectNavigator.url);
     }
 
     _signinStart(args, navigator) {
+        Log.info("_signinStart");
         return this.createSigninRequest(args).then(signinRequest => {
             Log.info("got signin request");
             return navigator.navigate(signinRequest.url);
         });
     }
-
     _signinEnd(url) {
+        Log.info("_signinEnd");
         return this.processSigninResponse(url).then(signinResponse => {
             Log.info("got signin response");
-            
+
             let user = new User(signinResponse);
-            
-            return this._storeUser(user).then(()=>{
+
+            return this._storeUser(user).then(() => {
                 Log.info("user stored");
-                
+
                 this._user = user;
-                
+
                 return user;
             });
         });

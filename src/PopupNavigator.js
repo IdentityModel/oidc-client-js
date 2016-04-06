@@ -6,10 +6,20 @@ import Log from './Log';
 export default class PopupNavigator {
 
     navigate(url) {
-        return Promise.resolve({url:url});
+        Log.info("PopupNavigator.navigate");
+        
+        return Promise.resolve();
     }
-    
-    get url(){
-        return window.location.href;
+
+    callback(url) {
+        Log.info("PopupNavigator.callback");
+        
+        try {
+            PopupWindow.notifyOpener(url);
+            return Promose.resolve();
+        }
+        catch (e) {
+            return Promose.reject(e);
+        }
     }
 }

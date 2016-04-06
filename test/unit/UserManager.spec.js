@@ -3,6 +3,7 @@
 
 import UserManager from '../../src/UserManager';
 import Log from '../../src/Log';
+import UserManagerSettings from '../../src/UserManagerSettings';
 
 import StubMetadataService from './StubMetadataService';
 import StubStateStore from './StubStateStore';
@@ -46,8 +47,19 @@ describe("UserManager", function() {
     });
 
     describe("constructor", function() {
-    
+        
+        it("should accept settings", function(){
+            subject.settings.client_id.should.equal('client');
+        });
+        
+    });
+   
+    describe("settings", function() {
+        
+        it("should be UserManagerSettings", function(){
+            subject.settings.should.be.instanceof(UserManagerSettings);
+        });
+        
     });
 
-   
 });
