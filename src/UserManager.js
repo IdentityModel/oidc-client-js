@@ -11,7 +11,6 @@ import RedirectNavigator from './RedirectNavigator';
 import PopupNavigator from './PopupNavigator';
 import IFrameNavigator from './IFrameNavigator';
 
-
 export default class UserManager extends OidcClient {
     constructor(settings, {
         redirectNavigator = new RedirectNavigator(),
@@ -35,7 +34,7 @@ export default class UserManager extends OidcClient {
         return this._user;
     }
 
-    getUser(data) {
+    getUser() {
         Log.info("UserManager.getUser");
 
         if (!this._user) {
@@ -108,6 +107,16 @@ export default class UserManager extends OidcClient {
         Log.info("_signinCallback");
         return navigator.callback(url);
     }
+    _signout(args, navigator, navigatorParams = {}) {
+        Log.info("_signout");
+        return this._signoutStart(args, navigator, navigatorParams).then(navResponse => {
+            return this._signoutEnd(navResponse.url);
+        });
+    }
+    _signoutCallback(url, navigator) {
+        Log.info("_signoutCallback");
+        return navigator.callback(url);
+    }
 
     signinRedirect(data) {
         Log.info("UserManager.signinRedirect");
@@ -117,16 +126,24 @@ export default class UserManager extends OidcClient {
         Log.info("UserManager.signinRedirectCallback");
         return this._signinEnd(url || this._redirectNavigator.url);
     }
+    signoutRedirect(data) {
+        Log.info("UserManager.signoutRedirect");
+        return this._signoutStart({ data: data }, this._redirectNavigator);
+    }
+    signoutRedirectCallback(url) {
+        Log.info("UserManager.signoutRedirectCallback");
+        return this._signoutEnd(url || this._redirectNavigator.url);
+    }
 
     _signinStart(args, navigator, navigatorParams = {}) {
         Log.info("_signinStart");
-        
+
         return navigator.prepare().then(handle => {
             Log.info("got navigator window handle");
-            
+
             return this.createSigninRequest(args).then(signinRequest => {
                 Log.info("got signin request");
-        
+
                 navigatorParams.url = signinRequest.url;
                 return handle.navigate(navigatorParams);
             });
@@ -134,12 +151,12 @@ export default class UserManager extends OidcClient {
     }
     _signinEnd(url) {
         Log.info("_signinEnd");
-        
+
         return this.processSigninResponse(url).then(signinResponse => {
             Log.info("got signin response");
 
             let user = new User(signinResponse);
-            
+
             return this._storeUser(user).then(() => {
                 Log.info("user stored");
 
@@ -150,26 +167,35 @@ export default class UserManager extends OidcClient {
         });
     }
 
-    // signout(data) {
-    //     Log.info("UserManager.signout");
+    _signoutStart(args, navigator, navigatorParams = {}) {
+        Log.info("_signoutStart");
 
-    //     var id_token = this._user && this._user.id_token;
-    //     this._user = null;
+        return navigator.prepare().then(handle => {
+            Log.info("got navigator window handle");
+            
+            return this.getUser().then(user => {
+                Log.info("loaded current user from storage");
 
-    //     return this._storeUser(null).then(() => {
-    //         Log.info("user removed from storage");
+                this._user = null;
+                var id_token = user && user.id_token;
 
-    //         return this.createSignoutRequest({ data: data, id_token_hint: id_token }).then(signoutRequest => {
-    //             Log.info("got signout request");
+                return this._storeUser(null).then(() => {
+                    Log.info("removed user from storage");
 
-    //             return this._navigator.navigate(signoutRequest.url).then(navigateResponse => {
-    //                 Log.info("got navigate response");
+                    return this.createSignoutRequest(args).then(signoutRequest => {
+                        Log.info("got signout request");
 
-    //                 return this.processSignoutResponse(navigateResponse.url);
-    //             });
-    //         });
-    //     });
-    // }
+                        navigatorParams.url = signoutRequest.url;
+                        return handle.navigate(navigatorParams);
+                    });
+                });
+            });
+        });
+    }
+    _signoutEnd(url) {
+        Log.info("_signoutEnd");
+        return this.processSignoutResponse(url);
+    }
 
     get _userStoreKey() {
         return `user:${this.settings.authority}:${this.settings.client_id}`;

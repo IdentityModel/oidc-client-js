@@ -45,7 +45,7 @@ describe("UserManagerSettings", function() {
         });
 
     });
-
+    
     describe("automaticSilentRenewEnabled", function() {
 
         it("should return value from initial settings", function() {

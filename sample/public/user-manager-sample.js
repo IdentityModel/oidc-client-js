@@ -6,11 +6,14 @@
 ///////////////////////////////
 document.getElementById('clearState').addEventListener("click", clearState, false);
 document.getElementById('getUser').addEventListener("click", getUser, false);
+
 document.getElementById('startSigninMainWindow').addEventListener("click", startSigninMainWindow, false);
 document.getElementById('endSigninMainWindow').addEventListener("click", endSigninMainWindow, false);
 document.getElementById('popupSignin').addEventListener("click", popupSignin, false);
 document.getElementById('iframeSignin').addEventListener("click", iframeSignin, false);
-document.getElementById('signoutMainWindow').addEventListener("click", signoutMainWindow, false);
+
+document.getElementById('startSignoutMainWindow').addEventListener("click", startSignoutMainWindow, false);
+document.getElementById('endSignoutMainWindow').addEventListener("click", endSignoutMainWindow, false);
 
 ///////////////////////////////
 // config
@@ -27,8 +30,10 @@ var settings = {
     scope: 'openid email roles',
     
     popup_redirect_uri:'http://localhost:5000/user-manager-sample-popup.html',
+    popup_post_logout_redirect_uri:'http://localhost:5000/user-manager-sample-popup-signout.html',
     
     silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
+    silent_post_logout_redirect_uri:'http://localhost:5000/user-manager-sample-silent-signout.html',
     enableSilentRedirect:true,
 
     filterProtocolClaims: true,
@@ -56,7 +61,7 @@ function getUser() {
 }
 
 function startSigninMainWindow() {
-    mgr.signinRedirect().then(function() {
+    mgr.signinRedirect({data:'some data'}).then(function() {
         log("signinRedirect done");
     }, function(err) {
         log(err);
@@ -72,7 +77,7 @@ function endSigninMainWindow() {
 }
 
 function popupSignin() {
-    mgr.signinPopup().then(function(user) {
+    mgr.signinPopup({data:'some data'}).then(function(user) {
         log("signed in", user);
     }, function(err) {
         log(err);
@@ -80,20 +85,29 @@ function popupSignin() {
 }
 
 function iframeSignin() {
-    mgr.signinSilent().then(function(user) {
+    mgr.signinSilent({data:'some data'}).then(function(user) {
         log("signed in", user);
     }, function(err) {
         log(err);
     });
 }
 
-function signoutMainWindow() {
-    // mgr.signout().then(function() {
-    //     log("signed out");
-    // }, function(err) {
-    //     log(err);
-    // });
-}
+function startSignoutMainWindow(){
+    mgr.signoutRedirect({data:'some data'}).then(function(resp) {
+        log("signed out", resp);
+    }, function(err) {
+        log(err);
+    });
+};
+
+function endSignoutMainWindow(){
+    mgr.signoutRedirectCallback().then(function(resp) {
+        log("signed out", resp);
+    }, function(err) {
+        log(err);
+    });
+};
+
 
 ///////////////////////////////
 // debugging helpers

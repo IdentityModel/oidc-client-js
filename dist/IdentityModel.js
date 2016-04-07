@@ -12284,7 +12284,7 @@ var IdentityModel =
 
 	    _createClass(UserManager, [{
 	        key: 'getUser',
-	        value: function getUser(data) {
+	        value: function getUser() {
 	            var _this2 = this;
 
 	            _Log2.default.info("UserManager.getUser");
@@ -12373,6 +12373,24 @@ var IdentityModel =
 	            return navigator.callback(url);
 	        }
 	    }, {
+	        key: '_signout',
+	        value: function _signout(args, navigator) {
+	            var _this4 = this;
+
+	            var navigatorParams = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+	            _Log2.default.info("_signout");
+	            return this._signoutStart(args, navigator, navigatorParams).then(function (navResponse) {
+	                return _this4._signoutEnd(navResponse.url);
+	            });
+	        }
+	    }, {
+	        key: '_signoutCallback',
+	        value: function _signoutCallback(url, navigator) {
+	            _Log2.default.info("_signoutCallback");
+	            return navigator.callback(url);
+	        }
+	    }, {
 	        key: 'signinRedirect',
 	        value: function signinRedirect(data) {
 	            _Log2.default.info("UserManager.signinRedirect");
@@ -12385,9 +12403,21 @@ var IdentityModel =
 	            return this._signinEnd(url || this._redirectNavigator.url);
 	        }
 	    }, {
+	        key: 'signoutRedirect',
+	        value: function signoutRedirect(data) {
+	            _Log2.default.info("UserManager.signoutRedirect");
+	            return this._signoutStart({ data: data }, this._redirectNavigator);
+	        }
+	    }, {
+	        key: 'signoutRedirectCallback',
+	        value: function signoutRedirectCallback(url) {
+	            _Log2.default.info("UserManager.signoutRedirectCallback");
+	            return this._signoutEnd(url || this._redirectNavigator.url);
+	        }
+	    }, {
 	        key: '_signinStart',
 	        value: function _signinStart(args, navigator) {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            var navigatorParams = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
@@ -12396,7 +12426,7 @@ var IdentityModel =
 	            return navigator.prepare().then(function (handle) {
 	                _Log2.default.info("got navigator window handle");
 
-	                return _this4.createSigninRequest(args).then(function (signinRequest) {
+	                return _this5.createSigninRequest(args).then(function (signinRequest) {
 	                    _Log2.default.info("got signin request");
 
 	                    navigatorParams.url = signinRequest.url;
@@ -12407,7 +12437,7 @@ var IdentityModel =
 	    }, {
 	        key: '_signinEnd',
 	        value: function _signinEnd(url) {
-	            var _this5 = this;
+	            var _this6 = this;
 
 	            _Log2.default.info("_signinEnd");
 
@@ -12416,37 +12446,52 @@ var IdentityModel =
 
 	                var user = new _User2.default(signinResponse);
 
-	                return _this5._storeUser(user).then(function () {
+	                return _this6._storeUser(user).then(function () {
 	                    _Log2.default.info("user stored");
 
-	                    _this5._user = user;
+	                    _this6._user = user;
 
 	                    return user;
 	                });
 	            });
 	        }
+	    }, {
+	        key: '_signoutStart',
+	        value: function _signoutStart(args, navigator) {
+	            var _this7 = this;
 
-	        // signout(data) {
-	        //     Log.info("UserManager.signout");
+	            var navigatorParams = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-	        //     var id_token = this._user && this._user.id_token;
-	        //     this._user = null;
+	            _Log2.default.info("_signoutStart");
 
-	        //     return this._storeUser(null).then(() => {
-	        //         Log.info("user removed from storage");
+	            return navigator.prepare().then(function (handle) {
+	                _Log2.default.info("got navigator window handle");
 
-	        //         return this.createSignoutRequest({ data: data, id_token_hint: id_token }).then(signoutRequest => {
-	        //             Log.info("got signout request");
+	                return _this7.getUser().then(function (user) {
+	                    _Log2.default.info("loaded current user from storage");
 
-	        //             return this._navigator.navigate(signoutRequest.url).then(navigateResponse => {
-	        //                 Log.info("got navigate response");
+	                    _this7._user = null;
+	                    var id_token = user && user.id_token;
 
-	        //                 return this.processSignoutResponse(navigateResponse.url);
-	        //             });
-	        //         });
-	        //     });
-	        // }
+	                    return _this7._storeUser(null).then(function () {
+	                        _Log2.default.info("removed user from storage");
 
+	                        return _this7.createSignoutRequest(args).then(function (signoutRequest) {
+	                            _Log2.default.info("got signout request");
+
+	                            navigatorParams.url = signoutRequest.url;
+	                            return handle.navigate(navigatorParams);
+	                        });
+	                    });
+	                });
+	            });
+	        }
+	    }, {
+	        key: '_signoutEnd',
+	        value: function _signoutEnd(url) {
+	            _Log2.default.info("_signoutEnd");
+	            return this.processSignoutResponse(url);
+	        }
 	    }, {
 	        key: '_loadUser',
 	        value: function _loadUser() {
