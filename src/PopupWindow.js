@@ -31,9 +31,6 @@ export default class PopupWindow {
         if (!this._popup) {
             this._error("Error opening popup window");
         }
-        else if (!this._popup.setUrl) {
-            this._error("popup not properly initialized");
-        }
         else if (!params || !params.url) {
             this._error("No url provided");
         }
