@@ -75,7 +75,7 @@ export default class PopupWindow {
     _checkForPopupClosed() {
         Log.info("PopupWindow._checkForPopupClosed");
 
-        if (!this._popup.window) {
+        if (!this._popup || !this._popup.window || this._popup.closed) {
             this._error("Popup window closed");
         }
     }
