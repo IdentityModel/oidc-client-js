@@ -14,4 +14,9 @@ export default class Global {
     static get XMLHttpRequest(){
         return XMLHttpRequest;
     }
+    static get timer(){
+        return {
+            setTimeout, clearTimeout
+        };
+    }
 };
