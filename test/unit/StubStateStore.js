@@ -3,6 +3,9 @@
 
 export default class StubStateStore {
     set(key, value) {
+        if (this.error) {
+            return Promise.reject(new Error(this.error));
+        }
         this.item = value;
         return Promise.resolve();
     }

@@ -147,6 +147,18 @@ describe("OidcClient", function() {
                 done();
             });
         });
+        
+        it("should fail if seting state into store fails", function(done) {
+            stubMetadataService.getAuthorizationEndpointResult = Promise.resolve("http://sts/authorize");
+            stubStore.error = "foo";
+
+            var p = subject.createSigninRequest();
+
+            p.then(null, err => {
+                err.message.should.contain("foo");
+                done();
+            });
+        });
 
         it("should store state", function(done) {
             stubMetadataService.getAuthorizationEndpointResult = Promise.resolve("http://sts/authorize");

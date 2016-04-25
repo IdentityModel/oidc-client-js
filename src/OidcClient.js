@@ -67,9 +67,10 @@ export default class OidcClient {
             });
             
             var state = request.state;
-            stateStore.set(state.id, state.toStorageString());
             
-            return request;
+            return stateStore.set(state.id, state.toStorageString()).then(()=>{
+                return request;
+            });
         });
     }
     
