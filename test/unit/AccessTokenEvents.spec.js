@@ -50,7 +50,7 @@ describe("AccessTokenEvents", function () {
     describe("init", function () {
 
         it("should cancel existing timers", function () {
-            subject.init();
+            subject.init({});
             
             expiringTimer.cancelWasCalled.should.be.true;
             expiredTimer.cancelWasCalled.should.be.true;
@@ -64,6 +64,33 @@ describe("AccessTokenEvents", function () {
             
             expiringTimer.duration.should.equal(10);
             expiredTimer.duration.should.equal(71);
+        });
+        
+        it("should not initialize expiring timer if already expired", function () {
+            subject.init({
+                access_token:"token",
+                expires_in : 0
+            });
+            
+            assert.isUndefined(expiringTimer.duration);
+        });
+
+        it("should initialize expired timer if already expired", function () {
+            subject.init({
+                access_token:"token",
+                expires_in : 0
+            });
+            
+            expiredTimer.duration.should.equal(1);
+        });
+        
+        it("should not initialize timers if no access token", function () {
+            subject.init({
+                expires_in : 70
+            });
+            
+            assert.isUndefined(expiringTimer.duration);
+            assert.isUndefined(expiredTimer.duration);
         });
 
     });

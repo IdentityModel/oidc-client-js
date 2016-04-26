@@ -9,23 +9,30 @@ const DefaultExpiringNotificationTime = 60;
 export default class AccessTokenEvents {
 
     constructor({
-        expiringNotificationTime = DefaultExpiringNotificationTime, 
+        expiringNotificationTime = DefaultExpiringNotificationTime,
         expiringTimer = new Timer(),
         expiredTimer = new Timer()
     } = {}) {
         this._expiringNotificationTime = expiringNotificationTime;
-        
+
         this._expiring = expiringTimer;
         this._expired = expiredTimer;
     }
 
     init(container) {
         this.cancel();
-        
-        if (container && container.access_token) {
-            var duration = container.expires_in;
+
+        // only register events if there's an access token where we care about expiration
+        if (container.access_token) {
+            let duration = container.expires_in;
+
+            let expiring = duration - this._expiringNotificationTime;
+            if (expiring > 0) {
+                // only register expiring if we still have time
+                this._expiring.init(expiring);
+            }
             
-            this._expiring.init(duration - this._expiringNotificationTime);
+            // always register expired. if it's negative, it will still fire
             this._expired.init(duration + 1);
         }
     }
