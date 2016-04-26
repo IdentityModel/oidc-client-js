@@ -3,11 +3,13 @@
 
 import Log from './Log';
 import AccessTokenEvents from './AccessTokenEvents';
+import Event from './Event';
 
 export default class UserManagerEvents extends AccessTokenEvents {
 
     constructor(settings) {
         super(settings);
+        this._silentRenewError = new Event();
     }
 
     init(user) {
@@ -16,5 +18,15 @@ export default class UserManagerEvents extends AccessTokenEvents {
 
     cancel() {
         super.cancel();
+    }
+    
+    addSilentRenewError(cb) {
+        this._silentRenewError.addHandler(cb);
+    }
+    removeSilentRenewError(cb) {
+        this._silentRenewError.removeHandler(cb);
+    }
+    _raiseSilentRenewError(e) {
+        this._silentRenewError.raise(e);
     }
 }
