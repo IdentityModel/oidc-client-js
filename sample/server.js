@@ -13,6 +13,10 @@ var app = express();
 var static = express.static(path.join(__dirname, 'public'));
 app.use(static);
 
+app.get("/IdentityModel.js", function(req, res){
+    res.sendFile(path.join(__dirname, '../dist/IdentityModel.js'));
+});
+
 var oidc = require('./oidc.js');
 oidc(url, app);
 
