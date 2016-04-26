@@ -10,6 +10,7 @@ import User from './User';
 import RedirectNavigator from './RedirectNavigator';
 import PopupNavigator from './PopupNavigator';
 import IFrameNavigator from './IFrameNavigator';
+import UserManagerEvents from './UserManagerEvents';
 
 export default class UserManager extends OidcClient {
     constructor(settings, {
@@ -28,31 +29,39 @@ export default class UserManager extends OidcClient {
         this._iframeNavigator = iframeNavigator;
 
         this._userStore = userStore;
+
+        this._events = new UserManagerEvents(settings);
     }
 
-    get user() {
-        return this._user;
+    get events() {
+        return this._events;
     }
 
     getUser() {
         Log.info("UserManager.getUser");
 
-        if (!this._user) {
-            Log.info("no user in-memory");
+        return this._loadUser().then(user => {
+            if (user) {
+                Log.info("user loaded");
 
-            return this._loadUser().then(user => {
-                this._user = user;
+                this._events.init(user);
+
                 return user;
-            });
-        }
+            }
+            else {
+                Log.info("user not found in storage");
+                return null;
+            }
+        });
+    }
 
-        if (this._user && !this._user.expired) {
-            Log.info("user is in-memory and not expired");
-            return Promise.resolve(this._user);
-        }
-
-        Log.info("no user");
-        return Promise.resolve(null);
+    removeUser() {
+        Log.info("UserManager.removeUser");
+        
+        return this._storeUser(null).then(() => {
+            Log.info("user removed from storage");
+            this._events.cancel();
+        });
     }
 
     signinPopup(data) {
@@ -160,7 +169,7 @@ export default class UserManager extends OidcClient {
             return this._storeUser(user).then(() => {
                 Log.info("user stored");
 
-                this._user = user;
+                this._events.init(user);
 
                 return user;
             });
@@ -172,15 +181,14 @@ export default class UserManager extends OidcClient {
 
         return navigator.prepare().then(handle => {
             Log.info("got navigator window handle");
-            
+
             return this.getUser().then(user => {
                 Log.info("loaded current user from storage");
 
-                this._user = null;
                 var id_token = user && user.id_token;
 
-                return this._storeUser(null).then(() => {
-                    Log.info("removed user from storage");
+                return this.removeUser().then(() => {
+                    Log.info("user removed, creating signout request");
 
                     return this.createSignoutRequest(args).then(signoutRequest => {
                         Log.info("got signout request");
@@ -194,7 +202,14 @@ export default class UserManager extends OidcClient {
     }
     _signoutEnd(url) {
         Log.info("_signoutEnd");
-        return this.processSignoutResponse(url);
+
+        return this.processSignoutResponse(url).then(signoutResponse => {
+            Log.info("got signout response");
+
+            this._events.cancel();
+
+            return signoutResponse;
+        });
     }
 
     get _userStoreKey() {
