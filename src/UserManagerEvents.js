@@ -9,9 +9,9 @@ export default class UserManagerEvents extends AccessTokenEvents {
 
     constructor(settings) {
         super(settings);
-        this._userLoaded = new Event();
-        this._userUnloaded = new Event();
-        this._silentRenewError = new Event();
+        this._userLoaded = new Event("User loaded");
+        this._userUnloaded = new Event("User unloaded");
+        this._silentRenewError = new Event("Silent renew error");
     }
 
     load(user) {
