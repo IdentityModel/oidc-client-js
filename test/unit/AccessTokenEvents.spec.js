@@ -47,17 +47,17 @@ describe("AccessTokenEvents", function () {
 
     });
 
-    describe("init", function () {
+    describe("load", function () {
 
         it("should cancel existing timers", function () {
-            subject.init({});
+            subject.load({});
             
             accessTokenExpiringTimer.cancelWasCalled.should.be.true;
             accessTokenExpiredTimer.cancelWasCalled.should.be.true;
         });
         
         it("should initialize timers", function () {
-            subject.init({
+            subject.load({
                 access_token:"token",
                 expires_in : 70
             });
@@ -67,7 +67,7 @@ describe("AccessTokenEvents", function () {
         });
         
         it("should immediately schedule expiring timer if expiration is soon", function () {
-            subject.init({
+            subject.load({
                 access_token:"token",
                 expires_in : 10
             });
@@ -76,7 +76,7 @@ describe("AccessTokenEvents", function () {
         });
         
         it("should not initialize expiring timer if already expired", function () {
-            subject.init({
+            subject.load({
                 access_token:"token",
                 expires_in : 0
             });
@@ -85,7 +85,7 @@ describe("AccessTokenEvents", function () {
         });
 
         it("should initialize expired timer if already expired", function () {
-            subject.init({
+            subject.load({
                 access_token:"token",
                 expires_in : 0
             });
@@ -94,7 +94,7 @@ describe("AccessTokenEvents", function () {
         });
         
         it("should not initialize timers if no access token", function () {
-            subject.init({
+            subject.load({
                 expires_in : 70
             });
             
@@ -104,11 +104,11 @@ describe("AccessTokenEvents", function () {
 
     });
     
-    describe("cancel", function () {
+    describe("unload", function () {
 
         it("should cancel timers", function () {
             
-            subject.cancel();
+            subject.unload();
             
             accessTokenExpiringTimer.cancelWasCalled.should.be.true;
             accessTokenExpiredTimer.cancelWasCalled.should.be.true;

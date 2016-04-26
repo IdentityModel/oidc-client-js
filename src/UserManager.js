@@ -44,7 +44,7 @@ export default class UserManager extends OidcClient {
             if (user) {
                 Log.info("user loaded");
 
-                this._events.init(user);
+                this._events.load(user);
 
                 return user;
             }
@@ -57,11 +57,11 @@ export default class UserManager extends OidcClient {
 
     removeUser() {
         Log.info("UserManager.removeUser");
-        
+
         return this._storeUser(null).then(() => {
             Log.info("user removed from storage");
-            
-            this._events.cancel();
+
+            this._events.unload();
         });
     }
 
@@ -170,7 +170,7 @@ export default class UserManager extends OidcClient {
             return this._storeUser(user).then(() => {
                 Log.info("user stored");
 
-                this._events.init(user);
+                this._events.load(user);
 
                 return user;
             });

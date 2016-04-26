@@ -10,8 +10,8 @@ export default class AccessTokenEvents {
 
     constructor({
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
-        accessTokenExpiringTimer = new Timer(),
-        accessTokenExpiredTimer = new Timer()
+        accessTokenExpiringTimer = new Timer("Access token expiring"),
+        accessTokenExpiredTimer = new Timer("Access token expired")
     } = {}) {
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
@@ -19,9 +19,9 @@ export default class AccessTokenEvents {
         this._accessTokenExpired = accessTokenExpiredTimer;
     }
 
-    init(container) {
-        Log.info("AccessTokenEvents.init");
-        this.cancel();
+    load(container) {
+        Log.info("AccessTokenEvents.load");
+        this.unload();
 
         // only register events if there's an access token where we care about expiration
         if (container.access_token) {
@@ -45,8 +45,8 @@ export default class AccessTokenEvents {
         }
     }
 
-    cancel() {
-        Log.info("AccessTokenEvents.canceling timers");
+    unload() {
+        Log.info("AccessTokenEvents.unload: canceling timers");
         this._accessTokenExpiring.cancel();
         this._accessTokenExpired.cancel();
     }

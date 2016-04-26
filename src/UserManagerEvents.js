@@ -9,17 +9,34 @@ export default class UserManagerEvents extends AccessTokenEvents {
 
     constructor(settings) {
         super(settings);
+        this._userLoaded = new Event();
+        this._userUnloaded = new Event();
         this._silentRenewError = new Event();
     }
 
-    init(user) {
-        super.init(user);
+    load(user) {
+        super.load(user);
+        this._userLoaded.raise(user);
+    }
+    unload() {
+        super.unload();
+        this._userUnloaded.raise();
     }
 
-    cancel() {
-        super.cancel();
+    addUserLoaded(cb) {
+        this._userLoaded.addHandler(cb);
+    }
+    removeUserLoaded(cb) {
+        this._userLoaded.removeHandler(cb);
     }
     
+    addUserUnloaded(cb) {
+        this._userUnloaded.addHandler(cb);
+    }
+    removeUserUnloaded(cb) {
+        this._userUnloaded.removeHandler(cb);
+    }
+
     addSilentRenewError(cb) {
         this._silentRenewError.addHandler(cb);
     }
