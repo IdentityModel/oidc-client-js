@@ -60,6 +60,7 @@ export default class UserManager extends OidcClient {
         
         return this._storeUser(null).then(() => {
             Log.info("user removed from storage");
+            
             this._events.cancel();
         });
     }
@@ -205,8 +206,6 @@ export default class UserManager extends OidcClient {
 
         return this.processSignoutResponse(url).then(signoutResponse => {
             Log.info("got signout response");
-
-            this._events.cancel();
 
             return signoutResponse;
         });
