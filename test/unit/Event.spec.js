@@ -83,5 +83,31 @@ describe("Event", function () {
         });
 
     });
+    
+    describe("raise", function () {
+
+        it("should pass params", function () {
+            var cb = function (a,b,c) {
+                a.should.equal(1);
+                b.should.equal(2);
+                c.should.equal(3);
+            };
+            subject.addHandler(cb);
+
+            subject.raise(1,2,3);
+        });
+        
+        it("should allow passing no params", function () {
+            var cb = function (a,b,c) {
+                assert.isUndefined(a);
+                assert.isUndefined(b);
+                assert.isUndefined(c);
+            };
+            subject.addHandler(cb);
+
+            subject.raise();
+        });
+        
+    });
 
 });

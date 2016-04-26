@@ -18,9 +18,9 @@ export default class Event {
         }
     }
 
-    raise() {
+    raise(...params) {
         for (var cb of this._callbacks) {
-            cb();
+            cb(...params);
         }
     }
 }
