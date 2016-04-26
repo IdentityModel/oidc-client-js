@@ -28,7 +28,7 @@ export default class UserManagerSettings extends OidcClientSettings {
     get silent_redirect_uri() {
         return this._silent_redirect_uri;
     }
-    get automaticSilentRenewEnabled() {
+    get performAutomaticSilentRenew() {
         return !!(this.silent_redirect_uri && this._enableAutomaticSilentRenew);
     }
     

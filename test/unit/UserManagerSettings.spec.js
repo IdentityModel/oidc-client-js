@@ -46,28 +46,28 @@ describe("UserManagerSettings", function () {
 
     });
 
-    describe("automaticSilentRenewEnabled", function () {
+    describe("enableAutomaticSilentRenew", function () {
 
         it("should return value from initial settings", function () {
             let subject = new UserManagerSettings({
                 silent_redirect_uri: 'test',
                 enableAutomaticSilentRenew: false
             });
-            subject.automaticSilentRenewEnabled.should.be.false;
+            subject.performAutomaticSilentRenew.should.be.false;
         });
 
         it("should use default value", function () {
             let subject = new UserManagerSettings({
                 silent_redirect_uri: 'test'
             });
-            subject.automaticSilentRenewEnabled.should.be.true;
+            subject.performAutomaticSilentRenew.should.be.true;
         });
 
         it("should be false if no silent redirect uri", function () {
             let subject = new UserManagerSettings({
                 enableAutomaticSilentRenew: true
             });
-            subject.automaticSilentRenewEnabled.should.be.false;
+            subject.performAutomaticSilentRenew.should.be.false;
         });
 
     });
