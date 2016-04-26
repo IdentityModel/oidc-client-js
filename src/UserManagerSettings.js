@@ -10,14 +10,14 @@ export default class UserManagerSettings extends OidcClientSettings {
     constructor({
         popup_redirect_uri,
         silent_redirect_uri,
-        enableAutomaticSilentRenew = true,
+        automaticSilentRenew = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime
     } = {}) {
         super(arguments[0]);
         
         this._popup_redirect_uri = popup_redirect_uri;
         this._silent_redirect_uri = silent_redirect_uri;
-        this._enableAutomaticSilentRenew = !!enableAutomaticSilentRenew;
+        this._automaticSilentRenew = !!automaticSilentRenew;
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
     }
     
@@ -28,8 +28,8 @@ export default class UserManagerSettings extends OidcClientSettings {
     get silent_redirect_uri() {
         return this._silent_redirect_uri;
     }
-    get performAutomaticSilentRenew() {
-        return !!(this.silent_redirect_uri && this._enableAutomaticSilentRenew);
+    get automaticSilentRenew() {
+        return !!(this.silent_redirect_uri && this._automaticSilentRenew);
     }
     
     get accessTokenExpiringNotificationTime(){

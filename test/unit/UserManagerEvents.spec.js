@@ -23,7 +23,7 @@ describe("UserManagerEvents", function () {
             };
             subject.addSilentRenewError(cb);
 
-            subject._raiseSilentRenewError();
+            subject._raiseSilentRenewError(new Error("boom"));
 
             cb.wasCalled.should.be.true;
         });
@@ -37,18 +37,18 @@ describe("UserManagerEvents", function () {
             subject.addSilentRenewError(cb);
             subject.removeSilentRenewError(cb);
 
-            subject._raiseSilentRenewError();
+            subject._raiseSilentRenewError(new Error("boom"));
 
             cb.wasCalled.should.be.false;
         });
 
         it("should pass error to callback", function () {
             var cb = function (e) {
-                e.message.should.equal("foo");
+                e.message.should.equal("boom");
             };
             subject.addSilentRenewError(cb);
 
-            subject._raiseSilentRenewError(new Error("foo"));
+            subject._raiseSilentRenewError(new Error("boom"));
         });
 
     });

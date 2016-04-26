@@ -15,10 +15,12 @@ export default class UserManagerEvents extends AccessTokenEvents {
     }
 
     load(user) {
+        Log.info("UserManagerEvents.load");
         super.load(user);
         this._userLoaded.raise(user);
     }
     unload() {
+        Log.info("UserManagerEvents.unload");
         super.unload();
         this._userUnloaded.raise();
     }
@@ -44,6 +46,7 @@ export default class UserManagerEvents extends AccessTokenEvents {
         this._silentRenewError.removeHandler(cb);
     }
     _raiseSilentRenewError(e) {
+        Log.info("UserManagerEvents._raiseSilentRenewError", e.message);
         this._silentRenewError.raise(e);
     }
 }

@@ -11,6 +11,7 @@ import RedirectNavigator from './RedirectNavigator';
 import PopupNavigator from './PopupNavigator';
 import IFrameNavigator from './IFrameNavigator';
 import UserManagerEvents from './UserManagerEvents';
+import SilentRenewService from './SilentRenewService';
 
 export default class UserManager extends OidcClient {
     constructor(settings, {
@@ -31,6 +32,11 @@ export default class UserManager extends OidcClient {
         this._userStore = userStore;
 
         this._events = new UserManagerEvents(settings);
+        
+        if (this.settings.automaticSilentRenew) {
+            Log.info("automaticSilentRenew is configured, setting up silent renew")
+            this._silentRenewService = new SilentRenewService(this);
+        }
     }
 
     get events() {
