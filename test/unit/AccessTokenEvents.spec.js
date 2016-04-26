@@ -66,6 +66,15 @@ describe("AccessTokenEvents", function () {
             expiredTimer.duration.should.equal(71);
         });
         
+        it("should immediately schedule expiring timer if expiration is soon", function () {
+            subject.init({
+                access_token:"token",
+                expires_in : 10
+            });
+            
+            expiringTimer.duration.should.equal(1);
+        });
+        
         it("should not initialize expiring timer if already expired", function () {
             subject.init({
                 access_token:"token",

@@ -20,24 +20,33 @@ export default class AccessTokenEvents {
     }
 
     init(container) {
+        Log.info("AccessTokenEvents.init");
         this.cancel();
 
         // only register events if there's an access token where we care about expiration
         if (container.access_token) {
             let duration = container.expires_in;
+            Log.info("access token present, remaining duration:", duration);
 
-            let expiring = duration - this._expiringNotificationTime;
-            if (expiring > 0) {
+            if (duration > 0) {
                 // only register expiring if we still have time
+                let expiring = duration - this._expiringNotificationTime;
+                if (expiring <= 0){
+                    expiring = 1;
+                }
+                Log.info("registering expiring timer in:", expiring);
                 this._expiring.init(expiring);
             }
-            
+
             // always register expired. if it's negative, it will still fire
-            this._expired.init(duration + 1);
+            let expired = duration + 1;
+            Log.info("registering expired timer in:", expired);
+            this._expired.init(expired);
         }
     }
 
     cancel() {
+        Log.info("AccessTokenEvents.canceling timers");
         this._expiring.cancel();
         this._expired.cancel();
     }
