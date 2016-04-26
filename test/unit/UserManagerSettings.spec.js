@@ -72,19 +72,19 @@ describe("UserManagerSettings", function () {
 
     });
 
-    describe("expiringNotificationTime", function () {
+    describe("accessTokenExpiringNotificationTime", function () {
 
         it("should return value from initial settings", function () {
             let subject = new UserManagerSettings({
-                expiringNotificationTime: 10
+                accessTokenExpiringNotificationTime: 10
             });
-            subject.expiringNotificationTime.should.equal(10);
+            subject.accessTokenExpiringNotificationTime.should.equal(10);
         });
 
         it("should use default value", function () {
             let subject = new UserManagerSettings({
             });
-            subject.expiringNotificationTime.should.equal(60);
+            subject.accessTokenExpiringNotificationTime.should.equal(60);
         });
 
     });

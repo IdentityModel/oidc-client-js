@@ -28,21 +28,21 @@ class StubTimer {
 describe("AccessTokenEvents", function () {
 
     let subject;
-    let expiringTimer;
-    let expiredTimer;
+    let accessTokenExpiringTimer;
+    let accessTokenExpiredTimer;
 
     beforeEach(function () {
-        expiringTimer = new StubTimer();
-        expiredTimer = new StubTimer();
+        accessTokenExpiringTimer = new StubTimer();
+        accessTokenExpiredTimer = new StubTimer();
         subject = new AccessTokenEvents({
-            expiredTimer, expiringTimer
+            accessTokenExpiringTimer, accessTokenExpiredTimer 
         });
     });
 
     describe("constructor", function () {
 
         it("should use default expiringNotificationTime", function () {
-            subject._expiringNotificationTime.should.equal(60);
+            subject._accessTokenExpiringNotificationTime.should.equal(60);
         });
 
     });
@@ -52,8 +52,8 @@ describe("AccessTokenEvents", function () {
         it("should cancel existing timers", function () {
             subject.init({});
             
-            expiringTimer.cancelWasCalled.should.be.true;
-            expiredTimer.cancelWasCalled.should.be.true;
+            accessTokenExpiringTimer.cancelWasCalled.should.be.true;
+            accessTokenExpiredTimer.cancelWasCalled.should.be.true;
         });
         
         it("should initialize timers", function () {
@@ -62,8 +62,8 @@ describe("AccessTokenEvents", function () {
                 expires_in : 70
             });
             
-            expiringTimer.duration.should.equal(10);
-            expiredTimer.duration.should.equal(71);
+            accessTokenExpiringTimer.duration.should.equal(10);
+            accessTokenExpiredTimer.duration.should.equal(71);
         });
         
         it("should immediately schedule expiring timer if expiration is soon", function () {
@@ -72,7 +72,7 @@ describe("AccessTokenEvents", function () {
                 expires_in : 10
             });
             
-            expiringTimer.duration.should.equal(1);
+            accessTokenExpiringTimer.duration.should.equal(1);
         });
         
         it("should not initialize expiring timer if already expired", function () {
@@ -81,7 +81,7 @@ describe("AccessTokenEvents", function () {
                 expires_in : 0
             });
             
-            assert.isUndefined(expiringTimer.duration);
+            assert.isUndefined(accessTokenExpiringTimer.duration);
         });
 
         it("should initialize expired timer if already expired", function () {
@@ -90,7 +90,7 @@ describe("AccessTokenEvents", function () {
                 expires_in : 0
             });
             
-            expiredTimer.duration.should.equal(1);
+            accessTokenExpiredTimer.duration.should.equal(1);
         });
         
         it("should not initialize timers if no access token", function () {
@@ -98,8 +98,8 @@ describe("AccessTokenEvents", function () {
                 expires_in : 70
             });
             
-            assert.isUndefined(expiringTimer.duration);
-            assert.isUndefined(expiredTimer.duration);
+            assert.isUndefined(accessTokenExpiringTimer.duration);
+            assert.isUndefined(accessTokenExpiredTimer.duration);
         });
 
     });
@@ -110,8 +110,8 @@ describe("AccessTokenEvents", function () {
             
             subject.cancel();
             
-            expiringTimer.cancelWasCalled.should.be.true;
-            expiredTimer.cancelWasCalled.should.be.true;
+            accessTokenExpiringTimer.cancelWasCalled.should.be.true;
+            accessTokenExpiredTimer.cancelWasCalled.should.be.true;
         });
 
     });

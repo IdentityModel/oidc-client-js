@@ -4,21 +4,21 @@
 import Log from './Log';
 import OidcClientSettings from './OidcClientSettings';
 
-const DefaultExpiringNotificationTime = 60;
+const DefaultAccessTokenExpiringNotificationTime = 60;
 
 export default class UserManagerSettings extends OidcClientSettings {
     constructor({
         popup_redirect_uri,
         silent_redirect_uri,
         enableAutomaticSilentRenew = true,
-        expiringNotificationTime = DefaultExpiringNotificationTime
+        accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime
     } = {}) {
         super(arguments[0]);
         
         this._popup_redirect_uri = popup_redirect_uri;
         this._silent_redirect_uri = silent_redirect_uri;
         this._enableAutomaticSilentRenew = !!enableAutomaticSilentRenew;
-        this._expiringNotificationTime = expiringNotificationTime;
+        this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
     }
     
     get popup_redirect_uri(){
@@ -32,7 +32,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         return !!(this.silent_redirect_uri && this._enableAutomaticSilentRenew);
     }
     
-    get expiringNotificationTime(){
-        return this._expiringNotificationTime;
+    get accessTokenExpiringNotificationTime(){
+        return this._accessTokenExpiringNotificationTime;
     }
 }

@@ -46,12 +46,12 @@ var user = null;
 ///////////////////////////////
 // events
 ///////////////////////////////
-mgr.events.addExpiring(function () {
+mgr.events.addAccessTokenExpiring(function () {
     console.log("token expiring");
     log("token expiring");
 });
 
-mgr.events.addExpired(function () {
+mgr.events.addAccessTokenExpired(function () {
     console.log("token expired");
     log("token expired");
 });

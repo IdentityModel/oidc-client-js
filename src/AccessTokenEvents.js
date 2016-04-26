@@ -4,19 +4,19 @@
 import Log from './Log';
 import Timer from './Timer';
 
-const DefaultExpiringNotificationTime = 60;
+const DefaultAccessTokenExpiringNotificationTime = 60;
 
 export default class AccessTokenEvents {
 
     constructor({
-        expiringNotificationTime = DefaultExpiringNotificationTime,
-        expiringTimer = new Timer(),
-        expiredTimer = new Timer()
+        accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
+        accessTokenExpiringTimer = new Timer(),
+        accessTokenExpiredTimer = new Timer()
     } = {}) {
-        this._expiringNotificationTime = expiringNotificationTime;
+        this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
-        this._expiring = expiringTimer;
-        this._expired = expiredTimer;
+        this._accessTokenExpiring = accessTokenExpiringTimer;
+        this._accessTokenExpired = accessTokenExpiredTimer;
     }
 
     init(container) {
@@ -30,38 +30,38 @@ export default class AccessTokenEvents {
 
             if (duration > 0) {
                 // only register expiring if we still have time
-                let expiring = duration - this._expiringNotificationTime;
+                let expiring = duration - this._accessTokenExpiringNotificationTime;
                 if (expiring <= 0){
                     expiring = 1;
                 }
                 Log.info("registering expiring timer in:", expiring);
-                this._expiring.init(expiring);
+                this._accessTokenExpiring.init(expiring);
             }
 
             // always register expired. if it's negative, it will still fire
             let expired = duration + 1;
             Log.info("registering expired timer in:", expired);
-            this._expired.init(expired);
+            this._accessTokenExpired.init(expired);
         }
     }
 
     cancel() {
         Log.info("AccessTokenEvents.canceling timers");
-        this._expiring.cancel();
-        this._expired.cancel();
+        this._accessTokenExpiring.cancel();
+        this._accessTokenExpired.cancel();
     }
 
-    addExpiring(cb) {
-        this._expiring.addHandler(cb);
+    addAccessTokenExpiring(cb) {
+        this._accessTokenExpiring.addHandler(cb);
     }
-    removeExpiring(cb) {
-        this._expiring.removeHandler(cb);
+    removeAccessTokenExpiring(cb) {
+        this._accessTokenExpiring.removeHandler(cb);
     }
 
-    addExpired(cb) {
-        this._expired.addHandler(cb);
+    addAccessTokenExpired(cb) {
+        this._accessTokenExpired.addHandler(cb);
     }
-    removeExpired(cb) {
-        this._expired.removeHandler(cb);
+    removeAccessTokenExpired(cb) {
+        this._accessTokenExpired.removeHandler(cb);
     }
 }
