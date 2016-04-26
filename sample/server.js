@@ -21,5 +21,5 @@ var oidc = require('./oidc.js');
 oidc(url, app);
 
 console.log("listening on " + url);
-open(url);
+//open(url);
 app.listen(port);

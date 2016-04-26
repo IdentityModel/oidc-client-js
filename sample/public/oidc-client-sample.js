@@ -14,7 +14,7 @@ document.getElementById('links').addEventListener('change', toggleLinks, false);
 // OidcClient config
 ///////////////////////////////
 IdentityModel.Log.logger = console;
-IdentityModel.Log.logLevel = IdentityModel.Log.INFO;
+IdentityModel.Log.level = IdentityModel.Log.INFO;
 
 var settings = {
     authority: 'http://localhost:5000/oidc',

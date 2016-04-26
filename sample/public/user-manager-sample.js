@@ -20,7 +20,7 @@ document.getElementById('endSignoutMainWindow').addEventListener("click", endSig
 // config
 ///////////////////////////////
 IdentityModel.Log.logger = console;
-IdentityModel.Log.logLevel = IdentityModel.Log.INFO;
+IdentityModel.Log.level = IdentityModel.Log.INFO;
 
 var settings = {
     authority: 'http://localhost:5000/oidc',
@@ -35,13 +35,12 @@ var settings = {
     
     silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
     silent_post_logout_redirect_uri:'http://localhost:5000/user-manager-sample-silent-signout.html',
-    enableSilentRedirect:true,
+    automaticSilentRenew:true,
 
     filterProtocolClaims: true,
     loadUserInfo: true
 };
 var mgr = new IdentityModel.UserManager(settings);
-var user = null;
 
 ///////////////////////////////
 // events
@@ -56,6 +55,11 @@ mgr.events.addAccessTokenExpired(function () {
     log("token expired");
 });
 
+mgr.events.addSilentRenewError(function (e) {
+    console.log("silent renew error", e.message);
+    log("silent renew error", e.message);
+});
+
 ///////////////////////////////
 // functions for UI elements
 ///////////////////////////////
@@ -68,9 +72,8 @@ function clearState(){
 }
 
 function getUser() {
-    mgr.getUser(null).then(function(loadedUser) {
-        user = loadedUser;
-        log("got user", loadedUser);
+    mgr.getUser(null).then(function(user) {
+        log("got user", user);
     }, function(err) {
         log(err);
     });
@@ -131,7 +134,6 @@ function endSignoutMainWindow(){
         log(err);
     });
 };
-
 
 ///////////////////////////////
 // debugging helpers
