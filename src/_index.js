@@ -6,11 +6,13 @@ import OidcClient from './OidcClient';
 import WebStorageStateStore from './WebStorageStateStore';
 import InMemoryWebStorage from './InMemoryWebStorage';
 import UserManager from './UserManager';
+import AccessTokenEvents from './AccessTokenEvents';
 
 export {
     Log,
     OidcClient, 
     WebStorageStateStore,
     InMemoryWebStorage,
-    UserManager
+    UserManager,
+    AccessTokenEvents
 };
