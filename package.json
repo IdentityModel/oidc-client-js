@@ -2,7 +2,7 @@
     "name": "oidc-client",
     "version": "1.0.0",
     "description": "OpenID Connect (OIDC) & OAuth2 client library",
-    "main": "src/_index.js",
+    "main": "index.js",
     "scripts": {
         "start": "node sample/server.js",
         "build": "webpack --config webpack.config.js",
