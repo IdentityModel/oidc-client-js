@@ -21,7 +21,8 @@ export default class AccessTokenEvents {
 
     load(container) {
         Log.info("AccessTokenEvents.load");
-        this.unload();
+        
+        this._cancelTimers();
 
         // only register events if there's an access token where we care about expiration
         if (container.access_token) {
@@ -46,7 +47,12 @@ export default class AccessTokenEvents {
     }
 
     unload() {
-        Log.info("AccessTokenEvents.unload: canceling timers");
+        Log.info("AccessTokenEvents.unload");
+        this._cancelTimers();
+    }
+    
+    _cancelTimers(){
+        Log.info("canceling existing access token timers");
         this._accessTokenExpiring.cancel();
         this._accessTokenExpired.cancel();
     }
