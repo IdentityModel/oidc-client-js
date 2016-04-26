@@ -31,7 +31,7 @@ describe("Timer", function () {
 
     beforeEach(function () {
         stubWindowTimer = new StubWindowTimer();
-        subject = new Timer(stubWindowTimer);
+        subject = new Timer("test name", stubWindowTimer);
     });
 
     describe("init", function () {

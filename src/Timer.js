@@ -7,8 +7,8 @@ import Event from './Event';
 
 export default class Timer extends Event {
 
-    constructor(timer = Global.timer) {
-        super();
+    constructor(name, timer = Global.timer) {
+        super(name);
         this._timer = timer;
     }
 

@@ -13,7 +13,7 @@ describe("Event", function () {
     let subject;
 
     beforeEach(function () {
-        subject = new Event();
+        subject = new Event("test name");
     });
 
     describe("addHandler", function () {
