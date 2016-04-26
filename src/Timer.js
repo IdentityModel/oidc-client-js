@@ -3,23 +3,13 @@
 
 import Log from './Log';
 import Global from './Global';
+import Event from './Event';
 
-export default class Timer {
+export default class Timer extends Event {
 
     constructor(timer = Global.timer) {
+        super();
         this._timer = timer;
-        this._callbacks = [];
-    }
-
-    addHandler(cb) {
-        this._callbacks.push(cb);
-    }
-
-    removeHandler(cb) {
-        var idx = this._callbacks.findIndex(item => item === cb);
-        if (idx >= 0) {
-            this._callbacks.splice(idx, 1);
-        }
     }
 
     init(duration) {
@@ -41,8 +31,6 @@ export default class Timer {
 
     _callback() {
         this._timerHandle = null;
-        for (var cb of this._callbacks) {
-            cb();
-        }
+        super.raise();
     }
 }
