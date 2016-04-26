@@ -134,7 +134,7 @@ module.exports = function(baseUrl, app) {
             var access_token = genAccessToken();
             url = addFragment(url, "access_token", access_token);
             url = addFragment(url, "token_type", "Bearer");
-            url = addFragment(url, "expires_in", "3600");
+            url = addFragment(url, "expires_in", "300");
             url = addFragment(url, "scope", req.query.scope);
         }
 

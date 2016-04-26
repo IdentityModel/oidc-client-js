@@ -6,6 +6,7 @@
 ///////////////////////////////
 document.getElementById('clearState').addEventListener("click", clearState, false);
 document.getElementById('getUser').addEventListener("click", getUser, false);
+document.getElementById('removeUser').addEventListener("click", removeUser, false);
 
 document.getElementById('startSigninMainWindow').addEventListener("click", startSigninMainWindow, false);
 document.getElementById('endSigninMainWindow').addEventListener("click", endSigninMainWindow, false);
@@ -40,6 +41,20 @@ var settings = {
     loadUserInfo: true
 };
 var mgr = new IdentityModel.UserManager(settings);
+var user = null;
+
+///////////////////////////////
+// events
+///////////////////////////////
+mgr.events.addExpiring(function () {
+    console.log("token expiring");
+    log("token expiring");
+});
+
+mgr.events.addExpired(function () {
+    console.log("token expired");
+    log("token expired");
+});
 
 ///////////////////////////////
 // functions for UI elements
@@ -53,8 +68,17 @@ function clearState(){
 }
 
 function getUser() {
-    mgr.getUser(null).then(function(user) {
-        log("got user", user);
+    mgr.getUser(null).then(function(loadedUser) {
+        user = loadedUser;
+        log("got user", loadedUser);
+    }, function(err) {
+        log(err);
+    });
+}
+
+function removeUser() {
+    mgr.removeUser().then(function() {
+        log("user removed");
     }, function(err) {
         log(err);
     });
