@@ -121,5 +121,21 @@ describe("SigninResponse", function() {
             Date.now = oldNow;
         });
     });
+    
+    describe("isOpenIdConnect", function() {
+        it("should detect openid scope", function() {
+            let subject = new SigninResponse("scope=foo%20openid%20bar");
+            subject.isOpenIdConnect.should.be.true;
+            
+            subject = new SigninResponse("scope=openid%20foo%20bar");
+            subject.isOpenIdConnect.should.be.true;
+
+            subject = new SigninResponse("scope=foo%20bar%20openid");
+            subject.isOpenIdConnect.should.be.true;
+            
+            subject = new SigninResponse("scope=foo%20bar");
+            subject.isOpenIdConnect.should.be.false;
+        });
+    });
 
 });

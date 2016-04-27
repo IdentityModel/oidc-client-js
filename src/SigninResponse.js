@@ -5,6 +5,8 @@ import Log from './Log';
 import UrlUtility from './UrlUtility';
 import ErrorResponse from './ErrorResponse';
 
+const OidcScope = "openid";
+
 export default class SigninResponse {
     constructor(url) {
 
@@ -47,5 +49,9 @@ export default class SigninResponse {
 
     get scopes() {
         return (this.scope || "").split(" ");
+    }
+    
+    get isOpenIdConnect(){
+        return this.scopes.indexOf(OidcScope) >= 0;
     }
 }
