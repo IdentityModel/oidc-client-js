@@ -126,6 +126,8 @@ module.exports = function(baseUrl, app) {
     });
 
     app.get(authorizationPath, function(req, res) {
+        //res.send("<h1>waiting...</h1>"); return;
+        
         var response_type = req.query.response_type;
 
         var url = req.query.redirect_uri;
