@@ -51,6 +51,10 @@ class MockJwtUtility {
 }
 
 class StubUserInfoService {
+    constructor(){
+        this.getClaimsWasCalled = false;
+    }
+    
     getClaims() {
         this.getClaimsWasCalled = true;
         return this.getClaimsResult;
@@ -132,7 +136,8 @@ describe("ResponseValidator", function() {
             data: { some: 'data' }
         };
         stubResponse = {
-            state: 'the_id'
+            state: 'the_id',
+            isOpenIdConnect:false
         };
 
         settings = {
@@ -302,6 +307,7 @@ describe("ResponseValidator", function() {
         it("should fail if request was OIDC but no id_token in response", function(done) {
 
             delete stubResponse.id_token;
+            stubResponse.isOpenIdConnect = true;
 
             subject._processSigninParams(stubState, stubResponse).then(null, err => {
                 err.message.should.contain("id_token");
@@ -348,6 +354,8 @@ describe("ResponseValidator", function() {
         it("should load and merge user info claims when loadUserInfo configured", function(done) {
 
             settings.loadUserInfo = true;
+            
+            stubResponse.isOpenIdConnect = true;
             stubResponse.profile = { a: 'apple', b: 'banana' };
             stubResponse.access_token = "access_token";
             stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
@@ -359,16 +367,34 @@ describe("ResponseValidator", function() {
             });
 
         });
+        
+        it("should not run if reqest was not openid", function(done) {
+
+            settings.loadUserInfo = true;
+
+            stubResponse.isOpenIdConnect = false;
+            stubResponse.profile = { a: 'apple', b: 'banana' };
+            stubResponse.access_token = "access_token";
+            stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
+
+            subject._processClaims(stubResponse).then(response => {
+                stubUserInfoService.getClaimsWasCalled.should.be.false;
+                done();
+            });
+
+        });
 
         it("should not load and merge user info claims when loadUserInfo not configured", function(done) {
 
             settings.loadUserInfo = false;
+            
+            stubResponse.isOpenIdConnect = true;
             stubResponse.profile = { a: 'apple', b: 'banana' };
+            stubResponse.access_token = "access_token";
             stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
 
             subject._processClaims(stubResponse).then(response => {
-                expect(stubUserInfoService.getClaimsWasCalled).to.be.undefined;
-                expect(subject._mergeClaimsWasCalled).to.be.undefined;
+                stubUserInfoService.getClaimsWasCalled.should.be.false;
                 done();
             });
 
@@ -377,12 +403,13 @@ describe("ResponseValidator", function() {
         it("should not load user info claims if no access token", function(done) {
 
             settings.loadUserInfo = true;
+            
+            stubResponse.isOpenIdConnect = true;
             stubResponse.profile = { a: 'apple', b: 'banana' };
             stubUserInfoService.getClaimsResult = Promise.resolve({ c: 'carrot' });
 
             subject._processClaims(stubResponse).then(response => {
-                expect(stubUserInfoService.getClaimsWasCalled).to.be.undefined;
-                expect(subject._mergeClaimsWasCalled).to.be.undefined;
+                stubUserInfoService.getClaimsWasCalled.should.be.false;
                 done();
             });
 

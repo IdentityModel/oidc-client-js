@@ -96,7 +96,7 @@ export default class ResponseValidator {
 
         response.profile = this._filterProtocolClaims(response.profile);
 
-        if (this._settings.loadUserInfo && response.access_token) {
+        if (this._settings.loadUserInfo && response.access_token && response.isOpenIdConnect) {
 
             Log.info("loading user info");
             return this._userInfoService.getClaims(response.access_token).then(claims => {
@@ -106,6 +106,9 @@ export default class ResponseValidator {
 
                 return response;
             });
+        }
+        else {
+            Log.info("not loading user info");
         }
 
         return Promise.resolve(response);
