@@ -26,7 +26,7 @@ export default class JsonService {
                 Log.info("HTTP response received, status", req.status);
                 
                 if (req.status === 200) {
-                    resolve(JSON.parse(req.response));
+                    resolve(JSON.parse(req.responseText));
                 }
                 else {
                     reject(Error(req.statusText + " (" + req.status + ")"));

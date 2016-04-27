@@ -59,7 +59,7 @@ describe("JsonService", function() {
             });
             
             stubHttpRequest.status = 200;
-            stubHttpRequest.response = JSON.stringify({foo:1, bar:'test'});
+            stubHttpRequest.responseText = JSON.stringify({foo:1, bar:'test'});
             stubHttpRequest.onload();
         });
         
