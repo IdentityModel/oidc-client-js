@@ -92,7 +92,7 @@ export default class PopupWindow {
         ) {
             Log.info("processing message");
             
-            let url = e.data;
+            let url = e.data || e.source.location.href; // for IE9
 
             this._cleanup();
 
