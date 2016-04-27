@@ -92,7 +92,7 @@ export default class PopupWindow {
         ) {
             Log.info("processing message");
             
-            let url = e.data.url;
+            let url = e.data;
 
             this._cleanup();
 
@@ -116,7 +116,7 @@ export default class PopupWindow {
             url = url || window.location.href;
             if (url) {
                 Log.info("posting url message to opener");
-                window.opener.postMessage({ url: url }, location.protocol + "//" + location.host);
+                window.opener.postMessage(url, location.protocol + "//" + location.host);
             }
         }
     }

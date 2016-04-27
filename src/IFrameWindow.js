@@ -78,7 +78,7 @@ export default class IFrameWindow {
             e.origin === this._origin &&
             e.source === this._frame.contentWindow
         ) {
-            let url = e.data.url;
+            let url = e.data;
             if (url) {
                 this._success({ url: url });
             }
@@ -99,7 +99,7 @@ export default class IFrameWindow {
             url = url || window.location.href;
             if (url) {
                 Log.info("posting url message to parent");
-                window.parent.postMessage({ url: url }, location.protocol + "//" + location.host);
+                window.parent.postMessage(url, location.protocol + "//" + location.host);
             }
         }
     }
