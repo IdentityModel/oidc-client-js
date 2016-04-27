@@ -69,13 +69,17 @@ export default class PopupWindow {
 
         this._checkForPopupClosedTimer = null;
         this._boundMessageEventssage = null;
+        
+        if (this._popup){
+            this._popup.close();
+        }
         this._popup = null;
     }
 
     _checkForPopupClosed() {
         Log.info("PopupWindow._checkForPopupClosed");
 
-        if (!this._popup || !this._popup.window || this._popup.closed) {
+        if (!this._popup || this._popup.closed) {
             this._error("Popup window closed");
         }
     }
@@ -112,9 +116,7 @@ export default class PopupWindow {
             url = url || window.location.href;
             if (url) {
                 Log.info("posting url message to opener");
-
                 window.opener.postMessage({ url: url }, location.protocol + "//" + location.host);
-                window.close();
             }
         }
     }
