@@ -7,7 +7,7 @@ import WebStorageStateStore from './src/WebStorageStateStore';
 import InMemoryWebStorage from './src/InMemoryWebStorage';
 import UserManager from './src/UserManager';
 import AccessTokenEvents from './src/AccessTokenEvents';
-import MetadataService from './MetadataService';
+import MetadataService from './src/MetadataService';
 
 export {
     Log,
