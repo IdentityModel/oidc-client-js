@@ -7,12 +7,14 @@ import WebStorageStateStore from './src/WebStorageStateStore';
 import InMemoryWebStorage from './src/InMemoryWebStorage';
 import UserManager from './src/UserManager';
 import AccessTokenEvents from './src/AccessTokenEvents';
+import MetadataService from './MetadataService';
 
 export {
     Log,
-    OidcClient, 
+    OidcClient,
     WebStorageStateStore,
     InMemoryWebStorage,
     UserManager,
-    AccessTokenEvents
+    AccessTokenEvents,
+    MetadataService
 };
