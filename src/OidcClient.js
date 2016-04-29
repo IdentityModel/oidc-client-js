@@ -33,6 +33,11 @@ export default class OidcClient {
         return this._settings;
     }
     
+
+    get metadataService() {
+        return this._metadataService;
+    }
+
     createSigninRequest({
         response_type, scope, redirect_uri, data, 
         prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values}={},

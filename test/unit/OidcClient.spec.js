@@ -81,9 +81,17 @@ describe("OidcClient", function() {
 
     });
 
-    describe("createSigninRequest", function() {
+    describe("metadataService", function () {
 
-        it("should return a promise", function() {
+        it("should be MetadataService", function () {
+            subject.metadataService.should.be.equal(stubMetadataService);
+        });
+
+    });
+
+    describe("createSigninRequest", function () {
+
+        it("should return a promise", function () {
             stubMetadataService.getAuthorizationEndpointResult = Promise.resolve("http://sts/authorize");
             subject.createSigninRequest().should.be.instanceof(Promise);
         });
