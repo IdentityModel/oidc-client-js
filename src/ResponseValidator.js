@@ -94,21 +94,28 @@ export default class ResponseValidator {
     _processClaims(response) {
         Log.info("ResponseValidator._processClaims");
 
-        response.profile = this._filterProtocolClaims(response.profile);
+        if (response.isOpenIdConnect) {
+            Log.info("response is OIDC, processing claims");
 
-        if (this._settings.loadUserInfo && response.access_token && response.isOpenIdConnect) {
+            response.profile = this._filterProtocolClaims(response.profile);
+            
+            if (this._settings.loadUserInfo && response.access_token) {
+                Log.info("loading user info");
+                
+                return this._userInfoService.getClaims(response.access_token).then(claims => {
 
-            Log.info("loading user info");
-            return this._userInfoService.getClaims(response.access_token).then(claims => {
+                    response.profile = this._mergeClaims(response.profile, claims);
+                    Log.info("user info claims received, updated profile:", response.profile);
 
-                response.profile = this._mergeClaims(response.profile, claims);
-                Log.info("user info claims received, updated profile:", response.profile);
-
-                return response;
-            });
+                    return response;
+                });
+            }
+            else {
+                Log.info("not loading user info");
+            }
         }
         else {
-            Log.info("not loading user info");
+            Log.info("response is not OIDC, not processing claims");
         }
 
         return Promise.resolve(response);
@@ -199,8 +206,8 @@ export default class ResponseValidator {
             Log.error("Failed to parse id_token", jwt);
             return Promise.reject(new Error("Failed to parse id_token"));
         }
-        
-        if (state.nonce !== jwt.payload.nonce){
+
+        if (state.nonce !== jwt.payload.nonce) {
             Log.error("Invalid nonce in id_token");
             return Promise.reject(new Error("Invalid nonce in id_token"));
         }
@@ -221,11 +228,11 @@ export default class ResponseValidator {
             Log.info("Received issuer");
 
             return this._metadataService.getSigningKeys().then(keys => {
-                if (!keys){
+                if (!keys) {
                     Log.error("No signing keys from metadata");
                     return Promise.reject(new Error("No signing keys from metadata"));
                 }
-                
+
                 Log.info("Received signing keys");
 
                 let key = keys.filter(key => {

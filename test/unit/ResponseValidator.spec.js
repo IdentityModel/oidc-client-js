@@ -341,11 +341,25 @@ describe("ResponseValidator", function() {
     });
 
     describe("_processClaims", function() {
+        
+        it("should filter protocol claims if OIDC", function(done) {
 
-        it("should filter protocol claims", function(done) {
+            stubResponse.isOpenIdConnect = true;
+            stubResponse.profile = { a: 'apple', b: 'banana' };
 
-            subject._processClaims(stubState, stubResponse).then(response => {
+            subject._processClaims(stubResponse).then(response => {
                 subject._filterProtocolClaimsWasCalled.should.be.true;
+                done();
+            });
+
+        });
+        
+        it("should not filter protocol claims if not OIDC", function(done) {
+
+            stubResponse.isOpenIdConnect = false;
+
+            subject._processClaims(stubResponse).then(response => {
+                assert.isUndefined(subject._filterProtocolClaimsWasCalled);
                 done();
             });
 
