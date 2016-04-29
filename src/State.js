@@ -5,25 +5,25 @@ import Log from './Log';
 import random from './random';
 
 export default class State {
-    constructor({id, nonce, data, created}={}) {
+    constructor({id, nonce, data, created} = {}) {
         this._id = id || random();
         this._data = data;
-        
-        if (nonce === true){
+
+        if (nonce === true) {
             this._nonce = random();
         }
-        else if (nonce){
+        else if (nonce) {
             this._nonce = nonce;
         }
-        
+
         if (typeof created === 'number' && created > 0) {
-            this._created =  created;
+            this._created = created;
         }
         else {
-            this._created =  parseInt(Date.now() / 1000);
+            this._created = parseInt(Date.now() / 1000);
         }
     }
-    
+
     get id() {
         return this._id;
     }
@@ -40,39 +40,57 @@ export default class State {
     toStorageString() {
         Log.info("State.toStorageString");
         return JSON.stringify({
-            id:this.id,
-            nonce:this.nonce,
-            data:this.data,
-            created:this.created
+            id: this.id,
+            nonce: this.nonce,
+            data: this.data,
+            created: this.created
         });
     }
-    
-    static fromStorageString(storageString){
+
+    static fromStorageString(storageString) {
         Log.info("State.fromStorageString");
         return new State(JSON.parse(storageString));
     }
-    
-    static clearStaleState(storage, age){
+
+    static clearStaleState(storage, age) {
         Log.info("State.clearStaleState");
-        
-        var cutoff = Date.now()/1000 - age;
-        
+
+        var cutoff = Date.now() / 1000 - age;
+
         return storage.getAllKeys().then(keys => {
             Log.info("got keys", keys);
-            
+
             var promises = [];
-            for(let key of keys){
+            for (let key of keys) {
                 var p = storage.get(key).then(item => {
-                    var state = State.fromStorageString(item)
-                    
-                    Log.info("got item from key", key, state.created);
-                    
-                    if (state.created <= cutoff) {
-                        Log.info("key being removed", key);
+                    let remove = false;
+
+                    if (item) {
+                        try {
+                            var state = State.fromStorageString(item)
+
+                            Log.info("got item from key: ", key, state.created);
+
+                            if (state.created <= cutoff) {
+                                remove = true;
+                            }
+                        }
+                        catch (e) {
+                            Log.error("Error parsing state for key", key, e.message);
+                            remove = true;
+                        }
+                    }
+                    else {
+                        Log.info("no item in storage for key: ", key);
+                        remove = true;
+                    }
+
+                    if (remove) {
+                        Log.info("removed item for key: ", key);
                         return storage.remove(key);
                     }
                 });
-                
+
                 promises.push(p);
             }
 
