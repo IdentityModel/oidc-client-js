@@ -32,7 +32,7 @@ export default class UserManager extends OidcClient {
         this._userStore = userStore;
 
         this._events = new UserManagerEvents(settings);
-        
+
         if (this.settings.automaticSilentRenew) {
             Log.info("automaticSilentRenew is configured, setting up silent renew")
             this._silentRenewService = new SilentRenewService(this);
@@ -79,7 +79,7 @@ export default class UserManager extends OidcClient {
             Log.error("No popup_redirect_uri or redirect_uri configured");
             return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
         }
-        
+
         args.redirect_uri = url;
         args.display = "popup";
 
@@ -98,10 +98,10 @@ export default class UserManager extends OidcClient {
             Log.error("No silent_redirect_uri configured");
             return Promise.reject(new Error("No silent_redirect_uri configured"));
         }
-        
+
         args.redirect_uri = url;
         args.prompt = "none";
-        
+
         return this._signin(args, this._iframeNavigator);
     }
     signinSilentCallback(url) {
@@ -179,7 +179,7 @@ export default class UserManager extends OidcClient {
         });
     }
 
-    _signoutStart(args, navigator, navigatorParams = {}) {
+    _signoutStart(args = {}, navigator, navigatorParams = {}) {
         Log.info("_signoutStart");
 
         return navigator.prepare().then(handle => {
@@ -188,7 +188,11 @@ export default class UserManager extends OidcClient {
             return this.getUser().then(user => {
                 Log.info("loaded current user from storage");
 
-                var id_token = user && user.id_token;
+                var id_token = args.id_token_hint || user && user.id_token;
+                if (id_token) {
+                    Log.info("Setting id_token into signout request");
+                    args.id_token_hint = id_token;
+                }
 
                 return this.removeUser().then(() => {
                     Log.info("user removed, creating signout request");
