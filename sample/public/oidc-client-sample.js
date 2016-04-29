@@ -38,7 +38,7 @@ function signin() {
         if (followLinks()) {
             window.location = req.url;
         }
-    }, function(err) {
+    }).catch(function(err) {
         log(err);
     });
 }
@@ -48,8 +48,8 @@ function processSigninResponse() {
     client.processSigninResponse().then(function(response) {
         signinResponse = response;
         log("signin response", signinResponse);
-    }, function(err) {
-        log(err.message);
+    }).catch(function(err) {
+        log(err);
     });
 }
 
@@ -66,8 +66,8 @@ function processSignoutResponse() {
     client.processSignoutResponse().then(function(response) {
         signinResponse = null;
         log("signout response", response);
-    }, function(err) {
-        log(err.message);
+    }).catch(function(err) {
+        log(err);
     });
 }
 

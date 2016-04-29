@@ -66,7 +66,7 @@ mgr.events.addSilentRenewError(function (e) {
 function clearState(){
     mgr.clearStaleState().then(function(){
         log("clearStateState success");
-    }, function(e){
+    }).catch(function(e){
         log("clearStateState error", e.message);
     });
 }
@@ -74,7 +74,7 @@ function clearState(){
 function getUser() {
     mgr.getUser().then(function(user) {
         log("got user", user);
-    }, function(err) {
+    }).catch(function(err) {
         log(err);
     });
 }
@@ -82,7 +82,7 @@ function getUser() {
 function removeUser() {
     mgr.removeUser().then(function() {
         log("user removed");
-    }, function(err) {
+    }).catch(function(err) {
         log(err);
     });
 }
@@ -90,7 +90,7 @@ function removeUser() {
 function startSigninMainWindow() {
     mgr.signinRedirect({data:'some data'}).then(function() {
         log("signinRedirect done");
-    }, function(err) {
+    }).catch(function(err) {
         log(err);
     });
 }
@@ -98,7 +98,7 @@ function startSigninMainWindow() {
 function endSigninMainWindow() {
     mgr.signinRedirectCallback().then(function(user) {
         log("signed in", user);
-    }, function(err) {
+    }).catch(function(err) {
         log(err);
     });
 }
@@ -106,7 +106,7 @@ function endSigninMainWindow() {
 function popupSignin() {
     mgr.signinPopup({data:'some data'}).then(function(user) {
         log("signed in", user);
-    }, function(err) {
+    }).catch(function(err) {
         log(err);
     });
 }
@@ -114,7 +114,7 @@ function popupSignin() {
 function iframeSignin() {
     mgr.signinSilent({data:'some data'}).then(function(user) {
         log("signed in", user);
-    }, function(err) {
+    }).catch(function(err) {
         log(err);
     });
 }
@@ -122,7 +122,7 @@ function iframeSignin() {
 function startSignoutMainWindow(){
     mgr.signoutRedirect({data:'some data'}).then(function(resp) {
         log("signed out", resp);
-    }, function(err) {
+    }).catch(function(err) {
         log(err);
     });
 };
@@ -130,7 +130,7 @@ function startSignoutMainWindow(){
 function endSignoutMainWindow(){
     mgr.signoutRedirectCallback().then(function(resp) {
         log("signed out", resp);
-    }, function(err) {
+    }).catch(function(err) {
         log(err);
     });
 };

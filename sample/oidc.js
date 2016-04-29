@@ -131,6 +131,13 @@ module.exports = function(baseUrl, app) {
         var response_type = req.query.response_type;
 
         var url = req.query.redirect_uri;
+        
+        var state = req.query.state;
+        if (state) {
+            url = addFragment(url, "state", state);
+        }
+        
+        //url = addFragment(url, "error", "bad_stuff"); res.redirect(url); return;
 
         if (isOAuth(response_type)) {
             var access_token = genAccessToken();
@@ -143,11 +150,6 @@ module.exports = function(baseUrl, app) {
         if (isOidc(response_type)) {
             url = addFragment(url, "id_token", genIdToken(req.query.client_id, req.query.nonce, access_token));
             url = addFragment(url, "session_state", "123");
-        }
-
-        var state = req.query.state;
-        if (state) {
-            url = addFragment(url, "state", state);
         }
 
         res.redirect(url);
