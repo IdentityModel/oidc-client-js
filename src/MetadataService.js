@@ -52,6 +52,11 @@ export default class MetadataService {
         Log.info("MetadataService.getUserInfoEndpoint");
         return this._getMetadataProperty("userinfo_endpoint");
     }
+    
+    getCheckSessionIframe() {
+        Log.info("MetadataService.getCheckSessionIframe");
+        return this._getMetadataProperty("check_session_iframe");
+    }
 
     getEndSessionEndpoint() {
         Log.info("MetadataService.getEndSessionEndpoint");

@@ -222,6 +222,23 @@ describe("MetadataService", function() {
 
     });
     
+    describe("getCheckSessionIframe", function() {
+
+        it("should return value from", function(done) {
+            settings.metadata = {
+                check_session_iframe: "http://sts/check_session"
+            };
+
+            let p = subject.getCheckSessionIframe();
+
+            p.then(result => {
+                result.should.equal("http://sts/check_session");
+                done();
+            });
+        });
+
+    });
+    
     describe("getIssuer", function() {
 
         it("should return value from", function(done) {
