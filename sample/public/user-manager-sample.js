@@ -72,7 +72,7 @@ function clearState(){
 }
 
 function getUser() {
-    mgr.getUser(null).then(function(user) {
+    mgr.getUser().then(function(user) {
         log("got user", user);
     }, function(err) {
         log(err);
