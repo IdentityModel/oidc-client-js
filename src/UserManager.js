@@ -71,20 +71,17 @@ export default class UserManager extends OidcClient {
         });
     }
 
-    signinPopup(data) {
+    signinPopup(args = {}) {
         Log.info("UserManager.signinPopup");
 
-        let url = this.settings.popup_redirect_uri || this.settings.redirect_uri;
+        let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
         if (!url) {
             Log.error("No popup_redirect_uri or redirect_uri configured");
             return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
         }
-
-        let args = {
-            data: data,
-            redirect_uri: url,
-            display: "popup"
-        };
+        
+        args.redirect_uri = url;
+        args.display = "popup";
 
         return this._signin(args, this._popupNavigator, { startUrl: url });
     }
@@ -93,19 +90,18 @@ export default class UserManager extends OidcClient {
         return this._signinCallback(url, this._popupNavigator);
     }
 
-    signinSilent(data) {
+    signinSilent(args = {}) {
         Log.info("UserManager.signinSilent");
 
-        if (!this.settings.silent_redirect_uri) {
+        let url = args.redirect_uri || this.settings.silent_redirect_uri;
+        if (!url) {
             Log.error("No silent_redirect_uri configured");
             return Promise.reject(new Error("No silent_redirect_uri configured"));
         }
-
-        var args = {
-            data: data,
-            redirect_uri: this.settings.silent_redirect_uri,
-            prompt: "none"
-        };
+        
+        args.redirect_uri = url;
+        args.prompt = "none";
+        
         return this._signin(args, this._iframeNavigator);
     }
     signinSilentCallback(url) {
@@ -134,17 +130,17 @@ export default class UserManager extends OidcClient {
         return navigator.callback(url);
     }
 
-    signinRedirect(data) {
+    signinRedirect(args) {
         Log.info("UserManager.signinRedirect");
-        return this._signinStart({ data: data }, this._redirectNavigator);
+        return this._signinStart(args, this._redirectNavigator);
     }
     signinRedirectCallback(url) {
         Log.info("UserManager.signinRedirectCallback");
         return this._signinEnd(url || this._redirectNavigator.url);
     }
-    signoutRedirect(data) {
+    signoutRedirect(args) {
         Log.info("UserManager.signoutRedirect");
-        return this._signoutStart({ data: data }, this._redirectNavigator);
+        return this._signoutStart(args, this._redirectNavigator);
     }
     signoutRedirectCallback(url) {
         Log.info("UserManager.signoutRedirectCallback");
