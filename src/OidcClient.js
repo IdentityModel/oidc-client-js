@@ -125,7 +125,10 @@ export default class OidcClient {
             });
 
             var state = request.state;
-            stateStore.set(state.id, state.toStorageString());
+            if (state) {
+                Log.info("Signout request has state to persist");
+                stateStore.set(state.id, state.toStorageString());
+            }
 
             return request;
         });
