@@ -1,9 +1,7 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
 import UrlUtility from './UrlUtility';
-import ErrorResponse from './ErrorResponse';
 
 const OidcScope = "openid";
 
@@ -12,10 +10,10 @@ export default class SigninResponse {
 
         var values = UrlUtility.parseUrlFragment(url, "#");
 
-        if (values.error) {
-            return new ErrorResponse(values);
-        }
-
+        this.error = values.error;
+        this.error_description = values.error_description;
+        this.error_uri = values.error_uri;
+        
         this.state = values.state;
         this.id_token = values.id_token;
         this.session_state = values.session_state;

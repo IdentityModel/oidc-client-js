@@ -4,6 +4,7 @@
 import Log from './Log';
 import MetadataService from './MetadataService';
 import UserInfoService from './UserInfoService';
+import ErrorResponse from './ErrorResponse';
 import JwtUtil from './JwtUtil';
 
 const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "c_hash"];
@@ -53,9 +54,9 @@ export default class ResponseValidator {
 
         if (response.error) {
             Log.warn("Response was error", response.error);
-            return Promise.reject(response);
+            return Promise.reject(new ErrorResponse(response));
         }
-
+        
         return Promise.resolve(response);
     }
 
@@ -75,7 +76,7 @@ export default class ResponseValidator {
 
         if (response.error) {
             Log.warn("Response was error", response.error);
-            return Promise.reject(response);
+            return Promise.reject(new ErrorResponse(response));
         }
 
         if (state.nonce && !response.id_token) {

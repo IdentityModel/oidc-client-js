@@ -4,6 +4,7 @@
 import Log from './Log';
 import OidcClientSettings from './OidcClientSettings';
 import MetadataService from './MetadataService';
+import ErrorResponse from './ErrorResponse';
 import SigninRequest from './SigninRequest';
 import SigninResponse from './SigninResponse';
 import SignoutRequest from './SignoutRequest';
@@ -44,8 +45,6 @@ export default class OidcClient {
     ) {
         Log.info("OidcClient.createSigninRequest");
 
-        stateStore = stateStore || this._stateStore;
-
         let client_id = this._settings.client_id;
         response_type = response_type || this._settings.response_type;
         scope = scope || this._settings.scope;
@@ -72,6 +71,7 @@ export default class OidcClient {
             });
 
             var state = request.state;
+            stateStore = stateStore || this._stateStore;
 
             return stateStore.set(state.id, state.toStorageString()).then(() => {
                 return request;
@@ -82,17 +82,16 @@ export default class OidcClient {
     processSigninResponse(url, stateStore) {
         Log.info("OidcClient.processSigninResponse");
 
-        stateStore = stateStore || this._stateStore;
-
         var response = new SigninResponse(url);
+        
         if (!response.state) {
             Log.error("No state in response");
             return Promise.reject(new Error("No state in response"));
         }
 
-        var stateKey = response.state;
-
-        return stateStore.remove(stateKey).then(storedStateString => {
+        stateStore = stateStore || this._stateStore;
+        
+        return stateStore.remove(response.state).then(storedStateString => {
             if (!storedStateString) {
                 Log.error("No matching state found in storage");
                 throw new Error("No matching state found in storage");
@@ -110,8 +109,6 @@ export default class OidcClient {
     ) {
         Log.info("OidcClient.createSignoutRequest");
 
-        stateStore = stateStore || this._stateStore;
-
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
 
         return this._metadataService.getEndSessionEndpoint().then(url => {
@@ -127,6 +124,8 @@ export default class OidcClient {
             var state = request.state;
             if (state) {
                 Log.info("Signout request has state to persist");
+                        
+                stateStore = stateStore || this._stateStore;
                 stateStore.set(state.id, state.toStorageString());
             }
 
@@ -137,15 +136,21 @@ export default class OidcClient {
     processSignoutResponse(url, stateStore) {
         Log.info("OidcClient.processSignoutResponse");
 
-        stateStore = stateStore || this._stateStore;
-
         var response = new SignoutResponse(url);
         if (!response.state) {
-            Log.error("No state in response");
-            return Promise.reject(new Error("No state in response"));
+            Log.info("No state in response");
+            
+            if (response.error) {
+                Log.warn("Response was error", response.error);
+                return Promise.reject(new ErrorResponse(response));
+            }
+            
+            return Promise.resolve(response);
         }
 
         var stateKey = response.state;
+
+        stateStore = stateStore || this._stateStore;
 
         return stateStore.remove(stateKey).then(storedStateString => {
             if (!storedStateString) {

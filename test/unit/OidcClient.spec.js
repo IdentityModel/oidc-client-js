@@ -268,7 +268,9 @@ describe("OidcClient", function () {
         it("should store state", function (done) {
             stubMetadataService.getEndSessionEndpointResult = Promise.resolve("http://sts/signout");
 
-            var p = subject.createSignoutRequest();
+            var p = subject.createSignoutRequest({
+                data:"foo"
+            });
 
             p.then(request => {
                 stubStore.item.should.be.ok;
@@ -276,6 +278,16 @@ describe("OidcClient", function () {
             });
         });
 
+        it("should not generate state if no data", function (done) {
+            stubMetadataService.getEndSessionEndpointResult = Promise.resolve("http://sts/signout");
+
+            var p = subject.createSignoutRequest();
+
+            p.then(request => {
+                assert.isUndefined(stubStore.item);
+                done();
+            });
+        });
     });
 
     describe("processSignoutResponse", function () {
@@ -284,10 +296,16 @@ describe("OidcClient", function () {
             subject.processSignoutResponse("state=state").should.be.instanceof(Promise);
         });
 
-        it("should fail if no state on response", function (done) {
-            stubStore.item = "state";
-            subject.processSignoutResponse("").then(null, err => {
-                err.message.should.contain('state');
+        it("should return result if no state on response", function (done) {
+            subject.processSignoutResponse("").then(response => {
+                response.should.be.ok;
+                done();
+            });
+        });
+
+        it("should return error", function (done) {
+            subject.processSignoutResponse("error=foo").then(null, err => {
+                err.error.should.equal("foo");
                 done();
             });
         });
@@ -305,6 +323,17 @@ describe("OidcClient", function () {
             stubStore.item = new State({ id: '1' }).toStorageString();
 
             subject.processSignoutResponse("state=1").then(response => {
+                stubValidator.signoutState.id.should.equal('1');
+                stubValidator.signoutResponse.should.be.deep.equal(response);
+                done();
+            });
+        });
+        
+        it("should call validator with state even if error in response", function (done) {
+           
+            stubStore.item = new State({ id: '1', data:"bar" }).toStorageString();
+
+            subject.processSignoutResponse("state=1&error=foo").then(response => {
                 stubValidator.signoutState.id.should.equal('1');
                 stubValidator.signoutResponse.should.be.deep.equal(response);
                 done();
