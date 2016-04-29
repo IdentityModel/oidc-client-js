@@ -8,9 +8,9 @@ module.exports = {
     ],
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: 'IdentityModel.js',
+        filename: 'oidc-client.js',
         libraryTarget: 'var',
-        library: 'IdentityModel'
+        library: 'Oidc'
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({

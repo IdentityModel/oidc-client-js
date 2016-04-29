@@ -7,11 +7,11 @@
 </head>
 
 <body>
-    <script src='IdentityModel.js'></script>
+    <script src='oidc-client.js'></script>
     <script>
-        IdentityModel.Log.logger = console;
-        IdentityModel.Log.logLevel = IdentityModel.Log.INFO;
-        new IdentityModel.UserManager().signinSilentCallback();
+        Oidc.Log.logger = console;
+        Oidc.Log.logLevel = Oidc.Log.INFO;
+        new Oidc.UserManager().signinSilentCallback();
     </script>
 </body>
 

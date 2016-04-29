@@ -13,8 +13,8 @@ document.getElementById('links').addEventListener('change', toggleLinks, false);
 ///////////////////////////////
 // OidcClient config
 ///////////////////////////////
-IdentityModel.Log.logger = console;
-IdentityModel.Log.level = IdentityModel.Log.INFO;
+Oidc.Log.logger = console;
+Oidc.Log.level = Oidc.Log.INFO;
 
 var settings = {
     authority: 'http://localhost:5000/oidc',
@@ -27,7 +27,7 @@ var settings = {
     filterProtocolClaims: true,
     loadUserInfo: true
 };
-var client = new IdentityModel.OidcClient(settings);
+var client = new Oidc.OidcClient(settings);
 
 ///////////////////////////////
 // functions for UI elements

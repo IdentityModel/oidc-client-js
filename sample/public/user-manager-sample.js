@@ -19,8 +19,8 @@ document.getElementById('endSignoutMainWindow').addEventListener("click", endSig
 ///////////////////////////////
 // config
 ///////////////////////////////
-IdentityModel.Log.logger = console;
-IdentityModel.Log.level = IdentityModel.Log.INFO;
+Oidc.Log.logger = console;
+Oidc.Log.level = Oidc.Log.INFO;
 
 var settings = {
     authority: 'http://localhost:5000/oidc',
@@ -40,7 +40,7 @@ var settings = {
     filterProtocolClaims: true,
     loadUserInfo: true
 };
-var mgr = new IdentityModel.UserManager(settings);
+var mgr = new Oidc.UserManager(settings);
 
 ///////////////////////////////
 // events
