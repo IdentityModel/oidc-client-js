@@ -31,10 +31,8 @@ var settings = {
     scope: 'openid email roles',
     
     popup_redirect_uri:'http://localhost:5000/user-manager-sample-popup.html',
-    popup_post_logout_redirect_uri:'http://localhost:5000/user-manager-sample-popup-signout.html',
     
     silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
-    silent_post_logout_redirect_uri:'http://localhost:5000/user-manager-sample-silent-signout.html',
     automaticSilentRenew:true,
 
     filterProtocolClaims: true,
