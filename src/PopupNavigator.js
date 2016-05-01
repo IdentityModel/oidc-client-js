@@ -6,8 +6,8 @@ import PopupWindow from './PopupWindow';
 
 export default class PopupNavigator {
     
-    prepare() {
-        let popup = new PopupWindow();
+    prepare(params) {
+        let popup = new PopupWindow(params);
         return Promise.resolve(popup);
     }
     

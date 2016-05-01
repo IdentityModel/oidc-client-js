@@ -4,10 +4,11 @@
 import Log from './Log';
 
 const CheckForPopupClosedInterval = 500;
+const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100';
 
 export default class PopupWindow {
 
-    constructor() {
+    constructor(params) {
         Log.info("PopupWindow.ctor");
 
         this._promise = new Promise((resolve, reject) => {
@@ -17,8 +18,10 @@ export default class PopupWindow {
 
         this._boundMessageEvent = this._message.bind(this);
         window.addEventListener("message", this._boundMessageEvent, false);
+        
+        let features = params.popupWindowFeatures || DefaultPopupFeatures;
 
-        this._popup = window.open('', '_blank', 'location=no,toolbar=no,width=500,height=500');
+        this._popup = window.open('', '_blank', features);
         if (this._popup) {
             Log.info("popup successfully created");
             this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);

@@ -150,7 +150,7 @@ export default class UserManager extends OidcClient {
     _signinStart(args, navigator, navigatorParams = {}) {
         Log.info("_signinStart");
 
-        return navigator.prepare().then(handle => {
+        return navigator.prepare(navigatorParams).then(handle => {
             Log.info("got navigator window handle");
 
             return this.createSigninRequest(args).then(signinRequest => {
@@ -182,7 +182,7 @@ export default class UserManager extends OidcClient {
     _signoutStart(args = {}, navigator, navigatorParams = {}) {
         Log.info("_signoutStart");
 
-        return navigator.prepare().then(handle => {
+        return navigator.prepare(navigatorParams).then(handle => {
             Log.info("got navigator window handle");
 
             return this.getUser().then(user => {

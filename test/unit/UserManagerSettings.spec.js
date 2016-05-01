@@ -36,6 +36,15 @@ describe("UserManagerSettings", function () {
         });
 
     });
+    
+    describe("popupWindowFeatures", function () {
+
+        it("should return value from initial settings", function () {
+            let subject = new UserManagerSettings({ popupWindowFeatures: 'foo' });
+            subject.popupWindowFeatures.should.equal('foo');
+        });
+
+    });
 
     describe("silent_redirect_uri", function () {
 
