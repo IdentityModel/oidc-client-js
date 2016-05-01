@@ -1,8 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import OidcClientSettings from '../../src/OidcClientSettings';
 import Log from '../../src/Log';
+import OidcClientSettings from '../../src/OidcClientSettings';
+import Global from '../../src/Global';
 
 import chai from 'chai';
 chai.should();
@@ -11,6 +12,7 @@ let assert = chai.assert;
 describe("OidcClientSettings", function() {
 
     beforeEach(function() {
+        Global._testing();
         Log.logger = console;
         Log.level = Log.NONE;
     });
@@ -288,4 +290,54 @@ describe("OidcClientSettings", function() {
         });
     });
 
+    describe("stateStore", function() {
+
+        it("should return value from initial settings", function() {
+            let temp = {};
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                stateStore : temp
+            });
+            subject.stateStore.should.equal(temp);
+        });
+    });
+    
+    describe("stateStore", function() {
+
+        it("should return value from initial settings", function() {
+            let temp = {};
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                stateStore : temp
+            });
+            subject.stateStore.should.equal(temp);
+        });
+    });
+   
+    describe("validator", function() {
+
+        it("should return value from initial settings", function() {
+            
+            let temp = {};
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                ResponseValidatorCtor : function(){return temp}
+            });
+            subject.validator.should.equal(temp);
+        });
+    });
+    
+    describe("metadataServiceCtor", function() {
+
+        it("should return value from initial settings", function() {
+            
+            let temp = {};
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                MetadataServiceCtor : function(){return temp}
+            });
+            subject.metadataService.should.equal(temp);
+        });
+    });
+    
 });

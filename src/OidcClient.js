@@ -3,37 +3,36 @@
 
 import Log from './Log';
 import OidcClientSettings from './OidcClientSettings';
-import MetadataService from './MetadataService';
 import ErrorResponse from './ErrorResponse';
 import SigninRequest from './SigninRequest';
 import SigninResponse from './SigninResponse';
 import SignoutRequest from './SignoutRequest';
 import SignoutResponse from './SignoutResponse';
-import WebStorageStateStore from './WebStorageStateStore';
-import ResponseValidator from './ResponseValidator';
 import State from './State';
 
 export default class OidcClient {
-    constructor(settings, {
-        stateStore = new WebStorageStateStore(),
-        ResponseValidatorCtor = ResponseValidator,
-        MetadataServiceCtor = MetadataService
-    } = {}) {
+    constructor(settings = {}) {
         if (settings instanceof OidcClientSettings) {
             this._settings = settings;
         }
         else {
             this._settings = new OidcClientSettings(settings);
         }
-        this._stateStore = stateStore;
-        this._validator = new ResponseValidatorCtor(this._settings);
-        this._metadataService = new MetadataServiceCtor(this._settings);
+    }
+
+    get _stateStore() {
+        return this.settings.stateStore;
+    }
+    get _validator() {
+        return this.settings.validator;
+    }
+    get _metadataService() {
+        return this.settings.metadataService;
     }
 
     get settings() {
         return this._settings;
     }
-
     get metadataService() {
         return this._metadataService;
     }
@@ -83,14 +82,14 @@ export default class OidcClient {
         Log.info("OidcClient.processSigninResponse");
 
         var response = new SigninResponse(url);
-        
+
         if (!response.state) {
             Log.error("No state in response");
             return Promise.reject(new Error("No state in response"));
         }
 
         stateStore = stateStore || this._stateStore;
-        
+
         return stateStore.remove(response.state).then(storedStateString => {
             if (!storedStateString) {
                 Log.error("No matching state found in storage");
@@ -124,7 +123,7 @@ export default class OidcClient {
             var state = request.state;
             if (state) {
                 Log.info("Signout request has state to persist");
-                        
+
                 stateStore = stateStore || this._stateStore;
                 stateStore.set(state.id, state.toStorageString());
             }
@@ -139,12 +138,12 @@ export default class OidcClient {
         var response = new SignoutResponse(url);
         if (!response.state) {
             Log.info("No state in response");
-            
+
             if (response.error) {
                 Log.warn("Response was error", response.error);
                 return Promise.reject(new ErrorResponse(response));
             }
-            
+
             return Promise.resolve(response);
         }
 

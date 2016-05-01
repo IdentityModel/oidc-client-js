@@ -4,32 +4,17 @@
 import Log from './Log';
 import OidcClient from './OidcClient';
 import UserManagerSettings from './UserManagerSettings';
-import WebStorageStateStore from './WebStorageStateStore';
-import Global from './Global';
 import User from './User';
-import RedirectNavigator from './RedirectNavigator';
-import PopupNavigator from './PopupNavigator';
-import IFrameNavigator from './IFrameNavigator';
 import UserManagerEvents from './UserManagerEvents';
 import SilentRenewService from './SilentRenewService';
 
 export default class UserManager extends OidcClient {
-    constructor(settings, {
-        redirectNavigator = new RedirectNavigator(),
-        popupNavigator = new PopupNavigator(),
-        iframeNavigator = new IFrameNavigator(),
-        userStore = new WebStorageStateStore({ store: Global.sessionStorage })
-    } = {}) {
+    constructor(settings = {}) {
+        
         if (!(settings instanceof UserManagerSettings)) {
             settings = new UserManagerSettings(settings);
         }
-        super(settings, arguments[1]);
-
-        this._redirectNavigator = redirectNavigator;
-        this._popupNavigator = popupNavigator;
-        this._iframeNavigator = iframeNavigator;
-
-        this._userStore = userStore;
+        super(settings);
 
         this._events = new UserManagerEvents(settings);
 
@@ -37,6 +22,19 @@ export default class UserManager extends OidcClient {
             Log.info("automaticSilentRenew is configured, setting up silent renew")
             this._silentRenewService = new SilentRenewService(this);
         }
+    }
+
+    get _redirectNavigator() {
+        return this.settings.redirectNavigator;
+    }
+    get _popupNavigator() {
+        return this.settings.popupNavigator;
+    }
+    get _iframeNavigator() {
+        return this.settings.iframeNavigator;
+    }
+    get _userStore() {
+        return this.settings.userStore;
     }
 
     get events() {
@@ -83,10 +81,10 @@ export default class UserManager extends OidcClient {
         args.redirect_uri = url;
         args.display = "popup";
 
-        return this._signin(args, this._popupNavigator, { 
-            startUrl: url, 
-            popupWindowFeatures : args.popupWindowFeatures || this.settings.popupWindowFeatures, 
-            popupWindowTarget : args.popupWindowTarget || this.settings.popupWindowTarget 
+        return this._signin(args, this._popupNavigator, {
+            startUrl: url,
+            popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
+            popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
         });
     }
     signinPopupCallback(url) {

@@ -1,6 +1,7 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+import Global from '../../src/Global';
 import OidcClient from '../../src/OidcClient';
 import SigninRequest from '../../src/SigninRequest';
 import SigninResponse from '../../src/SigninResponse';
@@ -29,23 +30,24 @@ describe("OidcClient", function () {
     let stubValidator;
 
     beforeEach(function () {
+        
+        Global._testing();
+        
         Log.logger = console;
         Log.level = Log.NONE;
-
-        settings = {
-            client_id: 'client',
-            redirect_uri: "http://app"
-        };
 
         stubStore = new StubStateStore();
         stubValidator = new StubResponseValidator();
         stubMetadataService = new StubMetadataService();
-
-        subject = new OidcClient(settings, {
+        
+        settings = {
+            client_id: 'client',
+            redirect_uri: "http://app",
             stateStore: stubStore,
             ResponseValidatorCtor: () => stubValidator,
             MetadataServiceCtor: () => stubMetadataService
-        });
+        };
+        subject = new OidcClient(settings);
     });
 
     describe("constructor", function () {

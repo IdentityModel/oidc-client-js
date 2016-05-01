@@ -107,4 +107,43 @@ describe("UserManagerSettings", function () {
 
     });
 
+    describe("redirectNavigator", function() {
+        it("should return value from initial settings", function() {
+            let temp = {};
+            let subject = new UserManagerSettings({
+                redirectNavigator : temp
+            });
+            subject.redirectNavigator.should.equal(temp);
+        });
+    });
+
+    describe("popupNavigator", function() {
+        it("should return value from initial settings", function() {
+            let temp = {};
+            let subject = new UserManagerSettings({
+                popupNavigator : temp
+            });
+            subject.popupNavigator.should.equal(temp);
+        });
+    });
+    
+    describe("iframeNavigator", function() {
+        it("should return value from initial settings", function() {
+            let temp = {};
+            let subject = new UserManagerSettings({
+                iframeNavigator : temp
+            });
+            subject.iframeNavigator.should.equal(temp);
+        });
+    });
+
+    describe("redirectNavigator", function() {
+        it("should return value from initial settings", function() {
+            let temp = {};
+            let subject = new UserManagerSettings({
+                userStore : temp
+            });
+            subject.userStore.should.equal(temp);
+        });
+    });
 });

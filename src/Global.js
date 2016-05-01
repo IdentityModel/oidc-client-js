@@ -10,20 +10,37 @@ const timer = {
     }
 };
 
+let testing = false;
+
 export default class Global {
+
+    static _testing() {
+        testing = true;
+    }
+
     static get location() {
-        return location;
+        if (!testing) {
+            return location;
+        }
     }
     static get localStorage() {
-        return localStorage;
+        if (!testing) {
+            return localStorage;
+        }
     }
     static get sessionStorage() {
-        return sessionStorage;
+        if (!testing) {
+            return sessionStorage;
+        }
     }
     static get XMLHttpRequest() {
-        return XMLHttpRequest;
+        if (!testing) {
+            return XMLHttpRequest;
+        }
     }
     static get timer() {
-        return timer;
+        if (!testing) {
+            return timer;
+        }
     }
 };

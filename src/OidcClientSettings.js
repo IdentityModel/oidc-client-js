@@ -2,6 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 import Log from './Log';
+import WebStorageStateStore from './WebStorageStateStore';
+import ResponseValidator from './ResponseValidator';
+import MetadataService from './MetadataService';
 
 const OidcMetadataUrlPath = '.well-known/openid-configuration';
 
@@ -21,7 +24,11 @@ export default class OidcClientSettings {
         prompt, display, max_age, ui_locales, acr_values,
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
-        staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds
+        staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
+        // other behavior
+        stateStore = new WebStorageStateStore(),
+        ResponseValidatorCtor = ResponseValidator,
+        MetadataServiceCtor = MetadataService
     } = {}) {
         
         this._authority = authority;
@@ -45,6 +52,10 @@ export default class OidcClientSettings {
         this._loadUserInfo = !!loadUserInfo;
         this._staleStateAge = staleStateAge;
         this._clockSkew = clockSkew;
+        
+        this._stateStore = stateStore;
+        this._validator = new ResponseValidatorCtor(this);
+        this._metadataService = new MetadataServiceCtor(this);
     }
 
     // client config
@@ -129,5 +140,15 @@ export default class OidcClientSettings {
     }
     get clockSkew() {
         return this._clockSkew;
+    }
+    
+    get stateStore() {
+        return this._stateStore;
+    }
+    get validator() {
+        return this._validator;
+    }
+    get metadataService() {
+        return this._metadataService;
     }
 }

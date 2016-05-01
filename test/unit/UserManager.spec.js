@@ -3,6 +3,7 @@
 
 import UserManager from '../../src/UserManager';
 import Log from '../../src/Log';
+import Global from '../../src/Global';
 import UserManagerSettings from '../../src/UserManagerSettings';
 
 import StubMetadataService from './StubMetadataService';
@@ -23,13 +24,11 @@ describe("UserManager", function() {
     let stubUserStore;
 
     beforeEach(function() {
+        
+        Global._testing();
+        
         Log.logger = console;
         Log.level = Log.NONE;
-
-        settings = {
-            authority:'http://sts/oidc',
-            client_id: 'client'
-        };
 
         stubNavigator = {};
         stubUserStore = new StubStateStore();
@@ -37,13 +36,17 @@ describe("UserManager", function() {
         stubValidator = new StubResponseValidator();
         stubMetadataService = new StubMetadataService();
         
-        subject = new UserManager(settings, {
+        settings = {
+            authority:'http://sts/oidc',
+            client_id: 'client',
             navigator : stubNavigator,
             userStore: stubUserStore,
             stateStore:stubStateStore, 
             ResponseValidatorCtor : () => stubValidator, 
             MetadataServiceCtor : () => stubMetadataService
-        });
+        };
+        
+        subject = new UserManager(settings);
     });
 
     describe("constructor", function() {
