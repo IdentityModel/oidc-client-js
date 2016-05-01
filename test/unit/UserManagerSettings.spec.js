@@ -45,6 +45,15 @@ describe("UserManagerSettings", function () {
         });
 
     });
+    
+    describe("popupWindowTarget", function () {
+
+        it("should return value from initial settings", function () {
+            let subject = new UserManagerSettings({ popupWindowTarget: 'foo' });
+            subject.popupWindowTarget.should.equal('foo');
+        });
+
+    });
 
     describe("silent_redirect_uri", function () {
 
