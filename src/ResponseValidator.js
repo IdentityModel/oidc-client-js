@@ -5,13 +5,13 @@ import Log from './Log';
 import MetadataService from './MetadataService';
 import UserInfoService from './UserInfoService';
 import ErrorResponse from './ErrorResponse';
-import JwtUtil from './JwtUtil';
+import JoseUtil from './JoseUtil';
 
 const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "c_hash"];
 
 export default class ResponseValidator {
 
-    constructor(settings, MetadataServiceCtor = MetadataService, UserInfoServiceCtor = UserInfoService, jwtUtil = JwtUtil) {
+    constructor(settings, MetadataServiceCtor = MetadataService, UserInfoServiceCtor = UserInfoService, joseUtil = JoseUtil) {
         if (!settings) {
             Log.error("No settings passed to ResponseValidator");
             throw new Error("settings");
@@ -20,7 +20,7 @@ export default class ResponseValidator {
         this._settings = settings;
         this._metadataService = new MetadataServiceCtor(this._settings);
         this._userInfoService = new UserInfoServiceCtor(this._settings);
-        this._jwtUtil = jwtUtil;
+        this._joseUtil = joseUtil;
     }
 
     validateSigninResponse(state, response) {
@@ -56,7 +56,7 @@ export default class ResponseValidator {
             Log.warn("Response was error", response.error);
             return Promise.reject(new ErrorResponse(response));
         }
-        
+
         return Promise.resolve(response);
     }
 
@@ -99,10 +99,10 @@ export default class ResponseValidator {
             Log.info("response is OIDC, processing claims");
 
             response.profile = this._filterProtocolClaims(response.profile);
-            
+
             if (this._settings.loadUserInfo && response.access_token) {
                 Log.info("loading user info");
-                
+
                 return this._userInfoService.getClaims(response.access_token).then(claims => {
 
                     response.profile = this._mergeClaims(response.profile, claims);
@@ -202,7 +202,7 @@ export default class ResponseValidator {
             return Promise.reject(new Error("No nonce on state"));
         }
 
-        let jwt = this._jwtUtil.parseJwt(response.id_token);
+        let jwt = this._joseUtil.parseJwt(response.id_token);
         if (!jwt || !jwt.header || !jwt.payload) {
             Log.error("Failed to parse id_token", jwt);
             return Promise.reject(new Error("Failed to parse id_token"));
@@ -245,15 +245,19 @@ export default class ResponseValidator {
                     return Promise.reject(new Error("No key matching kid found in signing keys"));
                 }
 
-                if (!this._jwtUtil.validateJwt(response.id_token, key, issuer, audience)) {
-                    Log.error("Signature failed to validate");
-                    return Promise.reject(new Error("Signature failed to validate"));
+                if (!this._validateJwt(response.id_token, key, issuer, audience)) {
+                    Log.error("JWT failed to validate");
+                    return Promise.reject(new Error("JWT failed to validate"));
                 }
 
                 response.profile = jwt.payload;
                 return response;
             });
         });
+    }
+
+    _validateJwt(jwt, key, issuer, audience) {
+        return this._joseUtil.validateJwt(jwt, key, issuer, audience);
     }
 
     _validateAccessToken(response) {
@@ -274,7 +278,7 @@ export default class ResponseValidator {
             return Promise.reject(new Error("No id_token"));
         }
 
-        let jwt = this._jwtUtil.parseJwt(response.id_token);
+        let jwt = this._joseUtil.parseJwt(response.id_token);
         if (!jwt || !jwt.header) {
             Log.error("Failed to parse id_token", jwt);
             return Promise.reject(new Error("Failed to parse id_token"));
@@ -299,14 +303,14 @@ export default class ResponseValidator {
         }
 
         let sha = "sha" + hashBits;
-        var hash = this._jwtUtil.hashString(response.access_token, sha);
+        var hash = this._joseUtil.hashString(response.access_token, sha);
         if (!hash) {
             Log.error("access_token hash failed:", sha);
             return Promise.reject(new Error("Failed to validate at_hash"));
         }
 
         var left = hash.substr(0, hash.length / 2);
-        var left_b64u = this._jwtUtil.hexToBase64Url(left);
+        var left_b64u = this._joseUtil.hexToBase64Url(left);
         if (left_b64u !== response.profile.at_hash) {
             Log.error("Failed to validate at_hash", left_b64u, response.profile.at_hash);
             return Promise.reject(new Error("Failed to validate at_hash"));

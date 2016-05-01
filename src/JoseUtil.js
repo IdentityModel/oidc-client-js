@@ -4,10 +4,10 @@
 import { jws, KEYUTIL as KeyUtil, X509, crypto, hextob64u } from 'jsrsasign';
 import Log from './Log';
 
-export default class JwtUtil {
+export default class JoseUtil {
 
     static parseJwt(jwt) {
-        Log.info("JwtUtil.parseJwt");
+        Log.info("JoseUtil.parseJwt");
         try {
             var token = jws.JWS.parse(jwt);
             return {
@@ -21,7 +21,7 @@ export default class JwtUtil {
     }
 
     static validateJwt(jwt, key, issuer, audience, now) {
-        Log.info("JwtUtil.validateJwt");
+        Log.info("JoseUtil.validateJwt");
 
         try {
             if (key.kty === "RSA") {
@@ -67,7 +67,7 @@ export default class JwtUtil {
     }
 
     static hashString(value, alg) {
-        Log.info("JwtUtil.hashString", value, alg);
+        Log.info("JoseUtil.hashString", value, alg);
         try {
             return crypto.Util.hashString(value, alg);
         }
@@ -77,7 +77,7 @@ export default class JwtUtil {
     }
 
     static hexToBase64Url(value) {
-        Log.info("JwtUtil.hexToBase64Url", value);
+        Log.info("JoseUtil.hexToBase64Url", value);
         try {
             return hextob64u(value);
         }

@@ -3,7 +3,7 @@
 
 import ResponseValidator from '../../src/ResponseValidator';
 import Log from '../../src/Log';
-import JwtUtil from '../../src/JwtUtil';
+import JoseUtil from '../../src/JoseUtil';
 
 import StubMetadataService from './StubMetadataService';
 
@@ -12,41 +12,41 @@ chai.should();
 let assert = chai.assert;
 let expect = chai.expect;
 
-class MockJwtUtility {
+class MockJoseUtility {
     parseJwt(...args) {
         this.parseJwtWasCalled = true;
         if (this.parseJwtResult){
-            Log.info("MockJwtUtility.parseJwt", this.parseJwtResult)
+            Log.info("MockJoseUtility.parseJwt", this.parseJwtResult)
             return this.parseJwtResult;
         }
-        return JwtUtil.parseJwt(...args);
+        return JoseUtil.parseJwt(...args);
     }
 
     validateJwt(...args) {
         this.validateJwtWasCalled = true;
         if (this.validateJwtResult){
-            Log.info("MockJwtUtility.validateJwt", this.validateJwtResult)
+            Log.info("MockJoseUtility.validateJwt", this.validateJwtResult)
             return this.validateJwtResult;
         }
-        return JwtUtil.validateJwt(...args);
+        return JoseUtil.validateJwt(...args);
     }
 
     hashString(...args) {
         this.hashStringWasCalled = true;
         if (this.hashStringResult){
-            Log.info("MockJwtUtility.hashString", this.hashStringResult)
+            Log.info("MockJoseUtility.hashString", this.hashStringResult)
             return this.hashStringResult;
         }
-        return JwtUtil.hashString(...args);
+        return JoseUtil.hashString(...args);
     }
 
     hexToBase64Url(...args) {
         this.hexToBase64UrlCalled = true;
         if (this.hexToBase64UrlResult){
-            Log.info("MockJwtUtility.hexToBase64Url", this.hexToBase64UrlResult)
+            Log.info("MockJoseUtility.hexToBase64Url", this.hexToBase64UrlResult)
             return this.hexToBase64UrlResult;
         }
-        return JwtUtil.hexToBase64Url(...args);
+        return JoseUtil.hexToBase64Url(...args);
     }
 }
 
@@ -62,8 +62,8 @@ class StubUserInfoService {
 }
 
 class MockResponseValidator extends ResponseValidator {
-    constructor(settings, MetadataServiceCtor, UserInfoServiceCtor, jwtUtility) {
-        super(settings, MetadataServiceCtor, UserInfoServiceCtor, jwtUtility);
+    constructor(settings, MetadataServiceCtor, UserInfoServiceCtor, joseUtil) {
+        super(settings, MetadataServiceCtor, UserInfoServiceCtor, joseUtil);
     }
 
     _mock(name, ...args) {
@@ -121,7 +121,7 @@ describe("ResponseValidator", function() {
     let subject;
     let stubMetadataService;
     let stubUserInfoService;
-    let mockJwtUtility;
+    let mockJoseUtility;
 
     let stubState;
     let stubResponse;
@@ -145,9 +145,9 @@ describe("ResponseValidator", function() {
         };
         stubMetadataService = new StubMetadataService();
         stubUserInfoService = new StubUserInfoService();
-        mockJwtUtility = new MockJwtUtility();
+        mockJoseUtility = new MockJoseUtility();
         
-        subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, mockJwtUtility);
+        subject = new MockResponseValidator(settings, () => stubMetadataService, () => stubUserInfoService, mockJoseUtility);
     });
 
     describe("constructor", function() {
@@ -697,10 +697,10 @@ describe("ResponseValidator", function() {
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.resolve([{kid:'a3rMUgMFv9tPclLa6yF3zAkfquE'}]);
 
-            mockJwtUtility.validateJwtResult = true;
+            mockJoseUtility.validateJwtResult = true;
             
             subject._validateIdToken(stubState, stubResponse).then(response => {
-                 mockJwtUtility.validateJwtWasCalled.should.be.true;
+                 mockJoseUtility.validateJwtWasCalled.should.be.true;
                 done();
             });
         });
@@ -711,7 +711,7 @@ describe("ResponseValidator", function() {
             stubMetadataService.getIssuerResult = Promise.resolve("test");
             stubMetadataService.getSigningKeysResult = Promise.resolve([{kid:'a3rMUgMFv9tPclLa6yF3zAkfquE'}]);
             
-            mockJwtUtility.validateJwtResult = true;
+            mockJoseUtility.validateJwtResult = true;
 
             subject._validateIdToken(stubState, stubResponse).then(response => {
                 response.profile.should.be.ok;
@@ -779,7 +779,7 @@ describe("ResponseValidator", function() {
             stubResponse.profile = {
                 at_hash: at_hash
             };
-            mockJwtUtility.parseJwtResult = { header: { alg: "bad" } };
+            mockJoseUtility.parseJwtResult = { header: { alg: "bad" } };
 
             subject._validateAccessToken(stubResponse).then(null, err => {
                 Log.info(err);
@@ -796,7 +796,7 @@ describe("ResponseValidator", function() {
                 at_hash: at_hash
             };
 
-            mockJwtUtility.parseJwtResult = { header: { alg: "HS123" } };
+            mockJoseUtility.parseJwtResult = { header: { alg: "HS123" } };
             subject._validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("alg");
                 done();
@@ -811,7 +811,7 @@ describe("ResponseValidator", function() {
                 at_hash: at_hash
             };
 
-            mockJwtUtility.parseJwtResult = { header: { alg: "abc" } };
+            mockJoseUtility.parseJwtResult = { header: { alg: "abc" } };
             subject._validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("alg");
                 done();
@@ -826,9 +826,9 @@ describe("ResponseValidator", function() {
             stubResponse.profile = {
                 at_hash: at_hash
             };
-            mockJwtUtility.parseJwtResult = { header: { alg: "RS256" } };
-            mockJwtUtility.hashStringResult = "hash";
-            mockJwtUtility.hexToBase64UrlResult = "wrong";
+            mockJoseUtility.parseJwtResult = { header: { alg: "RS256" } };
+            mockJoseUtility.hashStringResult = "hash";
+            mockJoseUtility.hexToBase64UrlResult = "wrong";
 
             subject._validateAccessToken(stubResponse).then(null, err => {
                 err.message.should.contain("at_hash");

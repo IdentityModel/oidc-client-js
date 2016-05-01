@@ -1,7 +1,7 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import JwtUtil from '../../src/JwtUtil';
+import JoseUtil from '../../src/JoseUtil';
 import Log from '../../src/Log';
 
 import chai from 'chai';
@@ -9,7 +9,7 @@ chai.should();
 let assert = chai.assert;
 let expect = chai.expect;
 
-describe("JwtUtil", function() {
+describe("JoseUtil", function() {
 
     let jwt;
     let jwtFromRsa;
@@ -60,7 +60,7 @@ describe("JwtUtil", function() {
 
         it("should parse a jwt", function() {
 
-            var result = JwtUtil.parseJwt(jwt);
+            var result = JoseUtil.parseJwt(jwt);
             result.should.be.ok;
             result.header.should.be.ok;
             result.payload.should.be.ok;
@@ -93,7 +93,7 @@ describe("JwtUtil", function() {
 
         it("should return undefined for an invalid jwt", function() {
 
-            var result = JwtUtil.parseJwt("junk");
+            var result = JoseUtil.parseJwt("junk");
             expect(result).to.be.undefined;
         });
 
@@ -107,7 +107,7 @@ describe("JwtUtil", function() {
             delete rsaKey.n;
             delete rsaKey.e;
 
-            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expectedNow);
             result.should.be.true;
 
         });
@@ -118,7 +118,7 @@ describe("JwtUtil", function() {
 
             delete rsaKey.x5c;
 
-            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expectedNow);
             result.should.be.true;
 
         });
@@ -127,42 +127,42 @@ describe("JwtUtil", function() {
 
             rsaKey.kty = "foo";
 
-            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expectedNow);
             result.should.be.false;
 
         });
 
         it("should fail for mismatched keys", function() {
 
-            var result = JwtUtil.validateJwt(jwtFromRsa, ecKey, expectedIssuer, expectedAudience, expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, ecKey, expectedIssuer, expectedAudience, expectedNow);
             result.should.be.false;
 
         });
 
         it("should not validate after exp", function() {
 
-            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expires + 1);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expires + 1);
             result.should.be.false;
 
         });
 
         it("should not validate before nbf", function() {
 
-            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, notBefore - 1);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, notBefore - 1);
             result.should.be.false;
 
         });
 
         it("should not validate for invalid audience", function() {
 
-            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, "invalid aud", expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, "invalid aud", expectedNow);
             result.should.be.false;
 
         });
 
         it("should not validate for invalid issuer", function() {
 
-            var result = JwtUtil.validateJwt(jwtFromRsa, rsaKey, "invalid issuer", expectedAudience, expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, "invalid issuer", expectedAudience, expectedNow);
             result.should.be.false;
 
         });
