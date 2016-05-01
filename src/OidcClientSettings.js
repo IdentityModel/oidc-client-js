@@ -8,6 +8,7 @@ const OidcMetadataUrlPath = '.well-known/openid-configuration';
 const DefaultResponseType = "id_token";
 const DefaultScope = "openid";
 const DefaultStaleStateAge = 60; // seconds
+const DefaultClockSkewInSeconds = 60 * 5;
 
 export default class OidcClientSettings {
     constructor({
@@ -19,7 +20,8 @@ export default class OidcClientSettings {
         // optional protocol
         prompt, display, max_age, ui_locales, acr_values,
         // behavior flags
-        filterProtocolClaims = true, loadUserInfo = true, staleStateAge = DefaultStaleStateAge
+        filterProtocolClaims = true, loadUserInfo = true,
+        staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds
     } = {}) {
         
         this._authority = authority;
@@ -42,6 +44,7 @@ export default class OidcClientSettings {
         this._filterProtocolClaims = !!filterProtocolClaims;
         this._loadUserInfo = !!loadUserInfo;
         this._staleStateAge = staleStateAge;
+        this._clockSkew = clockSkew;
     }
 
     // client config
@@ -114,7 +117,6 @@ export default class OidcClientSettings {
         this._signingKeys = value;
     }
 
-
     // behavior flags
     get filterProtocolClaims() {
         return this._filterProtocolClaims;
@@ -124,5 +126,8 @@ export default class OidcClientSettings {
     }
     get staleStateAge() {
         return this._staleStateAge;
+    }
+    get clockSkew() {
+        return this._clockSkew;
     }
 }

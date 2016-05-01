@@ -244,8 +244,11 @@ export default class ResponseValidator {
                     Log.error("No key matching kid found in signing keys");
                     return Promise.reject(new Error("No key matching kid found in signing keys"));
                 }
+                
+                let clockSkewInSeconds = this._settings.clockSkew;
+                Log.info("Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
-                if (!this._joseUtil.validateJwt(response.id_token, key, issuer, audience)) {
+                if (!this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds)) {
                     Log.error("JWT failed to validate");
                     return Promise.reject(new Error("JWT failed to validate"));
                 }

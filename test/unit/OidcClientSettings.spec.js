@@ -269,5 +269,23 @@ describe("OidcClientSettings", function() {
             subject.staleStateAge.should.equal(100);
         });
     });
+    
+    describe("clockSkew", function() {
+
+        it("should use default value", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client'
+            });
+            subject.clockSkew.should.equal(5 * 60); // 5 mins
+        });
+
+        it("should return value from initial settings", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                clockSkew : 10
+            });
+            subject.clockSkew.should.equal(10);
+        });
+    });
 
 });

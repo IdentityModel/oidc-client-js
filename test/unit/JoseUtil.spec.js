@@ -18,14 +18,16 @@ describe("JoseUtil", function() {
 
     const expectedIssuer = "https://localhost:44333/core";
     const expectedAudience = "js.tokenmanager";
-    const expires = 1459130201;
     const notBefore = 1459129901;
+    const issuedAt = notBefore;
+    const expires = 1459130201;
+    
     const expectedNow = notBefore;
 
     beforeEach(function() {
         Log.logger = console;
         Log.level = Log.NONE;
-
+        
         jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSIsImtpZCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo0NDMzMy9jb3JlIiwiYXVkIjoianMudG9rZW5tYW5hZ2VyIiwiZXhwIjoxNDU5MTMwMjAxLCJuYmYiOjE0NTkxMjk5MDEsIm5vbmNlIjoiNzIyMTAwNTIwOTk3MjM4MiIsImlhdCI6MTQ1OTEyOTkwMSwiYXRfaGFzaCI6IkpnRFVDeW9hdEp5RW1HaWlXYndPaEEiLCJzaWQiOiIwYzVmMDYxZTYzOThiMWVjNmEwYmNlMmM5NDFlZTRjNSIsInN1YiI6Ijg4NDIxMTEzIiwiYXV0aF90aW1lIjoxNDU5MTI5ODk4LCJpZHAiOiJpZHNydiIsImFtciI6WyJwYXNzd29yZCJdfQ.f6S1Fdd0UQScZAFBzXwRiVsUIPQnWZLSe07kdtjANRZDZXf5A7yDtxOftgCx5W0ONQcDFVpLGPgTdhp7agZkPpCFutzmwr0Rr9G7E7mUN4xcIgAABhmRDfzDayFBEu6VM8wEWTChezSWtx2xG_2zmVJxxmNV0jvkaz0bu7iin-C_UZg6T-aI9FZDoKRGXZP9gF65FQ5pQ4bCYQxhKcvjjUfs0xSHGboL7waN6RfDpO4vvVR1Kz-PQhIRyFAJYRuoH4PdMczHYtFCb-k94r-7TxEU0vp61ww4WntbPvVWwUbCUgsEtmDzAZT-NEJVhWztNk1ip9wDPXzZ2hEhDAPJ7A";
 
         jwtFromRsa = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSIsImtpZCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo0NDMzMy9jb3JlIiwiYXVkIjoianMudG9rZW5tYW5hZ2VyIiwiZXhwIjoxNDU5MTMwMjAxLCJuYmYiOjE0NTkxMjk5MDEsIm5vbmNlIjoiNzIyMTAwNTIwOTk3MjM4MiIsImlhdCI6MTQ1OTEyOTkwMSwiYXRfaGFzaCI6IkpnRFVDeW9hdEp5RW1HaWlXYndPaEEiLCJzaWQiOiIwYzVmMDYxZTYzOThiMWVjNmEwYmNlMmM5NDFlZTRjNSIsInN1YiI6Ijg4NDIxMTEzIiwiYXV0aF90aW1lIjoxNDU5MTI5ODk4LCJpZHAiOiJpZHNydiIsImFtciI6WyJwYXNzd29yZCJdfQ.f6S1Fdd0UQScZAFBzXwRiVsUIPQnWZLSe07kdtjANRZDZXf5A7yDtxOftgCx5W0ONQcDFVpLGPgTdhp7agZkPpCFutzmwr0Rr9G7E7mUN4xcIgAABhmRDfzDayFBEu6VM8wEWTChezSWtx2xG_2zmVJxxmNV0jvkaz0bu7iin-C_UZg6T-aI9FZDoKRGXZP9gF65FQ5pQ4bCYQxhKcvjjUfs0xSHGboL7waN6RfDpO4vvVR1Kz-PQhIRyFAJYRuoH4PdMczHYtFCb-k94r-7TxEU0vp61ww4WntbPvVWwUbCUgsEtmDzAZT-NEJVhWztNk1ip9wDPXzZ2hEhDAPJ7A";
@@ -107,7 +109,7 @@ describe("JoseUtil", function() {
             delete rsaKey.n;
             delete rsaKey.e;
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow);
             result.should.be.true;
 
         });
@@ -118,7 +120,7 @@ describe("JoseUtil", function() {
 
             delete rsaKey.x5c;
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow);
             result.should.be.true;
 
         });
@@ -127,42 +129,97 @@ describe("JoseUtil", function() {
 
             rsaKey.kty = "foo";
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow);
             result.should.be.false;
 
         });
 
         it("should fail for mismatched keys", function() {
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, ecKey, expectedIssuer, expectedAudience, expectedNow);
-            result.should.be.false;
-
-        });
-
-        it("should not validate after exp", function() {
-
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, expires + 1);
+            var result = JoseUtil.validateJwt(jwtFromRsa, ecKey, expectedIssuer, expectedAudience, 0, expectedNow);
             result.should.be.false;
 
         });
 
         it("should not validate before nbf", function() {
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, notBefore - 1);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, notBefore - 1);
             result.should.be.false;
 
         });
+        
+        it("should allow nbf within clock skew", function() {
+            
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 1);
+            result.should.be.true;
 
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 10);
+            result.should.be.true;
+        });
+
+        it("should now allow nbf outside clock skew", function() {
+            
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 11);
+            result.should.be.false;
+
+        });
+        
+        it("should not validate before iat", function() {
+
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, issuedAt - 1);
+            result.should.be.false;
+
+        });
+        
+        it("should allow iat within clock skew", function() {
+            
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 1);
+            result.should.be.true;
+
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 10);
+            result.should.be.true;
+        });
+
+        it("should now allow iat outside clock skew", function() {
+            
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 11);
+            result.should.be.false;
+
+        });
+        
+        it("should not validate after exp", function() {
+
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expires + 1);
+            result.should.be.false;
+
+        });
+        
+        it("should allow exp within clock skew", function() {
+            
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 1);
+            result.should.be.true;
+
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 10);
+            result.should.be.true;
+        });
+
+        it("should now allow exp outside clock skew", function() {
+            
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 11);
+            result.should.be.false;
+
+        });
+        
         it("should not validate for invalid audience", function() {
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, "invalid aud", expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, "invalid aud", 0, expectedNow);
             result.should.be.false;
 
         });
 
         it("should not validate for invalid issuer", function() {
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, "invalid issuer", expectedAudience, expectedNow);
+            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, "invalid issuer", expectedAudience, 0, expectedNow);
             result.should.be.false;
 
         });
