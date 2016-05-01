@@ -245,7 +245,7 @@ export default class ResponseValidator {
                     return Promise.reject(new Error("No key matching kid found in signing keys"));
                 }
 
-                if (!this._validateJwt(response.id_token, key, issuer, audience)) {
+                if (!this._joseUtil.validateJwt(response.id_token, key, issuer, audience)) {
                     Log.error("JWT failed to validate");
                     return Promise.reject(new Error("JWT failed to validate"));
                 }
@@ -254,10 +254,6 @@ export default class ResponseValidator {
                 return response;
             });
         });
-    }
-
-    _validateJwt(jwt, key, issuer, audience) {
-        return this._joseUtil.validateJwt(jwt, key, issuer, audience);
     }
 
     _validateAccessToken(response) {
