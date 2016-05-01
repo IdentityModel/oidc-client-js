@@ -83,7 +83,11 @@ export default class UserManager extends OidcClient {
         args.redirect_uri = url;
         args.display = "popup";
 
-        return this._signin(args, this._popupNavigator, { startUrl: url });
+        return this._signin(args, this._popupNavigator, { 
+            startUrl: url, 
+            popupWindowFeatures : args.popupWindowFeatures || this.settings.popupWindowFeatures, 
+            popupWindowTarget : args.popupWindowTarget || this.settings.popupWindowTarget 
+        });
     }
     signinPopupCallback(url) {
         Log.info("UserManager.signinPopupCallback");
