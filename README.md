@@ -32,8 +32,8 @@ and then browse to [http://localhost:5000](http://localhost:5000).
 
 ## Docs
 
-Some initial docs are [here](wiki).
+Some initial docs are [here](https://github.com/IdentityModel/oidc-client-js/wiki).
 
 ## Feedback, Feature requests, and Bugs
 
-All are welcome on the [issue tracker](issues).
+All are welcome on the [issue tracker](https://github.com/IdentityModel/oidc-client-js/issues).
