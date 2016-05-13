@@ -10,6 +10,8 @@ document.getElementById('removeUser').addEventListener("click", removeUser, fals
 
 document.getElementById('startSigninMainWindow').addEventListener("click", startSigninMainWindow, false);
 document.getElementById('endSigninMainWindow').addEventListener("click", endSigninMainWindow, false);
+document.getElementById('startSigninMainWindowDiffCallbackPage').addEventListener("click", startSigninMainWindowDiffCallbackPage, false);
+
 document.getElementById('popupSignin').addEventListener("click", popupSignin, false);
 document.getElementById('iframeSignin').addEventListener("click", iframeSignin, false);
 
@@ -101,6 +103,14 @@ function endSigninMainWindow() {
     });
 }
 
+function startSigninMainWindowDiffCallbackPage() {
+    mgr.signinRedirect({data:'some data', redirect_uri: 'http://localhost:5000/user-manager-sample-callback.html'}).then(function() {
+        log("signinRedirect done");
+    }).catch(function(err) {
+        log(err);
+    });
+}
+
 function popupSignin() {
     mgr.signinPopup({data:'some data'}).then(function(user) {
         log("signed in", user);
@@ -132,20 +142,3 @@ function endSignoutMainWindow(){
         log(err);
     });
 };
-
-///////////////////////////////
-// debugging helpers
-///////////////////////////////
-function log() {
-    document.getElementById('out').innerText = '';
-
-    Array.prototype.forEach.call(arguments, function(msg) {
-        if (msg instanceof Error){
-            msg = "Error: " + msg.message;
-        }
-        else if (typeof msg !== 'string') {
-            msg = JSON.stringify(msg, null, 2);
-        }
-        document.getElementById('out').innerHTML += msg + '\r\n';
-    });
-}

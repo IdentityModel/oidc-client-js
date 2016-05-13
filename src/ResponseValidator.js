@@ -67,7 +67,36 @@ export default class ResponseValidator {
             Log.error("State does not match");
             return Promise.reject(new Error("State does not match"));
         }
-
+        
+        if (!state.client_id) {
+            Log.error("No client_id on state");
+            return Promise.reject(new Error("No client_id on state"));
+        }
+        
+        if (!state.authority) {
+            Log.error("No authority on state");
+            return Promise.reject(new Error("No authority on state"));
+        }
+        
+        // this allows the authority to be loaded from the signin state
+        if (!this._settings.authority) {
+            this._settings.authority = state.authority;
+        }
+        // ensure we're using the correct authority if the authority is not loaded from signin state
+        else if (this._settings.authority && this._settings.authority !== state.authority) {
+            Log.error("authority mismatch on settings vs. signin state");
+            return Promise.reject(new Error("authority mismatch on settings vs. signin state"));
+        }
+        // this allows the client_id to be loaded from the signin state
+        if (!this._settings.client_id) {
+            this._settings.client_id = state.client_id;
+        }
+        // ensure we're using the correct client_id if the client_id is not loaded from signin state
+        else if (this._settings.client_id && this._settings.client_id !== state.client_id) {
+            Log.error("client_id mismatch on settings vs. signin state");
+            return Promise.reject(new Error("client_id mismatch on settings vs. signin state"));
+        }
+        
         // now that we know the state matches, take the stored data
         // and set it into the response so callers can get their state
         // this is important for both success & error outcomes
@@ -175,7 +204,7 @@ export default class ResponseValidator {
 
             if (response.access_token) {
                 Log.info("Validating id_token and access_token");
-                return this.__validateIdTokenAndAccessToken(state, response);
+                return this._validateIdTokenAndAccessToken(state, response);
             }
 
             Log.info("Validating id_token");
@@ -186,8 +215,8 @@ export default class ResponseValidator {
         return Promise.resolve(response);
     }
 
-    __validateIdTokenAndAccessToken(state, response) {
-        Log.info("ResponseValidator.__validateIdTokenAndAccessToken");
+    _validateIdTokenAndAccessToken(state, response) {
+        Log.info("ResponseValidator._validateIdTokenAndAccessToken");
 
         return this._validateIdToken(state, response).then(response => {
             return this._validateAccessToken(response);
@@ -201,7 +230,7 @@ export default class ResponseValidator {
             Log.error("No nonce on state");
             return Promise.reject(new Error("No nonce on state"));
         }
-
+        
         let jwt = this._joseUtil.parseJwt(response.id_token);
         if (!jwt || !jwt.header || !jwt.payload) {
             Log.error("Failed to parse id_token", jwt);
@@ -217,12 +246,6 @@ export default class ResponseValidator {
         if (!kid) {
             Log.error("No kid found in id_token");
             return Promise.reject(new Error("No kid found in id_token"));
-        }
-
-        let audience = this._settings.client_id;
-        if (!audience) {
-            Log.error("Invalid audience/client_id value");
-            return Promise.reject(new Error("Invalid audience/client_id value"));
         }
 
         return this._metadataService.getIssuer().then(issuer => {
@@ -244,17 +267,19 @@ export default class ResponseValidator {
                     Log.error("No key matching kid found in signing keys");
                     return Promise.reject(new Error("No key matching kid found in signing keys"));
                 }
+
+                let audience = state.client_id;
                 
                 let clockSkewInSeconds = this._settings.clockSkew;
                 Log.info("Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
-                if (!this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds)) {
-                    Log.error("JWT failed to validate");
-                    return Promise.reject(new Error("JWT failed to validate"));
-                }
-
-                response.profile = jwt.payload;
-                return response;
+                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{
+                    Log.info("JWT validation successful");
+                    
+                    response.profile = jwt.payload;
+                    
+                    return response;
+                });
             });
         });
     }

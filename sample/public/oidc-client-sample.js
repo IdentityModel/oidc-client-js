@@ -6,6 +6,7 @@
 ///////////////////////////////
 document.getElementById('signin').addEventListener("click", signin, false);
 document.getElementById('processSignin').addEventListener("click", processSigninResponse, false);
+document.getElementById('signinDifferentCallback').addEventListener("click", signinDifferentCallback, false);
 document.getElementById('signout').addEventListener("click", signout, false);
 document.getElementById('processSignout').addEventListener("click", processSignoutResponse, false);
 document.getElementById('links').addEventListener('change', toggleLinks, false);
@@ -48,6 +49,17 @@ function processSigninResponse() {
     client.processSigninResponse().then(function(response) {
         signinResponse = response;
         log("signin response", signinResponse);
+    }).catch(function(err) {
+        log(err);
+    });
+}
+
+function signinDifferentCallback(){
+    client.createSigninRequest({ data: { bar: 15 }, redirect_uri: 'http://localhost:5000/oidc-client-sample-callback.html' }).then(function(req) {
+        log("signin request", req, "<a href='" + req.url + "'>go signin</a>");
+        if (followLinks()) {
+            window.location = req.url;
+        }
     }).catch(function(err) {
         log(err);
     });
@@ -98,21 +110,4 @@ if (followLinks()) {
     else if (window.location.href.indexOf("?") >= 0) {
         processSignoutResponse();
     }
-}
-
-///////////////////////////////
-// debugging helpers
-///////////////////////////////
-function log() {
-    document.getElementById('out').innerText = '';
-
-    Array.prototype.forEach.call(arguments, function(msg) {
-        if (msg instanceof Error){
-            msg = "Error: " + msg.message;
-        }
-        else if (typeof msg !== 'string') {
-            msg = JSON.stringify(msg, null, 2);
-        }
-        document.getElementById('out').innerHTML += msg + '\r\n';
-    });
 }

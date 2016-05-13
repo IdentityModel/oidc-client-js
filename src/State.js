@@ -5,16 +5,9 @@ import Log from './Log';
 import random from './random';
 
 export default class State {
-    constructor({id, nonce, data, created} = {}) {
+    constructor({id, data, created} = {}) {
         this._id = id || random();
         this._data = data;
-
-        if (nonce === true) {
-            this._nonce = random();
-        }
-        else if (nonce) {
-            this._nonce = nonce;
-        }
 
         if (typeof created === 'number' && created > 0) {
             this._created = created;
@@ -27,9 +20,6 @@ export default class State {
     get id() {
         return this._id;
     }
-    get nonce() {
-        return this._nonce;
-    }
     get data() {
         return this._data;
     }
@@ -41,12 +31,11 @@ export default class State {
         Log.info("State.toStorageString");
         return JSON.stringify({
             id: this.id,
-            nonce: this.nonce,
             data: this.data,
             created: this.created
         });
     }
-
+    
     static fromStorageString(storageString) {
         Log.info("State.fromStorageString");
         return new State(JSON.parse(storageString));

@@ -35,7 +35,7 @@ export default class JoseUtil {
                 }
                 else {
                     Log.error("RSA key missing key material", key);
-                    return false;
+                    return Promise.reject(new Error("RSA key missing key material"));
                 }
             }
             else if (key.kty === "EC") {
@@ -44,21 +44,20 @@ export default class JoseUtil {
                 }
                 else {
                     Log.error("EC key missing key material", key);
-                    return false;
+                    return Promise.reject(new Error("EC key missing key material"));
                 }
             }
             else {
-                Log.error("Unsupported key type", key.kty);
-                return false;
+                Log.error("Unsupported key type", key && key.kty);
+                return Promise.reject(new Error("Unsupported key type: " + key && key.kty));
             }
 
             return JoseUtil._validateJwt(jwt, key, issuer, audience, clockSkew, now);
         }
         catch (e) {
-            Log.error(e);
+            Log.error(e && e.message || e);
+            return Promise.reject("JWT validation failed");
         }
-
-        return false;
     }
 
     static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
@@ -67,7 +66,7 @@ export default class JoseUtil {
         if (!clockSkew) {
             clockSkew = 0;
         }
-        
+
         if (!now) {
             now = parseInt(Date.now() / 1000);
         }
@@ -76,38 +75,44 @@ export default class JoseUtil {
 
         if (payload.iss !== issuer) {
             Log.error("Invalid issuer in token", payload.iss);
-            return false;
+            return Promise.reject(new Error("Invalid issuer in token: " + payload.iss));
         }
 
         if (payload.aud !== audience) {
             Log.error("Invalid audience in token", payload.aud);
-            return false;
+            return Promise.reject(new Error("Invalid audience in token: " + payload.aud));
         }
 
         var lowerNow = now + clockSkew;
         var upperNow = now - clockSkew;
 
         if (lowerNow < payload.iat) {
-            Log.error("Issued at value is in the future", payload.iat);
-            return false;
+            Log.error("iat is in the future", payload.iat);
+            return Promise.reject(new Error("iat is in the future: " + payload.iat));
         }
 
         if (lowerNow < payload.nbf) {
-            Log.error("Not before time is in the future", payload.nbf);
-            return false;
+            Log.error("nbf is in the future", payload.nbf);
+            return Promise.reject(new Error("nbf is in the future: " + payload.nbf));
         }
 
         if (payload.exp < upperNow) {
-            Log.error("Expiration is in the past", payload.exp);
-            return false;
+            Log.error("exp is in the past", payload.exp);
+            return Promise.reject(new Error("exp is in the past:" + payload.exp));
         }
 
-        if (!jws.JWS.verify(jwt, key, AllowedSigningAlgs)) {
-            Log.error("Signature validation failed");
-            return false;
+        try {
+            if (!jws.JWS.verify(jwt, key, AllowedSigningAlgs)) {
+                Log.error("signature validation failed");
+                return Promise.reject(new Error("signature validation failed"));
+            }
+        }
+        catch (e) {
+            Log.error(e && e.message || e);
+            return Promise.reject(new Error("signature validation failed"));
         }
 
-        return true;
+        return Promise.resolve();
     }
 
     static hashString(value, alg) {

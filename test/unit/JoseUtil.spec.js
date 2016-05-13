@@ -9,7 +9,7 @@ chai.should();
 let assert = chai.assert;
 let expect = chai.expect;
 
-describe("JoseUtil", function() {
+describe("JoseUtil", function () {
 
     let jwt;
     let jwtFromRsa;
@@ -21,13 +21,13 @@ describe("JoseUtil", function() {
     const notBefore = 1459129901;
     const issuedAt = notBefore;
     const expires = 1459130201;
-    
+
     const expectedNow = notBefore;
 
-    beforeEach(function() {
+    beforeEach(function () {
         Log.logger = console;
         Log.level = Log.NONE;
-        
+
         jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSIsImtpZCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo0NDMzMy9jb3JlIiwiYXVkIjoianMudG9rZW5tYW5hZ2VyIiwiZXhwIjoxNDU5MTMwMjAxLCJuYmYiOjE0NTkxMjk5MDEsIm5vbmNlIjoiNzIyMTAwNTIwOTk3MjM4MiIsImlhdCI6MTQ1OTEyOTkwMSwiYXRfaGFzaCI6IkpnRFVDeW9hdEp5RW1HaWlXYndPaEEiLCJzaWQiOiIwYzVmMDYxZTYzOThiMWVjNmEwYmNlMmM5NDFlZTRjNSIsInN1YiI6Ijg4NDIxMTEzIiwiYXV0aF90aW1lIjoxNDU5MTI5ODk4LCJpZHAiOiJpZHNydiIsImFtciI6WyJwYXNzd29yZCJdfQ.f6S1Fdd0UQScZAFBzXwRiVsUIPQnWZLSe07kdtjANRZDZXf5A7yDtxOftgCx5W0ONQcDFVpLGPgTdhp7agZkPpCFutzmwr0Rr9G7E7mUN4xcIgAABhmRDfzDayFBEu6VM8wEWTChezSWtx2xG_2zmVJxxmNV0jvkaz0bu7iin-C_UZg6T-aI9FZDoKRGXZP9gF65FQ5pQ4bCYQxhKcvjjUfs0xSHGboL7waN6RfDpO4vvVR1Kz-PQhIRyFAJYRuoH4PdMczHYtFCb-k94r-7TxEU0vp61ww4WntbPvVWwUbCUgsEtmDzAZT-NEJVhWztNk1ip9wDPXzZ2hEhDAPJ7A";
 
         jwtFromRsa = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSIsImtpZCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo0NDMzMy9jb3JlIiwiYXVkIjoianMudG9rZW5tYW5hZ2VyIiwiZXhwIjoxNDU5MTMwMjAxLCJuYmYiOjE0NTkxMjk5MDEsIm5vbmNlIjoiNzIyMTAwNTIwOTk3MjM4MiIsImlhdCI6MTQ1OTEyOTkwMSwiYXRfaGFzaCI6IkpnRFVDeW9hdEp5RW1HaWlXYndPaEEiLCJzaWQiOiIwYzVmMDYxZTYzOThiMWVjNmEwYmNlMmM5NDFlZTRjNSIsInN1YiI6Ijg4NDIxMTEzIiwiYXV0aF90aW1lIjoxNDU5MTI5ODk4LCJpZHAiOiJpZHNydiIsImFtciI6WyJwYXNzd29yZCJdfQ.f6S1Fdd0UQScZAFBzXwRiVsUIPQnWZLSe07kdtjANRZDZXf5A7yDtxOftgCx5W0ONQcDFVpLGPgTdhp7agZkPpCFutzmwr0Rr9G7E7mUN4xcIgAABhmRDfzDayFBEu6VM8wEWTChezSWtx2xG_2zmVJxxmNV0jvkaz0bu7iin-C_UZg6T-aI9FZDoKRGXZP9gF65FQ5pQ4bCYQxhKcvjjUfs0xSHGboL7waN6RfDpO4vvVR1Kz-PQhIRyFAJYRuoH4PdMczHYtFCb-k94r-7TxEU0vp61ww4WntbPvVWwUbCUgsEtmDzAZT-NEJVhWztNk1ip9wDPXzZ2hEhDAPJ7A";
@@ -58,9 +58,9 @@ describe("JoseUtil", function() {
         };
     });
 
-    describe("parseJwt", function() {
+    describe("parseJwt", function () {
 
-        it("should parse a jwt", function() {
+        it("should parse a jwt", function () {
 
             var result = JoseUtil.parseJwt(jwt);
             result.should.be.ok;
@@ -93,7 +93,7 @@ describe("JoseUtil", function() {
 
         });
 
-        it("should return undefined for an invalid jwt", function() {
+        it("should return undefined for an invalid jwt", function () {
 
             var result = JoseUtil.parseJwt("junk");
             expect(result).to.be.undefined;
@@ -102,126 +102,144 @@ describe("JoseUtil", function() {
     });
 
 
-    describe("validateJwt", function() {
+    describe("validateJwt", function () {
 
-        it("should validate from RSA X509 key", function() {
+        it("should validate from RSA X509 key", function (done) {
 
             delete rsaKey.n;
             delete rsaKey.e;
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow);
-            result.should.be.true;
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow).then(()=>{
+                done();
+            })
 
         });
 
-        it("should validate from RSA exponent and modulus", function() {
-
-            Log.level = Log.INFO;
+        it("should validate from RSA exponent and modulus", function (done) {
 
             delete rsaKey.x5c;
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow);
-            result.should.be.true;
-
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow).then(()=>{
+                done();
+            })
+    
         });
 
-        it("should fail for unsupported key types", function() {
+        it("should fail for unsupported key types", function (done) {
 
             rsaKey.kty = "foo";
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow);
-            result.should.be.false;
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow).catch(e => {
+                e.message.should.contain("foo");
+                done();
+            });
 
         });
 
-        it("should fail for mismatched keys", function() {
+        it("should fail for mismatched keys", function (done) {
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, ecKey, expectedIssuer, expectedAudience, 0, expectedNow);
-            result.should.be.false;
-
-        });
-
-        it("should not validate before nbf", function() {
-
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, notBefore - 1);
-            result.should.be.false;
-
-        });
-        
-        it("should allow nbf within clock skew", function() {
-            
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 1);
-            result.should.be.true;
-
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 10);
-            result.should.be.true;
-        });
-
-        it("should now allow nbf outside clock skew", function() {
-            
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 11);
-            result.should.be.false;
-
-        });
-        
-        it("should not validate before iat", function() {
-
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, issuedAt - 1);
-            result.should.be.false;
-
-        });
-        
-        it("should allow iat within clock skew", function() {
-            
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 1);
-            result.should.be.true;
-
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 10);
-            result.should.be.true;
-        });
-
-        it("should now allow iat outside clock skew", function() {
-            
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 11);
-            result.should.be.false;
-
-        });
-        
-        it("should not validate after exp", function() {
-
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expires + 1);
-            result.should.be.false;
-
-        });
-        
-        it("should allow exp within clock skew", function() {
-            
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 1);
-            result.should.be.true;
-
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 10);
-            result.should.be.true;
-        });
-
-        it("should now allow exp outside clock skew", function() {
-            
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 11);
-            result.should.be.false;
-
-        });
-        
-        it("should not validate for invalid audience", function() {
-
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, "invalid aud", 0, expectedNow);
-            result.should.be.false;
+            JoseUtil.validateJwt(jwtFromRsa, ecKey, expectedIssuer, expectedAudience, 0, expectedNow).catch(e => {
+                e.message.should.contain("signature");
+                done();
+            });
 
         });
 
-        it("should not validate for invalid issuer", function() {
+        it("should not validate before nbf", function (done) {
 
-            var result = JoseUtil.validateJwt(jwtFromRsa, rsaKey, "invalid issuer", expectedAudience, 0, expectedNow);
-            result.should.be.false;
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, notBefore - 1).catch(e => {
+                e.message.should.contain("iat");
+                done();
+            });
 
+        });
+
+        it("should allow nbf within clock skew", function (done) {
+
+            var p1 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 1);
+            var p2 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 10);
+            Promise.all([p1, p2]).then(()=>{
+               done(); 
+            });
+        });
+
+        it("should now allow nbf outside clock skew", function (done) {
+
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 11).catch(e => {
+                e.message.should.contain("iat");
+                done();
+            });
+
+        });
+
+        it("should not validate before iat", function (done) {
+
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, issuedAt - 1).catch(e => {
+                e.message.should.contain("iat");
+                done();
+            });
+
+        });
+
+        it("should allow iat within clock skew", function (done) {
+
+            var p1 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 1);
+            var p2 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 10);
+            Promise.all([p1, p2]).then(()=>{
+                done();
+            });
+        });
+
+        it("should now allow iat outside clock skew", function (done) {
+
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 11).catch(e => {
+                e.message.should.contain("iat");
+                done();
+            });
+
+        });
+
+        it("should not validate after exp", function (done) {
+
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expires + 1).catch(e => {
+                e.message.should.contain("exp");
+                done();
+            });
+
+        });
+
+        it("should allow exp within clock skew", function (done) {
+
+            var p1 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 1);
+            var p2 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 10)
+            Promise.all([p1, p2]).then(()=>{
+               done(); 
+            });
+        });
+
+        it("should now allow exp outside clock skew", function (done) {
+
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 11).catch(e => {
+                e.message.should.contain("exp");
+                done();
+            });
+
+        });
+
+        it("should not validate for invalid audience", function (done) {
+
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, "invalid aud", 0, expectedNow).catch(e => {
+                e.message.should.contain("aud");
+                done();
+            });
+        });
+
+        it("should not validate for invalid issuer", function (done) {
+
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, "invalid issuer", expectedAudience, 0, expectedNow).catch(e => {
+                e.message.should.contain("issuer");
+                done();
+            });
         });
 
 

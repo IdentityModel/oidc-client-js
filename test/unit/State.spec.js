@@ -25,19 +25,9 @@ describe("State", function() {
             subject.id.should.be.ok;
         });
 
-        it("should accept nonce", function() {
+        it("should accept id", function() {
             var subject = new State({ id: 5 });
             subject.id.should.be.equal(5);
-        });
-
-        it("should generate nonce", function() {
-            var subject = new State({ nonce: true });
-            subject.nonce.should.be.ok;
-        });
-
-        it("should accept nonce", function() {
-            var subject = new State({ nonce: 5 });
-            subject.nonce.should.be.equal(5);
         });
 
         it("should accept data", function() {
@@ -67,7 +57,7 @@ describe("State", function() {
     });
 
     it("can serialize and then deserialize", function() {
-        var subject1 = new State({ nonce: true, data: { foo: "test" }, created: 1000 });
+        var subject1 = new State({ data: { foo: "test" }, created: 1000 });
 
         var storage = subject1.toStorageString();
         var subject2 = State.fromStorageString(storage);
@@ -78,7 +68,6 @@ describe("State", function() {
     describe("clearStaleState", function() {
 
         it("should remove old state entries", function(done) {
-            //Log.level = Log.INFO;
             
             let oldNow = Date.now;
             Date.now = function() {

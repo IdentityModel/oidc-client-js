@@ -3,14 +3,14 @@
 
 import Log from './Log';
 import UrlUtility from './UrlUtility';
-import State from './State';
+import SigninState from './SigninState';
 
 export default class SigninRequest {
     constructor({
         // mandatory
-        url, client_id, redirect_uri, response_type, scope, data,
+        url, client_id, redirect_uri, response_type, scope, authority,
         // optional
-        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values
+        data, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values
     }) {
         if (!url) {
             Log.error("No url passed to SigninRequest");
@@ -32,9 +32,13 @@ export default class SigninRequest {
             Log.error("No scope passed to SigninRequest");
             throw new Error("scope");
         }
+        if (!authority) {
+            Log.error("No authority passed to SigninRequest");
+            throw new Error("authority");
+        }
 
         let oidc = SigninRequest.isOidc(response_type);
-        this.state = new State({ nonce: oidc, data });
+        this.state = new SigninState({ nonce: oidc, data, client_id, authority });
 
         url = UrlUtility.addQueryParam(url, "client_id", client_id);
         url = UrlUtility.addQueryParam(url, "redirect_uri", redirect_uri);

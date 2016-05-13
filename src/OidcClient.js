@@ -8,6 +8,7 @@ import SigninRequest from './SigninRequest';
 import SigninResponse from './SigninResponse';
 import SignoutRequest from './SignoutRequest';
 import SignoutResponse from './SignoutResponse';
+import SigninState from './SigninState';
 import State from './State';
 
 export default class OidcClient {
@@ -55,6 +56,8 @@ export default class OidcClient {
         max_age = max_age || this._settings.max_age;
         ui_locales = ui_locales || this._settings.ui_locales;
         acr_values = acr_values || this._settings.acr_values;
+        
+        let authority = this._settings.authority;
 
         return this._metadataService.getAuthorizationEndpoint().then(url => {
             Log.info("Received authorization endpoint", url);
@@ -66,6 +69,7 @@ export default class OidcClient {
                 response_type,
                 scope,
                 data,
+                authority,
                 prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values
             });
 
@@ -96,7 +100,7 @@ export default class OidcClient {
                 throw new Error("No matching state found in storage");
             }
 
-            let state = State.fromStorageString(storedStateString);
+            let state = SigninState.fromStorageString(storedStateString);
 
             Log.info("Received state from storage; validating response");
             return this._validator.validateSigninResponse(state, response);

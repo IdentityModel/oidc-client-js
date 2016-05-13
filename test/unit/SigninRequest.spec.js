@@ -19,6 +19,7 @@ describe("SigninRequest", function() {
             redirect_uri: "http://app", 
             response_type: "id_token", 
             scope: "openid", 
+            authority : "op",
             data: {data: "test"}
         };
         subject = new SigninRequest(settings);
@@ -81,6 +82,18 @@ describe("SigninRequest", function() {
             }
             catch (e) {
                 e.message.should.contain('scope');
+                return;
+            }
+            assert.fail();
+        });
+        
+        it("should require a authority param", function() {
+            try {
+                delete settings.authority;
+                new SigninRequest(settings);
+            }
+            catch (e) {
+                e.message.should.contain('authority');
                 return;
             }
             assert.fail();

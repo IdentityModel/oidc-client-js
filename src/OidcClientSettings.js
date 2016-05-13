@@ -30,7 +30,7 @@ export default class OidcClientSettings {
         ResponseValidatorCtor = ResponseValidator,
         MetadataServiceCtor = MetadataService
     } = {}) {
-        
+
         this._authority = authority;
         this._metadataUrl = metadataUrl;
         this._metadata = metadata;
@@ -52,7 +52,7 @@ export default class OidcClientSettings {
         this._loadUserInfo = !!loadUserInfo;
         this._staleStateAge = staleStateAge;
         this._clockSkew = clockSkew;
-        
+
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this);
         this._metadataService = new MetadataServiceCtor(this);
@@ -61,6 +61,16 @@ export default class OidcClientSettings {
     // client config
     get client_id() {
         return this._client_id;
+    }
+    set client_id(value) {
+        if (!this._client_id) {
+            // one-time set only
+            this._client_id = value;
+        }
+        else {
+            Log.error("client_id has already been assigned.")
+            throw new Error("client_id has already been assigned.")
+        }
     }
     get response_type() {
         return this._response_type;
@@ -97,6 +107,16 @@ export default class OidcClientSettings {
     // metadata
     get authority() {
         return this._authority;
+    }
+    set authority(value) {
+        if (!this._authority) {
+            // one-time set only
+            this._authority = value;
+        }
+        else {
+            Log.error("authority has already been assigned.")
+            throw new Error("authority has already been assigned.")
+        }
     }
     get metadataUrl() {
         if (!this._metadataUrl) {
@@ -141,7 +161,7 @@ export default class OidcClientSettings {
     get clockSkew() {
         return this._clockSkew;
     }
-    
+
     get stateStore() {
         return this._stateStore;
     }

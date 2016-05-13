@@ -9,25 +9,46 @@ import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 
-describe("OidcClientSettings", function() {
+describe("OidcClientSettings", function () {
 
-    beforeEach(function() {
+    beforeEach(function () {
         Global._testing();
         Log.logger = console;
         Log.level = Log.NONE;
     });
 
-    describe("client_id", function() {
-        it("should return value from initial settings", function() {
+    describe("client_id", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client'
             });
             subject.client_id.should.equal("client");
         });
+        
+        it("should not allow setting if previously set", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                authority: "http://sts"
+            });
+            try {
+                subject.client_id = "diff";
+                assert.fail();
+            }
+            catch (e) {
+                e.message.should.contain("client_id");
+            }
+        });
+
+        it("should allow setting if not previously set", function () {
+            let subject = new OidcClientSettings({
+            });
+            subject.client_id = "test";
+            subject.client_id.should.equal("test");
+        });
     });
 
-    describe("response_type", function() {
-        it("should return value from initial settings", function() {
+    describe("response_type", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 response_type: "foo"
@@ -35,7 +56,7 @@ describe("OidcClientSettings", function() {
             subject.response_type.should.equal("foo");
         });
 
-        it("should use default value", function() {
+        it("should use default value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client'
             });
@@ -44,8 +65,8 @@ describe("OidcClientSettings", function() {
 
     });
 
-    describe("scope", function() {
-        it("should return value from initial settings", function() {
+    describe("scope", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 scope: "foo"
@@ -53,7 +74,7 @@ describe("OidcClientSettings", function() {
             subject.scope.should.equal("foo");
         });
 
-        it("should use default value", function() {
+        it("should use default value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client'
             });
@@ -62,8 +83,8 @@ describe("OidcClientSettings", function() {
 
     });
 
-    describe("redirect_uri", function() {
-        it("should return value from initial settings", function() {
+    describe("redirect_uri", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 redirect_uri: "foo"
@@ -73,8 +94,8 @@ describe("OidcClientSettings", function() {
 
     });
 
-    describe("post_logout_redirect_uri", function() {
-        it("should return value from initial settings", function() {
+    describe("post_logout_redirect_uri", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 post_logout_redirect_uri: "http://app/loggedout"
@@ -83,8 +104,8 @@ describe("OidcClientSettings", function() {
         });
     });
 
-    describe("prompt", function() {
-        it("should return value from initial settings", function() {
+    describe("prompt", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 prompt: "foo"
@@ -93,8 +114,8 @@ describe("OidcClientSettings", function() {
         });
     });
 
-    describe("display", function() {
-        it("should return value from initial settings", function() {
+    describe("display", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 display: "foo"
@@ -103,8 +124,8 @@ describe("OidcClientSettings", function() {
         });
     });
 
-    describe("max_age", function() {
-        it("should return value from initial settings", function() {
+    describe("max_age", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 max_age: "foo"
@@ -113,8 +134,8 @@ describe("OidcClientSettings", function() {
         });
     });
 
-    describe("ui_locales", function() {
-        it("should return value from initial settings", function() {
+    describe("ui_locales", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 ui_locales: "foo"
@@ -123,8 +144,8 @@ describe("OidcClientSettings", function() {
         });
     });
 
-    describe("acr_values", function() {
-        it("should return value from initial settings", function() {
+    describe("acr_values", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 acr_values: "foo"
@@ -133,18 +154,40 @@ describe("OidcClientSettings", function() {
         });
     });
 
-    describe("authority", function() {
-        it("should return value from initial settings", function() {
+    describe("authority", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 authority: "http://sts"
             });
             subject.authority.should.equal("http://sts");
         });
+
+        it("should not allow setting if previously set", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                authority: "http://sts"
+            });
+            try {
+                subject.authority = "http://sts2";
+                assert.fail();
+            }
+            catch (e) {
+                e.message.should.contain("authority");
+            }
+        });
+
+        it("should allow setting if not previously set", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client'
+            });
+            subject.authority = "http://sts";
+            subject.authority.should.equal("http://sts");
+        });
     });
 
-    describe("metadataUrl", function() {
-        it("should return value from initial settings", function() {
+    describe("metadataUrl", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 metadataUrl: "http://sts/metadata"
@@ -152,7 +195,7 @@ describe("OidcClientSettings", function() {
             subject.metadataUrl.should.equal("http://sts/metadata");
         });
 
-        it("should infer value from authority", function() {
+        it("should infer value from authority", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 authority: "http://sts"
@@ -168,8 +211,8 @@ describe("OidcClientSettings", function() {
 
     });
 
-    describe("metadata", function() {
-        it("should return value from initial settings", function() {
+    describe("metadata", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 metadata: "test"
@@ -177,7 +220,7 @@ describe("OidcClientSettings", function() {
             subject.metadata.should.equal("test");
         });
 
-        it("should store value", function() {
+        it("should store value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
             });
@@ -187,8 +230,8 @@ describe("OidcClientSettings", function() {
 
     });
 
-    describe("signingKeys", function() {
-        it("should return value from initial settings", function() {
+    describe("signingKeys", function () {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 signingKeys: "test"
@@ -196,7 +239,7 @@ describe("OidcClientSettings", function() {
             subject.signingKeys.should.equal("test");
         });
 
-        it("should store value", function() {
+        it("should store value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
             });
@@ -206,16 +249,16 @@ describe("OidcClientSettings", function() {
 
     });
 
-    describe("filterProtocolClaims", function() {
+    describe("filterProtocolClaims", function () {
 
-        it("should use default value", function() {
+        it("should use default value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
             });
             subject.filterProtocolClaims.should.equal(true);
         });
 
-        it("should return value from initial settings", function() {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 filterProtocolClaims: true
@@ -230,16 +273,16 @@ describe("OidcClientSettings", function() {
         });
     });
 
-    describe("loadUserInfo", function() {
+    describe("loadUserInfo", function () {
 
-        it("should use default value", function() {
+        it("should use default value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
             });
             subject.loadUserInfo.should.equal(true);
         });
 
-        it("should return value from initial settings", function() {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 loadUserInfo: true
@@ -253,17 +296,17 @@ describe("OidcClientSettings", function() {
             subject.loadUserInfo.should.equal(false);
         });
     });
-    
-    describe("staleStateAge", function() {
 
-        it("should use default value", function() {
+    describe("staleStateAge", function () {
+
+        it("should use default value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
             });
             subject.staleStateAge.should.equal(60);
         });
 
-        it("should return value from initial settings", function() {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
                 staleStateAge: 100
@@ -271,73 +314,73 @@ describe("OidcClientSettings", function() {
             subject.staleStateAge.should.equal(100);
         });
     });
-    
-    describe("clockSkew", function() {
 
-        it("should use default value", function() {
+    describe("clockSkew", function () {
+
+        it("should use default value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client'
             });
             subject.clockSkew.should.equal(5 * 60); // 5 mins
         });
 
-        it("should return value from initial settings", function() {
+        it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
-                clockSkew : 10
+                clockSkew: 10
             });
             subject.clockSkew.should.equal(10);
         });
     });
 
-    describe("stateStore", function() {
+    describe("stateStore", function () {
 
-        it("should return value from initial settings", function() {
+        it("should return value from initial settings", function () {
             let temp = {};
             let subject = new OidcClientSettings({
                 client_id: 'client',
-                stateStore : temp
+                stateStore: temp
             });
             subject.stateStore.should.equal(temp);
         });
     });
-    
-    describe("stateStore", function() {
 
-        it("should return value from initial settings", function() {
+    describe("stateStore", function () {
+
+        it("should return value from initial settings", function () {
             let temp = {};
             let subject = new OidcClientSettings({
                 client_id: 'client',
-                stateStore : temp
+                stateStore: temp
             });
             subject.stateStore.should.equal(temp);
         });
     });
-   
-    describe("validator", function() {
 
-        it("should return value from initial settings", function() {
-            
+    describe("validator", function () {
+
+        it("should return value from initial settings", function () {
+
             let temp = {};
             let subject = new OidcClientSettings({
                 client_id: 'client',
-                ResponseValidatorCtor : function(){return temp}
+                ResponseValidatorCtor: function () { return temp }
             });
             subject.validator.should.equal(temp);
         });
     });
-    
-    describe("metadataServiceCtor", function() {
 
-        it("should return value from initial settings", function() {
-            
+    describe("metadataServiceCtor", function () {
+
+        it("should return value from initial settings", function () {
+
             let temp = {};
             let subject = new OidcClientSettings({
                 client_id: 'client',
-                MetadataServiceCtor : function(){return temp}
+                MetadataServiceCtor: function () { return temp }
             });
             subject.metadataService.should.equal(temp);
         });
     });
-    
+
 });

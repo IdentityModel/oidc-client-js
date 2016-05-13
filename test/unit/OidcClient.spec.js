@@ -9,6 +9,7 @@ import ErrorResponse from '../../src/ErrorResponse';
 import SignoutRequest from '../../src/SignoutRequest';
 import SignoutResponse from '../../src/SignoutResponse';
 import State from '../../src/State';
+import SigninState from '../../src/SigninState';
 import OidcClientSettings from '../../src/OidcClientSettings';
 import MetadataService from '../../src/MetadataService';
 
@@ -41,6 +42,7 @@ describe("OidcClient", function () {
         stubMetadataService = new StubMetadataService();
         
         settings = {
+            authority: 'authority',
             client_id: 'client',
             redirect_uri: "http://app",
             stateStore: stubStore,
@@ -207,11 +209,13 @@ describe("OidcClient", function () {
 
         it("should deserialize stored state and call validator", function (done) {
 
-            stubStore.item = new State({ id: '1', nonce: '2' }).toStorageString();
+            stubStore.item = new SigninState({ id: '1', nonce: '2', authority:'authority', client_id:'client' }).toStorageString();
 
             subject.processSigninResponse("state=1").then(response => {
                 stubValidator.signinState.id.should.equal('1');
                 stubValidator.signinState.nonce.should.equal('2');
+                stubValidator.signinState.authority.should.equal('authority');
+                stubValidator.signinState.client_id.should.equal('client');
                 stubValidator.signinResponse.should.be.deep.equal(response);
                 done();
             });
