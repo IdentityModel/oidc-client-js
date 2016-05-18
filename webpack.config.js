@@ -3,14 +3,13 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: [
-        'babel-polyfill',
         './index.js'
     ],
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'oidc-client.js',
-        libraryTarget: 'var',
-        library: 'Oidc'
+        libraryTarget: 'umd',
+        // library: 'Oidc'
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
