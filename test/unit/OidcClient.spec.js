@@ -45,6 +45,7 @@ describe("OidcClient", function () {
             authority: 'authority',
             client_id: 'client',
             redirect_uri: "http://app",
+            post_logout_redirect_uri: "http://app",
             stateStore: stubStore,
             ResponseValidatorCtor: () => stubValidator,
             MetadataServiceCtor: () => stubMetadataService
@@ -275,7 +276,7 @@ describe("OidcClient", function () {
             stubMetadataService.getEndSessionEndpointResult = Promise.resolve("http://sts/signout");
 
             var p = subject.createSignoutRequest({
-                data:"foo"
+                data:"foo", id_token_hint:'hint'
             });
 
             p.then(request => {
