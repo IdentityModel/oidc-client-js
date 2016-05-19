@@ -5,8 +5,11 @@
     "main": "dist/oidc-client.js",
     "scripts": {
         "start": "node sample/server.js",
-        "build": "webpack --config webpack.config.js",
-        "test": "mocha --compilers js:babel-register test/unit/*.spec.js"
+        "build": "webpack -p --config webpack.config.js",
+        "build:classic": "webpack -p --config webpack.config.classic.js",
+        "prebuild": "npm run build:classic",
+        "test": "mocha --compilers js:babel-register test/unit/*.spec.js",
+        "pretest": "npm run build"
     },
     "repository": {
         "type": "git",
@@ -43,5 +46,8 @@
     },
     "dependencies": {
         "jsrsasign": "^5.0.7"
+    },
+    "peerDependencies": {
+      "babel-polyfill": ">=6.7.4"
     }
 }
