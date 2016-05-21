@@ -12,17 +12,20 @@ export default class SignoutRequest {
             throw new Error("url");
         }
 
-        if (data) {
-            this.state = new State({ data });
-            url = UrlUtility.addQueryParam(url, "state", this.state.id);
-        }
-
         if (id_token_hint) {
             url = UrlUtility.addQueryParam(url, "id_token_hint", id_token_hint);
+            
+            if (post_logout_redirect_uri) {
+                url = UrlUtility.addQueryParam(url, "post_logout_redirect_uri", post_logout_redirect_uri);
+                
+                if (data) {
+                    this.state = new State({ data });
+                    
+                    url = UrlUtility.addQueryParam(url, "state", this.state.id);
+                }
+            }
         }
-        if (post_logout_redirect_uri) {
-            url = UrlUtility.addQueryParam(url, "post_logout_redirect_uri", post_logout_redirect_uri);
-        }
+        
         this.url = url;
     }
 }
