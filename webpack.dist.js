@@ -8,7 +8,7 @@ module.exports = {
     ],
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: 'oidc-client.classic.js',
+        filename: 'oidc-client.js',
         libraryTarget: 'var',
         library: 'Oidc'
     },

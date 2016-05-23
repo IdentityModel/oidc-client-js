@@ -6,10 +6,9 @@ module.exports = {
         './index.js'
     ],
     output: {
-        path: path.join(__dirname, 'dist'),
+        path: path.join(__dirname, 'lib'),
         filename: 'oidc-client.js',
         libraryTarget: 'umd',
-        // library: 'Oidc'
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({

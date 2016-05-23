@@ -2,14 +2,14 @@
     "name": "oidc-client",
     "version": "1.0.0-beta.6",
     "description": "OpenID Connect (OIDC) & OAuth2 client library",
-    "main": "dist/oidc-client.js",
+    "main": "lib/oidc-client.js",
     "scripts": {
+        "build:lib": "webpack -p --config webpack.lib.js",
+        "build:dist": "webpack -p --config webpack.dist.js",
+        "prebuild": "npm run build:lib",
+        "build": "npm run build:dist",
         "start": "node sample/server.js",
-        "build": "webpack -p --config webpack.config.js",
-        "build:classic": "webpack -p --config webpack.config.classic.js",
-        "prebuild": "npm run build:classic",
-        "test": "mocha --compilers js:babel-register test/unit/*.spec.js",
-        "pretest": "npm run build"
+        "test": "mocha --compilers js:babel-register test/unit/*.spec.js"
     },
     "repository": {
         "type": "git",
