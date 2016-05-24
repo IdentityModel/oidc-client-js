@@ -4,8 +4,6 @@
   "description": "OpenID Connect (OIDC) & OAuth2 client library",
   "main": "lib/oidc-client.min.js",
   "scripts": {
-    "build:lib": "webpack -p --config webpack.lib.js",
-    "build:dist": "webpack -p --config webpack.dist.js",
     "prepublish": "npm run build",
     "build": "gulp build",
     "start": "node sample/server.js",
