@@ -21,6 +21,7 @@ var uglifyPlugins =  [
 gulp.task('build-lib-sourcemap', function() {
   // run webpack
   gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    entry: npmEntry,
     output: {
         filename: 'oidc-client.js',
         libraryTarget: 'umd'
@@ -35,6 +36,7 @@ gulp.task('build-lib-sourcemap', function() {
 gulp.task('build-lib-min', function() {
   // run webpack
   gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    entry: npmEntry,
     output: {
         filename: 'oidc-client.min.js',
         libraryTarget: 'umd',
@@ -49,6 +51,7 @@ gulp.task('build-lib-min', function() {
 gulp.task('build-dist-sourcemap', function() {
   // run webpack
   gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    entry: classicEntry,
     output: {
         filename: 'oidc-client.js',
         libraryTarget: 'var',
@@ -65,6 +68,7 @@ gulp.task('build-dist-sourcemap', function() {
 gulp.task('build-dist-min', function() {
   // run webpack
   gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    entry: classicEntry,
     output: {
         filename: 'oidc-client.min.js',
         libraryTarget: 'var',
