@@ -60,6 +60,14 @@ mgr.events.addSilentRenewError(function (e) {
     log("silent renew error", e.message);
 });
 
+mgr.events.addUserLoaded(function (user) {
+    console.log("user loaded", user);
+});
+
+mgr.events.addUserUnloaded(function (e) {
+    console.log("user unloaded");
+});
+
 ///////////////////////////////
 // functions for UI elements
 ///////////////////////////////
