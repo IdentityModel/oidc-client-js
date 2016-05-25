@@ -9,7 +9,14 @@ Use **npm**
 
 `npm install oidc-client --save`
 
-If you don't use a package manager, then you can get the library from the `dist` folder on github [here](dist).
+If you don't use a package manager or a module loader, then you can get the library from the `dist` folder on github [here](dist).
+
+## Including in the browser
+
+If you intend to use this library directly in a browser and are not using UMD/AMD then there is a compiled version in the [~/dist](dist) folder. 
+It is already bundled/minified and contains the necessary dependencies and polyfills (mainly for ES6 features such as Promises).
+
+If you are using UMD/AMD and/or you already have included an ES6 polyfill (such as babel-polyfill.js) then you can include the UMD packaged version of the file from the [~/lib](lib) folder.
 
 ## Building the Source
 
@@ -33,13 +40,6 @@ and then browse to [http://localhost:5000](http://localhost:5000).
 ## Docs
 
 Some initial docs are [here](https://github.com/IdentityModel/oidc-client-js/wiki).
-
-## Including the library
-
-If you intend to use this library directly in a browser and are not using UMD/AMD then there is a compiled version in the ~/dist folder. 
-It is already bundled/minified and contains the necessary dependencies and polyfills (mainly for ES6 features such as Promises).
-
-If you are using UMD/AMD and/or you already have included an ES6 polyfill (such as babel-polyfill.js) then you can include the UMD packaged version of the file from the ~/lib folder.
 
 ## Feedback, Feature requests, and Bugs
 
