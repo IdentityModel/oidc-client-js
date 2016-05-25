@@ -9,7 +9,7 @@ Use **npm**
 
 `npm install oidc-client --save`
 
-If you don't use a package manager, then you can get the library from the `dist` folder on github [here](dist/oidc-client.js).
+If you don't use a package manager, then you can get the library from the `dist` folder on github [here](dist).
 
 ## Building the Source
 
