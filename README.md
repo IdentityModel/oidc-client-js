@@ -15,7 +15,7 @@ If you don't use a package manager, then you can get the library from the `dist`
 
 ```
 git clone https://github.com/IdentityModel/oidc-client-js.git
-cd oidc-client
+cd oidc-client-js
 npm install
 npm run build
 ```
