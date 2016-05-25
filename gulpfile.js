@@ -57,8 +57,7 @@ gulp.task('build-dist-sourcemap', function() {
         libraryTarget: 'var',
         library: 'Oidc'
     },
-    plugins: [
-    ],
+    plugins: [],
     devtool: 'inline-source-map'
   })))
   .pipe(gulp.dest('dist/'));
