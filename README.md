@@ -5,10 +5,14 @@ Also included is support for user session and access token management.
 
 ## Install
 
-Use **npm**
+##### NPM
 
 `npm install oidc-client --save`
 
+**NOTE**: if you're not using [babel-polyfill](https://www.npmjs.com/package/babel-polyfill) make sure you run
+`npm install --save babel-polyfill` as well. Then include it in your build.
+
+##### CommonJS
 If you don't use a package manager or a module loader, then you can get the library from the `dist` folder on github [here](dist).
 
 ## Including in the browser
