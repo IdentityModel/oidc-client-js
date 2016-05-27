@@ -5,6 +5,7 @@ import UserManager from '../../src/UserManager';
 import Log from '../../src/Log';
 import Global from '../../src/Global';
 import UserManagerSettings from '../../src/UserManagerSettings';
+import User from '../../src/User';
 
 import StubMetadataService from './StubMetadataService';
 import StubStateStore from './StubStateStore';
@@ -14,7 +15,7 @@ import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 
-describe("UserManager", function() {
+describe("UserManager", function () {
     let settings;
     let subject;
     let stubMetadataService;
@@ -23,10 +24,10 @@ describe("UserManager", function() {
     let stubNavigator;
     let stubUserStore;
 
-    beforeEach(function() {
-        
+    beforeEach(function () {
+
         Global._testing();
-        
+
         Log.logger = console;
         Log.level = Log.NONE;
 
@@ -35,34 +36,51 @@ describe("UserManager", function() {
         stubStateStore = new StubStateStore();
         stubValidator = new StubResponseValidator();
         stubMetadataService = new StubMetadataService();
-        
+
         settings = {
-            authority:'http://sts/oidc',
+            authority: 'http://sts/oidc',
             client_id: 'client',
-            navigator : stubNavigator,
+            navigator: stubNavigator,
             userStore: stubUserStore,
-            stateStore:stubStateStore, 
-            ResponseValidatorCtor : () => stubValidator, 
-            MetadataServiceCtor : () => stubMetadataService
+            stateStore: stubStateStore,
+            ResponseValidatorCtor: () => stubValidator,
+            MetadataServiceCtor: () => stubMetadataService
         };
-        
+
         subject = new UserManager(settings);
     });
 
-    describe("constructor", function() {
-        
-        it("should accept settings", function(){
+    describe("constructor", function () {
+
+        it("should accept settings", function () {
             subject.settings.client_id.should.equal('client');
         });
-        
+
     });
-   
-    describe("settings", function() {
-        
-        it("should be UserManagerSettings", function(){
+
+    describe("settings", function () {
+
+        it("should be UserManagerSettings", function () {
             subject.settings.should.be.instanceof(UserManagerSettings);
         });
-        
+
+    });
+
+    describe("userLoaded", function () {
+
+        it("should be able to call getUser without recursion", function (done) {
+
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
+            
+            subject.events.addUserLoaded(user => {
+                subject.getUser().then(user => {
+                    done();
+                });
+            });
+            
+            subject.events.load({});
+        });
+
     });
 
 });

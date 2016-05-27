@@ -62,6 +62,9 @@ mgr.events.addSilentRenewError(function (e) {
 
 mgr.events.addUserLoaded(function (user) {
     console.log("user loaded", user);
+    mgr.getUser().then(function(){
+       console.log("getUser loaded user after userLoaded event fired"); 
+    });
 });
 
 mgr.events.addUserUnloaded(function (e) {

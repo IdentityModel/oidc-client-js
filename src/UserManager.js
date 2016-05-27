@@ -47,9 +47,6 @@ export default class UserManager extends OidcClient {
         return this._loadUser().then(user => {
             if (user) {
                 Log.info("user loaded");
-
-                this._events.load(user);
-
                 return user;
             }
             else {
