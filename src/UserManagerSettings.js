@@ -4,6 +4,7 @@
 import Log from './Log';
 import OidcClientSettings from './OidcClientSettings';
 import RedirectNavigator from './RedirectNavigator';
+import CordovaPopupNavigator from './CordovaPopupNavigator';
 import PopupNavigator from './PopupNavigator';
 import IFrameNavigator from './IFrameNavigator';
 import WebStorageStateStore from './WebStorageStateStore';
@@ -18,8 +19,10 @@ export default class UserManagerSettings extends OidcClientSettings {
         popupWindowTarget,
         silent_redirect_uri,
         automaticSilentRenew = false,
+        automaticCordovaSilentRenew = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
+        cordovaPopupNavigator = new CordovaPopupNavigator(),
         popupNavigator = new PopupNavigator(),
         iframeNavigator = new IFrameNavigator(),
         userStore = new WebStorageStateStore({ store: Global.sessionStorage })
@@ -32,9 +35,11 @@ export default class UserManagerSettings extends OidcClientSettings {
         
         this._silent_redirect_uri = silent_redirect_uri;
         this._automaticSilentRenew = !!automaticSilentRenew;
+        this._automaticCordovaSilentRenew = !!automaticCordovaSilentRenew;
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
         this._redirectNavigator = redirectNavigator;
+        this._cordovaPopupNavigator = cordovaPopupNavigator;
         this._popupNavigator = popupNavigator;
         this._iframeNavigator = iframeNavigator;
         
@@ -57,13 +62,18 @@ export default class UserManagerSettings extends OidcClientSettings {
     get automaticSilentRenew() {
         return !!(this.silent_redirect_uri && this._automaticSilentRenew);
     }
-
+    get automaticCordovaSilentRenew() {
+        return !!(this.silent_redirect_uri && this._automaticCordovaSilentRenew);
+    }
     get accessTokenExpiringNotificationTime() {
         return this._accessTokenExpiringNotificationTime;
     }
 
     get redirectNavigator() {
         return this._redirectNavigator;
+    }
+    get cordovaPopupNavigator() {
+        return this._cordovaPopupNavigator;
     }
     get popupNavigator() {
         return this._popupNavigator;
