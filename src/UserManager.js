@@ -47,6 +47,7 @@ export default class UserManager extends OidcClient {
         return this._loadUser().then(user => {
             if (user) {
                 Log.info("user loaded");
+
                 return user;
             }
             else {
@@ -88,7 +89,6 @@ export default class UserManager extends OidcClient {
         Log.info("UserManager.signinPopupCallback");
         return this._signinCallback(url, this._popupNavigator);
     }
-
     signinSilent(args = {}) {
         Log.info("UserManager.signinSilent");
 
@@ -101,7 +101,7 @@ export default class UserManager extends OidcClient {
         args.redirect_uri = url;
         args.prompt = "none";
 
-        return this._signin(args, this._iframeNavigator);
+        return this._signin(args, this._iframeNavigator, { startUrl: url });
     }
     signinSilentCallback(url) {
         Log.info("UserManager.signinSilentCallback");
@@ -140,6 +140,21 @@ export default class UserManager extends OidcClient {
     signoutRedirect(args) {
         Log.info("UserManager.signoutRedirect");
         return this._signoutStart(args, this._redirectNavigator);
+    }
+    signoutPopup(args = {}) {
+        Log.info("UserManager.signoutPopup");
+
+        let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
+        if (!url) {
+            Log.error("No popup_redirect_uri or redirect_uri configured");
+            return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
+        }
+
+        return this._signout(args, this._popupNavigator, { 
+            startUrl: url,
+            popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
+            popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget 
+        });
     }
     signoutRedirectCallback(url) {
         Log.info("UserManager.signoutRedirectCallback");
