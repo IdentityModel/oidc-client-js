@@ -7,7 +7,6 @@ import UserManagerSettings from './UserManagerSettings';
 import User from './User';
 import UserManagerEvents from './UserManagerEvents';
 import SilentRenewService from './SilentRenewService';
-import CordovaSilentRenewService from './CordovaSilentRenewService';
 
 export default class UserManager extends OidcClient {
     constructor(settings = {}) {
@@ -23,17 +22,10 @@ export default class UserManager extends OidcClient {
             Log.info("automaticSilentRenew is configured, setting up silent renew")
             this._silentRenewService = new SilentRenewService(this);
         }
-        if (this.settings.automaticCordovaSilentRenew) {
-            Log.info("automaticCordovaSilentRenew is configured, setting up cordova silent renew")
-            this._cordovaSilentRenewService = new CordovaSilentRenewService(this);
-        }
     }
 
     get _redirectNavigator() {
         return this.settings.redirectNavigator;
-    }
-    get _cordovaPopupNavigator() {
-        return this.settings.cordovaPopupNavigator;
     }
     get _popupNavigator() {
         return this.settings.popupNavigator;
@@ -75,60 +67,6 @@ export default class UserManager extends OidcClient {
         });
     }
 
-    signinCordovaPopup(args = {}) {
-        Log.info("UserManager.signinCordovaPopup");
-
-        let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
-        if (!url) {
-            Log.error("No popup_redirect_uri or redirect_uri configured");
-            return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
-        }
-
-        args.redirect_uri = url;
-        args.display = "popup";
-
-        return this._signin(args, this._cordovaPopupNavigator, {
-            startUrl: url,
-            popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
-            popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
-        });
-    }
-    signoutCordovaPopup(args = {}) {
-        Log.info("UserManager.signoutCordovaPopup");
-
-        let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
-        if (!url) {
-            Log.error("No popup_redirect_uri or redirect_uri configured");
-            return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
-        }
-
-        args.redirect_uri = url;
-        args.display = "popup";
-
-        return this._signout(args, this._cordovaPopupNavigator, {
-            startUrl: url,
-            popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
-            popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
-        });
-    }
-    signinCordovaSilent(args = {}) {
-        Log.info("UserManager.signinCordovaSilent");
-
-        let url = args.redirect_uri || this.settings.silent_redirect_uri;
-        if (!url) {
-            Log.error("No silent_redirect_uri configured");
-            return Promise.reject(new Error("No silent_redirect_uri configured"));
-        }
-
-        args.redirect_uri = url;
-        args.prompt = "none";
-
-        return this._signin(args, this._cordovaPopupNavigator, {
-            startUrl: url,
-            popupWindowFeatures: 'hidden=yes',
-            popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
-        });
-    }
     signinPopup(args = {}) {
         Log.info("UserManager.signinPopup");
 
@@ -163,7 +101,7 @@ export default class UserManager extends OidcClient {
         args.redirect_uri = url;
         args.prompt = "none";
 
-        return this._signin(args, this._iframeNavigator);
+        return this._signin(args, this._iframeNavigator, { startUrl: url });
     }
     signinSilentCallback(url) {
         Log.info("UserManager.signinSilentCallback");
@@ -202,6 +140,21 @@ export default class UserManager extends OidcClient {
     signoutRedirect(args) {
         Log.info("UserManager.signoutRedirect");
         return this._signoutStart(args, this._redirectNavigator);
+    }
+    signoutPopup(args = {}) {
+        Log.info("UserManager.signoutPopup");
+
+        let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
+        if (!url) {
+            Log.error("No popup_redirect_uri or redirect_uri configured");
+            return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
+        }
+
+        return this._signout(args, this._popupNavigator, { 
+            startUrl: url,
+            popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
+            popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget 
+        });
     }
     signoutRedirectCallback(url) {
         Log.info("UserManager.signoutRedirectCallback");
