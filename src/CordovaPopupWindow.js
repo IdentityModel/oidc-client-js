@@ -3,7 +3,7 @@
 
 import Log from './Log';
 
-const DefaultPopupFeatures = 'location=no,toolbar=no';
+const DefaultPopupFeatures = 'location=no,toolbar=no,zoom=no';
 const DefaultPopupTarget = "_blank";
 
 export default class CordovaPopupWindow {
