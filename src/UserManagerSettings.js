@@ -18,7 +18,6 @@ export default class UserManagerSettings extends OidcClientSettings {
         popupWindowTarget,
         silent_redirect_uri,
         automaticSilentRenew = false,
-        automaticCordovaSilentRenew = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
