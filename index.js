@@ -8,6 +8,8 @@ export const InMemoryWebStorage = require('./src/InMemoryWebStorage');
 export const UserManager = require('./src/UserManager');
 export const AccessTokenEvents = require('./src/AccessTokenEvents');
 export const MetadataService = require('./src/MetadataService');
+export const CordovaPopupNavigator = require('./src/CordovaPopupNavigator');
+export const CordovaIFrameNavigator = require('./src/CordovaIFrameNavigator');
 
 export default {
     Log,
@@ -16,5 +18,7 @@ export default {
     InMemoryWebStorage,
     UserManager,
     AccessTokenEvents,
-    MetadataService
+    MetadataService,
+    CordovaPopupNavigator,
+    CordovaIFrameNavigator
 };
