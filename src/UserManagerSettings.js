@@ -57,7 +57,6 @@ export default class UserManagerSettings extends OidcClientSettings {
     get automaticSilentRenew() {
         return !!(this.silent_redirect_uri && this._automaticSilentRenew);
     }
-
     get accessTokenExpiringNotificationTime() {
         return this._accessTokenExpiringNotificationTime;
     }
