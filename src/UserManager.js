@@ -101,7 +101,10 @@ export default class UserManager extends OidcClient {
         args.redirect_uri = url;
         args.prompt = "none";
 
-        return this._signin(args, this._iframeNavigator, { startUrl: url });
+        return this._signin(args, this._iframeNavigator, { 
+            startUrl: url, 
+            silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
+        });
     }
     signinSilentCallback(url) {
         Log.info("UserManager.signinSilentCallback");

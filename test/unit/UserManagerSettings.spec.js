@@ -64,6 +64,15 @@ describe("UserManagerSettings", function () {
 
     });
 
+    describe("silentRequestTimeout", function () {
+
+        it("should return value from initial settings", function () {
+            let subject = new UserManagerSettings({ silentRequestTimeout: 123 });
+            subject.silentRequestTimeout.should.equal(123);
+        });
+
+    });
+
     describe("automaticSilentRenew", function () {
 
         it("should return value from initial settings", function () {

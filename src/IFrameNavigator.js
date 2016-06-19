@@ -6,8 +6,8 @@ import IFrameWindow from './IFrameWindow';
 
 export default class IFrameNavigator {
 
-    prepare() {
-        let frame = new IFrameWindow();
+    prepare(params) {
+        let frame = new IFrameWindow(params);
         return Promise.resolve(frame);
     }
 
