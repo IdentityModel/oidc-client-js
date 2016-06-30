@@ -28,4 +28,7 @@ export default class SignoutRequest {
         
         this.url = url;
     }
+
+    private state: State;
+    
 }

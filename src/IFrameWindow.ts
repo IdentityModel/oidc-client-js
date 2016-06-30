@@ -10,7 +10,7 @@ export default class IFrameWindow {
     constructor() {
         Log.info("IFrameWindow.ctor");
 
-        this._promise = new Promise((resolve, reject) => {
+        this._promise = new Promise<any>((resolve: Function, reject: Function) => {
             this._resolve = resolve;
             this._reject = reject;
         });
@@ -22,6 +22,13 @@ export default class IFrameWindow {
         this._frame.style.display = "none";
         window.document.body.appendChild(this._frame);
     }
+
+    private _promise: Promise<any>;
+    private _resolve: Function;
+    private _reject: Function;
+    private _boundMessageEvent: any;
+    private _frame: HTMLIFrameElement;
+    private _timer: number;
 
     navigate(params) {
         Log.info("IFrameWindow.navigate");
@@ -63,7 +70,7 @@ export default class IFrameWindow {
 
         this._timer = null;
         this._frame = null;
-        this._boundMessageEventssage = null;
+        this._boundMessageEvent = null;
     }
 
     _timeout() {

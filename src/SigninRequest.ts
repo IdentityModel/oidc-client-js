@@ -38,7 +38,7 @@ export default class SigninRequest {
         }
 
         let oidc = SigninRequest.isOidc(response_type);
-        this.state = new SigninState({ nonce: oidc, data, client_id, authority });
+        this.state = new SigninState({ nonce: oidc, client_id, authority });
 
         url = UrlUtility.addQueryParam(url, "client_id", client_id);
         url = UrlUtility.addQueryParam(url, "redirect_uri", redirect_uri);
@@ -59,6 +59,9 @@ export default class SigninRequest {
 
         this.url = url;
     }
+
+    private state: any;
+    private url: string;
 
     static isOidc(response_type) {
         var result = response_type.split(/\s+/g).filter(function(item) {

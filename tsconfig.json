@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES6",
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "outDir": "build"
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

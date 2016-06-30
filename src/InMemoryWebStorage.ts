@@ -7,6 +7,8 @@ export default class InMemoryWebStorage{
     constructor(){
         this._data = {};
     }
+
+    private _data: {};
     
     getItem(key) {
         Log.info("InMemoryWebStorage.getItem", key);

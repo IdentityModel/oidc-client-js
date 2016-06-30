@@ -15,10 +15,19 @@ export default class User {
         this.state = state;
     }
 
+    public id_token: string;
+    private session_state: string;
+    private access_token: string;
+    private token_type: string;
+    private scope: string;
+    private profile: string;
+    private expires_at: number;
+    private state: string;
+
+
     get expires_in() {
         if (this.expires_at) {
-            let now = parseInt(Date.now() / 1000);
-            return this.expires_at - now;
+            return this.expires_at - (Date.now() / 1000);
         }
         return undefined;
     }

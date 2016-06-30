@@ -6,10 +6,10 @@ import State from './State';
 import random from './random';
 
 export default class SigninState extends State {
-    constructor({nonce, authority, client_id} = {}) {
+    constructor({nonce = {}, authority = "", client_id = ""} = {}) {
         super(arguments[0]);
         
-        if (nonce === true) {
+        if (nonce) {
             this._nonce = random();
         }
         else if (nonce) {
@@ -19,6 +19,10 @@ export default class SigninState extends State {
         this._authority = authority;
         this._client_id = client_id;
     }
+
+    private _nonce: any;
+    private _authority: string;
+    private _client_id: string;
 
     get nonce() {
         return this._nonce;

@@ -12,6 +12,9 @@ export default class Timer extends Event {
         this._timer = timer;
     }
 
+    private _timer: any;
+    private _timerHandle: any;
+
     init(duration) {
         this.cancel();
 

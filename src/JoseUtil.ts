@@ -8,7 +8,7 @@ const AllowedSigningAlgs = ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'
 
 export default class JoseUtil {
 
-    static parseJwt(jwt) {
+    public static parseJwt(jwt) {
         Log.info("JoseUtil.parseJwt");
         try {
             var token = jws.JWS.parse(jwt);
@@ -68,7 +68,7 @@ export default class JoseUtil {
         }
 
         if (!now) {
-            now = parseInt(Date.now() / 1000);
+            now = Date.now() / 1000;
         }
 
         var payload = JoseUtil.parseJwt(jwt).payload;

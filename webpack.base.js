@@ -10,8 +10,8 @@ var createWebpackConfig = function(options) {
     module: {
       loaders: [
         {
-          test: /.js$/,
-          loaders: ['babel'],
+          test: /.tsx?$/,
+          loaders: ['ts-loader'],
           exclude: /node_modules/,
           include: __dirname
         }

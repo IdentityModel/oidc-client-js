@@ -9,7 +9,7 @@ import UserManagerEvents from './UserManagerEvents';
 import SilentRenewService from './SilentRenewService';
 
 export default class UserManager extends OidcClient {
-    constructor(settings = {}) {
+    constructor(settings: UserManagerSettings) {
         
         if (!(settings instanceof UserManagerSettings)) {
             settings = new UserManagerSettings(settings);
@@ -23,6 +23,10 @@ export default class UserManager extends OidcClient {
             this._silentRenewService = new SilentRenewService(this);
         }
     }
+
+    settings: UserManagerSettings;
+    private _events;
+    private _silentRenewService;
 
     get _redirectNavigator() {
         return this.settings.redirectNavigator;
@@ -66,7 +70,7 @@ export default class UserManager extends OidcClient {
         });
     }
 
-    signinPopup(args = {}) {
+    signinPopup(args: any = {}) {
         Log.info("UserManager.signinPopup");
 
         let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
@@ -89,7 +93,7 @@ export default class UserManager extends OidcClient {
         return this._signinCallback(url, this._popupNavigator);
     }
 
-    signinSilent(args = {}) {
+    signinSilent(args: any = {}) {
         Log.info("UserManager.signinSilent");
 
         let url = args.redirect_uri || this.settings.silent_redirect_uri;
@@ -108,7 +112,7 @@ export default class UserManager extends OidcClient {
         return this._signinCallback(url, this._iframeNavigator);
     }
 
-    _signin(args, navigator, navigatorParams = {}) {
+    _signin(args, navigator, navigatorParams: any = {}) {
         Log.info("_signin");
         return this._signinStart(args, navigator, navigatorParams).then(navResponse => {
             return this._signinEnd(navResponse.url);
@@ -118,7 +122,7 @@ export default class UserManager extends OidcClient {
         Log.info("_signinCallback");
         return navigator.callback(url);
     }
-    _signout(args, navigator, navigatorParams = {}) {
+    _signout(args, navigator, navigatorParams: any = {}) {
         Log.info("_signout");
         return this._signoutStart(args, navigator, navigatorParams).then(navResponse => {
             return this._signoutEnd(navResponse.url);
@@ -146,7 +150,7 @@ export default class UserManager extends OidcClient {
         return this._signoutEnd(url || this._redirectNavigator.url);
     }
 
-    _signinStart(args, navigator, navigatorParams = {}) {
+    _signinStart(args, navigator, navigatorParams: any = {}) {
         Log.info("_signinStart");
 
         return navigator.prepare(navigatorParams).then(handle => {
@@ -178,13 +182,13 @@ export default class UserManager extends OidcClient {
         });
     }
 
-    _signoutStart(args = {}, navigator, navigatorParams = {}) {
+    _signoutStart(args: any = {}, navigator, navigatorParams: any = {}) {
         Log.info("_signoutStart");
 
         return navigator.prepare(navigatorParams).then(handle => {
             Log.info("got navigator window handle");
 
-            return this.getUser().then(user => {
+            return this.getUser().then((user: User) => {
                 Log.info("loaded current user from storage");
 
                 var id_token = args.id_token_hint || user && user.id_token;

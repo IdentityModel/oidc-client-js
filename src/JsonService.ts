@@ -4,12 +4,18 @@
 import Log from './Log';
 import Global from './Global';
 
+export interface IJsonService {
+    getJson: (url: string, token?: string) => Promise<any>;
+}
+
 export default class JsonService {
     constructor(XMLHttpRequestCtor = Global.XMLHttpRequest) {
         this._XMLHttpRequest = XMLHttpRequestCtor;
     }
+
+    private _XMLHttpRequest: any;
     
-    getJson(url, token) {
+    getJson(url, token?) {
         Log.info("JsonService.getJson", url);
         
         if (!url){

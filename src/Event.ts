@@ -5,10 +5,13 @@ import Log from './Log';
 
 export default class Event {
 
-    constructor(name) {
+    constructor(name: string) {
         this._name = name;
         this._callbacks = [];
     }
+
+    _name: string;
+    _callbacks: Array<Function>;
 
     addHandler(cb) {
         this._callbacks.push(cb);

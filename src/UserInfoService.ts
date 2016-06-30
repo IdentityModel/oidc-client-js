@@ -17,7 +17,12 @@ export default class UserInfoService {
         this._metadataService = new MetadataServiceCtor(this._settings);
     }
 
-    getClaims(token) {
+            private _settings: any
+        private _jsonService: JsonService;
+        private _metadataService: MetadataService;
+
+
+    getClaims(token): Promise<any> {
         Log.info("UserInfoService.getClaims");
 
         if (!token) {

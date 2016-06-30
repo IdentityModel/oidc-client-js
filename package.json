@@ -44,7 +44,10 @@
     "webpack-stream": "^3.2.0"
   },
   "dependencies": {
-    "jsrsasign": "^5.0.7"
+    "babel-polyfill": "^6.9.1",
+    "jsrsasign": "^5.0.7",
+    "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10"
   },
   "peerDependencies": {
     "babel-polyfill": ">=6.7.4"

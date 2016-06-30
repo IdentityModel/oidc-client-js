@@ -21,7 +21,7 @@ export default class UrlUtility {
         return url;
     }
 
-    static parseUrlFragment(value, delimiter = "#", global = Global) {
+    static parseUrlFragment(value, delimiter = "#", global = Global): Object {
         Log.info("UrlUtility.parseUrlFragment");
 
         if (typeof value !== 'string'){

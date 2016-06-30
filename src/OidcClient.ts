@@ -21,6 +21,8 @@ export default class OidcClient {
         }
     }
 
+    private _settings: OidcClientSettings;
+
     get _stateStore() {
         return this.settings.stateStore;
     }
@@ -31,7 +33,7 @@ export default class OidcClient {
         return this.settings.metadataService;
     }
 
-    get settings() {
+    get settings(): OidcClientSettings {
         return this._settings;
     }
     get metadataService() {
@@ -39,9 +41,9 @@ export default class OidcClient {
     }
 
     createSigninRequest({
-        response_type, scope, redirect_uri, data,
-        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values} = {},
-        stateStore
+        response_type = "", scope = "", redirect_uri= "", data = {},
+        prompt= "", display= "", max_age = "", ui_locales = "", id_token_hint = "", login_hint = "", acr_values = ""} = {},
+        stateStore?: any
     ) {
         Log.info("OidcClient.createSigninRequest");
 
@@ -62,7 +64,7 @@ export default class OidcClient {
         return this._metadataService.getAuthorizationEndpoint().then(url => {
             Log.info("Received authorization endpoint", url);
 
-            let request = new SigninRequest({
+            let request: any = new SigninRequest({
                 url,
                 client_id,
                 redirect_uri,
@@ -82,10 +84,10 @@ export default class OidcClient {
         });
     }
 
-    processSigninResponse(url, stateStore) {
+    processSigninResponse(url, stateStore?: any) {
         Log.info("OidcClient.processSigninResponse");
 
-        var response = new SigninResponse(url);
+        var response: any = new SigninResponse(url);
 
         if (!response.state) {
             Log.error("No state in response");
@@ -107,8 +109,8 @@ export default class OidcClient {
         });
     }
 
-    createSignoutRequest({id_token_hint, data, post_logout_redirect_uri} = {},
-        stateStore
+    createSignoutRequest({id_token_hint = "", data = {}, post_logout_redirect_uri = ""} = {},
+        stateStore?: any
     ) {
         Log.info("OidcClient.createSignoutRequest");
 
@@ -117,7 +119,7 @@ export default class OidcClient {
         return this._metadataService.getEndSessionEndpoint().then(url => {
             Log.info("Received end session endpoint", url);
 
-            let request = new SignoutRequest({
+            let request: any = new SignoutRequest({
                 url,
                 id_token_hint,
                 post_logout_redirect_uri,
@@ -136,10 +138,10 @@ export default class OidcClient {
         });
     }
 
-    processSignoutResponse(url, stateStore) {
+    processSignoutResponse(url, stateStore?: any) {
         Log.info("OidcClient.processSignoutResponse");
 
-        var response = new SignoutResponse(url);
+        var response: any = new SignoutResponse(url);
         if (!response.state) {
             Log.info("No state in response");
 

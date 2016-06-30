@@ -19,6 +19,10 @@ export default class AccessTokenEvents {
         this._accessTokenExpired = accessTokenExpiredTimer;
     }
 
+    _accessTokenExpiringNotificationTime: number;
+    _accessTokenExpiring: Timer;
+    _accessTokenExpired: Timer;
+    
     load(container) {
         Log.info("AccessTokenEvents.load");
         

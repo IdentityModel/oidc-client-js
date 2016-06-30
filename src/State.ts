@@ -5,7 +5,7 @@ import Log from './Log';
 import random from './random';
 
 export default class State {
-    constructor({id, data, created} = {}) {
+    constructor({id = "", data = {}, created = 0} = {}) {
         this._id = id || random();
         this._data = data;
 
@@ -13,9 +13,13 @@ export default class State {
             this._created = created;
         }
         else {
-            this._created = parseInt(Date.now() / 1000);
+            this._created = Date.now() / 1000;
         }
     }
+
+    private _id: string;
+    private _data: {};
+    private _created: number;
 
     get id() {
         return this._id;

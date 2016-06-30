@@ -4,7 +4,7 @@
 import Log from './Log';
 
 export default class ErrorResponse extends Error {
-    constructor({error, error_description, error_uri, state}={}
+    constructor({error = "", error_description= "", error_uri = "", state = ""}={}
     ) {
          if (!error){
             Log.error("No error passed to ErrorResponse");
@@ -15,10 +15,15 @@ export default class ErrorResponse extends Error {
         
         this.name = "ErrorResponse"; 
         
-        this.error = error;
-        this.error_description = error_description;
-        this.error_uri = error_uri;
+        this._error = error;
+        this._error_description = error_description;
+        this._error_uri = error_uri;
         
-        this.state = state;
+        this._state = state;
     }
+
+    _error;
+    _error_description;
+    _error_uri;
+    _state;
 }

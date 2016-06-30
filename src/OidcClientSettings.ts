@@ -16,12 +16,12 @@ const DefaultClockSkewInSeconds = 60 * 5;
 export default class OidcClientSettings {
     constructor({
         // metadata related
-        authority, metadataUrl, metadata, signingKeys,
+        authority = "", metadataUrl = "", metadata = "", signingKeys = "",
         // client related
-        client_id, response_type = DefaultResponseType, scope = DefaultScope,
-        redirect_uri, post_logout_redirect_uri,
+        client_id = "", response_type = DefaultResponseType, scope = DefaultScope,
+        redirect_uri = "", post_logout_redirect_uri = "",
         // optional protocol
-        prompt, display, max_age, ui_locales, acr_values,
+        prompt = "", display = "", max_age = "", ui_locales = "", acr_values = "",
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
         staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
@@ -58,11 +58,39 @@ export default class OidcClientSettings {
         this._metadataService = new MetadataServiceCtor(this);
     }
 
+    private _authority: string;
+    private _metadataUrl: string;
+    private _metadata;
+    private _signingKeys;
+
+    private _client_id: string;
+    private _response_type: string;
+    private _scope: string;
+    private _redirect_uri: string;
+    private _post_logout_redirect_uri: string;
+
+    private _prompt: string;
+    private _display;
+    private _max_age;
+    private _ui_locales;
+    private _acr_values;
+
+    private _filterProtocolClaims;
+    private _loadUserInfo;
+    private _staleStateAge;
+    private _clockSkew;
+
+    private _stateStore;
+    private _validator;
+    private _metadataService;
+
+
     // client config
-    get client_id() {
+    get client_id(): any {
         return this._client_id;
     }
-    set client_id(value) {
+
+    set client_id(value: any) {
         if (!this._client_id) {
             // one-time set only
             this._client_id = value;
@@ -72,22 +100,22 @@ export default class OidcClientSettings {
             throw new Error("client_id has already been assigned.")
         }
     }
-    get response_type() {
+    get response_type(): any {
         return this._response_type;
     }
-    get scope() {
+    get scope(): string {
         return this._scope;
     }
-    get redirect_uri() {
+    get redirect_uri(): string {
         return this._redirect_uri;
     }
-    get post_logout_redirect_uri() {
+    get post_logout_redirect_uri(): string {
         return this._post_logout_redirect_uri;
     }
 
 
     // optional protocol params
-    get prompt() {
+    get prompt(): string {
         return this._prompt;
     }
     get display() {
@@ -105,10 +133,10 @@ export default class OidcClientSettings {
 
 
     // metadata
-    get authority() {
+    get authority(): string {
         return this._authority;
     }
-    set authority(value) {
+    set authority(value: string) {
         if (!this._authority) {
             // one-time set only
             this._authority = value;
@@ -118,7 +146,7 @@ export default class OidcClientSettings {
             throw new Error("authority has already been assigned.")
         }
     }
-    get metadataUrl() {
+    get metadataUrl(): string {
         if (!this._metadataUrl) {
             this._metadataUrl = this.authority;
 

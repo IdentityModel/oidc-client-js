@@ -15,6 +15,9 @@ export default class MetadataService {
         this._jsonService = new JsonServiceCtor();
     }
 
+    private _settings: any;
+    private _jsonService: JsonService;
+
     getMetadata() {
         Log.info("MetadataService.getMetadata");
 
@@ -89,7 +92,7 @@ export default class MetadataService {
         return this._getMetadataProperty("jwks_uri").then(jwks_uri => {
             Log.info("jwks_uri received", jwks_uri);
 
-            return this._jsonService.getJson(jwks_uri).then(keySet => {
+            return this._jsonService.getJson(jwks_uri).then((keySet: any) => {
                 Log.info("key set received", keySet);
 
                 if (!keySet.keys) {

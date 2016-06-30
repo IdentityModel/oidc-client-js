@@ -10,6 +10,9 @@ export default class WebStorageStateStore {
         this._prefix = prefix;
     }
 
+    private _store: Storage;
+    private _prefix: string;
+
     set(key, value) {
         Log.info("WebStorageStateStore.set", key);
 

@@ -9,6 +9,8 @@ export default class SilentRenewService {
         this._userManager = userManager;
         this._userManager.events.addAccessTokenExpiring(this._tokenExpiring.bind(this));
     }
+
+    private _userManager: any;
     
     _tokenExpiring() {
         Log.info("SilentRenewService automatically renewing access token");

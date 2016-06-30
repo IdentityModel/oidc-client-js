@@ -8,12 +8,12 @@ const OidcScope = "openid";
 export default class SigninResponse {
     constructor(url) {
 
-        var values = UrlUtility.parseUrlFragment(url, "#");
+        var values: any = UrlUtility.parseUrlFragment(url, "#");
 
         this.error = values.error;
         this.error_description = values.error_description;
         this.error_uri = values.error_uri;
-        
+
         this.state = values.state;
         this.id_token = values.id_token;
         this.session_state = values.session_state;
@@ -24,15 +24,27 @@ export default class SigninResponse {
 
         let expires_in = parseInt(values.expires_in);
         if (typeof expires_in === 'number' && expires_in > 0) {
-            let now = parseInt(Date.now() / 1000);
-            this.expires_at = now + expires_in;
+            this.expires_at = (Date.now() / 1000) + expires_in;
         }
     }
 
+    private error;
+    private error_description: string;
+    private error_uri: string;
+
+    private state: string;
+    private id_token: string;
+    private session_state: string;
+    private access_token: string;
+    private token_type: any;
+    private scope: string;
+    private profile: any; // will be set from ResponseValidator
+    private expires_at: number;
+
+
     get expires_in() {
         if (this.expires_at) {
-            let now = parseInt(Date.now() / 1000);
-            return this.expires_at - now;
+            return this.expires_at - (Date.now() / 1000);
         }
         return undefined;
     }
@@ -48,8 +60,8 @@ export default class SigninResponse {
     get scopes() {
         return (this.scope || "").split(" ");
     }
-    
-    get isOpenIdConnect(){
+
+    get isOpenIdConnect() {
         return this.scopes.indexOf(OidcScope) >= 0;
     }
 }

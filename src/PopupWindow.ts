@@ -30,6 +30,14 @@ export default class PopupWindow {
         }
     }
 
+        private _promise: Promise<any>;
+    private _resolve: Function;
+    private _reject: Function;
+    private _boundMessageEvent: any;
+    private _popup: Window;
+    private _checkForPopupClosedTimer: number;
+
+
     navigate(params) {
         Log.info("PopupWindow.navigate");
 
@@ -73,7 +81,7 @@ export default class PopupWindow {
         window.clearInterval(this._checkForPopupClosedTimer);
 
         this._checkForPopupClosedTimer = null;
-        this._boundMessageEventssage = null;
+        this._boundMessageEvent = null;
         
         if (this._popup){
             this._popup.close();

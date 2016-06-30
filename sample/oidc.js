@@ -58,7 +58,7 @@ function hashAccessToken(access_token) {
 }
 
 function genIdToken(aud, nonce, access_token) {
-    var now = parseInt(Date.now() / 1000);
+    var now = Date.now() / 1000;
     var payload = {
         aud: aud,
         iss: metadata.issuer,
