@@ -65,7 +65,7 @@ export default class IFrameWindow {
 
         this._timer = null;
         this._frame = null;
-        this._boundMessageEventssage = null;
+        this._boundMessageEvent = null;
     }
 
     _timeout() {
