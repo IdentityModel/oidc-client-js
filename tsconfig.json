@@ -1,12 +1,13 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "ES6",
+        "module": "umd",
+        "target": "es5",
+        "outDir": "build",
         "noImplicitAny": false,
-        "sourceMap": false,
-        "outDir": "build"
+        "listFiles": true
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "build"
     ]
 }

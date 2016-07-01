@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import JsonService from './JsonService';
+import Log from "./Log";
+import JsonService from "./JsonService";
 
 export default class MetadataService {
     constructor(settings, JsonServiceCtor = JsonService) {
@@ -40,7 +40,7 @@ export default class MetadataService {
                 return metadata;
             });
     }
-    
+
     getIssuer() {
         Log.info("MetadataService.getIssuer");
         return this._getMetadataProperty("issuer");
@@ -55,7 +55,7 @@ export default class MetadataService {
         Log.info("MetadataService.getUserInfoEndpoint");
         return this._getMetadataProperty("userinfo_endpoint");
     }
-    
+
     getCheckSessionIframe() {
         Log.info("MetadataService.getCheckSessionIframe");
         return this._getMetadataProperty("check_session_iframe");
@@ -100,7 +100,7 @@ export default class MetadataService {
                     throw new Error("Missing keys on keyset");
                 }
 
-                var filteredKeys = this._filterSigningKeys(keySet.keys);
+                let filteredKeys = this._filterSigningKeys(keySet.keys);
                 Log.info("filtered keys", filteredKeys);
 
                 this._settings.signingKeys = filteredKeys;

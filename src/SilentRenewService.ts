@@ -1,7 +1,7 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import Log from "./Log";
 
 export default class SilentRenewService {
 
@@ -11,10 +11,10 @@ export default class SilentRenewService {
     }
 
     private _userManager: any;
-    
+
     _tokenExpiring() {
         Log.info("SilentRenewService automatically renewing access token");
-        
+
         this._userManager.signinSilent().then(user => {
             Log.info("Silent token renewal successful");
         }, err => {

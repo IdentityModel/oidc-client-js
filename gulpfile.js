@@ -5,8 +5,7 @@ var createWebpackConfig = require('./webpack.base');
 
 // entry points for both configs
 var npmEntry = './index.ts';
-// var classicEntry = ['babel-polyfill', npmEntry];
-var classicEntry = npmEntry;
+var classicEntry = [npmEntry];
 
 // uglify plugin for minification
 var uglifyPlugins =  [
@@ -21,7 +20,7 @@ var uglifyPlugins =  [
 // npm compliant build with source-maps
 gulp.task('build-lib-sourcemap', function() {
   // run webpack
-  gulp.src('index.ts').pipe(webpackStream(createWebpackConfig({
+  gulp.src('./index.ts').pipe(webpackStream(createWebpackConfig({
     entry: npmEntry,
     output: {
         filename: 'oidc-client.js',

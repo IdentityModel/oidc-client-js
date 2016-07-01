@@ -1,12 +1,12 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import WebStorageStateStore from './WebStorageStateStore';
-import ResponseValidator from './ResponseValidator';
-import MetadataService from './MetadataService';
+import Log from "./Log";
+import WebStorageStateStore from "./WebStorageStateStore";
+import ResponseValidator from "./ResponseValidator";
+import MetadataService from "./MetadataService";
 
-const OidcMetadataUrlPath = '.well-known/openid-configuration';
+const OidcMetadataUrlPath = ".well-known/openid-configuration";
 
 const DefaultResponseType = "id_token";
 const DefaultScope = "openid";
@@ -96,8 +96,8 @@ export default class OidcClientSettings {
             this._client_id = value;
         }
         else {
-            Log.error("client_id has already been assigned.")
-            throw new Error("client_id has already been assigned.")
+            Log.error("client_id has already been assigned.");
+            throw new Error("client_id has already been assigned.");
         }
     }
     get response_type(): any {
@@ -142,8 +142,8 @@ export default class OidcClientSettings {
             this._authority = value;
         }
         else {
-            Log.error("authority has already been assigned.")
-            throw new Error("authority has already been assigned.")
+            Log.error("authority has already been assigned.");
+            throw new Error("authority has already been assigned.");
         }
     }
     get metadataUrl(): string {
@@ -151,8 +151,8 @@ export default class OidcClientSettings {
             this._metadataUrl = this.authority;
 
             if (this._metadataUrl && this._metadataUrl.indexOf(OidcMetadataUrlPath) < 0) {
-                if (this._metadataUrl[this._metadataUrl.length - 1] !== '/') {
-                    this._metadataUrl += '/';
+                if (this._metadataUrl[this._metadataUrl.length - 1] !== "/") {
+                    this._metadataUrl += "/";
                 }
                 this._metadataUrl += OidcMetadataUrlPath;
             }

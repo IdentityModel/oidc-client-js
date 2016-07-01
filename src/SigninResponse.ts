@@ -1,14 +1,14 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import UrlUtility from './UrlUtility';
+import UrlUtility from "./UrlUtility";
 
 const OidcScope = "openid";
 
 export default class SigninResponse {
     constructor(url) {
 
-        var values: any = UrlUtility.parseUrlFragment(url, "#");
+        let values: any = UrlUtility.parseUrlFragment(url, "#");
 
         this.error = values.error;
         this.error_description = values.error_description;
@@ -23,7 +23,7 @@ export default class SigninResponse {
         this.profile = undefined; // will be set from ResponseValidator
 
         let expires_in = parseInt(values.expires_in);
-        if (typeof expires_in === 'number' && expires_in > 0) {
+        if (typeof expires_in === "number" && expires_in > 0) {
             this.expires_at = (Date.now() / 1000) + expires_in;
         }
     }

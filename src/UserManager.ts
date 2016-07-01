@@ -1,16 +1,16 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import OidcClient from './OidcClient';
-import UserManagerSettings from './UserManagerSettings';
-import User from './User';
-import UserManagerEvents from './UserManagerEvents';
-import SilentRenewService from './SilentRenewService';
+import Log from "./Log";
+import OidcClient from "./OidcClient";
+import UserManagerSettings from "./UserManagerSettings";
+import User from "./User";
+import UserManagerEvents from "./UserManagerEvents";
+import SilentRenewService from "./SilentRenewService";
 
 export default class UserManager extends OidcClient {
     constructor(settings: UserManagerSettings) {
-        
+
         if (!(settings instanceof UserManagerSettings)) {
             settings = new UserManagerSettings(settings);
         }
@@ -19,7 +19,7 @@ export default class UserManager extends OidcClient {
         this._events = new UserManagerEvents(settings);
 
         if (this.settings.automaticSilentRenew) {
-            Log.info("automaticSilentRenew is configured, setting up silent renew")
+            Log.info("automaticSilentRenew is configured, setting up silent renew");
             this._silentRenewService = new SilentRenewService(this);
         }
     }
@@ -191,7 +191,7 @@ export default class UserManager extends OidcClient {
             return this.getUser().then((user: User) => {
                 Log.info("loaded current user from storage");
 
-                var id_token = args.id_token_hint || user && user.id_token;
+                let id_token = args.id_token_hint || user && user.id_token;
                 if (id_token) {
                     Log.info("Setting id_token into signout request");
                     args.id_token_hint = id_token;
@@ -242,7 +242,7 @@ export default class UserManager extends OidcClient {
         if (user) {
             Log.info("_storeUser storing user");
 
-            var storageString = user.toStorageString();
+            let storageString = user.toStorageString();
             return this._userStore.set(this._userStoreKey, storageString);
         }
         else {

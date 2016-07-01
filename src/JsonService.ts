@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import Global from './Global';
+import Log from "./Log";
+import Global from "./Global";
 
 export interface IJsonService {
     getJson: (url: string, token?: string) => Promise<any>;
@@ -14,23 +14,23 @@ export default class JsonService {
     }
 
     private _XMLHttpRequest: any;
-    
+
     getJson(url, token?) {
         Log.info("JsonService.getJson", url);
-        
-        if (!url){
+
+        if (!url) {
             Log.error("No url passed");
             throw new Error("url");
         }
-        
-        return new Promise((resolve, reject) => {
-            
-            var req = new this._XMLHttpRequest();
-            req.open('GET', url);
 
-            req.onload = function() {
+        return new Promise((resolve, reject) => {
+
+            let req = new this._XMLHttpRequest();
+            req.open("GET", url);
+
+            req.onload = function () {
                 Log.info("HTTP response received, status", req.status);
-                
+
                 if (req.status === 200) {
                     resolve(JSON.parse(req.responseText));
                 }
@@ -39,11 +39,11 @@ export default class JsonService {
                 }
             };
 
-            req.onerror = function() {
+            req.onerror = function () {
                 Log.error("network error");
                 reject(Error("Network Error"));
             };
-            
+
             if (token) {
                 Log.info("token passed, setting Authorization header");
                 req.setRequestHeader("Authorization", "Bearer " + token);

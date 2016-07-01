@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import JsonService from './JsonService';
-import MetadataService from './MetadataService';
-import Log from './Log';
+import JsonService from "./JsonService";
+import MetadataService from "./MetadataService";
+import Log from "./Log";
 
 export default class UserInfoService {
     constructor(settings, JsonServiceCtor = JsonService, MetadataServiceCtor = MetadataService) {
@@ -17,9 +17,9 @@ export default class UserInfoService {
         this._metadataService = new MetadataServiceCtor(this._settings);
     }
 
-            private _settings: any
-        private _jsonService: JsonService;
-        private _metadataService: MetadataService;
+    private _settings: any;
+    private _jsonService: JsonService;
+    private _metadataService: MetadataService;
 
 
     getClaims(token): Promise<any> {

@@ -1,7 +1,7 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import Log from "./Log";
 
 const DefaultTimeout = 5000;
 
@@ -17,7 +17,7 @@ export default class IFrameWindow {
 
         this._boundMessageEvent = this._message.bind(this);
         window.addEventListener("message", this._boundMessageEvent, false);
-        
+
         this._frame = window.document.createElement("iframe");
         this._frame.style.display = "none";
         window.document.body.appendChild(this._frame);
@@ -40,7 +40,7 @@ export default class IFrameWindow {
             this._timer = window.setTimeout(this._timeout.bind(this), DefaultTimeout);
             this._frame.src = params.url;
         }
-        
+
         return this.promise;
     }
 

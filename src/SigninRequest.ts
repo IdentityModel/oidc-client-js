@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import UrlUtility from './UrlUtility';
-import SigninState from './SigninState';
+import Log from "./Log";
+import UrlUtility from "./UrlUtility";
+import SigninState from "./SigninState";
 
 export default class SigninRequest {
     constructor({
@@ -44,14 +44,14 @@ export default class SigninRequest {
         url = UrlUtility.addQueryParam(url, "redirect_uri", redirect_uri);
         url = UrlUtility.addQueryParam(url, "response_type", response_type);
         url = UrlUtility.addQueryParam(url, "scope", scope);
-        
+
         url = UrlUtility.addQueryParam(url, "state", this.state.id);
         if (oidc) {
             url = UrlUtility.addQueryParam(url, "nonce", this.state.nonce);
         }
 
-        var optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values };
-        for(let key in optional){
+        let optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values };
+        for (let key in optional) {
             if (optional[key]) {
                 url = UrlUtility.addQueryParam(url, key, optional[key]);
             }
@@ -64,14 +64,14 @@ export default class SigninRequest {
     private url: string;
 
     static isOidc(response_type) {
-        var result = response_type.split(/\s+/g).filter(function(item) {
+        let result = response_type.split(/\s+/g).filter(function (item) {
             return item === "id_token";
         });
         return !!(result[0]);
     }
-    
+
     static isOAuth(response_type) {
-        var result = response_type.split(/\s+/g).filter(function(item) {
+        let result = response_type.split(/\s+/g).filter(function (item) {
             return item === "token";
         });
         return !!(result[0]);

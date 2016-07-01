@@ -1,11 +1,13 @@
+/// <reference path='../node_modules/typescript/lib/lib.es6.d.ts' />
+
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import MetadataService from './MetadataService';
-import UserInfoService from './UserInfoService';
-import ErrorResponse from './ErrorResponse';
-import JoseUtil from './JoseUtil';
+import Log from "./Log";
+import MetadataService from "./MetadataService";
+import UserInfoService from "./UserInfoService";
+import ErrorResponse from "./ErrorResponse";
+import JoseUtil from "./JoseUtil";
 
 const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "c_hash"];
 
@@ -88,7 +90,7 @@ export default class ResponseValidator {
         if (!this._settings.authority) {
             this._settings.authority = state.authority;
         }
-        // ensure we're using the correct authority if the authority is not loaded from signin state
+        // ensure we"re using the correct authority if the authority is not loaded from signin state
         else if (this._settings.authority && this._settings.authority !== state.authority) {
             Log.error("authority mismatch on settings vs. signin state");
             return Promise.reject(new Error("authority mismatch on settings vs. signin state"));
@@ -97,7 +99,7 @@ export default class ResponseValidator {
         if (!this._settings.client_id) {
             this._settings.client_id = state.client_id;
         }
-        // ensure we're using the correct client_id if the client_id is not loaded from signin state
+        // ensure we"re using the correct client_id if the client_id is not loaded from signin state
         else if (this._settings.client_id && this._settings.client_id !== state.client_id) {
             Log.error("client_id mismatch on settings vs. signin state");
             return Promise.reject(new Error("client_id mismatch on settings vs. signin state"));
@@ -158,10 +160,10 @@ export default class ResponseValidator {
     }
 
     _mergeClaims(claims1, claims2) {
-        var result = Object.assign({}, claims1);
+        let result = Object.assign({}, claims1);
 
         for (let name in claims2) {
-            var values = claims2[name];
+            let values = claims2[name];
             if (!Array.isArray(values)) {
                 values = [values];
             }
@@ -187,7 +189,7 @@ export default class ResponseValidator {
     _filterProtocolClaims(claims) {
         Log.info("ResponseValidator._filterProtocolClaims, incoming claims:", claims);
 
-        var result = Object.assign({}, claims);
+        let result = Object.assign({}, claims);
 
         if (this._settings._filterProtocolClaims) {
             ProtocolClaims.forEach(type => {
@@ -197,7 +199,7 @@ export default class ResponseValidator {
             Log.info("protocol claims filtered", result);
         }
         else {
-            Log.info("protocol claims not filtered")
+            Log.info("protocol claims not filtered");
         }
 
         return result;
@@ -248,7 +250,7 @@ export default class ResponseValidator {
             return Promise.reject(new Error("Invalid nonce in id_token"));
         }
 
-        var kid = jwt.header.kid;
+        let kid = jwt.header.kid;
         if (!kid) {
             Log.error("No kid found in id_token");
             return Promise.reject(new Error("No kid found in id_token"));
@@ -314,13 +316,13 @@ export default class ResponseValidator {
             return Promise.reject(new Error("Failed to parse id_token"));
         }
 
-        var hashAlg = jwt.header.alg;
+        let hashAlg = jwt.header.alg;
         if (!hashAlg || hashAlg.length !== 5) {
             Log.error("Unsupported alg:", hashAlg);
             return Promise.reject(new Error("Unsupported alg: " + hashAlg));
         }
 
-        var hashBits = hashAlg.substr(2, 3);
+        let hashBits = hashAlg.substr(2, 3);
         if (!hashBits) {
             Log.error("Unsupported alg:", hashAlg, hashBits);
             return Promise.reject(new Error("Unsupported alg: " + hashAlg));
@@ -333,14 +335,14 @@ export default class ResponseValidator {
         }
 
         let sha = "sha" + hashBits;
-        var hash = this._joseUtil.hashString(response.access_token, sha);
+        let hash = this._joseUtil.hashString(response.access_token, sha);
         if (!hash) {
             Log.error("access_token hash failed:", sha);
             return Promise.reject(new Error("Failed to validate at_hash"));
         }
 
-        var left = hash.substr(0, hash.length / 2);
-        var left_b64u = this._joseUtil.hexToBase64Url(left);
+        let left = hash.substr(0, hash.length / 2);
+        let left_b64u = this._joseUtil.hexToBase64Url(left);
         if (left_b64u !== response.profile.at_hash) {
             Log.error("Failed to validate at_hash", left_b64u, response.profile.at_hash);
             return Promise.reject(new Error("Failed to validate at_hash"));

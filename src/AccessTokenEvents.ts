@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import Timer from './Timer';
+import Log from "./Log";
+import Timer from "./Timer";
 
 const DefaultAccessTokenExpiringNotificationTime = 60;
 
@@ -22,10 +22,10 @@ export default class AccessTokenEvents {
     _accessTokenExpiringNotificationTime: number;
     _accessTokenExpiring: Timer;
     _accessTokenExpired: Timer;
-    
+
     load(container) {
         Log.info("AccessTokenEvents.load");
-        
+
         this._cancelTimers();
 
         // only register events if there's an access token where we care about expiration
@@ -36,7 +36,7 @@ export default class AccessTokenEvents {
             if (duration > 0) {
                 // only register expiring if we still have time
                 let expiring = duration - this._accessTokenExpiringNotificationTime;
-                if (expiring <= 0){
+                if (expiring <= 0) {
                     expiring = 1;
                 }
                 Log.info("registering expiring timer in:", expiring);
@@ -54,8 +54,8 @@ export default class AccessTokenEvents {
         Log.info("AccessTokenEvents.unload");
         this._cancelTimers();
     }
-    
-    _cancelTimers(){
+
+    _cancelTimers() {
         Log.info("canceling existing access token timers");
         this._accessTokenExpiring.cancel();
         this._accessTokenExpired.cancel();

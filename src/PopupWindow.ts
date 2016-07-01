@@ -1,10 +1,10 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import Log from "./Log";
 
 const CheckForPopupClosedInterval = 500;
-const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100';
+const DefaultPopupFeatures = "location=no,toolbar=no,width=500,height=500,left=100,top=100";
 const DefaultPopupTarget = "_blank";
 
 export default class PopupWindow {
@@ -19,18 +19,18 @@ export default class PopupWindow {
 
         this._boundMessageEvent = this._message.bind(this);
         window.addEventListener("message", this._boundMessageEvent, false);
-        
+
         let features = params.popupWindowFeatures || DefaultPopupFeatures;
         let target = params.popupWindowTarget || DefaultPopupTarget;
 
-        this._popup = window.open('', target, features);
+        this._popup = window.open("", target, features);
         if (this._popup) {
             Log.info("popup successfully created");
             this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);
         }
     }
 
-        private _promise: Promise<any>;
+    private _promise: Promise<any>;
     private _resolve: Function;
     private _reject: Function;
     private _boundMessageEvent: any;
@@ -82,8 +82,8 @@ export default class PopupWindow {
 
         this._checkForPopupClosedTimer = null;
         this._boundMessageEvent = null;
-        
-        if (this._popup){
+
+        if (this._popup) {
             this._popup.close();
         }
         this._popup = null;
@@ -104,7 +104,7 @@ export default class PopupWindow {
             e.source === this._popup.window
         ) {
             Log.info("processing message");
-            
+
             let url = e.data || e.source.location.href; // for IE9
 
             this._cleanup();

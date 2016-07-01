@@ -1,15 +1,15 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import random from './random';
+import Log from "./Log";
+import random from "./random";
 
 export default class State {
     constructor({id = "", data = {}, created = 0} = {}) {
         this._id = id || random();
         this._data = data;
 
-        if (typeof created === 'number' && created > 0) {
+        if (typeof created === "number" && created > 0) {
             this._created = created;
         }
         else {
@@ -39,7 +39,7 @@ export default class State {
             created: this.created
         });
     }
-    
+
     static fromStorageString(storageString) {
         Log.info("State.fromStorageString");
         return new State(JSON.parse(storageString));
@@ -48,19 +48,19 @@ export default class State {
     static clearStaleState(storage, age) {
         Log.info("State.clearStaleState");
 
-        var cutoff = Date.now() / 1000 - age;
+        let cutoff = Date.now() / 1000 - age;
 
         return storage.getAllKeys().then(keys => {
             Log.info("got keys", keys);
 
-            var promises = [];
+            let promises = [];
             for (let key of keys) {
-                var p = storage.get(key).then(item => {
+                let p = storage.get(key).then(item => {
                     let remove = false;
 
                     if (item) {
                         try {
-                            var state = State.fromStorageString(item)
+                            let state = State.fromStorageString(item);
 
                             Log.info("got item from key: ", key, state.created);
 

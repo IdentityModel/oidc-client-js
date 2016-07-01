@@ -1,21 +1,24 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { jws, KEYUTIL as KeyUtil, X509, crypto, hextob64u } from 'jsrsasign';
-import Log from './Log';
+declare var jws: any, KeyUtil: any, X509: any, crypto: any, hextob64u: any;
 
-const AllowedSigningAlgs = ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'ES256', 'ES384', 'ES512'];
+// import "..\node_modules\jsrsasign\lib\jsrsasign.js";
+
+import Log from "./Log";
+
+const AllowedSigningAlgs = ["RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512"];
 
 export default class JoseUtil {
 
     public static parseJwt(jwt) {
         Log.info("JoseUtil.parseJwt");
         try {
-            var token = jws.JWS.parse(jwt);
+            let token = jws.JWS.parse(jwt);
             return {
                 header: token.headerObj,
                 payload: token.payloadObj
-            }
+            };
         }
         catch (e) {
             Log.error(e);
@@ -71,7 +74,7 @@ export default class JoseUtil {
             now = Date.now() / 1000;
         }
 
-        var payload = JoseUtil.parseJwt(jwt).payload;
+        let payload = JoseUtil.parseJwt(jwt).payload;
 
         if (payload.iss !== issuer) {
             Log.error("Invalid issuer in token", payload.iss);
@@ -83,8 +86,8 @@ export default class JoseUtil {
             return Promise.reject(new Error("Invalid audience in token: " + payload.aud));
         }
 
-        var lowerNow = now + clockSkew;
-        var upperNow = now - clockSkew;
+        let lowerNow = now + clockSkew;
+        let upperNow = now - clockSkew;
 
         if (lowerNow < payload.iat) {
             Log.error("iat is in the future", payload.iat);

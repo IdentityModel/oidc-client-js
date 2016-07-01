@@ -1,13 +1,21 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-export const Log = require('./src/Log');
-export const OidcClient = require('./src/OidcClient');
-export const WebStorageStateStore = require('./src/WebStorageStateStore');
-export const InMemoryWebStorage = require('./src/InMemoryWebStorage');
-export const UserManager = require('./src/UserManager');
-export const AccessTokenEvents = require('./src/AccessTokenEvents');
-export const MetadataService = require('./src/MetadataService');
+import log from "./src/Log";
+import oidcClient from "./src/OidcClient";
+import webStorageStateStore from "./src/WebStorageStateStore";
+import inMemoryWebStorage from "./src/InMemoryWebStorage";
+import userManager from "./src/UserManager";
+import accessTokenEvents from "./src/AccessTokenEvents";
+import metadataService from "./src/MetadataService";
+
+export const Log = log;
+export const OidcClient = oidcClient;
+export const WebStorageStateStore = webStorageStateStore;
+export const InMemoryWebStorage = inMemoryWebStorage;
+export const UserManager = userManager;
+export const AccessTokenEvents = accessTokenEvents;
+export const MetadataService = metadataService;
 
 export default {
     Log,

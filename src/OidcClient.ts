@@ -1,15 +1,15 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import OidcClientSettings from './OidcClientSettings';
-import ErrorResponse from './ErrorResponse';
-import SigninRequest from './SigninRequest';
-import SigninResponse from './SigninResponse';
-import SignoutRequest from './SignoutRequest';
-import SignoutResponse from './SignoutResponse';
-import SigninState from './SigninState';
-import State from './State';
+import Log from "./Log";
+import OidcClientSettings from "./OidcClientSettings";
+import ErrorResponse from "./ErrorResponse";
+import SigninRequest from "./SigninRequest";
+import SigninResponse from "./SigninResponse";
+import SignoutRequest from "./SignoutRequest";
+import SignoutResponse from "./SignoutResponse";
+import SigninState from "./SigninState";
+import State from "./State";
 
 export default class OidcClient {
     constructor(settings = {}) {
@@ -41,8 +41,8 @@ export default class OidcClient {
     }
 
     createSigninRequest({
-        response_type = "", scope = "", redirect_uri= "", data = {},
-        prompt= "", display= "", max_age = "", ui_locales = "", id_token_hint = "", login_hint = "", acr_values = ""} = {},
+        response_type = "", scope = "", redirect_uri = "", data = {},
+        prompt = "", display = "", max_age = "", ui_locales = "", id_token_hint = "", login_hint = "", acr_values = ""} = {},
         stateStore?: any
     ) {
         Log.info("OidcClient.createSigninRequest");
@@ -52,13 +52,13 @@ export default class OidcClient {
         scope = scope || this._settings.scope;
         redirect_uri = redirect_uri || this._settings.redirect_uri;
 
-        // id_token_hint, login_hint aren't allowed on _settings
+        // id_token_hint, login_hint aren"t allowed on _settings
         prompt = prompt || this._settings.prompt;
         display = display || this._settings.display;
         max_age = max_age || this._settings.max_age;
         ui_locales = ui_locales || this._settings.ui_locales;
         acr_values = acr_values || this._settings.acr_values;
-        
+
         let authority = this._settings.authority;
 
         return this._metadataService.getAuthorizationEndpoint().then(url => {
@@ -75,7 +75,7 @@ export default class OidcClient {
                 prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values
             });
 
-            var state = request.state;
+            let state = request.state;
             stateStore = stateStore || this._stateStore;
 
             return stateStore.set(state.id, state.toStorageString()).then(() => {
@@ -87,7 +87,7 @@ export default class OidcClient {
     processSigninResponse(url, stateStore?: any) {
         Log.info("OidcClient.processSigninResponse");
 
-        var response: any = new SigninResponse(url);
+        let response: any = new SigninResponse(url);
 
         if (!response.state) {
             Log.error("No state in response");
@@ -126,7 +126,7 @@ export default class OidcClient {
                 data
             });
 
-            var state = request.state;
+            let state = request.state;
             if (state) {
                 Log.info("Signout request has state to persist");
 
@@ -141,7 +141,7 @@ export default class OidcClient {
     processSignoutResponse(url, stateStore?: any) {
         Log.info("OidcClient.processSignoutResponse");
 
-        var response: any = new SignoutResponse(url);
+        let response: any = new SignoutResponse(url);
         if (!response.state) {
             Log.info("No state in response");
 
@@ -153,7 +153,7 @@ export default class OidcClient {
             return Promise.resolve(response);
         }
 
-        var stateKey = response.state;
+        let stateKey = response.state;
 
         stateStore = stateStore || this._stateStore;
 
