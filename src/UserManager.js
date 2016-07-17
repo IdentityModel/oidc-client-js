@@ -48,6 +48,8 @@ export default class UserManager extends OidcClient {
             if (user) {
                 Log.info("user loaded");
 
+                this._events.load(user, false);
+
                 return user;
             }
             else {
