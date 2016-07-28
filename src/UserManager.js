@@ -48,6 +48,11 @@ export default class UserManager extends OidcClient {
             if (user) {
                 Log.info("user loaded");
 
+<<<<<<< HEAD
+=======
+                this._events.load(user, false);
+
+>>>>>>> upstream/dev
                 return user;
             }
             else {
@@ -101,7 +106,14 @@ export default class UserManager extends OidcClient {
         args.redirect_uri = url;
         args.prompt = "none";
 
+<<<<<<< HEAD
         return this._signin(args, this._iframeNavigator, { startUrl: url });
+=======
+        return this._signin(args, this._iframeNavigator, { 
+            startUrl: url, 
+            silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
+        });
+>>>>>>> upstream/dev
     }
     signinSilentCallback(url) {
         Log.info("UserManager.signinSilentCallback");

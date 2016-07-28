@@ -7,7 +7,7 @@ const DefaultTimeout = 5000;
 
 export default class IFrameWindow {
 
-    constructor() {
+    constructor(params) {
         Log.info("IFrameWindow.ctor");
 
         this._promise = new Promise((resolve, reject) => {
@@ -30,7 +30,9 @@ export default class IFrameWindow {
             this._error("No url provided");
         }
         else {
-            this._timer = window.setTimeout(this._timeout.bind(this), DefaultTimeout);
+            let timeout = params.silentRequestTimeout || DefaultTimeout;
+            Log.info("Using timeout of:", timeout);
+            this._timer = window.setTimeout(this._timeout.bind(this), timeout);
             this._frame.src = params.url;
         }
         
@@ -63,7 +65,7 @@ export default class IFrameWindow {
 
         this._timer = null;
         this._frame = null;
-        this._boundMessageEventssage = null;
+        this._boundMessageEvent = null;
     }
 
     _timeout() {

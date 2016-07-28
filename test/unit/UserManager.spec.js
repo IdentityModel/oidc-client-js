@@ -83,4 +83,34 @@ describe("UserManager", function () {
 
     });
 
+    describe("signinSilent", function(){
+
+        it("should pass silentRequestTimeout from settings", function(done){
+
+            settings.silentRequestTimeout = 123;
+            settings.silent_redirect_uri = "http://client/silent_callback";
+            subject = new UserManager(settings);
+
+            subject._signin = function(args, nav, navArgs){
+                Log.info("_signin", args, nav, navArgs);
+
+                navArgs.silentRequestTimeout.should.equal(123);
+                done();
+            }
+            subject.signinSilent();
+        });
+
+        it("should pass silentRequestTimeout from params", function(done){
+
+            settings.silent_redirect_uri = "http://client/silent_callback";
+            subject = new UserManager(settings);
+
+            subject._signin = function(args, nav, navArgs){
+                navArgs.silentRequestTimeout.should.equal(234);
+                done();
+            }
+            subject.signinSilent({silentRequestTimeout:234});
+        });
+    });
+
 });

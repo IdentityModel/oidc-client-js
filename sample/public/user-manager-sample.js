@@ -36,6 +36,7 @@ var settings = {
     
     silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
     automaticSilentRenew:true,
+    //silentRequestTimeout:10000,
 
     filterProtocolClaims: true,
     loadUserInfo: true
