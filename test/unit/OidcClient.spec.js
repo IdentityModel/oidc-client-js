@@ -272,6 +272,17 @@ describe("OidcClient", function () {
             });
         });
 
+        it("should fail if no signout endpoint on metadata", function (done) {
+            stubMetadataService.getEndSessionEndpointResult = Promise.resolve(undefined);
+
+            var p = subject.createSignoutRequest();
+
+            p.catch(err => {
+                err.message.should.contain("no end session endpoint");
+                done();
+            });
+        });
+
         it("should store state", function (done) {
             stubMetadataService.getEndSessionEndpointResult = Promise.resolve("http://sts/signout");
 

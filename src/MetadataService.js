@@ -55,23 +55,30 @@ export default class MetadataService {
     
     getCheckSessionIframe() {
         Log.info("MetadataService.getCheckSessionIframe");
-        return this._getMetadataProperty("check_session_iframe");
+        return this._getMetadataProperty("check_session_iframe", true);
     }
 
     getEndSessionEndpoint() {
         Log.info("MetadataService.getEndSessionEndpoint");
-        return this._getMetadataProperty("end_session_endpoint");
+        return this._getMetadataProperty("end_session_endpoint", true);
     }
 
-    _getMetadataProperty(name) {
+    _getMetadataProperty(name, optional=false) {
         Log.info("MetadataService._getMetadataProperty", name);
 
         return this.getMetadata().then(metadata => {
             Log.info("metadata recieved");
 
             if (metadata[name] === undefined) {
-                Log.error("Metadata does not contain property " + name);
-                throw new Error("Metadata does not contain property " + name);
+
+                if (optional === true) {
+                    Log.warn("Metadata does not contain optional property " + name);
+                    return undefined;
+                }
+                else {
+                    Log.error("Metadata does not contain property " + name);
+                    throw new Error("Metadata does not contain property " + name);
+                }
             }
 
             return metadata[name];
