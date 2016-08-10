@@ -16,6 +16,8 @@ export default class UserManager extends OidcClient {
         }
         super(settings);
 
+
+        // order is important for these two properties; SilentRenewService depends on the events.
         this._events = new UserManagerEvents(settings);
 
         if (this.settings.automaticSilentRenew) {
