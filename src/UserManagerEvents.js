@@ -14,10 +14,12 @@ export default class UserManagerEvents extends AccessTokenEvents {
         this._silentRenewError = new Event("Silent renew error");
     }
 
-    load(user) {
+    load(user, raiseEvent=true) {
         Log.info("UserManagerEvents.load");
         super.load(user);
-        this._userLoaded.raise(user);
+        if (raiseEvent) {
+            this._userLoaded.raise(user);
+        }
     }
     unload() {
         Log.info("UserManagerEvents.unload");

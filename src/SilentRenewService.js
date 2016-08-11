@@ -8,6 +8,14 @@ export default class SilentRenewService {
     constructor(userManager) {
         this._userManager = userManager;
         this._userManager.events.addAccessTokenExpiring(this._tokenExpiring.bind(this));
+
+        // this will trigger loading of the user so the expiring events can be initialized
+        this._userManager.getUser().then(user=>{
+            // deliberate nop
+        }).catch(err=>{
+            // catch to suppress errors since we're in a ctor
+            Log.error("Error from getUser:", err.message);
+        });
     }
     
     _tokenExpiring() {

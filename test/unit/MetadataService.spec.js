@@ -220,6 +220,18 @@ describe("MetadataService", function() {
             });
         });
 
+        it("should support optional value", function(done) {
+            settings.metadata = {
+            };
+
+            let p = subject.getEndSessionEndpoint();
+
+            p.then(result => {
+                assert.isUndefined(result);
+                done();
+            });
+        });
+
     });
     
     describe("getCheckSessionIframe", function() {
@@ -233,6 +245,18 @@ describe("MetadataService", function() {
 
             p.then(result => {
                 result.should.equal("http://sts/check_session");
+                done();
+            });
+        });
+
+        it("should support optional value", function(done) {
+            settings.metadata = {
+            };
+
+            let p = subject.getCheckSessionIframe();
+
+            p.then(result => {
+                assert.isUndefined(result);
                 done();
             });
         });

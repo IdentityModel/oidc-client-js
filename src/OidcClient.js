@@ -115,6 +115,11 @@ export default class OidcClient {
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
 
         return this._metadataService.getEndSessionEndpoint().then(url => {
+            if (!url) {
+                Log.error("No end session endpoint url returned");
+                throw new Error("no end session endpoint");
+            }
+
             Log.info("Received end session endpoint", url);
 
             let request = new SignoutRequest({

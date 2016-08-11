@@ -16,15 +16,6 @@ export default class CordovaPopupWindow {
             this._reject = reject;
         });
 
-        if (!window.cordova) {
-            return _promise.reject("cordova is undefined")
-        }
-        
-        var cordovaMetadata = window.cordova.require("cordova/plugin_list").metadata;
-        if (this._isInAppBrowserInstalled(cordovaMetadata) === false) {
-            return _promise.reject("InAppBrowser plugin not found")
-        }
-    
         this.features = params.popupWindowFeatures || DefaultPopupFeatures;
         this.target = params.popupWindowTarget || DefaultPopupTarget;
         
@@ -33,7 +24,7 @@ export default class CordovaPopupWindow {
     }
 
     _isInAppBrowserInstalled(cordovaMetadata) {
-        return ["cordova-plugin-inappbrowser", "org.apache.cordova.inappbrowser"].some(function (name) {
+        return ["cordova-plugin-inappbrowser", "cordova-plugin-inappbrowser.inappbrowser", "org.apache.cordova.inappbrowser"].some(function (name) {
             return cordovaMetadata.hasOwnProperty(name)
         })
     }
@@ -44,6 +35,14 @@ export default class CordovaPopupWindow {
         if (!params || !params.url) {
             this._error("No url provided");
         } else {
+            if (!window.cordova) {
+                return this._error("cordova is undefined")
+            }
+            
+            var cordovaMetadata = window.cordova.require("cordova/plugin_list").metadata;
+            if (this._isInAppBrowserInstalled(cordovaMetadata) === false) {
+                return this._error("InAppBrowser plugin not found")
+            }
             this._popup = cordova.InAppBrowser.open(params.url, this.target, this.features);
             if (this._popup) {
                 Log.info("popup successfully created");
@@ -89,10 +88,9 @@ export default class CordovaPopupWindow {
     _cleanup() {
         Log.info("CordovaPopupWindow._cleanup");
 
-        this._popup.removeEventListener("exit", this._exitCallbackEvent, false);
-        this._popup.removeEventListener("loadstart", this._loadStartCallbackEvent, false);
-       
         if (this._popup){
+            this._popup.removeEventListener("exit", this._exitCallbackEvent, false);
+            this._popup.removeEventListener("loadstart", this._loadStartCallbackEvent, false);
             this._popup.close();
         }
         this._popup = null;
