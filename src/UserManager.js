@@ -11,10 +11,10 @@ import SessionMonitor from './SessionMonitor';
 
 export default class UserManager extends OidcClient {
     constructor(settings = {},
-         SilentRenewServiceCtor = SilentRenewService,
-         SessionMonitorCtor = SessionMonitor
+        SilentRenewServiceCtor = SilentRenewService,
+        SessionMonitorCtor = SessionMonitor
     ) {
-        
+
         if (!(settings instanceof UserManagerSettings)) {
             settings = new UserManagerSettings(settings);
         }
@@ -111,14 +111,45 @@ export default class UserManager extends OidcClient {
         args.redirect_uri = url;
         args.prompt = "none";
 
-        return this._signin(args, this._iframeNavigator, { 
-            startUrl: url, 
+        return this._signin(args, this._iframeNavigator, {
+            startUrl: url,
             silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
         });
     }
     signinSilentCallback(url) {
         Log.info("UserManager.signinSilentCallback");
         return this._signinCallback(url, this._iframeNavigator);
+    }
+
+    silentQueryCurrentSignedInSession(args = {}) {
+        Log.info("UserManager.silentQueryCurrentSignedInSession");
+
+        let url = args.redirect_uri || this.settings.silent_redirect_uri;
+        if (!url) {
+            Log.error("No silent_redirect_uri configured");
+            return Promise.reject(new Error("No silent_redirect_uri configured"));
+        }
+
+        args.redirect_uri = url;
+        args.prompt = "none";
+        args.response_type = "id_token";
+        args.scope = "openid";
+
+        return this._signinStart(args, this._iframeNavigator, {
+            startUrl: url,
+            silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
+        }).then(navResponse => {
+            return this.processSigninResponse(navResponse.url).then(signinResponse => {
+                Log.info("got signin response");
+
+                if (signinResponse.session_state && signinResponse.profile.sub) {
+                    return {
+                        session_state: signinResponse.session_state,
+                        sub: signinResponse.profile.sub
+                    };
+                }
+            });
+        });
     }
 
     _signin(args, navigator, navigatorParams = {}) {
@@ -163,10 +194,10 @@ export default class UserManager extends OidcClient {
             return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
         }
 
-        return this._signout(args, this._popupNavigator, { 
+        return this._signout(args, this._popupNavigator, {
             startUrl: url,
             popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
-            popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget 
+            popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
         });
     }
     signoutRedirectCallback(url) {
