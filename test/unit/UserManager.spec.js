@@ -40,6 +40,7 @@ describe("UserManager", function () {
         settings = {
             authority: 'http://sts/oidc',
             client_id: 'client',
+            monitorSession : false,
             navigator: stubNavigator,
             userStore: stubUserStore,
             stateStore: stubStateStore,
