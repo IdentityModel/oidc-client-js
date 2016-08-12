@@ -34,47 +34,57 @@ export default class SessionMonitor {
     get _metadataService() {
         return this._userManager.metadataService;
     }
-    get _client_id(){
+    get _client_id() {
         return this._settings.client_id;
     }
-    get _checkSessionInterval(){
+    get _checkSessionInterval() {
         return this._settings.checkSessionInterval;
     }
 
     _start(user) {
         let session_state = user.session_state;
-        Log.info("SessionMonitor._start; session_state:", session_state);
 
-        if (!this._checkSessionIFrame) {
-            this._metadataService.getCheckSessionIframe().then(url => {
-                if (url) {
-                    Log.info("Initializing check session iframe")
+        if (session_state) {
+            this._sub = user.profile.sub;
+            Log.info("SessionMonitor._start; session_state:", session_state, ", sub:", this._sub);
 
-                    let client_id = this._client_id;
-                    let interval = this._checkSessionInterval;
+            if (!this._checkSessionIFrame) {
+                this._metadataService.getCheckSessionIframe().then(url => {
+                    if (url) {
+                        Log.info("Initializing check session iframe")
 
-                    this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval);
-                    this._checkSessionIFrame.start(session_state);
-                }
-                else {
-                    Log.warn("No check session iframe found in the metadata");
-                }
-            }).catch(err => {
-                // catch to suppress errors since we're in non-promise callback
-                Log.error("Error from getCheckSessionIframe:", err.message);
-            });
-        }
-        else {
-            this._checkSessionIFrame.start(session_state);
+                        let client_id = this._client_id;
+                        let interval = this._checkSessionInterval;
+
+                        this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval);
+                        this._checkSessionIFrame.start(session_state);
+                    }
+                    else {
+                        Log.warn("No check session iframe found in the metadata");
+                    }
+                }).catch(err => {
+                    // catch to suppress errors since we're in non-promise callback
+                    Log.error("Error from getCheckSessionIframe:", err.message);
+                });
+            }
+            else {
+                this._checkSessionIFrame.start(session_state);
+            }
         }
     }
 
     _stop() {
         Log.info("SessionMonitor._stop");
-        this._checkSessionIFrame.stop();
+
+        this._sub = null;
+
+        if (this._checkSessionIFrame) {
+            this._checkSessionIFrame.stop();
+        }
     }
 
     _callback() {
         Log.info("SessionMonitor._callback; user has changed login status");
+        this._userManager.events._raiseUserSignedOut();
     }
 }
