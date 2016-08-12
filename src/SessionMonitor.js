@@ -84,7 +84,32 @@ export default class SessionMonitor {
     }
 
     _callback() {
-        Log.info("SessionMonitor._callback; user has changed login status");
-        this._userManager.events._raiseUserSignedOut();
+        Log.info("SessionMonitor._callback");
+
+        this._userManager.silentQueryCurrentSignedInSession().then(session => {
+            var raiseEvent = true;
+
+            if (session) {
+                if (session.sub === this._sub) {
+                    Log.info("Same sub still logged in at OP, restarting check session iframe; session_state:", session.session_state);
+                    this._checkSessionIFrame.start(session.session_state);
+                    raiseEvent = false;
+                }
+                else if (session) {
+                    Log.info("Different subject signed into OP:", session.sub);
+                }
+            }
+            else {
+                Log.info("Subject no longer signed into OP");
+            }
+
+            if (raiseEvent) {
+                Log.info("SessionMonitor._callback; raising signed out event");
+                this._userManager.events._raiseUserSignedOut();
+            }
+        }).catch(err => {
+            Log.info("Error calling silentQueryCurrentSignedInSession; raising signed out event", err.message);
+            this._userManager.events._raiseUserSignedOut();
+        });
     }
 }
