@@ -7,22 +7,29 @@ import UserManagerSettings from './UserManagerSettings';
 import User from './User';
 import UserManagerEvents from './UserManagerEvents';
 import SilentRenewService from './SilentRenewService';
+import SessionMonitor from './SessionMonitor';
 
 export default class UserManager extends OidcClient {
-    constructor(settings = {}) {
+    constructor(settings = {},
+         SilentRenewServiceCtor = SilentRenewService,
+         SessionMonitorCtor = SessionMonitor
+    ) {
         
         if (!(settings instanceof UserManagerSettings)) {
             settings = new UserManagerSettings(settings);
         }
         super(settings);
 
-
-        // order is important for these two properties; SilentRenewService depends on the events.
         this._events = new UserManagerEvents(settings);
 
+        // order is important for the following properties; these services depend upon the events.
         if (this.settings.automaticSilentRenew) {
             Log.info("automaticSilentRenew is configured, setting up silent renew")
-            this._silentRenewService = new SilentRenewService(this);
+            this._silentRenewService = new SilentRenewServiceCtor(this);
+        }
+        if (this.settings.monitorSession) {
+            Log.info("monitorSession is configured, setting up session monitor")
+            this._sessionMonitor = new SessionMonitorCtor(this);
         }
     }
 
@@ -66,7 +73,6 @@ export default class UserManager extends OidcClient {
 
         return this._storeUser(null).then(() => {
             Log.info("user removed from storage");
-
             this._events.unload();
         });
     }

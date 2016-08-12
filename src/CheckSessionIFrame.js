@@ -2,45 +2,69 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 import Log from './Log';
-import CheckSessionHtml from './CheckSessionHtml';
 
 const DefaultInterval = 2000;
 
 export default class CheckSessionIFrame {
-    constructor(callback) {
+    constructor(callback, client_id, url, interval) {
         this._callback = callback;
+        this._client_id = client_id;
+        this._url = url;
+        this._interval = interval || DefaultInterval;
+
+        var idx = url.indexOf("/", url.indexOf("//") + 2);
+        this._frame_origin = url.substr(0, idx);
+
+        this._frame = window.document.createElement("iframe");
+        this._frame.style.display = "none";
+        this._frame.src = url;
+        window.document.body.appendChild(this._frame);
 
         this._boundMessageEvent = this._message.bind(this);
         window.addEventListener("message", this._boundMessageEvent, false);
-        
-        this._frame = window.document.createElement("iframe");
-        this._frame.style.display = "none";
-        window.document.body.appendChild(this._frame);
-        this._frame.document.write(CheckSessionHtml);
     }
 
     _message(e) {
-        Log.info("CheckSessionIFrame._message");
-
-        if (e.origin === this._origin &&
-            e.source === this._popup.window
+        if (e.origin === this._frame_origin &&
+            e.source === this._frame.contentWindow
         ) {
-            Log.info("processing message", e.data);
-            this._callback();
+            if (e.data === "error"){
+                Log.error("error message from check session op iframe");
+                this.stop();
+            }
+            else if (e.data === "changed"){
+                Log.info("changed message from check session op iframe");
+                this.stop();
+                this._callback();
+            }
+            else {
+                Log.info(e.data + " message from check session op iframe");
+            }
         }
     }
 
-    get _origin() {
-        return window.location.protocol + "//" + window.location.host;
+    start(session_state) {
+        if (this._session_state !== session_state) {
+            Log.info("CheckSessionIFrame.start");
+
+            this.stop();
+            
+            this._session_state = session_state;
+
+            this._timer = window.setInterval(() => {
+                this._frame.contentWindow.postMessage(this._client_id + " " + this._session_state, this._frame_origin);
+            }, this._interval);
+        }
     }
 
-    init(client_id, check_session_iframe, session_state, interval) {
-        let msg = {
-            client_id: client_id,
-            check_session_iframe : check_session_iframe,
-            session_state : session_state,
-            check_interval: interval || DefaultInterval
-        };
-        this._frame.postMessage(msg, this._origin);
+    stop() {
+        Log.info("CheckSessionIFrame.stop");
+
+        this._session_state = null;
+
+        if (this._timer) {
+            window.clearInterval(this._timer);
+            this._timer = null;
+        }
     }
 }
