@@ -121,8 +121,8 @@ export default class UserManager extends OidcClient {
         return this._signinCallback(url, this._iframeNavigator);
     }
 
-    silentQueryCurrentSignedInSession(args = {}) {
-        Log.info("UserManager.silentQueryCurrentSignedInSession");
+    querySessionStatus(args = {}) {
+        Log.info("UserManager.querySessionStatus");
 
         let url = args.redirect_uri || this.settings.silent_redirect_uri;
         if (!url) {

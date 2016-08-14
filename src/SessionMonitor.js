@@ -86,7 +86,7 @@ export default class SessionMonitor {
     _callback() {
         Log.info("SessionMonitor._callback");
 
-        this._userManager.silentQueryCurrentSignedInSession().then(session => {
+        this._userManager.querySessionStatus().then(session => {
             var raiseEvent = true;
 
             if (session) {
@@ -108,7 +108,7 @@ export default class SessionMonitor {
                 this._userManager.events._raiseUserSignedOut();
             }
         }).catch(err => {
-            Log.info("Error calling silentQueryCurrentSignedInSession; raising signed out event", err.message);
+            Log.info("Error calling queryCurrentSigninSession; raising signed out event", err.message);
             this._userManager.events._raiseUserSignedOut();
         });
     }
