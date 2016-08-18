@@ -140,6 +140,12 @@ describe("SigninResponse", function () {
 
             subject = new SigninResponse("scope=foo%20bar");
             subject.isOpenIdConnect.should.be.false;
+
+            subject = new SigninResponse("scope=foo%20bar&id_token=foo");
+            subject.isOpenIdConnect.should.be.false;
+
+            subject = new SigninResponse("id_token=foo");
+            subject.isOpenIdConnect.should.be.true;
         });
     });
 

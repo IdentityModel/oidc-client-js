@@ -50,6 +50,6 @@ export default class SigninResponse {
     }
     
     get isOpenIdConnect(){
-        return this.scopes.indexOf(OidcScope) >= 0;
+		return this.scopes.indexOf(OidcScope) >= 0 || (this.scope === undefined && this.id_token !== undefined); //scope is optional if same as requested
     }
 }
