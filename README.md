@@ -5,7 +5,9 @@ Also included is support for user session and access token management.
 
 ## Install
 
-node v4.4 or later required
+##### Node.js
+
+Node.js v4.4 or later required.
 
 ##### NPM
 
