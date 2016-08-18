@@ -369,6 +369,9 @@ describe("MetadataService", function() {
                 {
                     use:'enc',
                     kid:"test"
+                },
+                {
+                    kid:"test_use_not_present"
                 }]
             });
 
@@ -378,6 +381,9 @@ describe("MetadataService", function() {
                 keys.should.deep.equal([{
                     use:'sig',
                     kid:"test"
+                },
+                {
+                    kid:"test_use_not_present"
                 }]);
                 done();
             })

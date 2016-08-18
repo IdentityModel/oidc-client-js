@@ -110,7 +110,7 @@ export default class MetadataService {
         Log.info("MetadataService._filterSigningKeys", keys);
 
         return keys.filter(item => {
-            return item.use === "sig";
+            return item.use === "sig" || (item.use === undefined && item.kid !== undefined);
         });
     }
 }
