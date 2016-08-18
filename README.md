@@ -5,7 +5,7 @@ Also included is support for user session and access token management.
 
 ## Install
 
-##### NPM
+##### NPM (v4.4 or later)
 
 `npm install oidc-client --save`
 
