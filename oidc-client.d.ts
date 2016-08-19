@@ -123,6 +123,8 @@ declare namespace Oidc {
         signoutRedirect(args?: any): Promise<any>;
         signoutRedirectCallback(url?: string): Promise<any>;
 
+        querySessionStatus(args?: any): Promise<any>;
+
         events: UserManagerEvents;
     }
     interface UserManagerEvents extends AccessTokenEvents {
@@ -137,6 +139,9 @@ declare namespace Oidc {
 
         addSilentRenewError(callback:(ev:null) => void);
         removeSilentRenewError(callback:(ev:null) => void);
+
+        addUserSignedOut(callback:(ev:null) => void);
+        removeUserSignedOut(callback:(ev:null) => void);
     }
     interface UserManagerCtor extends OidcClientCtor {
         popup_redirect_uri?: string;
