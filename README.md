@@ -5,6 +5,10 @@ Also included is support for user session and access token management.
 
 ## Install
 
+##### Node.js
+
+Node.js v4.4 or later required.
+
 ##### NPM
 
 `npm install oidc-client --save`
