@@ -48,5 +48,6 @@
   },
   "peerDependencies": {
     "babel-polyfill": ">=6.7.4"
-  }
+  },
+  "typings": "oidc-client.d.ts"
 }
