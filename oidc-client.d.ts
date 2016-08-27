@@ -59,6 +59,8 @@ declare namespace Oidc {
 
         getAuthorizationEndpoint();
 
+        getRegistrationEndpoint();
+
         getUserInfoEndpoint();
 
         getCheckSessionIframe();
@@ -113,6 +115,9 @@ declare namespace Oidc {
 
         signinPopup(args?: any): Promise<User>;
         signinPopupCallback(url?: string): Promise<any>;
+
+        signupPopup(args?: any): Promise<User>;
+        signupPopupCallback(url?: string): Promise<any>;
 
         signinSilent(args?: any): Promise<User>;
         signinSilentCallback(url?: string): Promise<any>;
