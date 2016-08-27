@@ -10,6 +10,7 @@ var path = '/oidc';
 var metadataPath = path + '/.well-known/openid-configuration';
 var signingKeysPath = path + '/.well-known/jwks';
 var authorizationPath = path + '/connect/authorize';
+var registrationPath = path + '/connect/register';
 var userInfoPath = path + '/connect/userinfo';
 var endSessionPath = path + '/connect/endsession';
 
@@ -17,6 +18,7 @@ var metadata = {
     issuer: path,
     jwks_uri: signingKeysPath,
     authorization_endpoint: authorizationPath,
+    registration_endpoint: registrationPath,
     userinfo_endpoint: userInfoPath,
     end_session_endpoint: endSessionPath,
 };
@@ -125,18 +127,18 @@ module.exports = function(baseUrl, app) {
         res.json(keys);
     });
 
-    app.get(authorizationPath, function(req, res) {
+    app.get([authorizationPath, registrationPath], function(req, res) {
         //res.send("<h1>waiting...</h1>"); return;
-        
+
         var response_type = req.query.response_type;
 
         var url = req.query.redirect_uri;
-        
+
         var state = req.query.state;
         if (state) {
             url = addFragment(url, "state", state);
         }
-        
+
         //url = addFragment(url, "error", "bad_stuff"); res.redirect(url); return;
 
         if (isOAuth(response_type)) {

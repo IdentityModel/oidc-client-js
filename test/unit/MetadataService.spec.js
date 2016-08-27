@@ -18,7 +18,7 @@ describe("MetadataService", function() {
     beforeEach(function() {
         Log.logger = console;
         Log.level = Log.NONE;
-        
+
         settings = {};
         stubJsonService = new StubJsonService();
         subject = new MetadataService(settings, ()=>stubJsonService);
@@ -124,7 +124,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
      describe("_getMetadataProperty", function() {
 
         it("should return a promise", function() {
@@ -155,9 +155,9 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
          it("should fail if json call to load metadata fails", function(done) {
-             
+
             settings.metadataUrl = "http://sts/metadata";
             stubJsonService.result = Promise.reject(new Error("test"));
 
@@ -168,7 +168,7 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
     });
 
     describe("getAuthorizationEndpoint", function() {
@@ -185,7 +185,23 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
+    });
+
+    describe("getRegistrationEndpoint", function() {
+
+        it("should return value from metadata", function(done) {
+           settings.metadata = {
+               registration_endpoint: "http://sts/register"
+           };
+
+           let p = subject.getRegistrationEndpoint();
+
+            p.then(result => {
+               result.should.equal("http://sts/register");
+                done();
+            });
+        });
     });
 
     describe("getUserInfoEndpoint", function() {
@@ -233,7 +249,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
     describe("getCheckSessionIframe", function() {
 
         it("should return value from", function(done) {
@@ -262,7 +278,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
     describe("getIssuer", function() {
 
         it("should return value from", function(done) {
@@ -279,7 +295,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
     describe("getSigningKeys", function() {
 
         it("should return a promise", function() {
@@ -340,7 +356,7 @@ describe("MetadataService", function() {
         });
 
         it("should return keys from jwks_uri", function(done) {
-            
+
             settings.metadata = {
                 jwks_uri: "http://sts/metadata/keys"
             };
@@ -379,7 +395,7 @@ describe("MetadataService", function() {
                 done();
             })
         });
-        
+
         it("should filter signing keys", function(done) {
             settings.metadata = {
                 jwks_uri: "http://sts/metadata/keys"

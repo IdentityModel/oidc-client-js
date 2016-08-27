@@ -45,6 +45,46 @@ export default class OidcClient {
     ) {
         Log.info("OidcClient.createSigninRequest");
 
+        return this._createAuthorizationRequest({
+            response_type, scope, redirect_uri, data,
+            prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values},
+            stateStore, 'authorization'
+        );
+    }
+
+    processSigninResponse(url, stateStore) {
+        Log.info("OidcClient.processSigninResponse");
+
+        return this._processAuthorizationResponse(url, stateStore);
+    }
+
+    createSignupRequest({
+      response_type, scope, redirect_uri, data,
+      prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values} = {},
+      stateStore
+    ) {
+        Log.info("OidcClient.createSignupRequest");
+
+        return this._createAuthorizationRequest({
+              response_type, scope, redirect_uri, data,
+              prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values},
+          stateStore, 'registration'
+        );
+    }
+
+    processSignupResponse(url, stateStore) {
+        Log.info("OidcClient.processSignupResponse");
+
+        return this._processAuthorizationResponse(url, stateStore);
+    }
+
+    _createAuthorizationRequest({
+      response_type, scope, redirect_uri, data,
+      prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values} = {},
+      stateStore, auth_type
+    ) {
+        Log.info("OidcClient._createAuthorizationRequest");
+
         let client_id = this._settings.client_id;
         response_type = response_type || this._settings.response_type;
         scope = scope || this._settings.scope;
@@ -56,11 +96,14 @@ export default class OidcClient {
         max_age = max_age || this._settings.max_age;
         ui_locales = ui_locales || this._settings.ui_locales;
         acr_values = acr_values || this._settings.acr_values;
-        
-        let authority = this._settings.authority;
 
-        return this._metadataService.getAuthorizationEndpoint().then(url => {
-            Log.info("Received authorization endpoint", url);
+        let authority = this._settings.authority;
+        let endpoint = auth_type === 'authorization'
+            ? this._metadataService.getAuthorizationEndpoint()
+            : this._metadataService.getRegistrationEndpoint();
+
+        return endpoint.then(url => {
+            Log.info("Received authorization/registration endpoint", url);
 
             let request = new SigninRequest({
                 url,
@@ -82,8 +125,8 @@ export default class OidcClient {
         });
     }
 
-    processSigninResponse(url, stateStore) {
-        Log.info("OidcClient.processSigninResponse");
+    _processAuthorizationResponse(url, stateStore) {
+        Log.info("OidcClient._processAuthorizationResponse");
 
         var response = new SigninResponse(url);
 

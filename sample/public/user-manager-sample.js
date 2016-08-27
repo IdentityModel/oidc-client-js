@@ -11,9 +11,12 @@ document.getElementById('removeUser').addEventListener("click", removeUser, fals
 document.getElementById('startSigninMainWindow').addEventListener("click", startSigninMainWindow, false);
 document.getElementById('endSigninMainWindow').addEventListener("click", endSigninMainWindow, false);
 document.getElementById('startSigninMainWindowDiffCallbackPage').addEventListener("click", startSigninMainWindowDiffCallbackPage, false);
+document.getElementById('startSignupMainWindow').addEventListener("click", startSignupMainWindow, false);
+document.getElementById('endSignupMainWindow').addEventListener("click", endSignupMainWindow, false);
 
 document.getElementById('popupSignin').addEventListener("click", popupSignin, false);
 document.getElementById('iframeSignin').addEventListener("click", iframeSignin, false);
+document.getElementById('popupSignup').addEventListener("click", popupSignup, false);
 
 document.getElementById('startSignoutMainWindow').addEventListener("click", startSignoutMainWindow, false);
 document.getElementById('endSignoutMainWindow').addEventListener("click", endSignoutMainWindow, false);
@@ -31,9 +34,9 @@ var settings = {
     post_logout_redirect_uri: 'http://localhost:5000/user-manager-sample.html',
     response_type: 'id_token token',
     scope: 'openid email roles',
-    
+
     popup_redirect_uri:'http://localhost:5000/user-manager-sample-popup.html',
-    
+
     silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
     automaticSilentRenew:true,
     //silentRequestTimeout:10000,
@@ -64,7 +67,7 @@ mgr.events.addSilentRenewError(function (e) {
 mgr.events.addUserLoaded(function (user) {
     console.log("user loaded", user);
     mgr.getUser().then(function(){
-       console.log("getUser loaded user after userLoaded event fired"); 
+       console.log("getUser loaded user after userLoaded event fired");
     });
 });
 
@@ -115,6 +118,22 @@ function endSigninMainWindow() {
     });
 }
 
+function startSignupMainWindow() {
+    mgr.signupRedirect({data:'some data'}).then(function() {
+        log("signupRedirect done");
+    }).catch(function(err) {
+        log(err);
+    });
+}
+
+function endSignupMainWindow() {
+    mgr.signupRedirectCallback().then(function(user) {
+        log("signed in", user);
+    }).catch(function(err) {
+        log(err);
+    });
+}
+
 function startSigninMainWindowDiffCallbackPage() {
     mgr.signinRedirect({data:'some data', redirect_uri: 'http://localhost:5000/user-manager-sample-callback.html'}).then(function() {
         log("signinRedirect done");
@@ -133,6 +152,14 @@ function popupSignin() {
 
 function iframeSignin() {
     mgr.signinSilent({data:'some data'}).then(function(user) {
+        log("signed in", user);
+    }).catch(function(err) {
+        log(err);
+    });
+}
+
+function popupSignup() {
+    mgr.signupPopup({data:'some data'}).then(function(user) {
         log("signed in", user);
     }).catch(function(err) {
         log(err);

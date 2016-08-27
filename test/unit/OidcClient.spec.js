@@ -31,16 +31,16 @@ describe("OidcClient", function () {
     let stubValidator;
 
     beforeEach(function () {
-        
+
         Global._testing();
-        
+
         Log.logger = console;
         Log.level = Log.NONE;
 
         stubStore = new StubStateStore();
         stubValidator = new StubResponseValidator();
         stubMetadataService = new StubMetadataService();
-        
+
         settings = {
             authority: 'authority',
             client_id: 'client',
@@ -161,7 +161,7 @@ describe("OidcClient", function () {
             });
         });
 
-        it("should fail if seting state into store fails", function (done) {
+        it("should fail if setting state into store fails", function (done) {
             stubMetadataService.getAuthorizationEndpointResult = Promise.resolve("http://sts/authorize");
             stubStore.error = "foo";
 
@@ -213,6 +213,136 @@ describe("OidcClient", function () {
             stubStore.item = new SigninState({ id: '1', nonce: '2', authority:'authority', client_id:'client' }).toStorageString();
 
             subject.processSigninResponse("state=1").then(response => {
+                stubValidator.signinState.id.should.equal('1');
+                stubValidator.signinState.nonce.should.equal('2');
+                stubValidator.signinState.authority.should.equal('authority');
+                stubValidator.signinState.client_id.should.equal('client');
+                stubValidator.signinResponse.should.be.deep.equal(response);
+                done();
+            });
+        });
+
+    });
+
+    describe("createSignupRequest", function () {
+
+        it("should return a promise", function () {
+            stubMetadataService.getRegistrationEndpointResult = Promise.resolve("http://sts/register");
+            subject.createSignupRequest().should.be.instanceof(Promise);
+        });
+
+        it("should return SignupRequest", function (done) {
+            stubMetadataService.getRegistrationEndpointResult = Promise.resolve("http://sts/register");
+
+            var p = subject.createSignupRequest();
+
+            p.then(request => {
+                request.should.be.instanceof(SigninRequest);
+                done();
+            });
+        });
+
+        it("should pass params to SignupRequest", function (done) {
+            stubMetadataService.getRegistrationEndpointResult = Promise.resolve("http://sts/register");
+
+            var p = subject.createSignupRequest({
+                data: 'foo',
+                response_type: 'bar',
+                scope: 'baz',
+                redirect_uri: 'quux',
+                prompt: 'p',
+                display: 'd',
+                max_age: 'm',
+                ui_locales: 'u',
+                id_token_hint: 'ith',
+                login_hint: 'lh',
+                acr_values: 'av'
+            });
+
+            p.then(request => {
+                request.state.data.should.equal('foo');
+
+                var url = request.url;
+                url.should.contain("http://sts/register");
+                url.should.contain("response_type=bar");
+                url.should.contain("scope=baz");
+                url.should.contain("redirect_uri=quux");
+                url.should.contain("prompt=p");
+                url.should.contain("display=d");
+                url.should.contain("max_age=m");
+                url.should.contain("ui_locales=u");
+                url.should.contain("id_token_hint=ith");
+                url.should.contain("login_hint=lh");
+                url.should.contain("acr_values=av");
+
+                done();
+            });
+        });
+
+        it("should fail if metadata fails", function (done) {
+
+            stubMetadataService.getRegistrationEndpointResult = Promise.reject(new Error("test"));
+
+            var p = subject.createSignupRequest();
+
+            p.then(null, err => {
+                err.message.should.contain("test");
+                done();
+            });
+        });
+
+        it("should fail if setting state into store fails", function (done) {
+            stubMetadataService.getRegistrationEndpointResult = Promise.resolve("http://sts/register");
+            stubStore.error = "foo";
+
+            var p = subject.createSignupRequest();
+
+            p.then(null, err => {
+                err.message.should.contain("foo");
+                done();
+            });
+        });
+
+        it("should store state", function (done) {
+            stubMetadataService.getRegistrationEndpointResult = Promise.resolve("http://sts/register");
+
+            var p = subject.createSignupRequest();
+
+            p.then(request => {
+                stubStore.item.should.be.ok;
+                done();
+            });
+        });
+
+    });
+
+    describe("processSignupResponse", function () {
+
+        it("should return a promise", function () {
+            subject.processSignupResponse("state=state").should.be.instanceof(Promise);
+        });
+
+        it("should fail if no state on response", function (done) {
+            stubStore.item = "state";
+            subject.processSignupResponse("").then(null, err => {
+                err.message.should.contain('state');
+                done();
+            });
+        });
+
+        it("should fail if storage fails", function (done) {
+            stubStore.error = "fail";
+            subject.processSignupResponse("state=state").then(null, err => {
+                err.message.should.contain('fail');
+                done();
+            });
+        });
+
+        it("should deserialize stored state and call validator", function (done) {
+
+            stubStore.item = new SigninState({ id: '1', nonce: '2', authority:'authority', client_id:'client' }).toStorageString();
+
+            subject.processSignupResponse("state=1").then(response => {
                 stubValidator.signinState.id.should.equal('1');
                 stubValidator.signinState.nonce.should.equal('2');
                 stubValidator.signinState.authority.should.equal('authority');
@@ -346,9 +476,9 @@ describe("OidcClient", function () {
                 done();
             });
         });
-        
+
         it("should call validator with state even if error in response", function (done) {
-           
+
             stubStore.item = new State({ id: '1', data:"bar" }).toStorageString();
 
             subject.processSignoutResponse("state=1&error=foo").then(response => {

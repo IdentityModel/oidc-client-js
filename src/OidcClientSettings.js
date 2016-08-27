@@ -133,7 +133,7 @@ export default class OidcClientSettings {
         return this._metadataUrl;
     }
 
-    // settable/cachable metadata values
+    // settable/cacheable metadata values
     get metadata() {
         return this._metadata;
     }

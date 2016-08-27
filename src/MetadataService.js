@@ -37,7 +37,7 @@ export default class MetadataService {
                 return metadata;
             });
     }
-    
+
     getIssuer() {
         Log.info("MetadataService.getIssuer");
         return this._getMetadataProperty("issuer");
@@ -48,11 +48,16 @@ export default class MetadataService {
         return this._getMetadataProperty("authorization_endpoint");
     }
 
+    getRegistrationEndpoint() {
+        Log.info("MetadataService.getRegistrationEndpoint");
+        return this._getMetadataProperty("registration_endpoint");
+    }
+
     getUserInfoEndpoint() {
         Log.info("MetadataService.getUserInfoEndpoint");
         return this._getMetadataProperty("userinfo_endpoint");
     }
-    
+
     getCheckSessionIframe() {
         Log.info("MetadataService.getCheckSessionIframe");
         return this._getMetadataProperty("check_session_iframe", true);
@@ -67,7 +72,7 @@ export default class MetadataService {
         Log.info("MetadataService._getMetadataProperty", name);
 
         return this.getMetadata().then(metadata => {
-            Log.info("metadata recieved");
+            Log.info("metadata received");
 
             if (metadata[name] === undefined) {
 

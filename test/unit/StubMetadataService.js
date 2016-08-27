@@ -11,6 +11,9 @@ export default class StubMetadataService{
     getAuthorizationEndpoint(){
         return this.getAuthorizationEndpointResult;
     }
+    getRegistrationEndpoint(){
+        return this.getRegistrationEndpointResult;
+    }
     getEndSessionEndpoint(){
         return this.getEndSessionEndpointResult;
     }
