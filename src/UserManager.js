@@ -99,6 +99,28 @@ export default class UserManager extends OidcClient {
         Log.info("UserManager.signinPopupCallback");
         return this._signinCallback(url, this._popupNavigator);
     }
+    signupPopup(args = {}) {
+        Log.info("UserManager.signupPopup");
+
+        let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
+        if (!url) {
+            Log.error("No popup_redirect_uri or redirect_uri configured");
+            return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
+        }
+
+        args.redirect_uri = url;
+        args.display = "popup";
+
+        return this._signup(args, this._popupNavigator, {
+            startUrl: url,
+            popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
+            popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
+        });
+    }
+    signupPopupCallback(url) {
+        Log.info("UserManager.signupPopupCallback");
+        return this._signupCallback(url, this._popupNavigator);
+    }
     signinSilent(args = {}) {
         Log.info("UserManager.signinSilent");
 
@@ -162,6 +184,16 @@ export default class UserManager extends OidcClient {
         Log.info("_signinCallback");
         return navigator.callback(url);
     }
+    _signup(args, navigator, navigatorParams = {}) {
+        Log.info("_signup");
+        return this._signupStart(args, navigator, navigatorParams).then(navResponse => {
+            return this._signupEnd(navResponse.url);
+        });
+    }
+    _signupCallback(url, navigator) {
+        Log.info("_signupCallback");
+        return navigator.callback(url);
+    }
     _signout(args, navigator, navigatorParams = {}) {
         Log.info("_signout");
         return this._signoutStart(args, navigator, navigatorParams).then(navResponse => {
@@ -180,6 +212,14 @@ export default class UserManager extends OidcClient {
     signinRedirectCallback(url) {
         Log.info("UserManager.signinRedirectCallback");
         return this._signinEnd(url || this._redirectNavigator.url);
+    }
+    signupRedirect(args) {
+        Log.info("UserManager.signupRedirect");
+        return this._signupStart(args, this._redirectNavigator);
+    }
+    signupRedirectCallback(url) {
+        Log.info("UserManager.signupRedirectCallback");
+        return this._signupEnd(url || this._redirectNavigator.url);
     }
     signoutRedirect(args) {
         Log.info("UserManager.signoutRedirect");
@@ -226,6 +266,38 @@ export default class UserManager extends OidcClient {
             Log.info("got signin response");
 
             let user = new User(signinResponse);
+
+            return this._storeUser(user).then(() => {
+                Log.info("user stored");
+
+                this._events.load(user);
+
+                return user;
+            });
+        });
+    }
+
+    _signupStart(args, navigator, navigatorParams = {}) {
+        Log.info("_signupStart");
+
+        return navigator.prepare(navigatorParams).then(handle => {
+            Log.info("got navigator window handle");
+
+            return this.createSignupRequest(args).then(signupRequest => {
+                Log.info("got signin request");
+
+                navigatorParams.url = signupRequest.url;
+                return handle.navigate(navigatorParams);
+            });
+        });
+    }
+    _signupEnd(url) {
+        Log.info("_signupEnd");
+
+        return this.processSignupResponse(url).then(signupResponse => {
+            Log.info("got signin response");
+
+            let user = new User(signupResponse);
 
             return this._storeUser(user).then(() => {
                 Log.info("user stored");
