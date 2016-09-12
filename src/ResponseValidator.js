@@ -242,12 +242,6 @@ export default class ResponseValidator {
             return Promise.reject(new Error("Invalid nonce in id_token"));
         }
 
-        var kid = jwt.header.kid;
-        if (!kid) {
-            Log.error("No kid found in id_token");
-            return Promise.reject(new Error("No kid found in id_token"));
-        }
-
         return this._metadataService.getIssuer().then(issuer => {
             Log.info("Received issuer");
 
@@ -259,9 +253,19 @@ export default class ResponseValidator {
 
                 Log.info("Received signing keys");
 
-                let key = keys.filter(key => {
-                    return key.kid === kid;
-                })[0];
+                var kid = jwt.header.kid;
+                let key = null;
+                if (keys.length == 1 && !kid) {
+                    key = keys[0];
+                } else {
+                    if (!kid) {
+                        Log.error("No kid found in id_token");
+                        return Promise.reject(new Error("No kid found in id_token"));
+                    }
+                    key = keys.filter(key => {
+                        return key.kid === kid;
+                    })[0];
+                }
 
                 if (!key) {
                     Log.error("No key matching kid found in signing keys");
