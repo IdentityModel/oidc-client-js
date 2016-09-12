@@ -243,10 +243,6 @@ export default class ResponseValidator {
         }
 
         var kid = jwt.header.kid;
-        if (!kid) {
-            Log.error("No kid found in id_token");
-            return Promise.reject(new Error("No kid found in id_token"));
-        }
 
         return this._metadataService.getIssuer().then(issuer => {
             Log.info("Received issuer");
@@ -258,6 +254,17 @@ export default class ResponseValidator {
                 }
 
                 Log.info("Received signing keys");
+                if (!kid) {
+                    if (keys.length > 1) {
+                        Log.error("No kid found in id_token");
+                        return Promise.reject(new Error("No kid found in id_token"));
+                    } else {
+                        // kid is mandatory only when there are multiple keys in the referenced JWK Set document
+                        // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
+                        kid = keys[0].kid;
+                    }
+                    
+                }
 
                 let key = keys.filter(key => {
                     return key.kid === kid;
