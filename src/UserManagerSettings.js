@@ -20,6 +20,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         silentRequestTimeout,
         automaticSilentRenew = false,
         monitorSession = true,
+        checkSessionInterval,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
@@ -31,18 +32,19 @@ export default class UserManagerSettings extends OidcClientSettings {
         this._popup_redirect_uri = popup_redirect_uri;
         this._popupWindowFeatures = popupWindowFeatures;
         this._popupWindowTarget = popupWindowTarget;
-        
+
         this._silent_redirect_uri = silent_redirect_uri;
         this._silentRequestTimeout = silentRequestTimeout;
         this._automaticSilentRenew = !!automaticSilentRenew;
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
         this._monitorSession = monitorSession;
+        this._checkSessionInterval = checkSessionInterval;
 
         this._redirectNavigator = redirectNavigator;
         this._popupNavigator = popupNavigator;
         this._iframeNavigator = iframeNavigator;
-        
+
         this._userStore = userStore;
     }
 
@@ -59,7 +61,7 @@ export default class UserManagerSettings extends OidcClientSettings {
     get silent_redirect_uri() {
         return this._silent_redirect_uri;
     }
-     get silentRequestTimeout() {
+    get silentRequestTimeout() {
         return this._silentRequestTimeout;
     }
     get automaticSilentRenew() {
@@ -72,6 +74,9 @@ export default class UserManagerSettings extends OidcClientSettings {
     get monitorSession() {
         return this._monitorSession;
     }
+    get checkSessionInterval() {
+        return this._checkSessionInterval;
+    }
 
     get redirectNavigator() {
         return this._redirectNavigator;
@@ -82,7 +87,7 @@ export default class UserManagerSettings extends OidcClientSettings {
     get iframeNavigator() {
         return this._iframeNavigator;
     }
-    
+
     get userStore() {
         return this._userStore;
     }

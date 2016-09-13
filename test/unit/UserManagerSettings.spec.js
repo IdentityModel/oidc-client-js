@@ -36,7 +36,7 @@ describe("UserManagerSettings", function () {
         });
 
     });
-    
+
     describe("popupWindowFeatures", function () {
 
         it("should return value from initial settings", function () {
@@ -45,7 +45,7 @@ describe("UserManagerSettings", function () {
         });
 
     });
-    
+
     describe("popupWindowTarget", function () {
 
         it("should return value from initial settings", function () {
@@ -135,7 +135,7 @@ describe("UserManagerSettings", function () {
             subject.popupNavigator.should.equal(temp);
         });
     });
-    
+
     describe("iframeNavigator", function() {
         it("should return value from initial settings", function() {
             let temp = {};
@@ -153,6 +153,24 @@ describe("UserManagerSettings", function () {
                 userStore : temp
             });
             subject.userStore.should.equal(temp);
+        });
+    });
+
+    describe("monitorSession", function() {
+        it("should return value from initial settings", function() {
+            let subject = new UserManagerSettings({
+                monitorSession : true
+            });
+            subject.monitorSession.should.be.true;
+        });
+    });
+
+    describe("checkSessionInterval", function() {
+        it("should return value from initial settings", function() {
+            let subject = new UserManagerSettings({
+                checkSessionInterval : 30000
+            });
+            subject.checkSessionInterval.should.equal(30000);
         });
     });
 });
