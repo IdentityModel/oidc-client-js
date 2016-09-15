@@ -11,6 +11,7 @@ export const MetadataService = require('./src/MetadataService');
 export const CordovaPopupNavigator = require('./src/CordovaPopupNavigator');
 export const CordovaIFrameNavigator = require('./src/CordovaIFrameNavigator');
 export const CheckSessionIFrame = require('./src/CheckSessionIFrame');
+export const User = require('./src/User');
 
 export default {
     Log,
@@ -22,5 +23,6 @@ export default {
     MetadataService,
     CordovaPopupNavigator,
     CordovaIFrameNavigator,
-    CheckSessionIFrame
+    CheckSessionIFrame,
+    User
 };
