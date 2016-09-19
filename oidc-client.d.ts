@@ -1,3 +1,8 @@
+// Type definitions for oidc-client v1.1.0
+// Project: https://github.com/IdentityModel/oidc-client-js
+// Definitions by: Brock Allen <https://github.com/brockallen>
+// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+
 declare var UserManager: Oidc.UserManager;
 declare var OidcClient: Oidc.OidcClient;
 declare var AccessTokenEvents: Oidc.AccessTokenEvents;
@@ -9,19 +14,29 @@ declare var WebStorageStateStore: Oidc.WebStorageStateStore;
 declare module "oidc-client" {
     export = Oidc;
 }
-declare namespace Oidc {
 
+declare namespace Oidc {
+    class Error {
+        message: string;
+    }
+
+    class Promise<T> {
+        constructor(promise: any);
+        then(successCallback: (value?: T) => void, errorCallback: (err?: Error) => void): Promise<T>;
+        catch(errorCallback: (err:Error) => void): Promise<T>;
+    }
+    
     interface AccessTokenEvents {
 
         load(container);
 
         unload();
 
-        addAccessTokenExpiring(callback:(ev:null) => void);
-        removeAccessTokenExpiring(callback:(ev:null) => void);
+        addAccessTokenExpiring(callback:(ev:any) => void);
+        removeAccessTokenExpiring(callback:(ev:any) => void);
 
-        addAccessTokenExpired(callback:(ev:null) => void);
-        removeAccessTokenExpired(callback:(ev:null) => void);
+        addAccessTokenExpired(callback:(ev:any) => void);
+        removeAccessTokenExpired(callback:(ev:any) => void);
     }
     interface InMemoryWebStorage {
         getItem(key: string);
@@ -131,17 +146,17 @@ declare namespace Oidc {
         load(user: User);
         unload();
 
-        addUserLoaded(callback:(ev:null) => void);
-        removeUserLoaded(callback:(ev:null) => void);
+        addUserLoaded(callback:(ev:any) => void);
+        removeUserLoaded(callback:(ev:any) => void);
 
-        addUserUnloaded(callback:(ev:null) => void);
-        removeUserUnloaded(callback:(ev:null) => void);
+        addUserUnloaded(callback:(ev:any) => void);
+        removeUserUnloaded(callback:(ev:any) => void);
 
-        addSilentRenewError(callback:(ev:null) => void);
-        removeSilentRenewError(callback:(ev:null) => void);
+        addSilentRenewError(callback:(ev:any) => void);
+        removeSilentRenewError(callback:(ev:any) => void);
 
-        addUserSignedOut(callback:(ev:null) => void);
-        removeUserSignedOut(callback:(ev:null) => void);
+        addUserSignedOut(callback:(ev:any) => void);
+        removeUserSignedOut(callback:(ev:any) => void);
     }
     interface UserManagerCtor extends OidcClientCtor {
         popup_redirect_uri?: string;
