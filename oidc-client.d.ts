@@ -13,62 +13,62 @@ declare namespace Oidc {
 
     interface AccessTokenEvents {
 
-        load(container);
+        load(container: any): any;
 
-        unload();
+        unload(): any;
 
-        addAccessTokenExpiring(callback:(ev:null) => void);
-        removeAccessTokenExpiring(callback:(ev:null) => void);
+        addAccessTokenExpiring(callback: (ev: any) => void): any;
+        removeAccessTokenExpiring(callback: (ev: any) => void): any;
 
-        addAccessTokenExpired(callback:(ev:null) => void);
-        removeAccessTokenExpired(callback:(ev:null) => void);
+        addAccessTokenExpired(callback: (ev: any) => void): any;
+        removeAccessTokenExpired(callback: (ev: any) => void): any;
     }
     interface InMemoryWebStorage {
-        getItem(key: string);
+        getItem(key: string): any;
 
-        setItem(key: string, value: any);
+        setItem(key: string, value: any): any;
 
-        removeItem(key: string);
+        removeItem(key: string): any;
 
-        key(index: number);
+        key(index: number): any;
 
         length?: number;
     }
     interface Log {
-        NONE();
-        ERROR();
-        WARN();
-        INFO();
+        NONE(): number;
+        ERROR(): number;
+        WARN(): number;
+        INFO(): number;
 
-        reset();
+        reset(): void;
 
-        level(value);
+        level(value: number): number;
 
-        logger(value);
+        logger(value: any): any;
 
-        info(...args);
-        warn(...args);
-        error(...args);
+        info(...args: any[]): void;
+        warn(...args: any[]): void;
+        error(...args: any[]): void;
     }
 
     interface MetadataService {
-        new (settings: any);
-        getMetadata();
+        new (settings: any): any;
+        getMetadata(): any;
 
-        getIssuer();
+        getIssuer(): any;
 
-        getAuthorizationEndpoint();
+        getAuthorizationEndpoint(): any;
 
-        getUserInfoEndpoint();
+        getUserInfoEndpoint(): any;
 
-        getCheckSessionIframe();
+        getCheckSessionIframe(): any;
 
-        getEndSessionEndpoint();
+        getEndSessionEndpoint(): any;
 
-        getSigningKeys();
+        getSigningKeys(): any;
     }
     interface OidcClient {
-        new (settings: OidcClientCtor);
+        new (settings: OidcClientCtor): any;
 
         createSigninRequest(args?: any): Promise<any>;
         processSigninResponse(): Promise<any>;
@@ -104,7 +104,7 @@ declare namespace Oidc {
     }
 
     interface UserManager extends OidcClient {
-        new (settings: UserManagerCtor);
+        new (settings: UserManagerCtor): any;
 
         clearStaleState(): Promise<void>;
 
@@ -128,20 +128,20 @@ declare namespace Oidc {
         events: UserManagerEvents;
     }
     interface UserManagerEvents extends AccessTokenEvents {
-        load(user: User);
-        unload();
+        load(user: User): any;
+        unload(): any;
 
-        addUserLoaded(callback:(ev:null) => void);
-        removeUserLoaded(callback:(ev:null) => void);
+        addUserLoaded(callback: (ev: any) => void): any;
+        removeUserLoaded(callback: (ev: any) => void): any;
 
-        addUserUnloaded(callback:(ev:null) => void);
-        removeUserUnloaded(callback:(ev:null) => void);
+        addUserUnloaded(callback: (ev: any) => void): any;
+        removeUserUnloaded(callback: (ev: any) => void): any;
 
-        addSilentRenewError(callback:(ev:null) => void);
-        removeSilentRenewError(callback:(ev:null) => void);
+        addSilentRenewError(callback: (ev: any) => void): any;
+        removeSilentRenewError(callback: (ev: any) => void): any;
 
-        addUserSignedOut(callback:(ev:null) => void);
-        removeUserSignedOut(callback:(ev:null) => void);
+        addUserSignedOut(callback: (ev: any) => void): any;
+        removeUserSignedOut(callback: (ev: any) => void): any;
     }
     interface UserManagerCtor extends OidcClientCtor {
         popup_redirect_uri?: string;
@@ -156,13 +156,13 @@ declare namespace Oidc {
         userStore?: any;
     }
     interface WebStorageStateStore {
-        set(key: string, value: any);
+        set(key: string, value: any): any;
 
-        get(key: string);
+        get(key: string): any;
 
-        remove(key: string);
+        remove(key: string): any;
 
-        getAllKeys();
+        getAllKeys(): any;
     }
     interface User {
         id_token: string;
@@ -173,6 +173,6 @@ declare namespace Oidc {
         profile: any;
         expires_at: any;
         state: any;
-        toStorageString(storageString?: any);
+        toStorageString(storageString?: any): any;
     }
 }
