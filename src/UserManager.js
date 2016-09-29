@@ -146,10 +146,11 @@ export default class UserManager extends OidcClient {
             return this.processSigninResponse(navResponse.url).then(signinResponse => {
                 Log.info("got signin response");
 
-                if (signinResponse.session_state && signinResponse.profile.sub) {
+                if (signinResponse.session_state && signinResponse.profile.sub && signinResponse.profile.sid) {
                     return {
                         session_state: signinResponse.session_state,
-                        sub: signinResponse.profile.sub
+                        sub: signinResponse.profile.sub,
+                        sid: signinResponse.profile.sid
                     };
                 }
             });
