@@ -46,6 +46,7 @@ export default class SessionMonitor {
 
         if (session_state) {
             this._sub = user.profile.sub;
+            this._sid = user.profile.sid;
             Log.info("SessionMonitor._start; session_state:", session_state, ", sub:", this._sub);
 
             if (!this._checkSessionIFrame) {
@@ -77,6 +78,7 @@ export default class SessionMonitor {
         Log.info("SessionMonitor._stop");
 
         this._sub = null;
+        this._sid = null;
 
         if (this._checkSessionIFrame) {
             this._checkSessionIFrame.stop();
@@ -87,15 +89,20 @@ export default class SessionMonitor {
         Log.info("SessionMonitor._callback");
 
         this._userManager.querySessionStatus().then(session => {
-            var raiseEvent = true;
+            var raiseUserSignedOutEvent = true;
 
             if (session) {
                 if (session.sub === this._sub) {
-                    Log.info("Same sub still logged in at OP, restarting check session iframe; session_state:", session.session_state);
+                    raiseUserSignedOutEvent = false;
                     this._checkSessionIFrame.start(session.session_state);
-                    raiseEvent = false;
-                }
-                else if (session) {
+
+                    if (session.sid === this._sid) {
+                        Log.info("Same sub still logged in at OP, restarting check session iframe; session_state:", session.session_state);
+                    } else {
+                        Log.info("Same sub still logged int at OP, session state has changed, restarting check session iframe; session_state:", session.session_state);
+                        this._userManager.events._raiseUserSessionChanged();
+                    }
+                } else {
                     Log.info("Different subject signed into OP:", session.sub);
                 }
             }
@@ -103,7 +110,7 @@ export default class SessionMonitor {
                 Log.info("Subject no longer signed into OP");
             }
 
-            if (raiseEvent) {
+            if (raiseUserSignedOutEvent) {
                 Log.info("SessionMonitor._callback; raising signed out event");
                 this._userManager.events._raiseUserSignedOut();
             }

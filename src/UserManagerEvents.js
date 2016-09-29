@@ -13,6 +13,7 @@ export default class UserManagerEvents extends AccessTokenEvents {
         this._userUnloaded = new Event("User unloaded");
         this._silentRenewError = new Event("Silent renew error");
         this._userSignedOut = new Event("User signed out");
+        this._userSessionChanged = new Event("User session changed");
     }
 
     load(user, raiseEvent=true) {
@@ -62,5 +63,16 @@ export default class UserManagerEvents extends AccessTokenEvents {
     _raiseUserSignedOut(e) {
         Log.info("UserManagerEvents._raiseUserSignedOut");
         this._userSignedOut.raise(e);
+    }
+
+    addUserSessionChanged(cb) {
+        this._userSessionChanged.addHandler(cb);
+    }
+    removeUserSessionChanged(cb) {
+        this._userSessionChanged.removeHandler(cb);
+    }
+    _raiseUserSessionChanged(e) {
+        Log.info("UserManagerEvents._raiseUserSessionChanged");
+        this._userSessionChanged.raise(e);
     }
 }
