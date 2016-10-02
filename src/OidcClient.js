@@ -39,7 +39,11 @@ export default class OidcClient {
     }
 
     createSigninRequest({
-        response_type, scope, redirect_uri, data,
+        response_type, scope, redirect_uri, 
+        // data was meant to be the place a caller could indiate the data to 
+        // have round tripped, but people were getting confused, so i added state (since that matches the spec) 
+        // and so now if data is not passed, but state is then state will be used
+        data, state,
         prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values} = {},
         stateStore
     ) {
@@ -68,15 +72,15 @@ export default class OidcClient {
                 redirect_uri,
                 response_type,
                 scope,
-                data,
+                data: data || state,
                 authority,
                 prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values
             });
 
-            var state = request.state;
+            var signinState = request.state;
             stateStore = stateStore || this._stateStore;
 
-            return stateStore.set(state.id, state.toStorageString()).then(() => {
+            return stateStore.set(signinState.id, signinState.toStorageString()).then(() => {
                 return request;
             });
         });
@@ -107,7 +111,7 @@ export default class OidcClient {
         });
     }
 
-    createSignoutRequest({id_token_hint, data, post_logout_redirect_uri} = {},
+    createSignoutRequest({id_token_hint, data, state, post_logout_redirect_uri} = {},
         stateStore
     ) {
         Log.info("OidcClient.createSignoutRequest");
@@ -126,15 +130,15 @@ export default class OidcClient {
                 url,
                 id_token_hint,
                 post_logout_redirect_uri,
-                data
+                data: data || state
             });
 
-            var state = request.state;
-            if (state) {
+            var signoutState = request.state;
+            if (signoutState) {
                 Log.info("Signout request has state to persist");
 
                 stateStore = stateStore || this._stateStore;
-                stateStore.set(state.id, state.toStorageString());
+                stateStore.set(signoutState.id, signoutState.toStorageString());
             }
 
             return request;
