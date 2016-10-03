@@ -3,6 +3,7 @@
 
 export const Log = require('./src/Log');
 export const OidcClient = require('./src/OidcClient');
+export const OidcClientSettings = require('./src/OidcClientSettings');
 export const WebStorageStateStore = require('./src/WebStorageStateStore');
 export const InMemoryWebStorage = require('./src/InMemoryWebStorage');
 export const UserManager = require('./src/UserManager');
@@ -15,6 +16,7 @@ export const CheckSessionIFrame = require('./src/CheckSessionIFrame');
 export default {
     Log,
     OidcClient,
+    OidcClientSettings,
     WebStorageStateStore,
     InMemoryWebStorage,
     UserManager,
