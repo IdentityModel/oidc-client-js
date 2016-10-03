@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>user-manager test</title>
+    <link rel='stylesheet' href='app.css'>
+</head>
+
+<body>
+    <script src='oidc-client.js'></script>
+    <script>
+        Oidc.Log.logger = console;
+        Oidc.Log.logLevel = Oidc.Log.INFO;
+        new Oidc.UserManager().signinSilentCallback();
+    </script>
+</body>
+
+</html>

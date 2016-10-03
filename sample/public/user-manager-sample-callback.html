@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>oidc-client test</title>
+        <link rel='stylesheet' href='app.css'>
+    </head>
+    <body>
+        <div>
+            <a href="user-manager-sample.html">back to sample</a>
+        </div>
+        <pre id='out'></pre>
+        <script src='log.js'></script>
+        <script src='oidc-client.js'></script>
+        <script>
+            Oidc.Log.logger = console;
+            Oidc.Log.logLevel = Oidc.Log.INFO;
+            new Oidc.UserManager().signinRedirectCallback().then(function(user) {
+                log("signin response success", user);
+            }).catch(function(err) {
+                log(err);
+            });
+        </script>
+    </body>
+</html>
