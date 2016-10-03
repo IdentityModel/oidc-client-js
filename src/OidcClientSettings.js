@@ -21,7 +21,7 @@ export default class OidcClientSettings {
         client_id, response_type = DefaultResponseType, scope = DefaultScope,
         redirect_uri, post_logout_redirect_uri,
         // optional protocol
-        prompt, display, max_age, ui_locales, acr_values,
+        prompt, display, max_age, ui_locales, acr_values, resource,
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
         staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
@@ -47,6 +47,7 @@ export default class OidcClientSettings {
         this._max_age = max_age;
         this._ui_locales = ui_locales;
         this._acr_values = acr_values;
+        this._resource = resource;
 
         this._filterProtocolClaims = !!filterProtocolClaims;
         this._loadUserInfo = !!loadUserInfo;
@@ -101,6 +102,9 @@ export default class OidcClientSettings {
     }
     get acr_values() {
         return this._acr_values;
+    }
+    get resource() {
+        return this._resource;
     }
 
 

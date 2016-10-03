@@ -126,7 +126,8 @@ describe("OidcClient", function () {
                 ui_locales: 'u',
                 id_token_hint: 'ith',
                 login_hint: 'lh',
-                acr_values: 'av'
+                acr_values: 'av',
+                resource: 'res'
             });
 
             p.then(request => {
@@ -144,6 +145,7 @@ describe("OidcClient", function () {
                 url.should.contain("id_token_hint=ith");
                 url.should.contain("login_hint=lh");
                 url.should.contain("acr_values=av");
+                url.should.contain("resource=res");
 
                 done();
             });
@@ -163,7 +165,8 @@ describe("OidcClient", function () {
                 ui_locales: 'u',
                 id_token_hint: 'ith',
                 login_hint: 'lh',
-                acr_values: 'av'
+                acr_values: 'av',
+                resource: 'res'
             });
 
             p.then(request => {
@@ -181,6 +184,7 @@ describe("OidcClient", function () {
                 url.should.contain("id_token_hint=ith");
                 url.should.contain("login_hint=lh");
                 url.should.contain("acr_values=av");
+                url.should.contain("resource=res");
 
                 done();
             });

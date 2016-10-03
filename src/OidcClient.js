@@ -44,7 +44,7 @@ export default class OidcClient {
         // have round tripped, but people were getting confused, so i added state (since that matches the spec) 
         // and so now if data is not passed, but state is then state will be used
         data, state,
-        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values} = {},
+        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource} = {},
         stateStore
     ) {
         Log.info("OidcClient.createSigninRequest");
@@ -60,6 +60,7 @@ export default class OidcClient {
         max_age = max_age || this._settings.max_age;
         ui_locales = ui_locales || this._settings.ui_locales;
         acr_values = acr_values || this._settings.acr_values;
+        resource = resource || this._settings.resource;
         
         let authority = this._settings.authority;
 
@@ -74,7 +75,7 @@ export default class OidcClient {
                 scope,
                 data: data || state,
                 authority,
-                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values
+                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource
             });
 
             var signinState = request.state;

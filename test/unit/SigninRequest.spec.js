@@ -169,6 +169,13 @@ describe("SigninRequest", function() {
             subject.url.should.contain("acr_values=foo");
         });
 
+        it("should include resource", function() {
+            settings.resource = "foo";
+            subject = new SigninRequest(settings);
+            subject.url.should.contain("resource=foo");
+        });
+
+
     });
 
     describe("isOidc", function() {
