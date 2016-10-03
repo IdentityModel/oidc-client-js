@@ -63,6 +63,11 @@ export default class MetadataService {
         return this._getMetadataProperty("end_session_endpoint", true);
     }
 
+    getRevocationEndpoint() {
+        Log.info("MetadataService.getRevocationEndpoint");
+        return this._getMetadataProperty("revocation_endpoint", true);
+    }
+
     _getMetadataProperty(name, optional=false) {
         Log.info("MetadataService._getMetadataProperty", name);
 

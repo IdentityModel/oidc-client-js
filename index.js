@@ -3,6 +3,7 @@
 
 export const Log = require('./src/Log');
 export const OidcClient = require('./src/OidcClient');
+export const OidcClientSettings = require('./src/OidcClientSettings');
 export const WebStorageStateStore = require('./src/WebStorageStateStore');
 export const InMemoryWebStorage = require('./src/InMemoryWebStorage');
 export const UserManager = require('./src/UserManager');
@@ -11,10 +12,12 @@ export const MetadataService = require('./src/MetadataService');
 export const CordovaPopupNavigator = require('./src/CordovaPopupNavigator');
 export const CordovaIFrameNavigator = require('./src/CordovaIFrameNavigator');
 export const CheckSessionIFrame = require('./src/CheckSessionIFrame');
+export const TokenRevocationClient = require('./src/TokenRevocationClient');
 
 export default {
     Log,
     OidcClient,
+    OidcClientSettings,
     WebStorageStateStore,
     InMemoryWebStorage,
     UserManager,
@@ -22,5 +25,6 @@ export default {
     MetadataService,
     CordovaPopupNavigator,
     CordovaIFrameNavigator,
-    CheckSessionIFrame
+    CheckSessionIFrame,
+    TokenRevocationClient
 };
