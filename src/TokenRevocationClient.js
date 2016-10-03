@@ -7,13 +7,28 @@ import Global from './Global';
 const AccessTokenTypeHint = "access_token";
 
 export default class TokenRevocationClient {
-    constructor(url, XMLHttpRequestCtor = Global.XMLHttpRequest) {
+    constructor({url, client_id}, XMLHttpRequestCtor = Global.XMLHttpRequest) {
+        if (!url) {
+            Log.error("No url provided");
+            throw new Error("No url provided.");
+        }
+        if (!client_id) {
+            Log.error("No client_id provided");
+            throw new Error("No client_id provided.");
+        }
+        
+        this._client_id = client_id;
         this._url = url;
         this._XMLHttpRequestCtor = XMLHttpRequestCtor;
     }
 
     revoke(accessToken) {
         Log.info("TokenRevocationClient.revoke");
+
+        if (!accessToken) {
+            Log.error("No accessToken provided");
+            throw new Error("No accessToken provided.");
+        }
 
         return new Promise((resolve, reject) => {
 
@@ -31,7 +46,8 @@ export default class TokenRevocationClient {
                 }
             };
 
-            var body = "token_type_hint=" + encodeURIComponent(AccessTokenTypeHint);
+            var body = "client_id=" + encodeURIComponent(this._client_id); 
+            body += "&token_type_hint=" + encodeURIComponent(AccessTokenTypeHint);
             body += "&token=" + encodeURIComponent(accessToken);
             
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
