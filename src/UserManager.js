@@ -8,11 +8,13 @@ import User from './User';
 import UserManagerEvents from './UserManagerEvents';
 import SilentRenewService from './SilentRenewService';
 import SessionMonitor from './SessionMonitor';
+import TokenRevocationClient from './TokenRevocationClient';
 
 export default class UserManager extends OidcClient {
     constructor(settings = {},
         SilentRenewServiceCtor = SilentRenewService,
-        SessionMonitorCtor = SessionMonitor
+        SessionMonitorCtor = SessionMonitor,
+        TokenRevocationClientCtor = TokenRevocationClient
     ) {
 
         if (!(settings instanceof UserManagerSettings)) {
@@ -31,6 +33,8 @@ export default class UserManager extends OidcClient {
             Log.info("monitorSession is configured, setting up session monitor")
             this._sessionMonitor = new SessionMonitorCtor(this);
         }
+
+        this._TokenRevocationClientCtor = TokenRevocationClientCtor;
     }
 
     get _redirectNavigator() {
@@ -152,6 +156,71 @@ export default class UserManager extends OidcClient {
         });
     }
 
+    revokeAccessToken() {
+        Log.info("UserManager.revokeAccessToken");
+
+        return this.getUser().then(user => {
+            if (user) {
+                Log.info("user loaded");
+
+                return this._revokeInternal(user).then(() => {
+                    Log.info("removing token properties from user and re-storing");
+
+                    user.access_token = null;
+                    user.expires_at = null;
+                    user.token_type = null;
+
+                    return this._storeUser(user).then(() => {
+                        Log.info("user stored");
+                        this._events.load(user);
+                    });
+                });
+            }
+            else {
+                Log.info("no user loaded");
+            }
+        });
+    }
+
+    _revokeInternal(user) {
+        Log.info("checking if token revocation necessary");
+
+        var access_token = user && user.access_token;
+        // check for JWT vs. reference token
+        if (!access_token || access_token.indexOf('.') >= 0) {
+            Log.info("no need to revoke due to no token or JWT");
+            return Promise.resolve();
+        }
+
+        return this._getRevocationClient().then(client => {
+            Log.info("calling token revocation endpoint");
+            return client.revoke(access_token);
+        });
+    }
+
+    _getRevocationClient() {
+        if (this._tokenRevocationClient) {
+            Log.info("_getRevocationClient found in cache");
+            return Promise.resolve(this._tokenRevocationClient);
+        }
+
+        Log.info("_getRevocationClient not found in cache");
+
+        return this.metadataService.getRevocationEndpoint().then(url => {
+            if (!url) {
+                Log.error("Revocation not supported");
+                throw new Error("Revocation not supported");
+            }
+
+            this._tokenRevocationClient = new this._TokenRevocationClientCtor({
+                url: url, client_id: this._settings.client_id
+            });
+
+            Log.info("TokenRevocationClient created and cached");
+            return this._tokenRevocationClient;
+        });
+    }
+
     _signin(args, navigator, navigatorParams = {}) {
         Log.info("_signin");
         return this._signinStart(args, navigator, navigatorParams).then(navResponse => {
@@ -246,20 +315,23 @@ export default class UserManager extends OidcClient {
             return this.getUser().then(user => {
                 Log.info("loaded current user from storage");
 
-                var id_token = args.id_token_hint || user && user.id_token;
-                if (id_token) {
-                    Log.info("Setting id_token into signout request");
-                    args.id_token_hint = id_token;
-                }
+                return this._revokeInternal().then(() => {
 
-                return this.removeUser().then(() => {
-                    Log.info("user removed, creating signout request");
+                    var id_token = args.id_token_hint || user && user.id_token;
+                    if (id_token) {
+                        Log.info("Setting id_token into signout request");
+                        args.id_token_hint = id_token;
+                    }
 
-                    return this.createSignoutRequest(args).then(signoutRequest => {
-                        Log.info("got signout request");
+                    return this.removeUser().then(() => {
+                        Log.info("user removed, creating signout request");
 
-                        navigatorParams.url = signoutRequest.url;
-                        return handle.navigate(navigatorParams);
+                        return this.createSignoutRequest(args).then(signoutRequest => {
+                            Log.info("got signout request");
+
+                            navigatorParams.url = signoutRequest.url;
+                            return handle.navigate(navigatorParams);
+                        });
                     });
                 });
             });
