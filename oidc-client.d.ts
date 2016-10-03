@@ -1,74 +1,84 @@
-declare var UserManager: Oidc.UserManager;
-declare var OidcClient: Oidc.OidcClient;
-declare var AccessTokenEvents: Oidc.AccessTokenEvents;
-declare var Log: Oidc.Log;
-declare var InMemoryWebStorage: Oidc.InMemoryWebStorage;
-declare var MetadataService: Oidc.MetadataService;
-declare var WebStorageStateStore: Oidc.WebStorageStateStore;
-
-declare module "oidc-client" {
-    export = Oidc;
-}
 declare namespace Oidc {
-
+	interface Logger  {
+		error(message?: any, ...optionalParams: any[]): void;
+		info(message?: any, ...optionalParams: any[]): void;
+		warn(message?: any, ...optionalParams: any[]): void;
+	}
     interface AccessTokenEvents {
 
-        load(container);
+        load(container: User): void;
 
-        unload();
+        unload(): void;
 
-        addAccessTokenExpiring(callback:(ev:null) => void);
-        removeAccessTokenExpiring(callback:(ev:null) => void);
+        addAccessTokenExpiring(callback: (...ev: any[]) => void): void;
+        removeAccessTokenExpiring(callback: (...ev: any[]) => void): void;
 
-        addAccessTokenExpired(callback:(ev:null) => void);
-        removeAccessTokenExpired(callback:(ev:null) => void);
+        addAccessTokenExpired(callback: (...ev: any[]) => void): void;
+        removeAccessTokenExpired(callback: (...ev: any[]) => void): void;
     }
     interface InMemoryWebStorage {
-        getItem(key: string);
+        getItem(key: string): any;
 
-        setItem(key: string, value: any);
+        setItem(key: string, value: any): any;
 
-        removeItem(key: string);
+        removeItem(key: string): any;
 
-        key(index: number);
+        key(index: number): any;
 
         length?: number;
     }
-    interface Log {
-        NONE();
-        ERROR();
-        WARN();
-        INFO();
+    class Log {
+        static NONE: number;
+        static ERROR: number;
+        static WARN: number;
+        static INFO: number;
+		// For when TypeScript 2.0 compiler is more widely used
+        // static readonly NONE: number;
+        // static readonly ERROR: number;
+        // static readonly WARN: number;
+        // static readonly INFO: number;
 
-        reset();
+        static reset(): void;
 
-        level(value);
+        static level: number;
 
-        logger(value);
+        static logger: Logger;
 
-        info(...args);
-        warn(...args);
-        error(...args);
+        static info(message?: any, ...optionalParams: any[]): void;
+        static warn(message?: any, ...optionalParams: any[]): void;
+        static error(message?: any, ...optionalParams: any[]): void;
     }
 
     interface MetadataService {
-        new (settings: any);
-        getMetadata();
+        new (settings: OidcClientSettings): MetadataService;
 
-        getIssuer();
+        getMetadata(): Promise<any>;
 
-        getAuthorizationEndpoint();
+        getIssuer(): Promise<any>;
 
-        getUserInfoEndpoint();
+        getAuthorizationEndpoint(): Promise<any>;
 
-        getCheckSessionIframe();
+        getUserInfoEndpoint(): Promise<any>;
 
-        getEndSessionEndpoint();
+        getCheckSessionIframe(): Promise<any>;
 
-        getSigningKeys();
+        getEndSessionEndpoint(): Promise<any>;
+
+        getSigningKeys(): Promise<any>;
     }
-    interface OidcClient {
-        new (settings: OidcClientCtor);
+	interface MetadataServiceCtor {
+		(settings: OidcClientSettings, jsonServiceCtor?: any): MetadataService;
+	}
+	interface ResponseValidator {
+		validateSigninResponse(state: any, response: any): Promise<any>;
+		validateSignoutResponse(state: any, response: any): Promise<any>;
+	}
+	interface ResponseValidatorCtor {
+		(settings: OidcClientSettings, metadataServiceCtor?: MetadataServiceCtor, userInfoServiceCtor?: any): ResponseValidator;
+	}
+
+    class OidcClient {
+        constructor(settings: OidcClientSettings);
 
         createSigninRequest(args?: any): Promise<any>;
         processSigninResponse(): Promise<any>;
@@ -79,7 +89,7 @@ declare namespace Oidc {
         clearStaleState(stateStore: any): Promise<any>;
     }
 
-    interface OidcClientCtor {
+	interface OidcClientSettings {
         authority?: string;
         metadataUrl?: string;
         metadata?: any;
@@ -98,13 +108,13 @@ declare namespace Oidc {
         loadUserInfo?: boolean;
         staleStateAge?: number;
         clockSkew?: number;
-        stateStore?: any;
-        ResponseValidatorCtor?: any;
-        MetadataServiceCtor?: any;
+        stateStore?: WebStorageStateStore;
+        ResponseValidatorCtor?: ResponseValidatorCtor;
+        MetadataServiceCtor?: MetadataServiceCtor;
     }
 
-    interface UserManager extends OidcClient {
-        new (settings: UserManagerCtor);
+    class UserManager extends OidcClient {
+        constructor(settings: UserManagerSettings);
 
         clearStaleState(): Promise<void>;
 
@@ -128,22 +138,22 @@ declare namespace Oidc {
         events: UserManagerEvents;
     }
     interface UserManagerEvents extends AccessTokenEvents {
-        load(user: User);
-        unload();
+        load(user: User): any;
+        unload(): any;
 
-        addUserLoaded(callback:(ev:null) => void);
-        removeUserLoaded(callback:(ev:null) => void);
+        addUserLoaded(callback: (...ev: any[]) => void): void;
+        removeUserLoaded(callback: (...ev: any[]) => void): void;
 
-        addUserUnloaded(callback:(ev:null) => void);
-        removeUserUnloaded(callback:(ev:null) => void);
+        addUserUnloaded(callback: (...ev: any[]) => void): void;
+        removeUserUnloaded(callback: (...ev: any[]) => void): void;
 
-        addSilentRenewError(callback:(ev:null) => void);
-        removeSilentRenewError(callback:(ev:null) => void);
+        addSilentRenewError(callback: (...ev: any[]) => void): void;
+        removeSilentRenewError(callback: (...ev: any[]) => void): void;
 
-        addUserSignedOut(callback:(ev:null) => void);
-        removeUserSignedOut(callback:(ev:null) => void);
+        addUserSignedOut(callback: (...ev: any[]) => void): void;
+        removeUserSignedOut(callback: (...ev: any[]) => void): void;
     }
-    interface UserManagerCtor extends OidcClientCtor {
+    interface UserManagerSettings extends OidcClientSettings {
         popup_redirect_uri?: string;
         popupWindowFeatures?: string;
         popupWindowTarget?: any;
@@ -156,13 +166,13 @@ declare namespace Oidc {
         userStore?: any;
     }
     interface WebStorageStateStore {
-        set(key: string, value: any);
+        set(key: string, value: any): Promise<void>;
 
-        get(key: string);
+        get(key: string): Promise<any>;
 
-        remove(key: string);
+        remove(key: string): Promise<any>;
 
-        getAllKeys();
+        getAllKeys(): Promise<string[]>;
     }
     interface User {
         id_token: string;
@@ -171,8 +181,17 @@ declare namespace Oidc {
         token_type: string;
         scope: string;
         profile: any;
-        expires_at: any;
+        expires_at: number;
         state: any;
-        toStorageString(storageString?: any);
+        toStorageString(): string;
+
+		expires_in: number;
+		expired: boolean;
+		scopes: string[];
+
+		// For when TypeScript 2.0 compiler is more widely used
+		// readonly expires_in: number;
+		// readonly expired: boolean;
+		// readonly scopes: string[];
     }
 }
