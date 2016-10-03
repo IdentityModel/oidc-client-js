@@ -100,7 +100,7 @@ function removeUser() {
 }
 
 function startSigninMainWindow() {
-    mgr.signinRedirect({data:'some data'}).then(function() {
+    mgr.signinRedirect({state:'some data'}).then(function() {
         log("signinRedirect done");
     }).catch(function(err) {
         log(err);
@@ -116,7 +116,7 @@ function endSigninMainWindow() {
 }
 
 function startSigninMainWindowDiffCallbackPage() {
-    mgr.signinRedirect({data:'some data', redirect_uri: 'http://localhost:5000/user-manager-sample-callback.html'}).then(function() {
+    mgr.signinRedirect({state:'some data', redirect_uri: 'http://localhost:5000/user-manager-sample-callback.html'}).then(function() {
         log("signinRedirect done");
     }).catch(function(err) {
         log(err);
@@ -124,7 +124,7 @@ function startSigninMainWindowDiffCallbackPage() {
 }
 
 function popupSignin() {
-    mgr.signinPopup({data:'some data'}).then(function(user) {
+    mgr.signinPopup({state:'some data'}).then(function(user) {
         log("signed in", user);
     }).catch(function(err) {
         log(err);
@@ -132,7 +132,7 @@ function popupSignin() {
 }
 
 function iframeSignin() {
-    mgr.signinSilent({data:'some data'}).then(function(user) {
+    mgr.signinSilent({state:'some data'}).then(function(user) {
         log("signed in", user);
     }).catch(function(err) {
         log(err);
@@ -140,7 +140,7 @@ function iframeSignin() {
 }
 
 function startSignoutMainWindow(){
-    mgr.signoutRedirect({data:'some data'}).then(function(resp) {
+    mgr.signoutRedirect({state:'some data'}).then(function(resp) {
         log("signed out", resp);
     }).catch(function(err) {
         log(err);

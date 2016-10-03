@@ -34,7 +34,7 @@ var client = new Oidc.OidcClient(settings);
 // functions for UI elements
 ///////////////////////////////
 function signin() {
-    client.createSigninRequest({ data: { bar: 15 } }).then(function(req) {
+    client.createSigninRequest({ state: { bar: 15 } }).then(function(req) {
         log("signin request", req, "<a href='" + req.url + "'>go signin</a>");
         if (followLinks()) {
             window.location = req.url;
@@ -55,7 +55,7 @@ function processSigninResponse() {
 }
 
 function signinDifferentCallback(){
-    client.createSigninRequest({ data: { bar: 15 }, redirect_uri: 'http://localhost:5000/oidc-client-sample-callback.html' }).then(function(req) {
+    client.createSigninRequest({ state: { bar: 15 }, redirect_uri: 'http://localhost:5000/oidc-client-sample-callback.html' }).then(function(req) {
         log("signin request", req, "<a href='" + req.url + "'>go signin</a>");
         if (followLinks()) {
             window.location = req.url;
@@ -66,7 +66,7 @@ function signinDifferentCallback(){
 }
 
 function signout() {
-    client.createSignoutRequest({ id_token_hint: signinResponse && signinResponse.id_token, data: { foo: 5 } }).then(function(req) {
+    client.createSignoutRequest({ id_token_hint: signinResponse && signinResponse.id_token, state: { foo: 5 } }).then(function(req) {
         log("signout request", req, "<a href='" + req.url + "'>go signout</a>");
         if (followLinks()) {
             window.location = req.url;
