@@ -98,11 +98,13 @@ export default class SessionMonitor {
 
                     if (session.sid === this._sid) {
                         Log.info("Same sub still logged in at OP, restarting check session iframe; session_state:", session.session_state);
-                    } else {
-                        Log.info("Same sub still logged int at OP, session state has changed, restarting check session iframe; session_state:", session.session_state);
+                    } 
+                    else {
+                        Log.info("Same sub still logged in at OP, session state has changed, restarting check session iframe; session_state:", session.session_state);
                         this._userManager.events._raiseUserSessionChanged();
                     }
-                } else {
+                }
+                else {
                     Log.info("Different subject signed into OP:", session.sub);
                 }
             }
