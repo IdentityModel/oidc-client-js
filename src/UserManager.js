@@ -115,9 +115,21 @@ export default class UserManager extends OidcClient {
         args.redirect_uri = url;
         args.prompt = "none";
 
-        return this._signin(args, this._iframeNavigator, {
-            startUrl: url,
-            silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
+        let setIdToken;
+        if (args.id_token_hint) {
+            setIdToken = Promise.resolve();
+        }
+        else {
+            setIdToken = this.getUser().then(user => {
+                args.id_token_hint = user && user.id_token;
+            });
+        }
+
+        return setIdToken.then(() => {
+            return this._signin(args, this._iframeNavigator, {
+                startUrl: url,
+                silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
+            });
         });
     }
     signinSilentCallback(url) {
