@@ -34,7 +34,7 @@ export default class UserManager extends OidcClient {
             this._sessionMonitor = new SessionMonitorCtor(this);
         }
 
-        this._TokenRevocationClientCtor = TokenRevocationClientCtor;
+        this._tokenRevocationClient = new TokenRevocationClientCtor(this._settings);
     }
 
     get _redirectNavigator() {
@@ -161,10 +161,8 @@ export default class UserManager extends OidcClient {
         Log.info("UserManager.revokeAccessToken");
 
         return this.getUser().then(user => {
-            if (user) {
-                Log.info("user loaded");
-
-                return this._revokeInternal(user).then(() => {
+            return this._revokeInternal(user, true).then(success => {
+                if (success) {
                     Log.info("removing token properties from user and re-storing");
 
                     user.access_token = null;
@@ -175,51 +173,23 @@ export default class UserManager extends OidcClient {
                         Log.info("user stored");
                         this._events.load(user);
                     });
-                });
-            }
-            else {
-                Log.info("no user loaded");
-            }
+                }
+            });
         });
     }
 
-    _revokeInternal(user) {
-        Log.info("checking if token revocation necessary");
+    _revokeInternal(user, required) {
+        Log.info("checking if token revocation is necessary");
 
         var access_token = user && user.access_token;
+
         // check for JWT vs. reference token
         if (!access_token || access_token.indexOf('.') >= 0) {
-            Log.info("no need to revoke due to no token or JWT");
-            return Promise.resolve();
+            Log.info("no need to revoke due to no user, token, or JWT format");
+            return Promise.resolve(false);
         }
 
-        return this._getRevocationClient().then(client => {
-            Log.info("calling token revocation endpoint");
-            return client.revoke(access_token);
-        });
-    }
-
-    _getRevocationClient() {
-        if (this._tokenRevocationClient) {
-            Log.info("_getRevocationClient found in cache");
-            return Promise.resolve(this._tokenRevocationClient);
-        }
-
-        Log.info("_getRevocationClient not found in cache");
-
-        return this.metadataService.getRevocationEndpoint().then(url => {
-            if (!url) {
-                Log.error("Revocation not supported");
-                throw new Error("Revocation not supported");
-            }
-
-            this._tokenRevocationClient = new this._TokenRevocationClientCtor({
-                url: url, client_id: this._settings.client_id
-            });
-
-            Log.info("TokenRevocationClient created and cached");
-            return this._tokenRevocationClient;
-        });
+        return this._tokenRevocationClient.revoke(access_token, required).then(() => true);
     }
 
     _signin(args, navigator, navigatorParams = {}) {
@@ -316,7 +286,7 @@ export default class UserManager extends OidcClient {
             return this.getUser().then(user => {
                 Log.info("loaded current user from storage");
 
-                return this._revokeInternal().then(() => {
+                return this._revokeInternal(user).then(() => {
 
                     var id_token = args.id_token_hint || user && user.id_token;
                     if (id_token) {

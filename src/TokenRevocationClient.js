@@ -2,27 +2,24 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 import Log from './Log';
+import MetadataService from './MetadataService';
 import Global from './Global';
 
 const AccessTokenTypeHint = "access_token";
 
 export default class TokenRevocationClient {
-    constructor({url, client_id}, XMLHttpRequestCtor = Global.XMLHttpRequest) {
-        if (!url) {
-            Log.error("No url provided");
-            throw new Error("No url provided.");
-        }
-        if (!client_id) {
-            Log.error("No client_id provided");
-            throw new Error("No client_id provided.");
+    constructor(settings, XMLHttpRequestCtor = Global.XMLHttpRequest, MetadataServiceCtor = MetadataService) {
+        if (!settings) {
+            Log.error("No settings provided");
+            throw new Error("No settings provided.");
         }
         
-        this._client_id = client_id;
-        this._url = url;
+        this._settings = settings;
         this._XMLHttpRequestCtor = XMLHttpRequestCtor;
+        this._metadataService = new MetadataServiceCtor(this._settings);
     }
 
-    revoke(accessToken) {
+    revoke(accessToken, required) {
         Log.info("TokenRevocationClient.revoke");
 
         if (!accessToken) {
@@ -30,10 +27,29 @@ export default class TokenRevocationClient {
             throw new Error("No accessToken provided.");
         }
 
+        return this._metadataService.getRevocationEndpoint().then(url => {
+            if (!url) {
+                if (required) {
+                    Log.error("Revocation not supported");
+                    throw new Error("Revocation not supported");
+                }
+
+                // not required, so don't error and just return
+                return;
+            }
+
+            var client_id = this._settings.client_id;
+            return this._revoke(url, client_id, accessToken);
+        });
+    }
+
+    _revoke(url, client_id, accessToken) {
+        Log.info("Calling revocation endpoint");
+
         return new Promise((resolve, reject) => {
 
             var xhr = new this._XMLHttpRequestCtor();
-            xhr.open("POST", this._url);
+            xhr.open("POST", url);
             
             xhr.onload = () => {
                 Log.info("HTTP response received, status", xhr.status);
@@ -46,7 +62,7 @@ export default class TokenRevocationClient {
                 }
             };
 
-            var body = "client_id=" + encodeURIComponent(this._client_id); 
+            var body = "client_id=" + encodeURIComponent(client_id); 
             body += "&token_type_hint=" + encodeURIComponent(AccessTokenTypeHint);
             body += "&token=" + encodeURIComponent(accessToken);
             

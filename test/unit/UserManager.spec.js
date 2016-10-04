@@ -10,6 +10,7 @@ import User from '../../src/User';
 import StubMetadataService from './StubMetadataService';
 import StubStateStore from './StubStateStore';
 import StubResponseValidator from './StubResponseValidator';
+import StubTokenRevocationClient from './StubTokenRevocationClient';
 
 import chai from 'chai';
 chai.should();
@@ -23,6 +24,7 @@ describe("UserManager", function () {
     let stubValidator;
     let stubNavigator;
     let stubUserStore;
+    let stubTokenRevocationClient;
 
     beforeEach(function () {
 
@@ -36,6 +38,7 @@ describe("UserManager", function () {
         stubStateStore = new StubStateStore();
         stubValidator = new StubResponseValidator();
         stubMetadataService = new StubMetadataService();
+        stubTokenRevocationClient = new StubTokenRevocationClient();
 
         settings = {
             authority: 'http://sts/oidc',
@@ -48,7 +51,9 @@ describe("UserManager", function () {
             MetadataServiceCtor: () => stubMetadataService
         };
 
-        subject = new UserManager(settings);
+        subject = new UserManager(settings, 
+            null, null, 
+            () => stubTokenRevocationClient);
     });
 
     describe("constructor", function () {
