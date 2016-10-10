@@ -168,7 +168,9 @@ declare namespace Oidc {
         iframeNavigator?: any;
         userStore?: any;
     }
-    interface WebStorageStateStore {
+    class WebStorageStateStore {
+        constructor(prefix:string, store:any); 
+        
         set(key: string, value: any): Promise<void>;
 
         get(key: string): Promise<any>;
