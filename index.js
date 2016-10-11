@@ -11,6 +11,8 @@ export const AccessTokenEvents = require('./src/AccessTokenEvents');
 export const MetadataService = require('./src/MetadataService');
 export const CordovaPopupNavigator = require('./src/CordovaPopupNavigator');
 export const CordovaIFrameNavigator = require('./src/CordovaIFrameNavigator');
+export const ElectronPopupNavigator = require('./src/ElectronPopupNavigator');
+export const ElectronIFrameNavigator = require('./src/ElectronIFrameNavigator');
 export const CheckSessionIFrame = require('./src/CheckSessionIFrame');
 export const TokenRevocationClient = require('./src/TokenRevocationClient');
 
@@ -25,6 +27,8 @@ export default {
     MetadataService,
     CordovaPopupNavigator,
     CordovaIFrameNavigator,
+    ElectronPopupNavigator,
+    ElectronIFrameNavigator,
     CheckSessionIFrame,
     TokenRevocationClient
 };

@@ -4,9 +4,9 @@ var createWebpackConfig = function(options) {
     entry: options.entry,
     output: options.output,
     plugins: options.plugins,
-    node: {
-      fs: 'empty' // Because of jsrsasign usage of fs
-    },
+    // node: {
+    //   fs: 'empty' // Because of jsrsasign usage of fs
+    // },
     module: {
       loaders: [
         {
@@ -17,6 +17,7 @@ var createWebpackConfig = function(options) {
         }
       ]
     },
+    target: 'electron-renderer',
     // this is for the sourcemaps
     devtool: options.devtool
   };
