@@ -49,7 +49,7 @@ export default class SigninResponse {
         return (this.scope || "").split(" ");
     }
     
-    get isOpenIdConnect(){
-        return this.scopes.indexOf(OidcScope) >= 0;
+    get isOpenIdConnect() {
+        return this.scopes.indexOf(OidcScope) >= 0 || !!this.id_token;
     }
 }
