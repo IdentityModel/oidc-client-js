@@ -42,7 +42,11 @@ var settings = {
     loadUserInfo: true
 };
 
-if(process && process.versions && process.versions.electron)
+function isElectron() {
+    return (typeof process !== "undefined") && process.versions && (process.versions.electron !== undefined);
+}
+
+if(isElectron())
 {
     console.log("RUNNING ON ELECTRON");
     log("RUNNING ON ELECTRON");
