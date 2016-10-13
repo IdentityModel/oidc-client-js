@@ -17,6 +17,36 @@ var uglifyPlugins =  [
   })
 ];
 
+
+var externalsLib = [
+    (function () {
+      var IGNORES = [
+        'electron'
+      ];
+      return function (context, request, callback) {
+        if (IGNORES.indexOf(request) >= 0) {
+          return callback(null, request);
+        }
+        return callback();
+      };
+    })()
+  ];
+
+var externalsDist = [
+    (function () {
+      var IGNORES = [
+        'electron'
+      ];
+      return function (context, request, callback) {
+        if (IGNORES.indexOf(request) >= 0) {
+          return callback(null, "require('" + request + "')");
+        }
+        return callback();
+      };
+    })()
+  ];
+
+
 // npm compliant build with source-maps
 gulp.task('build-lib-sourcemap', function() {
   // run webpack
@@ -27,7 +57,8 @@ gulp.task('build-lib-sourcemap', function() {
         libraryTarget: 'umd'
     },
     plugins: [],
-    devtool: 'inline-source-map'
+    devtool: 'inline-source-map',
+    externals: externalsLib
   })))
   .pipe(gulp.dest('lib/'));
 });
@@ -42,7 +73,8 @@ gulp.task('build-lib-min', function() {
         libraryTarget: 'umd',
     },
     plugins: uglifyPlugins,
-    devtool: null
+    devtool: null,
+    externals: externalsLib
   })))
   .pipe(gulp.dest('lib/'));
 });
@@ -58,7 +90,8 @@ gulp.task('build-dist-sourcemap', function() {
         library: 'Oidc'
     },
     plugins: [],
-    devtool: 'inline-source-map'
+    devtool: 'inline-source-map',
+    externals: externalsDist
   })))
   .pipe(gulp.dest('dist/'));
 });
@@ -74,7 +107,8 @@ gulp.task('build-dist-min', function() {
         library: 'Oidc'
     },
     plugins: uglifyPlugins,
-    devtool: null
+    devtool: null,
+    externals: externalsDist
   })))
   .pipe(gulp.dest('dist/'));
 });
