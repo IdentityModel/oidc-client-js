@@ -24,19 +24,17 @@ document.getElementById('endSignoutMainWindow').addEventListener("click", endSig
 Oidc.Log.logger = console;
 Oidc.Log.level = Oidc.Log.INFO;
 
-var baseUrl =  'http://localhost:5000/electron/';
-
 var settings = {
     authority: 'http://localhost:5000/oidc',
     client_id: 'js.tokenmanager',
-    redirect_uri: baseUrl+'user-manager-sample.html',
-    post_logout_redirect_uri: baseUrl+'user-manager-sample.html',
+    redirect_uri: 'http://localhost:5000/user-manager-sample.html',
+    post_logout_redirect_uri: 'http://localhost:5000/user-manager-sample.html',
     response_type: 'id_token token',
     scope: 'openid email roles',
     
-    popup_redirect_uri: baseUrl+'user-manager-sample-popup.html',
+    popup_redirect_uri:'http://localhost:5000/user-manager-sample-popup.html',
     
-    silent_redirect_uri: baseUrl+'user-manager-sample-silent.html',
+    silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
     automaticSilentRenew:true,
     //silentRequestTimeout:10000,
 
@@ -44,9 +42,13 @@ var settings = {
     loadUserInfo: true
 };
 
-
+if(process && process.versions && process.versions.electron)
+{
+    console.log("RUNNING ON ELECTRON");
+    log("RUNNING ON ELECTRON");
     settings.popupNavigator = new Oidc.ElectronPopupNavigator();
     settings.iframeNavigator = new Oidc.ElectronIFrameNavigator();
+}
 
 var mgr = new Oidc.UserManager(settings);
 
@@ -123,7 +125,7 @@ function endSigninMainWindow() {
 }
 
 function startSigninMainWindowDiffCallbackPage() {
-    mgr.signinRedirect({state:'some data', redirect_uri: 'http://localhost:5001/user-manager-sample-callback.html'}).then(function() {
+    mgr.signinRedirect({state:'some data', redirect_uri: 'http://localhost:5000/user-manager-sample-callback.html'}).then(function() {
         log("signinRedirect done");
     }).catch(function(err) {
         log(err);

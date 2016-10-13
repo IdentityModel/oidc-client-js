@@ -13,4 +13,16 @@ export default class ElectronIFrameNavigator {
         return Promise.resolve(popup);
     }
 
+    callback(url) {
+        Log.info("ElectronIFrameNavigator.callback");
+
+        try {
+            ElectronPopupWindow.notifyParent(url);
+            return Promise.resolve();
+        }
+        catch (e) {
+            return Promise.reject(e);
+        }
+    }
+
 }

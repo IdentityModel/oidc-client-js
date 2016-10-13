@@ -11,4 +11,15 @@ export default class ElectronPopupNavigator {
         return Promise.resolve(popup);
     }
 
+    callback(url) {
+        Log.info("ElectronPopupNavigator.callback");
+
+        try {
+            ElectronPopupWindow.notifyOpener(url);
+            return Promise.resolve();
+        }
+        catch (e) {
+            return Promise.reject(e);
+        }
+    }
 }

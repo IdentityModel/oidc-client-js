@@ -21,8 +21,21 @@ export default class ElectronPopupWindow {
         
         
         var electron = require('electron');
-        var electronRemote = electron.remote;
-        this._popup = new electronRemote.BrowserWindow(this.features);
+        if(electron)
+        {
+            var electronRemote = electron.remote;
+            if(electronRemote)
+            {
+                this._popup = new electronRemote.BrowserWindow(this.features);
+            }
+        }
+        else
+        {
+            this._boundMessageEvent = this._message.bind(this);
+            window.addEventListener("message", this._boundMessageEvent, false);
+
+            this._popup = window.open('', target, features);
+        }
 
         if (this._popup) {
             Log.info("popup successfully created");
@@ -31,7 +44,7 @@ export default class ElectronPopupWindow {
     }
     
     navigate(params) {
-        Log.info("PopupWindow.navigate");
+        Log.info("ElectronPopupWindow.navigate");
 
         if (!this._popup) {
             this._error("Error opening popup window");
@@ -84,22 +97,36 @@ export default class ElectronPopupWindow {
     }
 
     _cleanup() {
-        Log.info("PopupWindow._cleanup");
+        Log.info("ElectronPopupWindow._cleanup");
 
-        require('electron').remote.getCurrentWindow().removeAllListeners();
+        var electron = require('electron');
+        if(electron)
+        {
+            var electronRemote = electron.remote;
+            if(electronRemote)
+            {
+                electronRemote.getCurrentWindow().removeAllListeners();
+            }
+        }
+        
         window.clearInterval(this._checkForPopupClosedTimer);
 
         this._checkForPopupClosedTimer = null;
         this._boundMessageEventssage = null;
         
-        if (this._popup && !this._popup.isDestroyed()){
+        var isDestroyed = false;
+        try{
+            isDestroyed = this._popup.isDestroyed();
+        }catch(error){}
+
+        if (this._popup && !isDestroyed){
             this._popup.close();
         }
         this._popup = null;
     }
 
     _checkForPopupClosed() {
-        Log.info("PopupWindow._checkForPopupClosed");
+        Log.info("ElectronPopupWindow._checkForPopupClosed");
 
         if (!this._popup || this._popup.closed || this._popup.isDestroyed()) {
             this._error("Popup window closed");
@@ -107,4 +134,40 @@ export default class ElectronPopupWindow {
     }
 
 
+    _message(e) {
+        Log.info("PopupWindow._message");
+
+        if (e.origin === this._origin &&
+            e.source === this._popup.window
+        ) {
+            Log.info("processing message");
+            
+            let url = e.data || e.source.location.href; // for IE9
+
+            this._cleanup();
+
+            if (url) {
+                this._success({ url: url });
+            }
+            else {
+                this._error("Invalid response from popup");
+            }
+        }
+    }
+
+    get _origin() {
+        return location.protocol + "//" + location.host;
+    }
+
+    static notifyOpener(url) {
+        Log.info("PopupWindow.notifyOpener");
+
+        if (window.opener) {
+            url = url || window.location.href;
+            if (url) {
+                Log.info("posting url message to opener");
+                window.opener.postMessage(url, location.protocol + "//" + location.host);
+            }
+        }
+    }
 }
