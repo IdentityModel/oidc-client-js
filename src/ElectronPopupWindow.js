@@ -4,8 +4,7 @@
 import Log from './Log';
 
 const CheckForPopupClosedInterval = 500;
-const DefaultPopupFeatures = 'location=no,toolbar=no,zoom=no';
-const DefaultPopupTarget = "_blank";
+const DefaultPopupFeatures = {width: 500, height: 500};
 
 export default class ElectronPopupWindow {
 
@@ -17,31 +16,36 @@ export default class ElectronPopupWindow {
             this._reject = reject;
         });
 
-        this.electron = require('electron');
-        this.electronContainer = this.electron.remote;
 
-        this._popup = new this.electronContainer.BrowserWindow(
-            // {
-            //     "web-preferences": {
-            //         "web-security": false,
-            //         "sandbox": true
-            //     }
-            // }
-            );
+        this.features = params.popupWindowFeatures || DefaultPopupFeatures;
+        
+        this.electron = require('electron');
+        this.electronRemote = this.electron.remote;
+
+        
+        this._boundMessageEvent = this._message.bind(this);
+        window.addEventListener("message", this._boundMessageEvent);
+
+        this._popup = new this.electronRemote.BrowserWindow(this.features);
         var popup = this._popup;
 
-        // this._boundMessageEvent = this._message.bind(this);
-        // window.on("message", this._boundMessageEvent, false);
+        // this._popup.webContents.on('did-get-redirect-request', function (event, oldUrl, newUrl, isMainFrame) {
+        //     Log.info('Redirect electron');
+        //     event.preventDefault();
+        //     console.log(event);
+        //     console.log(newUrl);
+        //     this._success({ url: arg });
+        // });
 
-        //const {ipcMain} = require('electron');
-        var ipcMain = this.electronContainer.ipcMain;
+
+
+        var ipcMain = this.electronRemote.ipcMain;
         if(ipcMain)
         {
             Log.info("configuring electron receiver");
             ipcMain.on('synchronous-message', (event, arg) => {
                 Log.info("receiving url");
                 this._success({ url: arg });
-                popup.close();
             });
         }
 
@@ -63,14 +67,6 @@ export default class ElectronPopupWindow {
         }
         else {
             Log.info("Setting URL in popup");
-
-            this._popup.show();
-
-            // this._popup.webContents.on('did-finish-load', () => {
-            //     Log.info('did-finish-load!');
-            //     var urlLocation = this._popup.location.href;
-            //     this._success({ url: urlLocation });
-            // });
 
             this._popup.loadURL(params.url);
         }
@@ -98,7 +94,7 @@ export default class ElectronPopupWindow {
     _cleanup() {
         Log.info("PopupWindow._cleanup");
 
-        //window.removeEventListener("message", this._boundMessageEvent, false);
+        require('electron').remote.getCurrentWindow().removeAllListeners();
         window.clearInterval(this._checkForPopupClosedTimer);
 
         this._checkForPopupClosedTimer = null;
@@ -113,7 +109,7 @@ export default class ElectronPopupWindow {
     _checkForPopupClosed() {
         Log.info("PopupWindow._checkForPopupClosed");
 
-        if (!this._popup || this._popup.isDestroyed()) {
+        if (!this._popup || this._popup.closed || this._popup.isDestroyed()) {
             this._error("Popup window closed");
         }
     }
@@ -146,19 +142,24 @@ export default class ElectronPopupWindow {
     static notifyOpener(url) {
         Log.info("PopupWindow.notifyOpener");
 
-        var electron = require('electron');
-        const ipcRenderer = electron.ipcRenderer;
-        if(ipcRenderer)
-        {
+
+        if (window.opener) {
             url = url || window.location.href;
-            Log.info("posting url message to opener");
+            if (url) {
+                Log.info("posting url message to opener");
+                window.opener.postMessage(url, location.protocol + "//" + location.host);
+            }
+        }else{
+            var electron = require('electron');
+            const ipcRenderer = electron.ipcRenderer;
+            if(ipcRenderer)
+            {
+                url = url || window.location.href;
+                Log.info("posting url message to opener (electron)");
 
-            ipcRenderer.send('synchronous-message', url);
-
-            const remote = electron.remote;
-            var window = remote.getCurrentWindow();
-            window.close();
-            
+                ipcRenderer.send('synchronous-message', url);
+                
+            }
         }
     }
 }

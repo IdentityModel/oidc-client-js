@@ -7,6 +7,8 @@ import ElectronPopupWindow from './ElectronPopupWindow';
 export default class ElectronIFrameNavigator {
     
     prepare(params) {
+        params.popupWindowFeatures = params.popupWindowFeatures || {};
+        params.popupWindowFeatures.show = false;
         let popup = new ElectronPopupWindow(params);
         return Promise.resolve(popup);
     }
