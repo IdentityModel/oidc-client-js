@@ -19,36 +19,10 @@ export default class ElectronPopupWindow {
 
         this.features = params.popupWindowFeatures || DefaultPopupFeatures;
         
-        this.electron = require('electron');
-        this.electronRemote = this.electron.remote;
-
         
-        this._boundMessageEvent = this._message.bind(this);
-        window.addEventListener("message", this._boundMessageEvent);
-
-        this._popup = new this.electronRemote.BrowserWindow(this.features);
-        var popup = this._popup;
-
-        // this._popup.webContents.on('did-get-redirect-request', function (event, oldUrl, newUrl, isMainFrame) {
-        //     Log.info('Redirect electron');
-        //     event.preventDefault();
-        //     console.log(event);
-        //     console.log(newUrl);
-        //     this._success({ url: arg });
-        // });
-
-
-
-        var ipcMain = this.electronRemote.ipcMain;
-        if(ipcMain)
-        {
-            Log.info("configuring electron receiver");
-            ipcMain.on('synchronous-message', (event, arg) => {
-                Log.info("receiving url");
-                this._success({ url: arg });
-            });
-        }
-
+        var electron = require('electron');
+        var electronRemote = electron.remote;
+        this._popup = new electronRemote.BrowserWindow(this.features);
 
         if (this._popup) {
             Log.info("popup successfully created");
@@ -67,6 +41,24 @@ export default class ElectronPopupWindow {
         }
         else {
             Log.info("Setting URL in popup");
+
+            var success = this._success;
+
+            var self = this;
+
+            this._popup.webContents.on('did-get-redirect-request', function (event, oldUrl, newUrl, isMainFrame) {
+                Log.info('Redirect intercepted');
+                Log.info(newUrl);
+
+                //if redirect contains access_token then should consider a success!
+                if(newUrl.indexOf('access_token=') > -1)
+                {
+                    Log.info('Redirect contains access_token');
+                    event.preventDefault();
+
+                    success.apply(self, [ { url: newUrl } ]);
+                }
+            });
 
             this._popup.loadURL(params.url);
         }
@@ -114,52 +106,5 @@ export default class ElectronPopupWindow {
         }
     }
 
-    _message(e) {
-        Log.info("PopupWindow._message");
 
-        if (e.origin === this._origin &&
-            e.source === this._popup.window
-        ) {
-            Log.info("processing message");
-            
-            let url = e.data || e.source.location.href; // for IE9
-
-            this._cleanup();
-
-            if (url) {
-                this._success({ url: url });
-            }
-            else {
-                this._error("Invalid response from popup");
-            }
-        }
-    }
-
-    get _origin() {
-        return location.protocol + "//" + location.host;
-    }
-
-    static notifyOpener(url) {
-        Log.info("PopupWindow.notifyOpener");
-
-
-        if (window.opener) {
-            url = url || window.location.href;
-            if (url) {
-                Log.info("posting url message to opener");
-                window.opener.postMessage(url, location.protocol + "//" + location.host);
-            }
-        }else{
-            var electron = require('electron');
-            const ipcRenderer = electron.ipcRenderer;
-            if(ipcRenderer)
-            {
-                url = url || window.location.href;
-                Log.info("posting url message to opener (electron)");
-
-                ipcRenderer.send('synchronous-message', url);
-                
-            }
-        }
-    }
 }

@@ -17,7 +17,6 @@ var createWebpackConfig = function(options) {
         }
       ]
     },
-    target: 'electron-renderer',
     // this is for the sourcemaps
     devtool: options.devtool
   };
