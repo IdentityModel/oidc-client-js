@@ -4,7 +4,7 @@
 var open = require('open');
 var path = require('path');
 
-var port = 5001;
+var port = 5000;
 var url = "http://localhost:" + port;
 
 var express = require('express');
