@@ -120,7 +120,7 @@ export default class UserManager extends OidcClient {
             setIdToken = Promise.resolve();
         }
         else {
-            setIdToken = this.getUser().then(user => {
+            setIdToken = this._loadUser().then(user => {
                 args.id_token_hint = user && user.id_token;
             });
         }
@@ -172,7 +172,7 @@ export default class UserManager extends OidcClient {
     revokeAccessToken() {
         Log.info("UserManager.revokeAccessToken");
 
-        return this.getUser().then(user => {
+        return this._loadUser().then(user => {
             return this._revokeInternal(user, true).then(success => {
                 if (success) {
                     Log.info("removing token properties from user and re-storing");
@@ -295,7 +295,7 @@ export default class UserManager extends OidcClient {
         return navigator.prepare(navigatorParams).then(handle => {
             Log.info("got navigator window handle");
 
-            return this.getUser().then(user => {
+            return this._loadUser().then(user => {
                 Log.info("loaded current user from storage");
 
                 return this._revokeInternal(user).then(() => {
