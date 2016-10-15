@@ -41,6 +41,19 @@ var settings = {
     filterProtocolClaims: true,
     loadUserInfo: true
 };
+
+function isElectron() {
+    return (typeof process !== "undefined") && process.versions && (process.versions.electron !== undefined);
+}
+
+if(isElectron())
+{
+    console.log("RUNNING ON ELECTRON");
+    log("RUNNING ON ELECTRON");
+    settings.popupNavigator = new Oidc.ElectronPopupNavigator();
+    settings.iframeNavigator = new Oidc.ElectronIFrameNavigator();
+}
+
 var mgr = new Oidc.UserManager(settings);
 
 ///////////////////////////////
