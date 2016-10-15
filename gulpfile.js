@@ -7,45 +7,17 @@ var createWebpackConfig = require('./webpack.base');
 var npmEntry = './index.js';
 var classicEntry = ['babel-polyfill', npmEntry];
 
+var electronPlugin = new webpack.IgnorePlugin(/^(electron)$/);
+
 // uglify plugin for minification
-var uglifyPlugins =  [
-  new webpack.optimize.UglifyJsPlugin({
+var uglifyPlugin = new webpack.optimize.UglifyJsPlugin({
       compress: {
           warnings: false,
           screw_ie8: true,
       },
-  })
-];
+  });
 
-
-var externalsLib = [
-    (function () {
-      var IGNORES = [
-        'electron'
-      ];
-      return function (context, request, callback) {
-        if (IGNORES.indexOf(request) >= 0) {
-          return callback(null, request);
-        }
-        return callback();
-      };
-    })()
-  ];
-
-var externalsDist = [
-    (function () {
-      var IGNORES = [
-        'electron'
-      ];
-      return function (context, request, callback) {
-        if (IGNORES.indexOf(request) >= 0) {
-          return callback(null, "require('" + request + "')");
-        }
-        return callback();
-      };
-    })()
-  ];
-
+var externals = { "electron" : "electron" };
 
 // npm compliant build with source-maps
 gulp.task('build-lib-sourcemap', function() {
@@ -56,9 +28,9 @@ gulp.task('build-lib-sourcemap', function() {
         filename: 'oidc-client.js',
         libraryTarget: 'umd'
     },
-    plugins: [],
+    plugins: [electronPlugin],
     devtool: 'inline-source-map',
-    externals: externalsLib
+    externals: externals
   })))
   .pipe(gulp.dest('lib/'));
 });
@@ -72,9 +44,9 @@ gulp.task('build-lib-min', function() {
         filename: 'oidc-client.min.js',
         libraryTarget: 'umd',
     },
-    plugins: uglifyPlugins,
+    plugins: [uglifyPlugin, electronPlugin],
     devtool: null,
-    externals: externalsLib
+    externals: externals
   })))
   .pipe(gulp.dest('lib/'));
 });
@@ -89,9 +61,9 @@ gulp.task('build-dist-sourcemap', function() {
         libraryTarget: 'var',
         library: 'Oidc'
     },
-    plugins: [],
+    plugins: [electronPlugin],
     devtool: 'inline-source-map',
-    externals: externalsDist
+    externals: externals
   })))
   .pipe(gulp.dest('dist/'));
 });
@@ -106,9 +78,9 @@ gulp.task('build-dist-min', function() {
         libraryTarget: 'var',
         library: 'Oidc'
     },
-    plugins: uglifyPlugins,
+    plugins: [uglifyPlugin, electronPlugin],
     devtool: null,
-    externals: externalsDist
+    externals: externals
   })))
   .pipe(gulp.dest('dist/'));
 });

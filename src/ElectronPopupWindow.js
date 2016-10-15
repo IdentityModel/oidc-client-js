@@ -20,7 +20,7 @@ export default class ElectronPopupWindow {
         this.features = params.popupWindowFeatures || DefaultPopupFeatures;
         
         
-        var electron = require('electron');
+        var electron = eval("require('electron')");
         if(electron)
         {
             var electronRemote = electron.remote;
@@ -99,7 +99,7 @@ export default class ElectronPopupWindow {
     _cleanup() {
         Log.info("ElectronPopupWindow._cleanup");
 
-        var electron = require('electron');
+        var electron = eval("require('electron')");
         if(electron)
         {
             var electronRemote = electron.remote;
