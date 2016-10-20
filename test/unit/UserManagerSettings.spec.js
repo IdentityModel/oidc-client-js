@@ -155,4 +155,13 @@ describe("UserManagerSettings", function () {
             subject.userStore.should.equal(temp);
         });
     });
+
+    describe("revokeAccessTokenOnSignout", function() {
+        it("should return value from initial settings", function() {
+            let subject = new UserManagerSettings({
+                revokeAccessTokenOnSignout : true
+            });
+            subject.revokeAccessTokenOnSignout.should.equal(true);
+        });
+    });
 });

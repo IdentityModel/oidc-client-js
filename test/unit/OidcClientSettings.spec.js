@@ -47,6 +47,15 @@ describe("OidcClientSettings", function () {
         });
     });
 
+    describe("client_secret", function () {
+        it("should return value from initial settings", function () {
+            let subject = new OidcClientSettings({
+                client_secret: 'secret'
+            });
+            subject.client_secret.should.equal("secret");
+        });
+    });
+
     describe("response_type", function () {
         it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({

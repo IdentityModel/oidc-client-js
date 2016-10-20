@@ -18,7 +18,7 @@ export default class OidcClientSettings {
         // metadata related
         authority, metadataUrl, metadata, signingKeys,
         // client related
-        client_id, response_type = DefaultResponseType, scope = DefaultScope,
+        client_id, client_secret, response_type = DefaultResponseType, scope = DefaultScope,
         redirect_uri, post_logout_redirect_uri,
         // optional protocol
         prompt, display, max_age, ui_locales, acr_values, resource,
@@ -37,6 +37,7 @@ export default class OidcClientSettings {
         this._signingKeys = signingKeys;
 
         this._client_id = client_id;
+        this._client_secret = client_secret;
         this._response_type = response_type;
         this._scope = scope;
         this._redirect_uri = redirect_uri;
@@ -72,6 +73,9 @@ export default class OidcClientSettings {
             Log.error("client_id has already been assigned.")
             throw new Error("client_id has already been assigned.")
         }
+    }
+    get client_secret() {
+        return this._client_secret;
     }
     get response_type() {
         return this._response_type;

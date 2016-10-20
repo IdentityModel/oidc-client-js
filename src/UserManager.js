@@ -298,7 +298,8 @@ export default class UserManager extends OidcClient {
             return this.getUser().then(user => {
                 Log.info("loaded current user from storage");
 
-                return this._revokeInternal(user).then(() => {
+                var revokePromise = this._settings.revokeAccessTokenOnSignout ? this._revokeInternal(user) : Promise.resolve();
+                return revokePromise.then(() => {
 
                     var id_token = args.id_token_hint || user && user.id_token;
                     if (id_token) {

@@ -39,11 +39,12 @@ export default class TokenRevocationClient {
             }
 
             var client_id = this._settings.client_id;
-            return this._revoke(url, client_id, accessToken);
+            var client_secret = this._settings.client_secret;
+            return this._revoke(url, client_id, client_secret, accessToken);
         });
     }
 
-    _revoke(url, client_id, accessToken) {
+    _revoke(url, client_id, client_secret, accessToken) {
         Log.info("Calling revocation endpoint");
 
         return new Promise((resolve, reject) => {
@@ -63,6 +64,9 @@ export default class TokenRevocationClient {
             };
 
             var body = "client_id=" + encodeURIComponent(client_id); 
+            if (client_secret) {
+                body += "&client_secret=" + encodeURIComponent(client_secret);
+            }
             body += "&token_type_hint=" + encodeURIComponent(AccessTokenTypeHint);
             body += "&token=" + encodeURIComponent(accessToken);
             

@@ -20,6 +20,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         silentRequestTimeout,
         automaticSilentRenew = false,
         monitorSession = true,
+        revokeAccessTokenOnSignout = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
@@ -38,6 +39,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
         this._monitorSession = monitorSession;
+        this._revokeAccessTokenOnSignout = revokeAccessTokenOnSignout;
 
         this._redirectNavigator = redirectNavigator;
         this._popupNavigator = popupNavigator;
@@ -71,6 +73,9 @@ export default class UserManagerSettings extends OidcClientSettings {
 
     get monitorSession() {
         return this._monitorSession;
+    }
+    get revokeAccessTokenOnSignout() {
+        return this._revokeAccessTokenOnSignout;
     }
 
     get redirectNavigator() {
