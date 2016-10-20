@@ -1,0 +1,17 @@
+create:
+  include-footer: false
+  footer-heading:
+  footer-content:
+  footer-includes-milestone: false
+  milestone-replace-text:
+export:
+  include-created-date-in-title: false
+  created-date-string-format:
+  perform-regex-removal: false
+  regex-text:
+  multiline-regex: false
+issue-labels-include:
+- bug
+- enhancement
+issue-labels-exclude:
+- Internal Refactoring
