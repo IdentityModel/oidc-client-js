@@ -258,12 +258,12 @@ export default class ResponseValidator {
                     if (keys.length > 1) {
                         Log.error("No kid found in id_token");
                         return Promise.reject(new Error("No kid found in id_token"));
-                    } else {
+                    } 
+                    else {
                         // kid is mandatory only when there are multiple keys in the referenced JWK Set document
                         // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
                         kid = keys[0].kid;
                     }
-                    
                 }
 
                 let key = keys.filter(key => {
