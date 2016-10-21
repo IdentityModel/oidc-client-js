@@ -135,6 +135,7 @@ declare namespace Oidc {
 
         signoutRedirect(args?: any): Promise<any>;
         signoutRedirectCallback(url?: string): Promise<any>;
+        signoutPopup(args?: any): Promise<any>;
 
         querySessionStatus(args?: any): Promise<any>;
 
