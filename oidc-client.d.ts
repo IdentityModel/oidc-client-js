@@ -161,7 +161,11 @@ declare namespace Oidc {
         popupWindowFeatures?: string;
         popupWindowTarget?: any;
         silent_redirect_uri?: any;
+        silentRequestTimeout?: any;
         automaticSilentRenew?: any;
+        monitorSession?: any;
+        checkSessionInterval?: any;
+        revokeAccessTokenOnSignout?: any;
         accessTokenExpiringNotificationTime?: string;
         redirectNavigator?: any;
         popupNavigator?: any;
