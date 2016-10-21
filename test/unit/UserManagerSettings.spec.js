@@ -164,4 +164,18 @@ describe("UserManagerSettings", function () {
             subject.revokeAccessTokenOnSignout.should.equal(true);
         });
     });
+
+    describe("checkSessionInterval", function() {
+        it("should return value from initial settings", function() {
+            let subject = new UserManagerSettings({
+                checkSessionInterval : 6000
+            });
+            subject.checkSessionInterval.should.equal(6000);
+        });
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.checkSessionInterval.should.equal(2000);
+        });
+    });
 });
