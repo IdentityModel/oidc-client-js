@@ -10,6 +10,7 @@ import WebStorageStateStore from './WebStorageStateStore';
 import Global from './Global';
 
 const DefaultAccessTokenExpiringNotificationTime = 60;
+const DefaultCheckSessionInterval = 2000;
 
 export default class UserManagerSettings extends OidcClientSettings {
     constructor({
@@ -20,6 +21,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         silentRequestTimeout,
         automaticSilentRenew = false,
         monitorSession = true,
+        checkSessionInterval = DefaultCheckSessionInterval,
         revokeAccessTokenOnSignout = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
@@ -39,6 +41,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
         this._monitorSession = monitorSession;
+        this._checkSessionInterval = checkSessionInterval;
         this._revokeAccessTokenOnSignout = revokeAccessTokenOnSignout;
 
         this._redirectNavigator = redirectNavigator;
@@ -73,6 +76,9 @@ export default class UserManagerSettings extends OidcClientSettings {
 
     get monitorSession() {
         return this._monitorSession;
+    }
+    get checkSessionInterval() {
+        return this._checkSessionInterval;
     }
     get revokeAccessTokenOnSignout() {
         return this._revokeAccessTokenOnSignout;
