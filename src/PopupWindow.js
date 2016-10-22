@@ -2,9 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 import Log from './Log';
+import UrlUtility from './UrlUtility';
 
 const CheckForPopupClosedInterval = 500;
-const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100';
+const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100;';
+//const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100;resizable=yes';
+
 const DefaultPopupTarget = "_blank";
 
 export default class PopupWindow {
@@ -17,17 +20,18 @@ export default class PopupWindow {
             this._reject = reject;
         });
 
-        this._boundMessageEvent = this._message.bind(this);
-        window.addEventListener("message", this._boundMessageEvent, false);
-        
-        let features = params.popupWindowFeatures || DefaultPopupFeatures;
         let target = params.popupWindowTarget || DefaultPopupTarget;
+        let features = params.popupWindowFeatures || DefaultPopupFeatures;
 
         this._popup = window.open('', target, features);
         if (this._popup) {
             Log.info("popup successfully created");
             this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);
         }
+    }
+
+    get promise() {
+        return this._promise;
     }
 
     navigate(params) {
@@ -42,15 +46,14 @@ export default class PopupWindow {
         else {
             Log.info("Setting URL in popup");
 
+            this._id = params.id;
+            window["popupCallback_" + params.id] = this._callback.bind(this);
+
             this._popup.focus();
             this._popup.window.location = params.url;
         }
 
         return this.promise;
-    }
-
-    get promise() {
-        return this._promise;
     }
 
     _success(data) {
@@ -69,13 +72,12 @@ export default class PopupWindow {
     _cleanup() {
         Log.info("PopupWindow._cleanup");
 
-        window.removeEventListener("message", this._boundMessageEvent, false);
         window.clearInterval(this._checkForPopupClosedTimer);
-
         this._checkForPopupClosedTimer = null;
-        this._boundMessageEventssage = null;
-        
-        if (this._popup){
+
+        delete window["popupCallback_" + this._id];
+
+        if (this._popup) {
             this._popup.close();
         }
         this._popup = null;
@@ -89,29 +91,17 @@ export default class PopupWindow {
         }
     }
 
-    _message(e) {
-        Log.info("PopupWindow._message");
+    _callback(url) {
+        Log.info("PopupWindow._callback");
 
-        if (e.origin === this._origin &&
-            e.source === this._popup.window
-        ) {
-            Log.info("processing message");
-            
-            let url = e.data || e.source.location.href; // for IE9
+        this._cleanup();
 
-            this._cleanup();
-
-            if (url) {
-                this._success({ url: url });
-            }
-            else {
-                this._error("Invalid response from popup");
-            }
+        if (url) {
+            this._success({ url: url });
         }
-    }
-
-    get _origin() {
-        return location.protocol + "//" + location.host;
+        else {
+            this._error("Invalid response from popup");
+        }
     }
 
     static notifyOpener(url) {
@@ -120,8 +110,23 @@ export default class PopupWindow {
         if (window.opener) {
             url = url || window.location.href;
             if (url) {
-                Log.info("posting url message to opener");
-                window.opener.postMessage(url, location.protocol + "//" + location.host);
+
+                var data = UrlUtility.parseUrlFragment(url);
+                
+                if (data.state) {
+                    var name = "popupCallback_" + data.state;
+                    var callback = window.opener[name]; 
+                    if (callback) {
+                        Log.info("passing url message to opener");
+                        callback(url);
+                    }
+                    else {
+                        Log.warn("no matching callback found on opener");
+                    }
+                }
+                else {
+                    Log.warn("no state found in response url");
+                }
             }
         }
     }

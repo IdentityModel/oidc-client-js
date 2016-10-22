@@ -267,6 +267,7 @@ export default class UserManager extends OidcClient {
                 Log.info("got signin request");
 
                 navigatorParams.url = signinRequest.url;
+                navigatorParams.id = signinRequest.state.id;
                 return handle.navigate(navigatorParams);
             });
         });
