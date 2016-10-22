@@ -2,11 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 const timer = {
-    setTimeout: function (cb, duration) {
-        return setTimeout(cb, duration);
+    setInterval: function (cb, duration) {
+        return setInterval(cb, duration);
     },
-    clearTimeout: function (handle) {
-        return clearTimeout(handle);
+    clearInterval: function (handle) {
+        return clearInterval(handle);
     }
 };
 

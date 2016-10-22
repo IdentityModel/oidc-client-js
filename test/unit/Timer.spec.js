@@ -13,13 +13,13 @@ class StubWindowTimer {
         this.clearTimeoutWasCalled = false;
     }
 
-    setTimeout(cb, duration) {
+    setInterval(cb, duration) {
         this.callback = cb;
         this.duration = duration;
         return 5;
     }
 
-    clearTimeout() {
+    clearInterval() {
         this.clearTimeoutWasCalled = true;
     }
 }
@@ -39,7 +39,6 @@ describe("Timer", function () {
         it("should setup a timer", function () {
             subject.init(10);
             stubWindowTimer.callback.should.be.ok;
-            stubWindowTimer.duration.should.equal(10000);
         });
 
         it("should use 1 second if duration is too low", function () {
@@ -51,12 +50,71 @@ describe("Timer", function () {
             stubWindowTimer.duration.should.equal(1000);
         });
 
+        it("should use duration if less than default", function () {
+            subject.init(2);
+            stubWindowTimer.duration.should.equal(2000);
+            subject.init(3);
+            stubWindowTimer.duration.should.equal(3000);
+        });
+
         it("should cancel previous timer", function () {
             subject.init(10);
             stubWindowTimer.clearTimeoutWasCalled.should.be.false;
 
             subject.init(10);
 
+            stubWindowTimer.clearTimeoutWasCalled.should.be.true;
+        });
+    });
+
+     describe("_callback", function () {
+
+        it("should fire when timer expires", function () {
+            var cb = function () {
+                cb.wasCalled = true;
+            };
+            cb.wasCalled = false;
+            subject.addHandler(cb);
+
+            subject._nowFunc = () => 100;
+            subject.init(10);
+
+            subject._nowFunc = () => 109;
+            stubWindowTimer.callback();
+            cb.wasCalled.should.be.false;
+            
+            subject._nowFunc = () => 110;
+            stubWindowTimer.callback();
+            cb.wasCalled.should.be.true;
+        });
+        
+        
+        it("should fire if timer late", function () {
+            var cb = function () {
+                cb.wasCalled = true;
+            };
+            cb.wasCalled = false;
+            subject.addHandler(cb);
+
+            subject._nowFunc = () => 100;
+            subject.init(10);
+
+            subject._nowFunc = () => 109;
+            stubWindowTimer.callback();
+            cb.wasCalled.should.be.false;
+            
+            subject._nowFunc = () => 111;
+            stubWindowTimer.callback();
+            cb.wasCalled.should.be.true;
+        });
+
+        it("should cancel window timer", function () {
+            subject._nowFunc = () => 100;
+            subject.init(10);
+
+            subject._nowFunc = () => 110;
+            stubWindowTimer.callback();
+            
             stubWindowTimer.clearTimeoutWasCalled.should.be.true;
         });
     });
@@ -87,7 +145,9 @@ describe("Timer", function () {
             };
             subject.addHandler(cb);
 
+            subject._nowFunc = () => 100;
             subject.init(10);
+            subject._nowFunc = () => 110;
             stubWindowTimer.callback();
 
             cb.wasCalled.should.be.true;
@@ -103,7 +163,9 @@ describe("Timer", function () {
             subject.addHandler(cb);
             subject.addHandler(cb);
 
+            subject._nowFunc = () => 100;
             subject.init(10);
+            subject._nowFunc = () => 110;
             stubWindowTimer.callback();
 
             count.should.equal(4);
@@ -119,9 +181,12 @@ describe("Timer", function () {
             };
             cb.wasCalled = false;
             
+            subject._nowFunc = () => 100;
             subject.addHandler(cb);
             subject.init(10);
             subject.removeHandler(cb);
+
+            subject._nowFunc = () => 110;
             stubWindowTimer.callback();
 
             cb.wasCalled.should.be.false;
@@ -140,10 +205,12 @@ describe("Timer", function () {
             subject.addHandler(cb2);
             subject.addHandler(cb1);
 
+            subject._nowFunc = () => 100;
             subject.init(10);
             subject.removeHandler(cb1);
             subject.removeHandler(cb1);
 
+            subject._nowFunc = () => 110;
             stubWindowTimer.callback();
 
             count.should.equal(0);
