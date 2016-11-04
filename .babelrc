@@ -2,7 +2,7 @@
     "presets": ["es2015"],
     "plugins": [
         "babel-plugin-add-module-exports", 
-        ["transform-es2015-classes", {
+        ["transform-runtime", {
             "loose": true
         }]
     ]

@@ -1,11 +1,11 @@
 var gulp = require('gulp');
+var babel = require('gulp-babel');
 var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 var createWebpackConfig = require('./webpack.base');
 
 // entry points for both configs
 var npmEntry = './index.js';
-var classicEntry = ['babel-polyfill', npmEntry];
 
 // uglify plugin for minification
 var uglifyPlugins =  [
@@ -50,8 +50,8 @@ gulp.task('build-lib-min', function() {
 // classic build with sourcemaps
 gulp.task('build-dist-sourcemap', function() {
   // run webpack
-  gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
-    entry: classicEntry,
+  gulp.src('index.js').pipe(babel()).pipe(webpackStream(createWebpackConfig({
+    entry: npmEntry,
     output: {
         filename: 'oidc-client.js',
         libraryTarget: 'var',
@@ -66,8 +66,8 @@ gulp.task('build-dist-sourcemap', function() {
 // classic build without sourcemaps & minified
 gulp.task('build-dist-min', function() {
   // run webpack
-  gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
-    entry: classicEntry,
+  gulp.src('index.js').pipe(babel()).pipe(webpackStream(createWebpackConfig({
+    entry: npmEntry,
     output: {
         filename: 'oidc-client.min.js',
         libraryTarget: 'var',
