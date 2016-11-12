@@ -78,7 +78,8 @@ export default class JoseUtil {
             return Promise.reject(new Error("Invalid issuer in token: " + payload.iss));
         }
 
-        if (payload.aud !== audience && (Array.isArray(payload.aud) && payload.aud.indexOf(audience) === -1)) {
+        var validAudience = payload.aud === audience || (Array.isArray(payload.aud) && payload.aud.indexOf(audience) >= 0); 
+        if (!validAudience) {
             Log.error("Invalid audience in token", payload.aud);
             return Promise.reject(new Error("Invalid audience in token: " + payload.aud));
         }
