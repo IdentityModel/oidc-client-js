@@ -167,7 +167,7 @@ declare namespace Oidc {
         monitorSession?: any;
         checkSessionInterval?: any;
         revokeAccessTokenOnSignout?: any;
-        accessTokenExpiringNotificationTime?: string;
+        accessTokenExpiringNotificationTime?: number;
         redirectNavigator?: any;
         popupNavigator?: any;
         iframeNavigator?: any;
