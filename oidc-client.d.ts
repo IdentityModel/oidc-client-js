@@ -2,11 +2,11 @@ declare module "oidc-client" {
     export = Oidc;
 }
 declare namespace Oidc {
-	interface Logger  {
-		error(message?: any, ...optionalParams: any[]): void;
-		info(message?: any, ...optionalParams: any[]): void;
-		warn(message?: any, ...optionalParams: any[]): void;
-	}
+    interface Logger  {
+        error(message?: any, ...optionalParams: any[]): void;
+        info(message?: any, ...optionalParams: any[]): void;
+        warn(message?: any, ...optionalParams: any[]): void;
+    }
     interface AccessTokenEvents {
 
         load(container: User): void;
@@ -35,7 +35,7 @@ declare namespace Oidc {
         static ERROR: number;
         static WARN: number;
         static INFO: number;
-		// For when TypeScript 2.0 compiler is more widely used
+        // For when TypeScript 2.0 compiler is more widely used
         // static readonly NONE: number;
         // static readonly ERROR: number;
         // static readonly WARN: number;
@@ -69,16 +69,16 @@ declare namespace Oidc {
 
         getSigningKeys(): Promise<any>;
     }
-	interface MetadataServiceCtor {
-		(settings: OidcClientSettings, jsonServiceCtor?: any): MetadataService;
-	}
-	interface ResponseValidator {
-		validateSigninResponse(state: any, response: any): Promise<any>;
-		validateSignoutResponse(state: any, response: any): Promise<any>;
-	}
-	interface ResponseValidatorCtor {
-		(settings: OidcClientSettings, metadataServiceCtor?: MetadataServiceCtor, userInfoServiceCtor?: any): ResponseValidator;
-	}
+    interface MetadataServiceCtor {
+        (settings: OidcClientSettings, jsonServiceCtor?: any): MetadataService;
+    }
+    interface ResponseValidator {
+        validateSigninResponse(state: any, response: any): Promise<any>;
+        validateSignoutResponse(state: any, response: any): Promise<any>;
+    }
+    interface ResponseValidatorCtor {
+        (settings: OidcClientSettings, metadataServiceCtor?: MetadataServiceCtor, userInfoServiceCtor?: any): ResponseValidator;
+    }
 
     class OidcClient {
         constructor(settings: OidcClientSettings);
@@ -92,7 +92,7 @@ declare namespace Oidc {
         clearStaleState(stateStore: any): Promise<any>;
     }
 
-	interface OidcClientSettings {
+    interface OidcClientSettings {
         authority?: string;
         metadataUrl?: string;
         metadata?: any;
@@ -201,13 +201,13 @@ declare namespace Oidc {
         state: any;
         toStorageString(): string;
 
-		expires_in: number;
-		expired: boolean;
-		scopes: string[];
+        expires_in: number;
+        expired: boolean;
+        scopes: string[];
 
-		// For when TypeScript 2.0 compiler is more widely used
-		// readonly expires_in: number;
-		// readonly expired: boolean;
-		// readonly scopes: string[];
+        // For when TypeScript 2.0 compiler is more widely used
+        // readonly expires_in: number;
+        // readonly expired: boolean;
+        // readonly scopes: string[];
     }
 }
