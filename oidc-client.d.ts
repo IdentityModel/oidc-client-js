@@ -96,7 +96,7 @@ declare namespace Oidc {
         authority?: string;
         metadataUrl?: string;
         metadata?: any;
-        signingKeys?: string;
+        signingKeys?: any[];
         client_id?: string;
         response_type?: string;
         scope?: string;
