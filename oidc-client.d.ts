@@ -210,4 +210,15 @@ declare namespace Oidc {
         // readonly expired: boolean;
         // readonly scopes: string[];
     }
+    class CordovaPopupWindow {
+        constructor(params: any);
+        navigate(params: any): Promise<any>;
+        promise: Promise<any>;
+    }
+    class CordovaPopupNavigator {
+        prepare(params: any): Promise<CordovaPopupWindow>;
+    }
+    class CordovaIFrameNavigator {
+        prepare(params: any): Promise<CordovaPopupWindow>;
+    }
 }
