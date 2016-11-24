@@ -28,7 +28,8 @@ export default class OidcClientSettings {
         // other behavior
         stateStore = new WebStorageStateStore(),
         ResponseValidatorCtor = ResponseValidator,
-        MetadataServiceCtor = MetadataService
+        MetadataServiceCtor = MetadataService,
+        validateIdToken = true
     } = {}) {
 
         this._authority = authority;
@@ -58,6 +59,7 @@ export default class OidcClientSettings {
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this);
         this._metadataService = new MetadataServiceCtor(this);
+        this._validateIdToken = validateIdToken;
     }
 
     // client config
@@ -178,5 +180,9 @@ export default class OidcClientSettings {
     }
     get metadataService() {
         return this._metadataService;
+    }
+
+    get validateIdToken() {
+        return this._validateIdToken;
     }
 }
