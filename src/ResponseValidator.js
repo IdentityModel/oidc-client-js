@@ -244,6 +244,13 @@ export default class ResponseValidator {
 
         var kid = jwt.header.kid;
 
+        // Optionally skip ID Token Key validation
+        if(this._settings.validateIdToken === false) {
+            Log.info('Skipping ID Token jwks key Validation');
+            response.profile = jwt.payload;
+            return Promise.resolve(response);
+        }
+
         return this._metadataService.getIssuer().then(issuer => {
             Log.info("Received issuer");
 
