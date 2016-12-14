@@ -380,7 +380,7 @@ describe("MetadataService", function() {
             })
         });
         
-        it("should filter signing keys", function(done) {
+        it("should filter signing keys when encoding keys present", function(done) {
             settings.metadata = {
                 jwks_uri: "http://sts/metadata/keys"
             };
@@ -402,6 +402,32 @@ describe("MetadataService", function() {
                 keys.should.deep.equal([{
                     use:'sig',
                     kid:"test"
+                }]);
+                done();
+            })
+        });
+
+        it("should not filter signing keys when no explicit encoding keys present", function(done) {
+            settings.metadata = {
+                jwks_uri: "http://sts/metadata/keys"
+            };
+            stubJsonService.result = Promise.resolve({
+                keys:[
+                {
+                    kid:"test1"
+                },
+                {
+                    kid:"test2"
+                }]
+            });
+
+            let p = subject.getSigningKeys();
+
+            p.then(keys => {
+                keys.should.deep.equal([{
+                    kid:"test1"
+                }, {
+                    kid:"test2"
                 }]);
                 done();
             })
