@@ -120,9 +120,14 @@ export default class MetadataService {
 
     _filterSigningKeys(keys) {
         Log.info("MetadataService._filterSigningKeys", keys);
-
-        return keys.filter(item => {
-            return item.use === "sig";
-        });
+        if (keys.some(item => {
+            return item.use === "enc";
+        })) {
+            return keys.filter(item => {
+                return item.use === "sig";
+            });
+        } else {
+            return keys;
+        }
     }
 }
