@@ -36,7 +36,7 @@ export default class Global {
         }
     }
 
-    static setXMLHttpRequest = (newRequest) => {
+    static setXMLHttpRequest(newRequest) {
       request = newRequest;
     }
 
