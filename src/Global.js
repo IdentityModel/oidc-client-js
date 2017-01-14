@@ -12,6 +12,8 @@ const timer = {
 
 let testing = false;
 
+let request = XMLHttpRequest;
+
 export default class Global {
 
     static _testing() {
@@ -33,9 +35,14 @@ export default class Global {
             return sessionStorage;
         }
     }
+
+    static setXMLHttpRequest = (newRequest) => {
+      request = newRequest;
+    }
+
     static get XMLHttpRequest() {
         if (!testing) {
-            return XMLHttpRequest;
+            return request;
         }
     }
     static get timer() {
