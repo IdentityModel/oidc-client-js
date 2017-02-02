@@ -16,7 +16,7 @@ class MockJoseUtility {
     parseJwt(...args) {
         this.parseJwtWasCalled = true;
         if (this.parseJwtResult) {
-            Log.info("MockJoseUtility.parseJwt", this.parseJwtResult)
+            Log.debug("MockJoseUtility.parseJwt", this.parseJwtResult)
             return this.parseJwtResult;
         }
         return JoseUtil.parseJwt(...args);
@@ -25,7 +25,7 @@ class MockJoseUtility {
     validateJwt(...args) {
         this.validateJwtWasCalled = true;
         if (this.validateJwtResult) {
-            Log.info("MockJoseUtility.validateJwt", this.validateJwtResult)
+            Log.debug("MockJoseUtility.validateJwt", this.validateJwtResult)
             return this.validateJwtResult;
         }
         return JoseUtil.validateJwt(...args);
@@ -34,7 +34,7 @@ class MockJoseUtility {
     hashString(...args) {
         this.hashStringWasCalled = true;
         if (this.hashStringResult) {
-            Log.info("MockJoseUtility.hashString", this.hashStringResult)
+            Log.debug("MockJoseUtility.hashString", this.hashStringResult)
             return this.hashStringResult;
         }
         return JoseUtil.hashString(...args);
@@ -43,7 +43,7 @@ class MockJoseUtility {
     hexToBase64Url(...args) {
         this.hexToBase64UrlCalled = true;
         if (this.hexToBase64UrlResult) {
-            Log.info("MockJoseUtility.hexToBase64Url", this.hexToBase64UrlResult)
+            Log.debug("MockJoseUtility.hexToBase64Url", this.hexToBase64UrlResult)
             return this.hexToBase64UrlResult;
         }
         return JoseUtil.hexToBase64Url(...args);
@@ -67,15 +67,15 @@ class MockResponseValidator extends ResponseValidator {
     }
 
     _mock(name, ...args) {
-        Log.info("mock called", name);
+        Log.debug("mock called", name);
         this[name + "WasCalled"] = true;
 
         if (this[name + "Result"]) {
-            Log.info("mock returning result", this[name + "Result"]);
+            Log.debug("mock returning result", this[name + "Result"]);
             return this[name + "Result"];
         }
 
-        Log.info("mock calling super");
+        Log.debug("mock calling super");
         return super[name](...args);
     }
 
@@ -837,7 +837,7 @@ describe("ResponseValidator", function () {
             };
 
             subject._validateAccessToken(stubResponse).then(null, err => {
-                Log.info(err);
+                Log.debug(err);
                 err.message.should.contain("id_token");
                 done();
             });
@@ -852,7 +852,7 @@ describe("ResponseValidator", function () {
             mockJoseUtility.parseJwtResult = { header: { alg: "bad" } };
 
             subject._validateAccessToken(stubResponse).then(null, err => {
-                Log.info(err);
+                Log.debug(err);
                 err.message.should.contain("alg");
                 done();
             });

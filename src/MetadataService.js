@@ -3,7 +3,6 @@
 
 import Log from './Log';
 import JsonService from './JsonService';
-import OidcClientSettings from './OidcClientSettings';
 
 export default class MetadataService {
     constructor(settings, JsonServiceCtor = JsonService) {
@@ -12,13 +11,7 @@ export default class MetadataService {
             throw new Error("settings");
         }
 
-        if (settings instanceof OidcClientSettings) {
-            this._settings = settings;
-        }
-        else {
-            this._settings = new OidcClientSettings(settings);
-        }
-
+        this._settings = settings;
         this._jsonService = new JsonServiceCtor();
     }
 

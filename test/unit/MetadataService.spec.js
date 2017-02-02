@@ -31,6 +31,7 @@ describe("MetadataService", function() {
                 new MetadataService();
             }
             catch (e) {
+                Log.debug(e.message);
                 e.message.should.contain('settings');
                 return;
             }
