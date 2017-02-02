@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 let nopLogger = {
+    debug(){},
     info(){},
     warn(){},
     error(){}
@@ -11,6 +12,7 @@ const NONE = 0;
 const ERROR = 1;
 const WARN = 2;
 const INFO = 3;
+const DEBUG = 4;
 
 let logger;
 let level;
@@ -20,6 +22,7 @@ export default class Log {
     static get ERROR() {return ERROR};
     static get WARN() {return WARN};
     static get INFO() {return INFO};
+    static get DEBUG() {return DEBUG};
     
     static reset(){
         level = INFO;
@@ -30,7 +33,7 @@ export default class Log {
         return level;
     }
     static set level(value){
-        if (NONE <= value && value <= INFO){
+        if (NONE <= value && value <= DEBUG){
             level = value;
         }
         else {
@@ -42,7 +45,12 @@ export default class Log {
         return logger;
     }
     static set logger(value){
-        if (value.info && value.warn && value.error){
+        if (!value.debug && value.info) {
+            // just to stay backwards compat. can remove in 2.0
+            value.debug = value.info;
+        }
+
+        if (value.debug && value.info && value.warn && value.error){
             logger = value;
         }
         else {
@@ -50,6 +58,11 @@ export default class Log {
         }
     }
     
+    static debug(...args){
+        if (level >= DEBUG){
+            logger.debug.apply(logger, Array.from(args));
+        }
+    }
     static info(...args){
         if (level >= INFO){
             logger.info.apply(logger, Array.from(args));
