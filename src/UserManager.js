@@ -26,11 +26,11 @@ export default class UserManager extends OidcClient {
 
         // order is important for the following properties; these services depend upon the events.
         if (this.settings.automaticSilentRenew) {
-            Log.info("automaticSilentRenew is configured, setting up silent renew")
+            Log.debug("automaticSilentRenew is configured, setting up silent renew")
             this._silentRenewService = new SilentRenewServiceCtor(this);
         }
         if (this.settings.monitorSession) {
-            Log.info("monitorSession is configured, setting up session monitor")
+            Log.debug("monitorSession is configured, setting up session monitor")
             this._sessionMonitor = new SessionMonitorCtor(this);
         }
 
@@ -55,34 +55,34 @@ export default class UserManager extends OidcClient {
     }
 
     getUser() {
-        Log.info("UserManager.getUser");
+        Log.debug("UserManager.getUser");
 
         return this._loadUser().then(user => {
             if (user) {
-                Log.info("user loaded");
+                Log.debug("user loaded");
 
                 this._events.load(user, false);
 
                 return user;
             }
             else {
-                Log.info("user not found in storage");
+                Log.debug("user not found in storage");
                 return null;
             }
         });
     }
 
     removeUser() {
-        Log.info("UserManager.removeUser");
+        Log.debug("UserManager.removeUser");
 
         return this._storeUser(null).then(() => {
-            Log.info("user removed from storage");
+            Log.debug("user removed from storage");
             this._events.unload();
         });
     }
 
     signinPopup(args = {}) {
-        Log.info("UserManager.signinPopup");
+        Log.debug("UserManager.signinPopup");
 
         let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
         if (!url) {
@@ -100,11 +100,11 @@ export default class UserManager extends OidcClient {
         });
     }
     signinPopupCallback(url) {
-        Log.info("UserManager.signinPopupCallback");
+        Log.debug("UserManager.signinPopupCallback");
         return this._signinCallback(url, this._popupNavigator);
     }
     signinSilent(args = {}) {
-        Log.info("UserManager.signinSilent");
+        Log.debug("UserManager.signinSilent");
 
         let url = args.redirect_uri || this.settings.silent_redirect_uri;
         if (!url) {
@@ -133,12 +133,12 @@ export default class UserManager extends OidcClient {
         });
     }
     signinSilentCallback(url) {
-        Log.info("UserManager.signinSilentCallback");
+        Log.debug("UserManager.signinSilentCallback");
         return this._signinCallback(url, this._iframeNavigator);
     }
 
     querySessionStatus(args = {}) {
-        Log.info("UserManager.querySessionStatus");
+        Log.debug("UserManager.querySessionStatus");
 
         let url = args.redirect_uri || this.settings.silent_redirect_uri;
         if (!url) {
@@ -156,7 +156,7 @@ export default class UserManager extends OidcClient {
             silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
         }).then(navResponse => {
             return this.processSigninResponse(navResponse.url).then(signinResponse => {
-                Log.info("got signin response");
+                Log.debug("got signin response");
 
                 if (signinResponse.session_state && signinResponse.profile.sub && signinResponse.profile.sid) {
                     return {
@@ -170,19 +170,19 @@ export default class UserManager extends OidcClient {
     }
 
     revokeAccessToken() {
-        Log.info("UserManager.revokeAccessToken");
+        Log.debug("UserManager.revokeAccessToken");
 
         return this._loadUser().then(user => {
             return this._revokeInternal(user, true).then(success => {
                 if (success) {
-                    Log.info("removing token properties from user and re-storing");
+                    Log.debug("removing token properties from user and re-storing");
 
                     user.access_token = null;
                     user.expires_at = null;
                     user.token_type = null;
 
                     return this._storeUser(user).then(() => {
-                        Log.info("user stored");
+                        Log.debug("user stored");
                         this._events.load(user);
                     });
                 }
@@ -191,13 +191,13 @@ export default class UserManager extends OidcClient {
     }
 
     _revokeInternal(user, required) {
-        Log.info("checking if token revocation is necessary");
+        Log.debug("checking if token revocation is necessary");
 
         var access_token = user && user.access_token;
 
         // check for JWT vs. reference token
         if (!access_token || access_token.indexOf('.') >= 0) {
-            Log.info("no need to revoke due to no user, token, or JWT format");
+            Log.debug("no need to revoke due to no user, token, or JWT format");
             return Promise.resolve(false);
         }
 
@@ -205,40 +205,40 @@ export default class UserManager extends OidcClient {
     }
 
     _signin(args, navigator, navigatorParams = {}) {
-        Log.info("_signin");
+        Log.debug("_signin");
         return this._signinStart(args, navigator, navigatorParams).then(navResponse => {
             return this._signinEnd(navResponse.url);
         });
     }
     _signinCallback(url, navigator) {
-        Log.info("_signinCallback");
+        Log.debug("_signinCallback");
         return navigator.callback(url);
     }
     _signout(args, navigator, navigatorParams = {}) {
-        Log.info("_signout");
+        Log.debug("_signout");
         return this._signoutStart(args, navigator, navigatorParams).then(navResponse => {
             return this._signoutEnd(navResponse.url);
         });
     }
     _signoutCallback(url, navigator) {
-        Log.info("_signoutCallback");
+        Log.debug("_signoutCallback");
         return navigator.callback(url);
     }
 
     signinRedirect(args) {
-        Log.info("UserManager.signinRedirect");
+        Log.debug("UserManager.signinRedirect");
         return this._signinStart(args, this._redirectNavigator);
     }
     signinRedirectCallback(url) {
-        Log.info("UserManager.signinRedirectCallback");
+        Log.debug("UserManager.signinRedirectCallback");
         return this._signinEnd(url || this._redirectNavigator.url);
     }
     signoutRedirect(args) {
-        Log.info("UserManager.signoutRedirect");
+        Log.debug("UserManager.signoutRedirect");
         return this._signoutStart(args, this._redirectNavigator);
     }
     signoutPopup(args = {}) {
-        Log.info("UserManager.signoutPopup");
+        Log.debug("UserManager.signoutPopup");
 
         let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
         if (!url) {
@@ -253,18 +253,18 @@ export default class UserManager extends OidcClient {
         });
     }
     signoutRedirectCallback(url) {
-        Log.info("UserManager.signoutRedirectCallback");
+        Log.debug("UserManager.signoutRedirectCallback");
         return this._signoutEnd(url || this._redirectNavigator.url);
     }
 
     _signinStart(args, navigator, navigatorParams = {}) {
-        Log.info("_signinStart");
+        Log.debug("_signinStart");
 
         return navigator.prepare(navigatorParams).then(handle => {
-            Log.info("got navigator window handle");
+            Log.debug("got navigator window handle");
 
             return this.createSigninRequest(args).then(signinRequest => {
-                Log.info("got signin request");
+                Log.debug("got signin request");
 
                 navigatorParams.url = signinRequest.url;
                 navigatorParams.id = signinRequest.state.id;
@@ -273,15 +273,15 @@ export default class UserManager extends OidcClient {
         });
     }
     _signinEnd(url) {
-        Log.info("_signinEnd");
+        Log.debug("_signinEnd");
 
         return this.processSigninResponse(url).then(signinResponse => {
-            Log.info("got signin response");
+            Log.debug("got signin response");
 
             let user = new User(signinResponse);
 
             return this._storeUser(user).then(() => {
-                Log.info("user stored");
+                Log.debug("user stored");
 
                 this._events.load(user);
 
@@ -291,28 +291,28 @@ export default class UserManager extends OidcClient {
     }
 
     _signoutStart(args = {}, navigator, navigatorParams = {}) {
-        Log.info("_signoutStart");
+        Log.debug("_signoutStart");
 
         return navigator.prepare(navigatorParams).then(handle => {
-            Log.info("got navigator window handle");
+            Log.debug("got navigator window handle");
 
             return this._loadUser().then(user => {
-                Log.info("loaded current user from storage");
+                Log.debug("loaded current user from storage");
 
                 var revokePromise = this._settings.revokeAccessTokenOnSignout ? this._revokeInternal(user) : Promise.resolve();
                 return revokePromise.then(() => {
 
                     var id_token = args.id_token_hint || user && user.id_token;
                     if (id_token) {
-                        Log.info("Setting id_token into signout request");
+                        Log.debug("Setting id_token into signout request");
                         args.id_token_hint = id_token;
                     }
 
                     return this.removeUser().then(() => {
-                        Log.info("user removed, creating signout request");
+                        Log.debug("user removed, creating signout request");
 
                         return this.createSignoutRequest(args).then(signoutRequest => {
-                            Log.info("got signout request");
+                            Log.debug("got signout request");
 
                             navigatorParams.url = signoutRequest.url;
                             return handle.navigate(navigatorParams);
@@ -323,10 +323,10 @@ export default class UserManager extends OidcClient {
         });
     }
     _signoutEnd(url) {
-        Log.info("_signoutEnd");
+        Log.debug("_signoutEnd");
 
         return this.processSignoutResponse(url).then(signoutResponse => {
-            Log.info("got signout response");
+            Log.debug("got signout response");
 
             return signoutResponse;
         });
@@ -337,28 +337,28 @@ export default class UserManager extends OidcClient {
     }
 
     _loadUser() {
-        Log.info("_loadUser");
+        Log.debug("_loadUser");
 
         return this._userStore.get(this._userStoreKey).then(storageString => {
             if (storageString) {
-                Log.info("user storageString loaded");
+                Log.debug("user storageString loaded");
                 return User.fromStorageString(storageString);
             }
 
-            Log.info("no user storageString");
+            Log.debug("no user storageString");
             return null;
         });
     }
 
     _storeUser(user) {
         if (user) {
-            Log.info("_storeUser storing user");
+            Log.debug("_storeUser storing user");
 
             var storageString = user.toStorageString();
             return this._userStore.set(this._userStoreKey, storageString);
         }
         else {
-            Log.info("_storeUser removing user storage");
+            Log.debug("_storeUser removing user storage");
             return this._userStore.remove(this._userStoreKey);
         }
     }

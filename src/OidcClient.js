@@ -47,7 +47,7 @@ export default class OidcClient {
         prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource} = {},
         stateStore
     ) {
-        Log.info("OidcClient.createSigninRequest");
+        Log.debug("OidcClient.createSigninRequest");
 
         let client_id = this._settings.client_id;
         response_type = response_type || this._settings.response_type;
@@ -65,7 +65,7 @@ export default class OidcClient {
         let authority = this._settings.authority;
 
         return this._metadataService.getAuthorizationEndpoint().then(url => {
-            Log.info("Received authorization endpoint", url);
+            Log.debug("Received authorization endpoint", url);
 
             let request = new SigninRequest({
                 url,
@@ -88,7 +88,7 @@ export default class OidcClient {
     }
 
     processSigninResponse(url, stateStore) {
-        Log.info("OidcClient.processSigninResponse");
+        Log.debug("OidcClient.processSigninResponse");
 
         var response = new SigninResponse(url);
 
@@ -107,7 +107,7 @@ export default class OidcClient {
 
             let state = SigninState.fromStorageString(storedStateString);
 
-            Log.info("Received state from storage; validating response");
+            Log.debug("Received state from storage; validating response");
             return this._validator.validateSigninResponse(state, response);
         });
     }
@@ -115,7 +115,7 @@ export default class OidcClient {
     createSignoutRequest({id_token_hint, data, state, post_logout_redirect_uri} = {},
         stateStore
     ) {
-        Log.info("OidcClient.createSignoutRequest");
+        Log.debug("OidcClient.createSignoutRequest");
 
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
 
@@ -125,7 +125,7 @@ export default class OidcClient {
                 throw new Error("no end session endpoint");
             }
 
-            Log.info("Received end session endpoint", url);
+            Log.debug("Received end session endpoint", url);
 
             let request = new SignoutRequest({
                 url,
@@ -136,7 +136,7 @@ export default class OidcClient {
 
             var signoutState = request.state;
             if (signoutState) {
-                Log.info("Signout request has state to persist");
+                Log.debug("Signout request has state to persist");
 
                 stateStore = stateStore || this._stateStore;
                 stateStore.set(signoutState.id, signoutState.toStorageString());
@@ -147,11 +147,11 @@ export default class OidcClient {
     }
 
     processSignoutResponse(url, stateStore) {
-        Log.info("OidcClient.processSignoutResponse");
+        Log.debug("OidcClient.processSignoutResponse");
 
         var response = new SignoutResponse(url);
         if (!response.state) {
-            Log.info("No state in response");
+            Log.debug("No state in response");
 
             if (response.error) {
                 Log.warn("Response was error", response.error);
@@ -173,13 +173,13 @@ export default class OidcClient {
 
             let state = State.fromStorageString(storedStateString);
 
-            Log.info("Received state from storage; validating response");
+            Log.debug("Received state from storage; validating response");
             return this._validator.validateSignoutResponse(state, response);
         });
     }
 
     clearStaleState(stateStore) {
-        Log.info("OidcClient.clearStaleState");
+        Log.debug("OidcClient.clearStaleState");
 
         stateStore = stateStore || this._stateStore;
 

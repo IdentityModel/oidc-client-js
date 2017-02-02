@@ -9,7 +9,7 @@ const AllowedSigningAlgs = ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'
 export default class JoseUtil {
 
     static parseJwt(jwt) {
-        Log.info("JoseUtil.parseJwt");
+        Log.debug("JoseUtil.parseJwt");
         try {
             var token = jws.JWS.parse(jwt);
             return {
@@ -23,7 +23,7 @@ export default class JoseUtil {
     }
 
     static validateJwt(jwt, key, issuer, audience, clockSkew, now) {
-        Log.info("JoseUtil.validateJwt");
+        Log.debug("JoseUtil.validateJwt");
 
         try {
             if (key.kty === "RSA") {
@@ -61,7 +61,7 @@ export default class JoseUtil {
     }
 
     static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
-        Log.info("JoseUtil._validateJwt");
+        Log.debug("JoseUtil._validateJwt");
 
         if (!clockSkew) {
             clockSkew = 0;
@@ -117,7 +117,7 @@ export default class JoseUtil {
     }
 
     static hashString(value, alg) {
-        Log.info("JoseUtil.hashString", value, alg);
+        Log.debug("JoseUtil.hashString", value, alg);
         try {
             return crypto.Util.hashString(value, alg);
         }
@@ -127,7 +127,7 @@ export default class JoseUtil {
     }
 
     static hexToBase64Url(value) {
-        Log.info("JoseUtil.hexToBase64Url", value);
+        Log.debug("JoseUtil.hexToBase64Url", value);
         try {
             return hextob64u(value);
         }

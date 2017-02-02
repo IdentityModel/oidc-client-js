@@ -8,7 +8,7 @@ const DefaultTimeout = 5000;
 export default class IFrameWindow {
 
     constructor(params) {
-        Log.info("IFrameWindow.ctor");
+        Log.debug("IFrameWindow.ctor");
 
         this._promise = new Promise((resolve, reject) => {
             this._resolve = resolve;
@@ -24,14 +24,14 @@ export default class IFrameWindow {
     }
 
     navigate(params) {
-        Log.info("IFrameWindow.navigate");
+        Log.debug("IFrameWindow.navigate");
 
         if (!params || !params.url) {
             this._error("No url provided");
         }
         else {
             let timeout = params.silentRequestTimeout || DefaultTimeout;
-            Log.info("Using timeout of:", timeout);
+            Log.debug("Using timeout of:", timeout);
             this._timer = window.setTimeout(this._timeout.bind(this), timeout);
             this._frame.src = params.url;
         }
@@ -46,7 +46,7 @@ export default class IFrameWindow {
     _success(data) {
         this._cleanup();
 
-        Log.info("Successful response from frame window");
+        Log.debug("Successful response from frame window");
         this._resolve(data);
     }
     _error(message) {
@@ -57,7 +57,7 @@ export default class IFrameWindow {
     }
 
     _cleanup() {
-        Log.info("IFrameWindow._cleanup");
+        Log.debug("IFrameWindow._cleanup");
 
         window.removeEventListener("message", this._boundMessageEvent, false);
         window.clearTimeout(this._timer);
@@ -69,12 +69,12 @@ export default class IFrameWindow {
     }
 
     _timeout() {
-        Log.info("IFrameWindow._timeout");
+        Log.debug("IFrameWindow._timeout");
         this._error("Frame window timed out");
     }
 
     _message(e) {
-        Log.info("IFrameWindow._message");
+        Log.debug("IFrameWindow._message");
 
         if (this._timer &&
             e.origin === this._origin &&
@@ -95,12 +95,12 @@ export default class IFrameWindow {
     }
 
     static notifyParent(url) {
-        Log.info("IFrameWindow.notifyParent");
+        Log.debug("IFrameWindow.notifyParent");
 
         if (window.parent && window !== window.parent) {
             url = url || window.location.href;
             if (url) {
-                Log.info("posting url message to parent");
+                Log.debug("posting url message to parent");
                 window.parent.postMessage(url, location.protocol + "//" + location.host);
             }
         }

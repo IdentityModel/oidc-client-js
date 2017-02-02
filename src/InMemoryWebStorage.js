@@ -9,17 +9,17 @@ export default class InMemoryWebStorage{
     }
     
     getItem(key) {
-        Log.info("InMemoryWebStorage.getItem", key);
+        Log.debug("InMemoryWebStorage.getItem", key);
         return this._data[key];
     }
     
     setItem(key, value){
-        Log.info("InMemoryWebStorage.setItem", key);
+        Log.debug("InMemoryWebStorage.setItem", key);
         this._data[key] = value;
     }   
     
     removeItem(key){
-        Log.info("InMemoryWebStorage.removeItem", key);
+        Log.debug("InMemoryWebStorage.removeItem", key);
         delete this._data[key];
     }
     

@@ -12,7 +12,7 @@ export default class IFrameNavigator {
     }
 
     callback(url) {
-        Log.info("IFrameNavigator.callback");
+        Log.debug("IFrameNavigator.callback");
 
         try {
             IFrameWindow.notifyParent(url);

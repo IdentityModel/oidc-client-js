@@ -27,7 +27,7 @@ export default class Timer extends Event {
         }
         duration = parseInt(duration);
 
-        Log.info("Timer.init timer " + this._name + " for duration:", duration);
+        Log.debug("Timer.init timer " + this._name + " for duration:", duration);
         this._expiration = this.now + duration;
 
         // we're using a fairly short timer and then checking the expiration in the 
@@ -42,7 +42,7 @@ export default class Timer extends Event {
 
     cancel() {
         if (this._timerHandle) {
-            Log.info("Timer.cancel: ", this._name);
+            Log.debug("Timer.cancel: ", this._name);
             this._timer.clearInterval(this._timerHandle);
             this._timerHandle = null;
         }
@@ -50,7 +50,7 @@ export default class Timer extends Event {
 
     _callback() {
         var diff = this._expiration - this.now;
-        Log.info("Timer._callback; " + this._name + " timer expires in:", diff);
+        Log.debug("Timer._callback; " + this._name + " timer expires in:", diff);
 
         if (this._expiration <= this.now) {
             this.cancel();

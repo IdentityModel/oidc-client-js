@@ -10,7 +10,7 @@ export default class JsonService {
     }
     
     getJson(url, token) {
-        Log.info("JsonService.getJson", url);
+        Log.debug("JsonService.getJson", url);
         
         if (!url){
             Log.error("No url passed");
@@ -23,7 +23,7 @@ export default class JsonService {
             req.open('GET', url);
 
             req.onload = function() {
-                Log.info("HTTP response received, status", req.status);
+                Log.debug("HTTP response received, status", req.status);
                 
                 if (req.status === 200) {
                     resolve(JSON.parse(req.responseText));
@@ -39,7 +39,7 @@ export default class JsonService {
             };
             
             if (token) {
-                Log.info("token passed, setting Authorization header");
+                Log.debug("token passed, setting Authorization header");
                 req.setRequestHeader("Authorization", "Bearer " + token);
             }
 

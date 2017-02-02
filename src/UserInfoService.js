@@ -18,7 +18,7 @@ export default class UserInfoService {
     }
 
     getClaims(token) {
-        Log.info("UserInfoService.getClaims");
+        Log.debug("UserInfoService.getClaims");
 
         if (!token) {
             Log.error("No token passed");
@@ -26,10 +26,10 @@ export default class UserInfoService {
         }
 
         return this._metadataService.getUserInfoEndpoint().then(url => {
-            Log.info("received userinfo url", url);
+            Log.debug("received userinfo url", url);
 
             return this._jsonService.getJson(url, token).then(claims => {
-                Log.info("claims received", claims);
+                Log.debug("claims received", claims);
                 return claims;
             });
         });

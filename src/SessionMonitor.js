@@ -47,12 +47,12 @@ export default class SessionMonitor {
         if (session_state) {
             this._sub = user.profile.sub;
             this._sid = user.profile.sid;
-            Log.info("SessionMonitor._start; session_state:", session_state, ", sub:", this._sub);
+            Log.debug("SessionMonitor._start; session_state:", session_state, ", sub:", this._sub);
 
             if (!this._checkSessionIFrame) {
                 this._metadataService.getCheckSessionIframe().then(url => {
                     if (url) {
-                        Log.info("Initializing check session iframe")
+                        Log.debug("Initializing check session iframe")
 
                         let client_id = this._client_id;
                         let interval = this._checkSessionInterval;
@@ -75,7 +75,7 @@ export default class SessionMonitor {
     }
 
     _stop() {
-        Log.info("SessionMonitor._stop");
+        Log.debug("SessionMonitor._stop");
 
         this._sub = null;
         this._sid = null;
@@ -86,7 +86,7 @@ export default class SessionMonitor {
     }
 
     _callback() {
-        Log.info("SessionMonitor._callback");
+        Log.debug("SessionMonitor._callback");
 
         this._userManager.querySessionStatus().then(session => {
             var raiseUserSignedOutEvent = true;
@@ -97,27 +97,27 @@ export default class SessionMonitor {
                     this._checkSessionIFrame.start(session.session_state);
 
                     if (session.sid === this._sid) {
-                        Log.info("Same sub still logged in at OP, restarting check session iframe; session_state:", session.session_state);
+                        Log.debug("Same sub still logged in at OP, restarting check session iframe; session_state:", session.session_state);
                     } 
                     else {
-                        Log.info("Same sub still logged in at OP, session state has changed, restarting check session iframe; session_state:", session.session_state);
+                        Log.debug("Same sub still logged in at OP, session state has changed, restarting check session iframe; session_state:", session.session_state);
                         this._userManager.events._raiseUserSessionChanged();
                     }
                 }
                 else {
-                    Log.info("Different subject signed into OP:", session.sub);
+                    Log.debug("Different subject signed into OP:", session.sub);
                 }
             }
             else {
-                Log.info("Subject no longer signed into OP");
+                Log.debug("Subject no longer signed into OP");
             }
 
             if (raiseUserSignedOutEvent) {
-                Log.info("SessionMonitor._callback; raising signed out event");
+                Log.debug("SessionMonitor._callback; raising signed out event");
                 this._userManager.events._raiseUserSignedOut();
             }
         }).catch(err => {
-            Log.info("Error calling queryCurrentSigninSession; raising signed out event", err.message);
+            Log.debug("Error calling queryCurrentSigninSession; raising signed out event", err.message);
             this._userManager.events._raiseUserSignedOut();
         });
     }

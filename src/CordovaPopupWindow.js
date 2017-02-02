@@ -9,7 +9,7 @@ const DefaultPopupTarget = "_blank";
 export default class CordovaPopupWindow {
 
     constructor(params) {
-        Log.info("CordovaPopupWindow.ctor");
+        Log.debug("CordovaPopupWindow.ctor");
 
         this._promise = new Promise((resolve, reject) => {
             this._resolve = resolve;
@@ -20,7 +20,7 @@ export default class CordovaPopupWindow {
         this.target = params.popupWindowTarget || DefaultPopupTarget;
         
         this.redirect_uri = params.startUrl;
-        Log.info("redirect_uri: " + this.redirect_uri);
+        Log.debug("redirect_uri: " + this.redirect_uri);
     }
 
     _isInAppBrowserInstalled(cordovaMetadata) {
@@ -30,7 +30,7 @@ export default class CordovaPopupWindow {
     }
     
     navigate(params) {
-        Log.info("CordovaPopupWindow.navigate");
+        Log.debug("CordovaPopupWindow.navigate");
 
         if (!params || !params.url) {
             this._error("No url provided");
@@ -45,7 +45,7 @@ export default class CordovaPopupWindow {
             }
             this._popup = cordova.InAppBrowser.open(params.url, this.target, this.features);
             if (this._popup) {
-                Log.info("popup successfully created");
+                Log.debug("popup successfully created");
                 
                 this._exitCallbackEvent = this._exitCallback.bind(this); 
                 this._loadStartCallbackEvent = this._loadStartCallback.bind(this);
@@ -75,7 +75,7 @@ export default class CordovaPopupWindow {
     _success(data) {
         this._cleanup();
 
-        Log.info("Successful response from cordova popup window");
+        Log.debug("Successful response from cordova popup window");
         this._resolve(data);
     }
     _error(message) {
@@ -86,7 +86,7 @@ export default class CordovaPopupWindow {
     }
 
     _cleanup() {
-        Log.info("CordovaPopupWindow._cleanup");
+        Log.debug("CordovaPopupWindow._cleanup");
 
         if (this._popup){
             this._popup.removeEventListener("exit", this._exitCallbackEvent, false);

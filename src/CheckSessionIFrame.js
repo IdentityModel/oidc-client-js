@@ -33,19 +33,19 @@ export default class CheckSessionIFrame {
                 this.stop();
             }
             else if (e.data === "changed"){
-                Log.info("changed message from check session op iframe");
+                Log.debug("changed message from check session op iframe");
                 this.stop();
                 this._callback();
             }
             else {
-                Log.info(e.data + " message from check session op iframe");
+                Log.debug(e.data + " message from check session op iframe");
             }
         }
     }
 
     start(session_state) {
         if (this._session_state !== session_state) {
-            Log.info("CheckSessionIFrame.start");
+            Log.debug("CheckSessionIFrame.start");
 
             this.stop();
             
@@ -58,7 +58,7 @@ export default class CheckSessionIFrame {
     }
 
     stop() {
-        Log.info("CheckSessionIFrame.stop");
+        Log.debug("CheckSessionIFrame.stop");
 
         this._session_state = null;
 

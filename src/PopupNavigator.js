@@ -12,7 +12,7 @@ export default class PopupNavigator {
     }
     
     callback(url) {
-        Log.info("PopupNavigator.callback");
+        Log.debug("PopupNavigator.callback");
 
         try {
             PopupWindow.notifyOpener(url);
