@@ -73,11 +73,19 @@ export default class JoseUtil {
 
         var payload = JoseUtil.parseJwt(jwt).payload;
 
+        if (!payload.iss) {
+            Log.error("issuer was not provided");
+            return Promise.reject(new Error("issuer was not provided"));
+        }
         if (payload.iss !== issuer) {
             Log.error("Invalid issuer in token", payload.iss);
             return Promise.reject(new Error("Invalid issuer in token: " + payload.iss));
         }
 
+        if (!payload.aud) {
+            Log.error("aud was not provided");
+            return Promise.reject(new Error("aud was not provided"));
+        }
         var validAudience = payload.aud === audience || (Array.isArray(payload.aud) && payload.aud.indexOf(audience) >= 0); 
         if (!validAudience) {
             Log.error("Invalid audience in token", payload.aud);
@@ -87,16 +95,24 @@ export default class JoseUtil {
         var lowerNow = now + clockSkew;
         var upperNow = now - clockSkew;
 
+        if (!payload.iat) {
+            Log.error("iat was not provided");
+            return Promise.reject(new Error("iat was not provided"));
+        }
         if (lowerNow < payload.iat) {
             Log.error("iat is in the future", payload.iat);
             return Promise.reject(new Error("iat is in the future: " + payload.iat));
         }
 
-        if (lowerNow < payload.nbf) {
+        if (payload.nbf && lowerNow < payload.nbf) {
             Log.error("nbf is in the future", payload.nbf);
             return Promise.reject(new Error("nbf is in the future: " + payload.nbf));
         }
 
+        if (!payload.exp) {
+            Log.error("exp was not provided");
+            return Promise.reject(new Error("exp was not provided"));
+        }
         if (payload.exp < upperNow) {
             Log.error("exp is in the past", payload.exp);
             return Promise.reject(new Error("exp is in the past:" + payload.exp));
