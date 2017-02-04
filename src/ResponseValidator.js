@@ -133,6 +133,12 @@ export default class ResponseValidator {
                 Log.debug("loading user info");
 
                 return this._userInfoService.getClaims(response.access_token).then(claims => {
+                    Log.debug("user info claims received from user info endpoint");
+
+                    if (claims.sub !== response.profile.sub) {
+                        Log.error("sub from user info endpoint does not match sub in id_token");
+                        return Promise.reject(new Error("sub from user info endpoint does not match sub in id_token"));
+                    }
 
                     response.profile = this._mergeClaims(response.profile, claims);
                     Log.debug("user info claims received, updated profile:", response.profile);
@@ -254,25 +260,29 @@ export default class ResponseValidator {
                 }
 
                 Log.debug("Received signing keys");
+                let key;
                 if (!kid) {
+                    keys = this._filterByAlg(keys, jwt.header.alg);
+
                     if (keys.length > 1) {
-                        Log.error("No kid found in id_token");
-                        return Promise.reject(new Error("No kid found in id_token"));
+                        Log.error("No kid found in id_token and more than one key found in metadata");
+                        return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
                     } 
                     else {
                         // kid is mandatory only when there are multiple keys in the referenced JWK Set document
                         // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
-                        kid = keys[0].kid;
+                        key = keys[0];
                     }
                 }
-
-                let key = keys.filter(key => {
-                    return key.kid === kid;
-                })[0];
+                else {
+                    key = keys.filter(key => {
+                        return key.kid === kid;
+                    })[0];
+                }
 
                 if (!key) {
-                    Log.error("No key matching kid found in signing keys");
-                    return Promise.reject(new Error("No key matching kid found in signing keys"));
+                    Log.error("No key matching kid or alg found in signing keys");
+                    return Promise.reject(new Error("No key matching kid or alg found in signing keys"));
                 }
 
                 let audience = state.client_id;
@@ -283,12 +293,46 @@ export default class ResponseValidator {
                 return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{
                     Log.debug("JWT validation successful");
                     
+                    if (!jwt.payload.sub) {
+                        Log.error("No sub present in id_token");
+                        return Promise.reject(new Error("No sub present in id_token"));
+                    }
+
                     response.profile = jwt.payload;
                     
                     return response;
                 });
             });
         });
+    }
+
+    _filterByAlg(keys, alg){
+        Log.debug("ResponseValidator._filterByAlg", alg);
+
+        var kty = null;
+        if (alg.startsWith("RS")) {
+            kty = "RSA";
+        }
+        else if (alg.startsWith("PS")) {
+            kty = "PS";
+        }
+        else if (alg.startsWith("ES")) {
+            kty = "EC";
+        }
+        else {
+            Log.debug("alg not supported: ", alg);
+            return [];
+        }
+        
+        Log.debug("Looking for keys that match kty: ", kty);
+
+        keys = keys.filter(key => {
+            return key.kty === kty;
+        });
+
+        Log.debug("Number of keys that match kty: ", kty, keys.length);
+
+        return keys;
     }
 
     _validateAccessToken(response) {
