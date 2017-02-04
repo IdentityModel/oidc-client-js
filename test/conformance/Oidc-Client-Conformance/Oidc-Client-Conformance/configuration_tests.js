@@ -3,10 +3,11 @@ Oidc.Log.logger = console;
 Oidc.Log.level = Oidc.Log.DEBUG;
 
 var rp_id = "oidc-client-js";
-var response_type = 'id_token token';
+var response_type = 'id_token';
+var test_client_name = 'configuration';
 var default_scope = "openid";
-var authority = 'https://rp.certification.openid.net:8090/' + rp_id + '.' + response_type.replace(' ', '__') + '/';
-var log_url = 'https://rp.certification.openid.net:8090/log/' + rp_id + '.' + response_type.replace(' ', '__') + '/';
+var authority = 'https://rp.certification.openid.net:8090/' + rp_id + '.' + test_client_name + '/';
+var log_url = 'https://rp.certification.openid.net:8090/log/' + rp_id + '.' + test_client_name + '/';
 
 var redirect_uri = window.location.protocol + '//' + window.location.hostname + window.location.pathname + 'callback.html';
 
