@@ -4,7 +4,6 @@
 import Log from './Log';
 import MetadataService from './MetadataService';
 import Global from './Global';
-import OidcClientSettings from './OidcClientSettings';
 
 const AccessTokenTypeHint = "access_token";
 
@@ -15,13 +14,7 @@ export default class TokenRevocationClient {
             throw new Error("No settings provided.");
         }
         
-        if (settings instanceof OidcClientSettings) {
-            this._settings = settings;
-        }
-        else {
-            this._settings = new OidcClientSettings(settings);
-        }
-
+        this._settings = settings;
         this._XMLHttpRequestCtor = XMLHttpRequestCtor;
         this._metadataService = new MetadataServiceCtor(this._settings);
     }

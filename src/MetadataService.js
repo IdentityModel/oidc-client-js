@@ -4,6 +4,8 @@
 import Log from './Log';
 import JsonService from './JsonService';
 
+const OidcMetadataUrlPath = '.well-known/openid-configuration';
+
 export default class MetadataService {
     constructor(settings, JsonServiceCtor = JsonService) {
         if (!settings) {
@@ -15,6 +17,26 @@ export default class MetadataService {
         this._jsonService = new JsonServiceCtor();
     }
 
+    get metadataUrl() {
+        if (!this._metadataUrl) {
+            if (this._settings.metadataUrl) {
+                this._metadataUrl = this._settings.metadataUrl;
+            }
+            else {
+                this._metadataUrl = this._settings.authority;
+
+                if (this._metadataUrl && this._metadataUrl.indexOf(OidcMetadataUrlPath) < 0) {
+                    if (this._metadataUrl[this._metadataUrl.length - 1] !== '/') {
+                        this._metadataUrl += '/';
+                    }
+                    this._metadataUrl += OidcMetadataUrlPath;
+                }
+            }
+        }
+
+        return this._metadataUrl;
+    }
+
     getMetadata() {
         Log.debug("MetadataService.getMetadata");
 
@@ -23,14 +45,14 @@ export default class MetadataService {
             return Promise.resolve(this._settings.metadata);
         }
 
-        if (!this._settings.metadataUrl) {
-            Log.error("No metadataUrl configured on settings");
-            return Promise.reject(new Error("No metadataUrl configured on settings"));
+        if (!this.metadataUrl) {
+            Log.error("No authority or metadataUrl configured on settings");
+            return Promise.reject(new Error("No authority or metadataUrl configured on settings"));
         }
 
-        Log.debug("getting metadata from", this._settings.metadataUrl);
+        Log.debug("getting metadata from", this.metadataUrl);
 
-        return this._jsonService.getJson(this._settings.metadataUrl)
+        return this._jsonService.getJson(this.metadataUrl)
             .then(metadata => {
                 Log.debug("json received");
                 this._settings.metadata = metadata;
