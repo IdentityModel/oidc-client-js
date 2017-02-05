@@ -3,6 +3,7 @@
   "version": "1.3.0-beta.1",
   "description": "OpenID Connect (OIDC) & OAuth2 client library",
   "main": "lib/oidc-client.min.js",
+  "types": "lib/oidc-client.d.ts",
   "scripts": {
     "build": "gulp build",
     "start": "node sample/server.js",
@@ -49,6 +50,5 @@
   },
   "peerDependencies": {
     "babel-polyfill": ">=6.9.1"
-  },
-  "typings": "oidc-client.d.ts"
+  }
 }
