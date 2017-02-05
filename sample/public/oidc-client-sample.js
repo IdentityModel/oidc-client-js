@@ -15,7 +15,7 @@ document.getElementById('links').addEventListener('change', toggleLinks, false);
 // OidcClient config
 ///////////////////////////////
 Oidc.Log.logger = console;
-Oidc.Log.level = Oidc.Log.DEBUG;
+Oidc.Log.level = Oidc.Log.INFO;
 
 var settings = {
     authority: 'http://localhost:5000/oidc',

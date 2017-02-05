@@ -22,7 +22,7 @@ document.getElementById('endSignoutMainWindow').addEventListener("click", endSig
 // config
 ///////////////////////////////
 Oidc.Log.logger = console;
-Oidc.Log.level = Oidc.Log.DEBUG;
+Oidc.Log.level = Oidc.Log.INFO;
 
 var settings = {
     authority: 'http://localhost:5000/oidc',

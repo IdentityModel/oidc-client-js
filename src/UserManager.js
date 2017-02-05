@@ -59,14 +59,14 @@ export default class UserManager extends OidcClient {
 
         return this._loadUser().then(user => {
             if (user) {
-                Log.debug("user loaded");
+                Log.info("user loaded");
 
                 this._events.load(user, false);
 
                 return user;
             }
             else {
-                Log.debug("user not found in storage");
+                Log.info("user not found in storage");
                 return null;
             }
         });
@@ -76,7 +76,7 @@ export default class UserManager extends OidcClient {
         Log.debug("UserManager.removeUser");
 
         return this._storeUser(null).then(() => {
-            Log.debug("user removed from storage");
+            Log.info("user removed from storage");
             this._events.unload();
         });
     }
@@ -97,11 +97,33 @@ export default class UserManager extends OidcClient {
             startUrl: url,
             popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
             popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
+        }).then(user => {
+            if (user) {
+                if (user.profile && user.profile.sub) {
+                    Log.info("signinPopup successful, signed in sub: ", user.profile.sub);
+                }
+                else {
+                    Log.info("signinPopup successful");
+                }
+            }
+
+            return user;
         });
     }
     signinPopupCallback(url) {
         Log.debug("UserManager.signinPopupCallback");
-        return this._signinCallback(url, this._popupNavigator);
+        return this._signinCallback(url, this._popupNavigator).then(user => {
+            if (user) {
+                if (user.profile && user.profile.sub) {
+                    Log.info("signinPopupCallback successful, signed in sub: ", user.profile.sub);
+                }
+                else {
+                    Log.info("signinPopupCallback successful");
+                }
+            }
+
+            return user;
+        });
     }
     signinSilent(args = {}) {
         Log.debug("UserManager.signinSilent");
@@ -130,11 +152,33 @@ export default class UserManager extends OidcClient {
                 startUrl: url,
                 silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
             });
+        }).then(user => {
+            if (user) {
+                if (user.profile && user.profile.sub) {
+                    Log.info("signinSilent successful, signed in sub: ", user.profile.sub);
+                }
+                else {
+                    Log.info("signinSilent successful");
+                }
+            }
+
+            return user;
         });
     }
     signinSilentCallback(url) {
         Log.debug("UserManager.signinSilentCallback");
-        return this._signinCallback(url, this._iframeNavigator);
+        return this._signinCallback(url, this._iframeNavigator).then(user => {
+            if (user) {
+                if (user.profile && user.profile.sub) {
+                    Log.info("signinSilentCallback successful, signed in sub: ", user.profile.sub);
+                }
+                else {
+                    Log.info("signinSilentCallback successful");
+                }
+            }
+
+            return user;
+        });
     }
 
     querySessionStatus(args = {}) {
@@ -159,11 +203,15 @@ export default class UserManager extends OidcClient {
                 Log.debug("got signin response");
 
                 if (signinResponse.session_state && signinResponse.profile.sub && signinResponse.profile.sid) {
+                    Log.info("querySessionStatus success for sub: ",  signinResponse.profile.sub);
                     return {
                         session_state: signinResponse.session_state,
                         sub: signinResponse.profile.sub,
                         sid: signinResponse.profile.sid
                     };
+                }
+                else {
+                    Log.info("querySessionStatus successful, user not authenticated");
                 }
             });
         });
@@ -187,6 +235,8 @@ export default class UserManager extends OidcClient {
                     });
                 }
             });
+        }).then(()=>{
+            Log.info("access token revoked successfully");
         });
     }
 
@@ -227,15 +277,30 @@ export default class UserManager extends OidcClient {
 
     signinRedirect(args) {
         Log.debug("UserManager.signinRedirect");
-        return this._signinStart(args, this._redirectNavigator);
+        return this._signinStart(args, this._redirectNavigator).then(()=>{
+            Log.info("signinRedirect successful");
+        });
     }
     signinRedirectCallback(url) {
         Log.debug("UserManager.signinRedirectCallback");
-        return this._signinEnd(url || this._redirectNavigator.url);
+        return this._signinEnd(url || this._redirectNavigator.url).then(user => {
+            if (user) {
+                if (user.profile && user.profile.sub) {
+                    Log.info("signinRedirectCallback successful, signed in sub: ", user.profile.sub);
+                }
+                else {
+                    Log.info("signinRedirectCallback successful");
+                }
+            }
+
+            return user;
+        });
     }
     signoutRedirect(args) {
         Log.debug("UserManager.signoutRedirect");
-        return this._signoutStart(args, this._redirectNavigator);
+        return this._signoutStart(args, this._redirectNavigator).then(()=>{
+            Log.info("signoutRedirect successful");
+        });
     }
     signoutPopup(args = {}) {
         Log.debug("UserManager.signoutPopup");
@@ -250,11 +315,16 @@ export default class UserManager extends OidcClient {
             startUrl: url,
             popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
             popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
+        }).then(response=>{
+            Log.info("signoutPopup successful");
+            return response;
         });
     }
     signoutRedirectCallback(url) {
         Log.debug("UserManager.signoutRedirectCallback");
-        return this._signoutEnd(url || this._redirectNavigator.url);
+        return this._signoutEnd(url || this._redirectNavigator.url).then(response=>{
+            Log.info("signoutRedirectCallback successful");
+        });
     }
 
     _signinStart(args, navigator, navigatorParams = {}) {
