@@ -36,11 +36,13 @@ declare namespace Oidc {
         static ERROR: number;
         static WARN: number;
         static INFO: number;
+        static DEBUG: number;
         // For when TypeScript 2.0 compiler is more widely used
         // static readonly NONE: number;
         // static readonly ERROR: number;
         // static readonly WARN: number;
         // static readonly INFO: number;
+        // static readonly DEBUG: number;
 
         static reset(): void;
 
@@ -48,6 +50,7 @@ declare namespace Oidc {
 
         static logger: Logger;
 
+        static debug(message?: any, ...optionalParams: any[]): void;
         static info(message?: any, ...optionalParams: any[]): void;
         static warn(message?: any, ...optionalParams: any[]): void;
         static error(message?: any, ...optionalParams: any[]): void;
