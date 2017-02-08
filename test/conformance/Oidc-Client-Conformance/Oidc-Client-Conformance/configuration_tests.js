@@ -1,6 +1,6 @@
 
 Oidc.Log.logger = console;
-Oidc.Log.level = Oidc.Log.DEBUG;
+Oidc.Log.level = Oidc.Log.INFO;
 
 var rp_id = "oidc-client-js";
 var response_type = 'id_token';
@@ -24,8 +24,9 @@ function start() {
     //rp__discovery__jwks_uri__keys();
     //rp__discovery__issuer__not__matching__config();
     //rp__discovery__openid__configuration();
-    //rp__id_token__sig__none();
-    //rp__key__rotation__op__sign__key();
+    //rp__id_token__sig__none(); // not applicable for implicit
+    //rp__key__rotation__op__sign__key__native();
+    //rp__key__rotation__op__sign__key(); // not applicable for implicit
 }
 
 function rp__discovery__jwks_uri__keys() {
@@ -40,10 +41,12 @@ function rp__discovery__openid__configuration() {
 function rp__id_token__sig__none() {
     run('rp-id_token-sig-none');
 }
+function rp__key__rotation__op__sign__key__native() {
+    run('rp-key-rotation-op-sign-key-native');
+}
 function rp__key__rotation__op__sign__key() {
     run('rp-key-rotation-op-sign-key');
 }
-
 
 
 function run(test_id, scope){
