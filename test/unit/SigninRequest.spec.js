@@ -175,6 +175,17 @@ describe("SigninRequest", function() {
             subject.url.should.contain("resource=foo");
         });
 
+        it("should include request", function() {
+            settings.request = "foo";
+            subject = new SigninRequest(settings);
+            subject.url.should.contain("request=foo");
+        });
+
+        it("should include request_uri", function() {
+            settings.request_uri = "foo";
+            subject = new SigninRequest(settings);
+            subject.url.should.contain("request_uri=foo");
+        });
 
     });
 

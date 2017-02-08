@@ -10,7 +10,7 @@ export default class SigninRequest {
         // mandatory
         url, client_id, redirect_uri, response_type, scope, authority,
         // optional
-        data, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource
+        data, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri
     }) {
         if (!url) {
             Log.error("No url passed to SigninRequest");
@@ -50,7 +50,7 @@ export default class SigninRequest {
             url = UrlUtility.addQueryParam(url, "nonce", this.state.nonce);
         }
 
-        var optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource };
+        var optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri };
         for(let key in optional){
             if (optional[key]) {
                 url = UrlUtility.addQueryParam(url, key, optional[key]);

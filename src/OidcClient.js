@@ -44,7 +44,7 @@ export default class OidcClient {
         // have round tripped, but people were getting confused, so i added state (since that matches the spec) 
         // and so now if data is not passed, but state is then state will be used
         data, state,
-        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource} = {},
+        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri} = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSigninRequest");
@@ -67,7 +67,7 @@ export default class OidcClient {
         return this._metadataService.getAuthorizationEndpoint().then(url => {
             Log.debug("Received authorization endpoint", url);
 
-            let request = new SigninRequest({
+            let signinRequest = new SigninRequest({
                 url,
                 client_id,
                 redirect_uri,
@@ -75,14 +75,14 @@ export default class OidcClient {
                 scope,
                 data: data || state,
                 authority,
-                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource
+                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri
             });
 
-            var signinState = request.state;
+            var signinState = signinRequest.state;
             stateStore = stateStore || this._stateStore;
 
             return stateStore.set(signinState.id, signinState.toStorageString()).then(() => {
-                return request;
+                return signinRequest;
             });
         });
     }
