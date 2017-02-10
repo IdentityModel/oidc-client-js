@@ -381,32 +381,5 @@ describe("MetadataService", function() {
             })
         });
         
-        it("should filter signing keys", function(done) {
-            settings.metadata = {
-                jwks_uri: "http://sts/metadata/keys"
-            };
-            stubJsonService.result = Promise.resolve({
-                keys:[
-                {
-                    use:'sig',
-                    kid:"test"
-                },
-                {
-                    use:'enc',
-                    kid:"test"
-                }]
-            });
-
-            let p = subject.getSigningKeys();
-
-            p.then(keys => {
-                keys.should.deep.equal([{
-                    use:'sig',
-                    kid:"test"
-                }]);
-                done();
-            })
-        });
-
     });
 });

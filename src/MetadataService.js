@@ -136,20 +136,9 @@ export default class MetadataService {
                     throw new Error("Missing keys on keyset");
                 }
 
-                var filteredKeys = this._filterSigningKeys(keySet.keys);
-                Log.debug("filtered keys", filteredKeys);
-
-                this._settings.signingKeys = filteredKeys;
+                this._settings.signingKeys = keySet.keys;
                 return this._settings.signingKeys;
             });
-        });
-    }
-
-    _filterSigningKeys(keys) {
-        Log.debug("MetadataService._filterSigningKeys", keys);
-
-        return keys.filter(item => {
-            return item.use === "sig";
         });
     }
 }
