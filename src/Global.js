@@ -24,8 +24,17 @@ export default class Global {
         }
     }
     static get localStorage() {
+        let st = null;
+        //catch access denied errors in ie <= 11
+        try{
+          st = window.localStorage;
+        }
+        catch(ex){
+            //fallback to session storage
+          st = window.sessionStorage;
+        }
         if (!testing) {
-            return localStorage;
+          return st;
         }
     }
     static get sessionStorage() {
