@@ -4,7 +4,7 @@
 import Log from './Log';
 import Timer from './Timer';
 
-const DefaultAccessTokenExpiringNotificationTime = 60;
+const DefaultAccessTokenExpiringNotificationTime = 60; // seconds
 
 export default class AccessTokenEvents {
 

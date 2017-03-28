@@ -5,7 +5,7 @@ import Log from './Log';
 import Global from './Global';
 import Event from './Event';
 
-const TimerDuration = 5; // 5 seconds
+const TimerDuration = 5; // seconds
 
 export default class Timer extends Event {
 
