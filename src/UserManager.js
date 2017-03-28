@@ -233,10 +233,6 @@ export default class UserManager extends OidcClient {
             return this._signoutEnd(navResponse.url);
         });
     }
-    _signoutCallback(url, navigator, delimiter) {
-        Log.debug("_signoutCallback");
-        return navigator.callback(url, delimiter);
-    }
 
     signinRedirect(args) {
         Log.debug("UserManager.signinRedirect");
@@ -294,10 +290,14 @@ export default class UserManager extends OidcClient {
             Log.info("signoutPopup successful");
         });
     }
-    signoutPopupCallback(url) {
+    signoutPopupCallback(url, keepOpen) {
+        if (typeof(keepOpen) === 'undefined' && typeof(url) === 'boolean') {
+            url = null;
+            keepOpen = true;
+        }
         Log.debug("UserManager.signoutPopupCallback");
         let delimiter = '?';
-        return this._signoutCallback(url, this._popupNavigator, delimiter).then(() => {
+        return this._popupNavigator.callback(url, keepOpen, delimiter).then(() => {
             Log.info("signoutPopupCallback successful");
         });
     }

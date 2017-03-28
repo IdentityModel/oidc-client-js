@@ -71,7 +71,7 @@ export default class PopupWindow {
         this._reject(new Error(message));
     }
 
-    _cleanup() {
+    _cleanup(keepOpen) {
         Log.debug("PopupWindow._cleanup");
 
         window.clearInterval(this._checkForPopupClosedTimer);
@@ -79,7 +79,7 @@ export default class PopupWindow {
 
         delete window["popupCallback_" + this._id];
 
-        if (this._popup) {
+        if (this._popup && !keepOpen) {
             this._popup.close();
         }
         this._popup = null;
@@ -93,10 +93,10 @@ export default class PopupWindow {
         }
     }
 
-    _callback(url) {
+    _callback(url, keepOpen) {
         Log.debug("PopupWindow._callback");
 
-        this._cleanup();
+        this._cleanup(keepOpen);
 
         if (url) {
             this._success({ url: url });
@@ -106,7 +106,7 @@ export default class PopupWindow {
         }
     }
 
-    static notifyOpener(url, delimiter) {
+    static notifyOpener(url, keepOpen, delimiter) {
         Log.debug("PopupWindow.notifyOpener");
 
         if (window.opener) {
@@ -120,7 +120,7 @@ export default class PopupWindow {
                     var callback = window.opener[name]; 
                     if (callback) {
                         Log.debug("passing url message to opener");
-                        callback(url);
+                        callback(url, keepOpen);
                     }
                     else {
                         Log.warn("no matching callback found on opener");

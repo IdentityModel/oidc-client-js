@@ -135,8 +135,8 @@ function popupSignin() {
 }
 
 function popupSignout() {
-    mgr.signoutPopup({state:'some data'}).then(function(user) {
-        log("signed out", user);
+    mgr.signoutPopup({state:'some data'}).then(function() {
+        log("signed out");
     }).catch(function(err) {
         log(err);
     });

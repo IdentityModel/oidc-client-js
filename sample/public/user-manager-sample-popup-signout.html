@@ -7,11 +7,13 @@
 </head>
 
 <body>
+    <h1>Signed Out</h1>
     <script src='oidc-client.js'></script>
     <script>
         Oidc.Log.logger = console;
         Oidc.Log.level = Oidc.Log.INFO;
-        new Oidc.UserManager().signoutPopupCallback();
+        // true param will keep popup window open
+        new Oidc.UserManager().signoutPopupCallback(true);
     </script>
 </body>
 
