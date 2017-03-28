@@ -47,7 +47,9 @@ export default class PopupWindow {
             Log.debug("Setting URL in popup");
 
             this._id = params.id;
-            window["popupCallback_" + params.id] = this._callback.bind(this);
+            if (this._id) {
+                window["popupCallback_" + params.id] = this._callback.bind(this);
+            }
 
             this._popup.focus();
             this._popup.window.location = params.url;
@@ -104,14 +106,14 @@ export default class PopupWindow {
         }
     }
 
-    static notifyOpener(url) {
+    static notifyOpener(url, delimiter) {
         Log.debug("PopupWindow.notifyOpener");
 
         if (window.opener) {
             url = url || window.location.href;
             if (url) {
 
-                var data = UrlUtility.parseUrlFragment(url);
+                var data = UrlUtility.parseUrlFragment(url, delimiter);
                 
                 if (data.state) {
                     var name = "popupCallback_" + data.state;

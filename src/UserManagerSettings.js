@@ -15,6 +15,7 @@ const DefaultCheckSessionInterval = 2000;
 export default class UserManagerSettings extends OidcClientSettings {
     constructor({
         popup_redirect_uri,
+        popup_post_logout_redirect_uri,
         popupWindowFeatures,
         popupWindowTarget,
         silent_redirect_uri,
@@ -32,6 +33,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         super(arguments[0]);
 
         this._popup_redirect_uri = popup_redirect_uri;
+        this._popup_post_logout_redirect_uri = popup_post_logout_redirect_uri;
         this._popupWindowFeatures = popupWindowFeatures;
         this._popupWindowTarget = popupWindowTarget;
         
@@ -53,6 +55,9 @@ export default class UserManagerSettings extends OidcClientSettings {
 
     get popup_redirect_uri() {
         return this._popup_redirect_uri;
+    }
+    get popup_post_logout_redirect_uri() {
+        return this._popup_post_logout_redirect_uri;
     }
     get popupWindowFeatures() {
         return this._popupWindowFeatures;

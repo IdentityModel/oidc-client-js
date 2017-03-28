@@ -217,43 +217,6 @@ export default class UserManager extends OidcClient {
         });
     }
 
-    revokeAccessToken() {
-        Log.debug("UserManager.revokeAccessToken");
-
-        return this._loadUser().then(user => {
-            return this._revokeInternal(user, true).then(success => {
-                if (success) {
-                    Log.debug("removing token properties from user and re-storing");
-
-                    user.access_token = null;
-                    user.expires_at = null;
-                    user.token_type = null;
-
-                    return this._storeUser(user).then(() => {
-                        Log.debug("user stored");
-                        this._events.load(user);
-                    });
-                }
-            });
-        }).then(()=>{
-            Log.info("access token revoked successfully");
-        });
-    }
-
-    _revokeInternal(user, required) {
-        Log.debug("checking if token revocation is necessary");
-
-        var access_token = user && user.access_token;
-
-        // check for JWT vs. reference token
-        if (!access_token || access_token.indexOf('.') >= 0) {
-            Log.debug("no need to revoke due to no user, token, or JWT format");
-            return Promise.resolve(false);
-        }
-
-        return this._tokenRevocationClient.revoke(access_token, required).then(() => true);
-    }
-
     _signin(args, navigator, navigatorParams = {}) {
         Log.debug("_signin");
         return this._signinStart(args, navigator, navigatorParams).then(navResponse => {
@@ -270,9 +233,9 @@ export default class UserManager extends OidcClient {
             return this._signoutEnd(navResponse.url);
         });
     }
-    _signoutCallback(url, navigator) {
+    _signoutCallback(url, navigator, delimiter) {
         Log.debug("_signoutCallback");
-        return navigator.callback(url);
+        return navigator.callback(url, delimiter);
     }
 
     signinRedirect(args) {
@@ -302,28 +265,40 @@ export default class UserManager extends OidcClient {
             Log.info("signoutRedirect successful");
         });
     }
+    signoutRedirectCallback(url) {
+        Log.debug("UserManager.signoutRedirectCallback");
+        return this._signoutEnd(url || this._redirectNavigator.url).then(response=>{
+            Log.info("signoutRedirectCallback successful");
+        });
+    }
     signoutPopup(args = {}) {
-        Log.debug("UserManager.signoutPopup");
+        Log.debug("UserManager.signinPopup");
 
-        let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
-        if (!url) {
-            Log.error("No popup_redirect_uri or redirect_uri configured");
-            return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
+        let url = args.post_logout_redirect_uri || this.settings.popup_post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
+        args.post_logout_redirect_uri = url;
+        args.display = "popup";
+        if (args.post_logout_redirect_uri){
+            // we're putting a dummy entry in here because we 
+            // need a unique id from the state for notification
+            // to the parent window, which is necessary if we
+            // plan to return back to the client after signout
+            // and so we can close the popup after signout
+            args.state = args.state || {};
         }
 
         return this._signout(args, this._popupNavigator, {
             startUrl: url,
             popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
             popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
-        }).then(response=>{
+        }).then(() => {
             Log.info("signoutPopup successful");
-            return response;
         });
     }
-    signoutRedirectCallback(url) {
-        Log.debug("UserManager.signoutRedirectCallback");
-        return this._signoutEnd(url || this._redirectNavigator.url).then(response=>{
-            Log.info("signoutRedirectCallback successful");
+    signoutPopupCallback(url) {
+        Log.debug("UserManager.signoutPopupCallback");
+        let delimiter = '?';
+        return this._signoutCallback(url, this._popupNavigator, delimiter).then(() => {
+            Log.info("signoutPopupCallback successful");
         });
     }
 
@@ -385,6 +360,9 @@ export default class UserManager extends OidcClient {
                             Log.debug("got signout request");
 
                             navigatorParams.url = signoutRequest.url;
+                            if (signoutRequest.state) {
+                                navigatorParams.id = signoutRequest.state.id;
+                            }
                             return handle.navigate(navigatorParams);
                         });
                     });
@@ -402,6 +380,43 @@ export default class UserManager extends OidcClient {
         });
     }
 
+    revokeAccessToken() {
+        Log.debug("UserManager.revokeAccessToken");
+
+        return this._loadUser().then(user => {
+            return this._revokeInternal(user, true).then(success => {
+                if (success) {
+                    Log.debug("removing token properties from user and re-storing");
+
+                    user.access_token = null;
+                    user.expires_at = null;
+                    user.token_type = null;
+
+                    return this._storeUser(user).then(() => {
+                        Log.debug("user stored");
+                        this._events.load(user);
+                    });
+                }
+            });
+        }).then(()=>{
+            Log.info("access token revoked successfully");
+        });
+    }
+
+    _revokeInternal(user, required) {
+        Log.debug("checking if token revocation is necessary");
+
+        var access_token = user && user.access_token;
+
+        // check for JWT vs. reference token
+        if (!access_token || access_token.indexOf('.') >= 0) {
+            Log.debug("no need to revoke due to no user, token, or JWT format");
+            return Promise.resolve(false);
+        }
+
+        return this._tokenRevocationClient.revoke(access_token, required).then(() => true);
+    }
+    
     get _userStoreKey() {
         return `user:${this.settings.authority}:${this.settings.client_id}`;
     }

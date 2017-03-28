@@ -11,11 +11,11 @@ export default class PopupNavigator {
         return Promise.resolve(popup);
     }
     
-    callback(url) {
+    callback(url, delimiter) {
         Log.debug("PopupNavigator.callback");
 
         try {
-            PopupWindow.notifyOpener(url);
+            PopupWindow.notifyOpener(url, delimiter);
             return Promise.resolve();
         }
         catch (e) {
