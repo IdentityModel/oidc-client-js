@@ -59,6 +59,8 @@ declare namespace Oidc {
     interface MetadataService {
         new (settings: OidcClientSettings): MetadataService;
 
+        metadataUrl?: string;
+
         getMetadata(): Promise<any>;
 
         getIssuer(): Promise<any>;
@@ -106,6 +108,7 @@ declare namespace Oidc {
         scope?: string;
         redirect_uri?: string;
         post_logout_redirect_uri?: string;
+        popup_post_logout_redirect_uri?: string;
         prompt?: string;
         display?: string;
         max_age?: number;
@@ -139,7 +142,10 @@ declare namespace Oidc {
 
         signoutRedirect(args?: any): Promise<any>;
         signoutRedirectCallback(url?: string): Promise<any>;
+
         signoutPopup(args?: any): Promise<any>;
+        signoutPopupCallback(url?: string, keepOpen?: boolean): Promise<void>;
+        signoutPopupCallback(keepOpen?: boolean): Promise<void>;
 
         querySessionStatus(args?: any): Promise<any>;
 
