@@ -168,9 +168,9 @@ describe("ResponseValidator", function () {
 
     });
 
-    describe("validateSignoutResponse", function (done) {
+    describe("validateSignoutResponse", function () {
 
-        it("should validate that the client state matches response state", function () {
+        it("should validate that the client state matches response state", function (done) {
 
             stubResponse.state = "not_the_id";
             subject.validateSignoutResponse(stubState, stubResponse).then(null, err => {
@@ -211,7 +211,7 @@ describe("ResponseValidator", function () {
 
     });
 
-    describe("validateSigninResponse", function (done) {
+    describe("validateSigninResponse", function () {
 
         it("should process signin params", function (done) {
 
@@ -343,7 +343,7 @@ describe("ResponseValidator", function () {
             });
         });
 
-        it("should validate that the client state matches response state", function () {
+        it("should validate that the client state matches response state", function (done) {
 
             stubResponse.state = "not_the_id";
             subject._processSigninParams(stubState, stubResponse).then(null, err => {
