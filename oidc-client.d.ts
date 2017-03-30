@@ -20,7 +20,7 @@ declare namespace Oidc {
         addAccessTokenExpired(callback: (...ev: any[]) => void): void;
         removeAccessTokenExpired(callback: (...ev: any[]) => void): void;
     }
-    interface InMemoryWebStorage {
+    class InMemoryWebStorage {
         getItem(key: string): any;
 
         setItem(key: string, value: any): any;
