@@ -58,7 +58,9 @@ export default class SessionMonitor {
                         let interval = this._checkSessionInterval;
 
                         this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval);
-                        this._checkSessionIFrame.start(session_state);
+                        this._checkSessionIFrame.load().then(() => {
+                            this._checkSessionIFrame.start(session_state);
+                        });
                     }
                     else {
                         Log.warn("No check session iframe found in the metadata");
@@ -98,7 +100,7 @@ export default class SessionMonitor {
 
                     if (session.sid === this._sid) {
                         Log.debug("Same sub still logged in at OP, restarting check session iframe; session_state:", session.session_state);
-                    } 
+                    }
                     else {
                         Log.debug("Same sub still logged in at OP, session state has changed, restarting check session iframe; session_state:", session.session_state);
                         this._userManager.events._raiseUserSessionChanged();
