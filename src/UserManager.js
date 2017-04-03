@@ -255,7 +255,7 @@ export default class UserManager extends OidcClient {
             return user;
         });
     }
-    signoutRedirect(args) {
+    signoutRedirect(args = {}) {
         Log.debug("UserManager.signoutRedirect");
         let postLogoutRedirectUri = args.post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
         if (postLogoutRedirectUri){
