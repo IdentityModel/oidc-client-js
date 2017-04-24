@@ -11,6 +11,7 @@ const timer = {
 };
 
 let testing = false;
+let request = null;
 
 export default class Global {
 
@@ -23,21 +24,29 @@ export default class Global {
             return location;
         }
     }
+
     static get localStorage() {
         if (!testing) {
             return localStorage;
         }
     }
+
     static get sessionStorage() {
         if (!testing) {
             return sessionStorage;
         }
     }
+
+    static setXMLHttpRequest(newRequest) {
+        request = newRequest;
+    }
+
     static get XMLHttpRequest() {
         if (!testing) {
-            return XMLHttpRequest;
+            return request || XMLHttpRequest;
         }
     }
+
     static get timer() {
         if (!testing) {
             return timer;

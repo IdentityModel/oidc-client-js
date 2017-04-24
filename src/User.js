@@ -36,7 +36,7 @@ export default class User {
     }
 
     toStorageString() {
-        Log.info("User.toStorageString");
+        Log.debug("User.toStorageString");
         return JSON.stringify({
             id_token: this.id_token,
             session_state: this.session_state,
@@ -49,7 +49,7 @@ export default class User {
     }
 
     static fromStorageString(storageString) {
-        Log.info("User.fromStorageString");
+        Log.debug("User.fromStorageString");
         return new User(JSON.parse(storageString));
     }
 }

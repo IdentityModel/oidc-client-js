@@ -24,14 +24,14 @@ export default class ResponseValidator {
     }
 
     validateSigninResponse(state, response) {
-        Log.info("ResponseValidator.validateSigninResponse");
+        Log.debug("ResponseValidator.validateSigninResponse");
 
         return this._processSigninParams(state, response).then(response => {
-            Log.info("state processed");
+            Log.debug("state processed");
             return this._validateTokens(state, response).then(response => {
-                Log.info("tokens validated");
+                Log.debug("tokens validated");
                 return this._processClaims(response).then(response => {
-                    Log.info("claims processed");
+                    Log.debug("claims processed");
                     return response;
                 });
             });
@@ -39,7 +39,7 @@ export default class ResponseValidator {
     }
 
     validateSignoutResponse(state, response) {
-        Log.info("ResponseValidator.validateSignoutResponse");
+        Log.debug("ResponseValidator.validateSignoutResponse");
 
         if (state.id !== response.state) {
             Log.error("State does not match");
@@ -49,7 +49,7 @@ export default class ResponseValidator {
         // now that we know the state matches, take the stored data
         // and set it into the response so callers can get their state
         // this is important for both success & error outcomes
-        Log.info("state validated");
+        Log.debug("state validated");
         response.state = state.data;
 
         if (response.error) {
@@ -61,7 +61,7 @@ export default class ResponseValidator {
     }
 
     _processSigninParams(state, response) {
-        Log.info("ResponseValidator._processSigninParams");
+        Log.debug("ResponseValidator._processSigninParams");
 
         if (state.id !== response.state) {
             Log.error("State does not match");
@@ -100,7 +100,7 @@ export default class ResponseValidator {
         // now that we know the state matches, take the stored data
         // and set it into the response so callers can get their state
         // this is important for both success & error outcomes
-        Log.info("state validated");
+        Log.debug("state validated");
         response.state = state.data;
 
         if (response.error) {
@@ -122,30 +122,36 @@ export default class ResponseValidator {
     }
 
     _processClaims(response) {
-        Log.info("ResponseValidator._processClaims");
+        Log.debug("ResponseValidator._processClaims");
 
         if (response.isOpenIdConnect) {
-            Log.info("response is OIDC, processing claims");
+            Log.debug("response is OIDC, processing claims");
 
             response.profile = this._filterProtocolClaims(response.profile);
 
             if (this._settings.loadUserInfo && response.access_token) {
-                Log.info("loading user info");
+                Log.debug("loading user info");
 
                 return this._userInfoService.getClaims(response.access_token).then(claims => {
+                    Log.debug("user info claims received from user info endpoint");
+
+                    if (claims.sub !== response.profile.sub) {
+                        Log.error("sub from user info endpoint does not match sub in id_token");
+                        return Promise.reject(new Error("sub from user info endpoint does not match sub in id_token"));
+                    }
 
                     response.profile = this._mergeClaims(response.profile, claims);
-                    Log.info("user info claims received, updated profile:", response.profile);
+                    Log.debug("user info claims received, updated profile:", response.profile);
 
                     return response;
                 });
             }
             else {
-                Log.info("not loading user info");
+                Log.debug("not loading user info");
             }
         }
         else {
-            Log.info("response is not OIDC, not processing claims");
+            Log.debug("response is not OIDC, not processing claims");
         }
 
         return Promise.resolve(response);
@@ -179,7 +185,7 @@ export default class ResponseValidator {
     }
 
     _filterProtocolClaims(claims) {
-        Log.info("ResponseValidator._filterProtocolClaims, incoming claims:", claims);
+        Log.debug("ResponseValidator._filterProtocolClaims, incoming claims:", claims);
 
         var result = Object.assign({}, claims);
 
@@ -188,35 +194,35 @@ export default class ResponseValidator {
                 delete result[type];
             });
 
-            Log.info("protocol claims filtered", result);
+            Log.debug("protocol claims filtered", result);
         }
         else {
-            Log.info("protocol claims not filtered")
+            Log.debug("protocol claims not filtered")
         }
 
         return result;
     }
 
     _validateTokens(state, response) {
-        Log.info("ResponseValidator._validateTokens");
+        Log.debug("ResponseValidator._validateTokens");
 
         if (response.id_token) {
 
             if (response.access_token) {
-                Log.info("Validating id_token and access_token");
+                Log.debug("Validating id_token and access_token");
                 return this._validateIdTokenAndAccessToken(state, response);
             }
 
-            Log.info("Validating id_token");
+            Log.debug("Validating id_token");
             return this._validateIdToken(state, response);
         }
 
-        Log.info("No id_token to validate");
+        Log.debug("No id_token to validate");
         return Promise.resolve(response);
     }
 
     _validateIdTokenAndAccessToken(state, response) {
-        Log.info("ResponseValidator._validateIdTokenAndAccessToken");
+        Log.debug("ResponseValidator._validateIdTokenAndAccessToken");
 
         return this._validateIdToken(state, response).then(response => {
             return this._validateAccessToken(response);
@@ -224,7 +230,7 @@ export default class ResponseValidator {
     }
 
     _validateIdToken(state, response) {
-        Log.info("ResponseValidator._validateIdToken");
+        Log.debug("ResponseValidator._validateIdToken");
 
         if (!state.nonce) {
             Log.error("No nonce on state");
@@ -245,7 +251,7 @@ export default class ResponseValidator {
         var kid = jwt.header.kid;
 
         return this._metadataService.getIssuer().then(issuer => {
-            Log.info("Received issuer");
+            Log.debug("Received issuer");
 
             return this._metadataService.getSigningKeys().then(keys => {
                 if (!keys) {
@@ -253,36 +259,45 @@ export default class ResponseValidator {
                     return Promise.reject(new Error("No signing keys from metadata"));
                 }
 
-                Log.info("Received signing keys");
+                Log.debug("Received signing keys");
+                let key;
                 if (!kid) {
+                    keys = this._filterByAlg(keys, jwt.header.alg);
+
                     if (keys.length > 1) {
-                        Log.error("No kid found in id_token");
-                        return Promise.reject(new Error("No kid found in id_token"));
+                        Log.error("No kid found in id_token and more than one key found in metadata");
+                        return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
                     } 
                     else {
                         // kid is mandatory only when there are multiple keys in the referenced JWK Set document
                         // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
-                        kid = keys[0].kid;
+                        key = keys[0];
                     }
                 }
-
-                let key = keys.filter(key => {
-                    return key.kid === kid;
-                })[0];
+                else {
+                    key = keys.filter(key => {
+                        return key.kid === kid;
+                    })[0];
+                }
 
                 if (!key) {
-                    Log.error("No key matching kid found in signing keys");
-                    return Promise.reject(new Error("No key matching kid found in signing keys"));
+                    Log.error("No key matching kid or alg found in signing keys");
+                    return Promise.reject(new Error("No key matching kid or alg found in signing keys"));
                 }
 
                 let audience = state.client_id;
                 
                 let clockSkewInSeconds = this._settings.clockSkew;
-                Log.info("Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
+                Log.debug("Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
                 return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{
-                    Log.info("JWT validation successful");
+                    Log.debug("JWT validation successful");
                     
+                    if (!jwt.payload.sub) {
+                        Log.error("No sub present in id_token");
+                        return Promise.reject(new Error("No sub present in id_token"));
+                    }
+
                     response.profile = jwt.payload;
                     
                     return response;
@@ -291,8 +306,37 @@ export default class ResponseValidator {
         });
     }
 
+    _filterByAlg(keys, alg){
+        Log.debug("ResponseValidator._filterByAlg", alg);
+
+        var kty = null;
+        if (alg.startsWith("RS")) {
+            kty = "RSA";
+        }
+        else if (alg.startsWith("PS")) {
+            kty = "PS";
+        }
+        else if (alg.startsWith("ES")) {
+            kty = "EC";
+        }
+        else {
+            Log.debug("alg not supported: ", alg);
+            return [];
+        }
+        
+        Log.debug("Looking for keys that match kty: ", kty);
+
+        keys = keys.filter(key => {
+            return key.kty === kty;
+        });
+
+        Log.debug("Number of keys that match kty: ", kty, keys.length);
+
+        return keys;
+    }
+
     _validateAccessToken(response) {
-        Log.info("ResponseValidator._validateAccessToken");
+        Log.debug("ResponseValidator._validateAccessToken");
 
         if (!response.profile) {
             Log.error("No profile loaded from id_token");

@@ -11,7 +11,7 @@ export default class WebStorageStateStore {
     }
 
     set(key, value) {
-        Log.info("WebStorageStateStore.set", key);
+        Log.debug("WebStorageStateStore.set", key);
 
         key = this._prefix + key;
 
@@ -21,7 +21,7 @@ export default class WebStorageStateStore {
     }
 
     get(key) {
-        Log.info("WebStorageStateStore.get", key);
+        Log.debug("WebStorageStateStore.get", key);
 
         key = this._prefix + key;
 
@@ -31,7 +31,7 @@ export default class WebStorageStateStore {
     }
 
     remove(key) {
-        Log.info("WebStorageStateStore.remove", key);
+        Log.debug("WebStorageStateStore.remove", key);
 
         key = this._prefix + key;
 
@@ -42,7 +42,7 @@ export default class WebStorageStateStore {
     }
 
     getAllKeys() {
-        Log.info("WebStorageStateStore.getAllKeys");
+        Log.debug("WebStorageStateStore.getAllKeys");
 
         var keys = [];
 

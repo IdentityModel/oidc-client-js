@@ -34,7 +34,7 @@ describe("WebStorageStateStore", function() {
             })
         });
 
-        it("should use prefix if specified", function() {
+        it("should use prefix if specified", function(done) {
             prefix = "foo.";
             subject = new WebStorageStateStore({ prefix: prefix, store: store });
 

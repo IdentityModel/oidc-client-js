@@ -98,7 +98,7 @@ describe("UserManager", function () {
             subject = new UserManager(settings);
 
             subject._signin = function(args, nav, navArgs){
-                Log.info("_signin", args, nav, navArgs);
+                Log.debug("_signin", args, nav, navArgs);
 
                 navArgs.silentRequestTimeout.should.equal(123);
                 done();

@@ -97,7 +97,7 @@ describe("State", function() {
             inMemStore.setItem("junk5", "junk");
             
             State.clearStaleState(store, 100).then(() => {
-                Log.info("clearStaleState done");
+                Log.debug("clearStaleState done");
                 
                 inMemStore.length.should.equal(8);
                 inMemStore.getItem(prefix + "s4").should.be.ok;

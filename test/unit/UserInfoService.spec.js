@@ -46,11 +46,10 @@ describe("UserInfoService", function() {
         });
 
         it("should require a token", function(done) {
-            subject.getClaims().then(null,
-                err => {
-                    err.message.should.contain("token");
-                    done();
-                });
+            subject.getClaims().catch(err => {
+                err.message.should.contain("token");
+                done();
+            });
         });
 
         it("should call userinfo endpoint and pass token", function(done) {

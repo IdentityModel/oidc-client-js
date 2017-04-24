@@ -53,12 +53,12 @@ describe("SignoutRequest", function() {
             subject.url.should.contain("post_logout_redirect_uri=loggedout");
         });
         
-        it("should not include post_logout_redirect_uri if no id_token_hint provided", function() {
+        it("should include post_logout_redirect_uri if no id_token_hint provided", function() {
 
             delete settings.id_token_hint;
             subject = new SignoutRequest(settings);
 
-            subject.url.should.not.contain("post_logout_redirect_uri=loggedout");
+            subject.url.should.contain("post_logout_redirect_uri=loggedout");
         });
         
         it("should include state if post_logout_redirect_uri provided", function() {

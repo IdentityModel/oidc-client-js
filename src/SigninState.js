@@ -31,7 +31,7 @@ export default class SigninState extends State {
     }
     
     toStorageString() {
-        Log.info("SigninState.toStorageString");
+        Log.debug("SigninState.toStorageString");
         return JSON.stringify({
             id: this.id,
             data: this.data,
@@ -43,7 +43,7 @@ export default class SigninState extends State {
     }
 
     static fromStorageString(storageString) {
-        Log.info("SigninState.fromStorageString");
+        Log.debug("SigninState.fromStorageString");
         var data = JSON.parse(storageString);
         return new SigninState(data);
     }

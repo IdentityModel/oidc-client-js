@@ -20,7 +20,7 @@ export default class TokenRevocationClient {
     }
 
     revoke(accessToken, required) {
-        Log.info("TokenRevocationClient.revoke");
+        Log.debug("TokenRevocationClient.revoke");
 
         if (!accessToken) {
             Log.error("No accessToken provided");
@@ -45,7 +45,7 @@ export default class TokenRevocationClient {
     }
 
     _revoke(url, client_id, client_secret, accessToken) {
-        Log.info("Calling revocation endpoint");
+        Log.debug("Calling revocation endpoint");
 
         return new Promise((resolve, reject) => {
 
@@ -53,7 +53,7 @@ export default class TokenRevocationClient {
             xhr.open("POST", url);
             
             xhr.onload = () => {
-                Log.info("HTTP response received, status", xhr.status);
+                Log.debug("HTTP response received, status", xhr.status);
                 
                 if (xhr.status === 200) {
                     resolve();

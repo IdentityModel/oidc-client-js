@@ -8,41 +8,47 @@ export default class JsonService {
     constructor(XMLHttpRequestCtor = Global.XMLHttpRequest) {
         this._XMLHttpRequest = XMLHttpRequestCtor;
     }
-
+    
     getJson(url, token) {
-        Log.info("JsonService.getJson", url);
-
-        if (!url) {
+        Log.debug("JsonService.getJson", url);
+        
+        if (!url){
             Log.error("No url passed");
             throw new Error("url");
         }
-
-        return new Promise(function (resolve, reject) {
-            var req = new _this._XMLHttpRequest();
+        
+        return new Promise((resolve, reject) => {
+            
+            var req = new this._XMLHttpRequest();
             if (url.indexOf('userinfo') > -1) {
-                _Log2.default.info("token passed, setting Authorization header");
-                console.log('Setting req header: ' + token);
-                url = url + "?access_token=" + token;
-            }
+                 Log.default.info("token passed, setting Authorization header");
+                 console.log('Setting req header: ' + token);
+                 url = url + "?access_token=" + token;
+             }
 
             req.open('GET', url);
-            req.onload = function () {
-                _Log2.default.info("HTTP response received, status", req.status);
+
+            req.onload = function() {
+                Log.debug("HTTP response received, status", req.status);
+                
                 if (req.status === 200) {
                     resolve(JSON.parse(req.responseText));
-                } else {
+                }
+                else {
                     reject(Error(req.statusText + " (" + req.status + ")"));
                 }
             };
-            req.onerror = function () {
-                _Log2.default.error("network error");
+
+            req.onerror = function() {
+                Log.error("network error");
                 reject(Error("Network Error"));
             };
-
+            
             if (token && url.indexOf('userinfo') === -1) {
-                _Log2.default.info("token passed, setting Authorization header");
+                Log.debug("token passed, setting Authorization header");
                 req.setRequestHeader("Authorization", "Bearer " + token);
             }
+
             req.send();
         });
     }

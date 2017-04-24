@@ -5,6 +5,7 @@ declare namespace Oidc {
     interface Logger  {
         error(message?: any, ...optionalParams: any[]): void;
         info(message?: any, ...optionalParams: any[]): void;
+        debug(message?: any, ...optionalParams: any[]): void;
         warn(message?: any, ...optionalParams: any[]): void;
     }
     interface AccessTokenEvents {
@@ -19,7 +20,7 @@ declare namespace Oidc {
         addAccessTokenExpired(callback: (...ev: any[]) => void): void;
         removeAccessTokenExpired(callback: (...ev: any[]) => void): void;
     }
-    interface InMemoryWebStorage {
+    class InMemoryWebStorage {
         getItem(key: string): any;
 
         setItem(key: string, value: any): any;
@@ -35,11 +36,13 @@ declare namespace Oidc {
         static ERROR: number;
         static WARN: number;
         static INFO: number;
+        static DEBUG: number;
         // For when TypeScript 2.0 compiler is more widely used
         // static readonly NONE: number;
         // static readonly ERROR: number;
         // static readonly WARN: number;
         // static readonly INFO: number;
+        // static readonly DEBUG: number;
 
         static reset(): void;
 
@@ -47,6 +50,7 @@ declare namespace Oidc {
 
         static logger: Logger;
 
+        static debug(message?: any, ...optionalParams: any[]): void;
         static info(message?: any, ...optionalParams: any[]): void;
         static warn(message?: any, ...optionalParams: any[]): void;
         static error(message?: any, ...optionalParams: any[]): void;
@@ -54,6 +58,8 @@ declare namespace Oidc {
 
     interface MetadataService {
         new (settings: OidcClientSettings): MetadataService;
+
+        metadataUrl?: string;
 
         getMetadata(): Promise<any>;
 
@@ -102,6 +108,7 @@ declare namespace Oidc {
         scope?: string;
         redirect_uri?: string;
         post_logout_redirect_uri?: string;
+        popup_post_logout_redirect_uri?: string;
         prompt?: string;
         display?: string;
         max_age?: number;
@@ -135,7 +142,10 @@ declare namespace Oidc {
 
         signoutRedirect(args?: any): Promise<any>;
         signoutRedirectCallback(url?: string): Promise<any>;
+
         signoutPopup(args?: any): Promise<any>;
+        signoutPopupCallback(url?: string, keepOpen?: boolean): Promise<void>;
+        signoutPopupCallback(keepOpen?: boolean): Promise<void>;
 
         querySessionStatus(args?: any): Promise<any>;
 

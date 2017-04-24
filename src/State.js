@@ -28,7 +28,7 @@ export default class State {
     }
 
     toStorageString() {
-        Log.info("State.toStorageString");
+        Log.debug("State.toStorageString");
         return JSON.stringify({
             id: this.id,
             data: this.data,
@@ -37,17 +37,17 @@ export default class State {
     }
     
     static fromStorageString(storageString) {
-        Log.info("State.fromStorageString");
+        Log.debug("State.fromStorageString");
         return new State(JSON.parse(storageString));
     }
 
     static clearStaleState(storage, age) {
-        Log.info("State.clearStaleState");
+        Log.debug("State.clearStaleState");
 
         var cutoff = Date.now() / 1000 - age;
 
         return storage.getAllKeys().then(keys => {
-            Log.info("got keys", keys);
+            Log.debug("got keys", keys);
 
             var promises = [];
             for (let key of keys) {
@@ -58,7 +58,7 @@ export default class State {
                         try {
                             var state = State.fromStorageString(item)
 
-                            Log.info("got item from key: ", key, state.created);
+                            Log.debug("got item from key: ", key, state.created);
 
                             if (state.created <= cutoff) {
                                 remove = true;
@@ -70,12 +70,12 @@ export default class State {
                         }
                     }
                     else {
-                        Log.info("no item in storage for key: ", key);
+                        Log.debug("no item in storage for key: ", key);
                         remove = true;
                     }
 
                     if (remove) {
-                        Log.info("removed item for key: ", key);
+                        Log.debug("removed item for key: ", key);
                         return storage.remove(key);
                     }
                 });
@@ -83,7 +83,7 @@ export default class State {
                 promises.push(p);
             }
 
-            Log.info("waiting on promise count:", promises.length);
+            Log.debug("waiting on promise count:", promises.length);
             return Promise.all(promises);
         });
     }

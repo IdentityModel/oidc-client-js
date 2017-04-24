@@ -10,7 +10,7 @@ export default class RedirectNavigator {
     }
 
     navigate(params) {
-        Log.info("RedirectNavigator.navigate");
+        Log.debug("RedirectNavigator.navigate");
         
         if (!params || !params.url) {
             Log.error("No url provided");
@@ -23,7 +23,7 @@ export default class RedirectNavigator {
     }
 
     get url() {
-        Log.info("RedirectNavigator.url");
+        Log.debug("RedirectNavigator.url");
         return window.location.href;
     }
 }

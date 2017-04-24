@@ -9,7 +9,7 @@ const AllowedSigningAlgs = ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512'
 export default class JoseUtil {
 
     static parseJwt(jwt) {
-        Log.info("JoseUtil.parseJwt");
+        Log.debug("JoseUtil.parseJwt");
         try {
             var token = jws.JWS.parse(jwt);
             return {
@@ -23,7 +23,7 @@ export default class JoseUtil {
     }
 
     static validateJwt(jwt, key, issuer, audience, clockSkew, now) {
-        Log.info("JoseUtil.validateJwt");
+        Log.debug("JoseUtil.validateJwt");
 
         try {
             if (key.kty === "RSA") {
@@ -61,7 +61,7 @@ export default class JoseUtil {
     }
 
     static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
-        Log.info("JoseUtil._validateJwt");
+        Log.debug("JoseUtil._validateJwt");
 
         if (!clockSkew) {
             clockSkew = 0;
@@ -73,11 +73,19 @@ export default class JoseUtil {
 
         var payload = JoseUtil.parseJwt(jwt).payload;
 
+        if (!payload.iss) {
+            Log.error("issuer was not provided");
+            return Promise.reject(new Error("issuer was not provided"));
+        }
         if (payload.iss !== issuer) {
             Log.error("Invalid issuer in token", payload.iss);
             return Promise.reject(new Error("Invalid issuer in token: " + payload.iss));
         }
 
+        if (!payload.aud) {
+            Log.error("aud was not provided");
+            return Promise.reject(new Error("aud was not provided"));
+        }
         var validAudience = payload.aud === audience || (Array.isArray(payload.aud) && payload.aud.indexOf(audience) >= 0); 
         if (!validAudience) {
             Log.error("Invalid audience in token", payload.aud);
@@ -87,16 +95,24 @@ export default class JoseUtil {
         var lowerNow = now + clockSkew;
         var upperNow = now - clockSkew;
 
+        if (!payload.iat) {
+            Log.error("iat was not provided");
+            return Promise.reject(new Error("iat was not provided"));
+        }
         if (lowerNow < payload.iat) {
             Log.error("iat is in the future", payload.iat);
             return Promise.reject(new Error("iat is in the future: " + payload.iat));
         }
 
-        if (lowerNow < payload.nbf) {
+        if (payload.nbf && lowerNow < payload.nbf) {
             Log.error("nbf is in the future", payload.nbf);
             return Promise.reject(new Error("nbf is in the future: " + payload.nbf));
         }
 
+        if (!payload.exp) {
+            Log.error("exp was not provided");
+            return Promise.reject(new Error("exp was not provided"));
+        }
         if (payload.exp < upperNow) {
             Log.error("exp is in the past", payload.exp);
             return Promise.reject(new Error("exp is in the past:" + payload.exp));
@@ -117,7 +133,7 @@ export default class JoseUtil {
     }
 
     static hashString(value, alg) {
-        Log.info("JoseUtil.hashString", value, alg);
+        Log.debug("JoseUtil.hashString", value, alg);
         try {
             return crypto.Util.hashString(value, alg);
         }
@@ -127,7 +143,7 @@ export default class JoseUtil {
     }
 
     static hexToBase64Url(value) {
-        Log.info("JoseUtil.hexToBase64Url", value);
+        Log.debug("JoseUtil.hexToBase64Url", value);
         try {
             return hextob64u(value);
         }

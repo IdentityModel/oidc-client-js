@@ -22,7 +22,7 @@ export default class UrlUtility {
     }
 
     static parseUrlFragment(value, delimiter = "#", global = Global) {
-        Log.info("UrlUtility.parseUrlFragment");
+        Log.debug("UrlUtility.parseUrlFragment");
 
         if (typeof value !== 'string'){
             value = global.location.href;

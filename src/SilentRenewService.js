@@ -19,10 +19,10 @@ export default class SilentRenewService {
     }
     
     _tokenExpiring() {
-        Log.info("SilentRenewService automatically renewing access token");
+        Log.debug("SilentRenewService automatically renewing access token");
         
         this._userManager.signinSilent().then(user => {
-            Log.info("Silent token renewal successful");
+            Log.debug("Silent token renewal successful");
         }, err => {
             Log.error("Error from signinSilent:", err.message);
             this._userManager.events._raiseSilentRenewError(err);

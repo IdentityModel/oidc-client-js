@@ -18,6 +18,8 @@ document.getElementById('iframeSignin').addEventListener("click", iframeSignin, 
 document.getElementById('startSignoutMainWindow').addEventListener("click", startSignoutMainWindow, false);
 document.getElementById('endSignoutMainWindow').addEventListener("click", endSignoutMainWindow, false);
 
+document.getElementById('popupSignout').addEventListener("click", popupSignout, false);
+
 ///////////////////////////////
 // config
 ///////////////////////////////
@@ -32,7 +34,8 @@ var settings = {
     response_type: 'id_token token',
     scope: 'openid email roles',
     
-    popup_redirect_uri:'http://localhost:5000/user-manager-sample-popup.html',
+    popup_redirect_uri:'http://localhost:5000/user-manager-sample-popup-signin.html',
+    popup_post_logout_redirect_uri:'http://localhost:5000/user-manager-sample-popup-signout.html',
     
     silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
     automaticSilentRenew:true,
@@ -126,6 +129,14 @@ function startSigninMainWindowDiffCallbackPage() {
 function popupSignin() {
     mgr.signinPopup({state:'some data'}).then(function(user) {
         log("signed in", user);
+    }).catch(function(err) {
+        log(err);
+    });
+}
+
+function popupSignout() {
+    mgr.signoutPopup({state:'some data'}).then(function() {
+        log("signed out");
     }).catch(function(err) {
         log(err);
     });

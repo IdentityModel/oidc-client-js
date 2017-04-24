@@ -17,14 +17,14 @@ export default class UserManagerEvents extends AccessTokenEvents {
     }
 
     load(user, raiseEvent=true) {
-        Log.info("UserManagerEvents.load");
+        Log.debug("UserManagerEvents.load");
         super.load(user);
         if (raiseEvent) {
             this._userLoaded.raise(user);
         }
     }
     unload() {
-        Log.info("UserManagerEvents.unload");
+        Log.debug("UserManagerEvents.unload");
         super.unload();
         this._userUnloaded.raise();
     }
@@ -50,7 +50,7 @@ export default class UserManagerEvents extends AccessTokenEvents {
         this._silentRenewError.removeHandler(cb);
     }
     _raiseSilentRenewError(e) {
-        Log.info("UserManagerEvents._raiseSilentRenewError", e.message);
+        Log.debug("UserManagerEvents._raiseSilentRenewError", e.message);
         this._silentRenewError.raise(e);
     }
 
@@ -61,7 +61,7 @@ export default class UserManagerEvents extends AccessTokenEvents {
         this._userSignedOut.removeHandler(cb);
     }
     _raiseUserSignedOut(e) {
-        Log.info("UserManagerEvents._raiseUserSignedOut");
+        Log.debug("UserManagerEvents._raiseUserSignedOut");
         this._userSignedOut.raise(e);
     }
 
@@ -72,7 +72,7 @@ export default class UserManagerEvents extends AccessTokenEvents {
         this._userSessionChanged.removeHandler(cb);
     }
     _raiseUserSessionChanged(e) {
-        Log.info("UserManagerEvents._raiseUserSessionChanged");
+        Log.debug("UserManagerEvents._raiseUserSessionChanged");
         this._userSessionChanged.raise(e);
     }
 }

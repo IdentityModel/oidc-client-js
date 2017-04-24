@@ -127,7 +127,9 @@ describe("OidcClient", function () {
                 id_token_hint: 'ith',
                 login_hint: 'lh',
                 acr_values: 'av',
-                resource: 'res'
+                resource: 'res',
+                request: 'req',
+                request_uri: 'req_uri'
             });
 
             p.then(request => {
@@ -146,6 +148,8 @@ describe("OidcClient", function () {
                 url.should.contain("login_hint=lh");
                 url.should.contain("acr_values=av");
                 url.should.contain("resource=res");
+                url.should.contain("request=req");
+                url.should.contain("request_uri=req_uri");
 
                 done();
             });
