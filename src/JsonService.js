@@ -21,8 +21,7 @@ export default class JsonService {
             
             var req = new this._XMLHttpRequest();
             if (url.indexOf('userinfo') > -1) {
-                 Log.default.info("token passed, setting Authorization header");
-                 console.log('Setting req header: ' + token);
+                 Log.debug("token passed, setting Authorization header");
                  url = url + "?access_token=" + token;
              }
 
