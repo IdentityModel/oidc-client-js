@@ -95,7 +95,7 @@ declare namespace Oidc {
         createSignoutRequest(args?: any): Promise<any>;
         processSignoutResponse(): Promise<any>;
 
-        clearStaleState(stateStore: any): Promise<any>;
+        clearStaleState(stateStore?: any): Promise<void>;
     }
 
     interface OidcClientSettings {
@@ -126,24 +126,22 @@ declare namespace Oidc {
     class UserManager extends OidcClient {
         constructor(settings: UserManagerSettings);
 
-        clearStaleState(): Promise<void>;
-
         getUser(): Promise<User>;
         removeUser(): Promise<void>;
 
         signinPopup(args?: any): Promise<User>;
-        signinPopupCallback(url?: string): Promise<any>;
+        signinPopupCallback(url?: string): Promise<User>;
 
         signinSilent(args?: any): Promise<User>;
-        signinSilentCallback(url?: string): Promise<any>;
+        signinSilentCallback(url?: string): Promise<User>;
 
-        signinRedirect(args?: any): Promise<any>;
+        signinRedirect(args?: any): Promise<void>;
         signinRedirectCallback(url?: string): Promise<User>;
 
-        signoutRedirect(args?: any): Promise<any>;
+        signoutRedirect(args?: any): Promise<void>;
         signoutRedirectCallback(url?: string): Promise<any>;
 
-        signoutPopup(args?: any): Promise<any>;
+        signoutPopup(args?: any): Promise<void>;
         signoutPopupCallback(url?: string, keepOpen?: boolean): Promise<void>;
         signoutPopupCallback(keepOpen?: boolean): Promise<void>;
 
