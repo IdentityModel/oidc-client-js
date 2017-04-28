@@ -1,6 +1,5 @@
-declare module "oidc-client" {
-    export = Oidc;
-}
+export = Oidc;
+
 declare namespace Oidc {
     interface Logger  {
         error(message?: any, ...optionalParams: any[]): void;
