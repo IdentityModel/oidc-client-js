@@ -13,6 +13,7 @@ export const CordovaPopupNavigator = require('./src/CordovaPopupNavigator');
 export const CordovaIFrameNavigator = require('./src/CordovaIFrameNavigator');
 export const CheckSessionIFrame = require('./src/CheckSessionIFrame');
 export const TokenRevocationClient = require('./src/TokenRevocationClient');
+export const SessionMonitor = require('./src/SessionMonitor');
  export const Global = require('./src/Global'); 
 
 export default {
@@ -28,5 +29,6 @@ export default {
     CordovaIFrameNavigator,
     CheckSessionIFrame,
     TokenRevocationClient,
+    SessionMonitor,
     Global
 };
