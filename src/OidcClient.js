@@ -40,11 +40,11 @@ export default class OidcClient {
 
     createSigninRequest({
         response_type, scope, redirect_uri, 
-        // data was meant to be the place a caller could indiate the data to 
+        // data was meant to be the place a caller could indicate the data to
         // have round tripped, but people were getting confused, so i added state (since that matches the spec) 
         // and so now if data is not passed, but state is then state will be used
-        data, state,
-        prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri} = {},
+        data, state, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
+        resource, request, request_uri, extraQueryParams } = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSigninRequest");
@@ -61,6 +61,7 @@ export default class OidcClient {
         ui_locales = ui_locales || this._settings.ui_locales;
         acr_values = acr_values || this._settings.acr_values;
         resource = resource || this._settings.resource;
+        extraQueryParams = extraQueryParams || this._settings.extraQueryParams;
         
         let authority = this._settings.authority;
 
@@ -75,7 +76,8 @@ export default class OidcClient {
                 scope,
                 data: data || state,
                 authority,
-                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri
+                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
+                resource, request, request_uri, extraQueryParams,
             });
 
             var signinState = signinRequest.state;
