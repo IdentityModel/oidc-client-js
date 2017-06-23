@@ -101,15 +101,14 @@ function slimBuildTarget() {
 }
 
 // Adds a configuration for slimming down the production build. This build
-// does not contain logs, or the full babel-polyfill. Instead it imports specific
+// does not contain the full babel-polyfill. Instead it imports specific
 // core-js polyfills
 gulp.task('build-slim', function() {
   gulp.src('index.js').pipe(webpackStream(createWebpackConfig(slimBuildTarget()), require('webpack')))
   .pipe(gulp.dest('dist/'))
 });
 
-// Creates a build with only RSA256 exponent+modulus support (no X509). This
-// build is ~140kB minified and ~36.5kb gzipped.
+// Creates a build with only RSA256 exponent+modulus support (no X509)
 gulp.task('build-slim-rsa', function() {
   var conf = slimBuildTarget();
   conf.output.filename = 'oidc-client.rsa256.slim.min.js';
