@@ -28,7 +28,7 @@ gulp.task('build-lib-sourcemap', function() {
     },
     plugins: [],
     devtool: 'inline-source-map'
-  })))
+  }), require('webpack')))
   .pipe(gulp.dest('lib/'));
 });
 
@@ -43,7 +43,7 @@ gulp.task('build-lib-min', function() {
     },
     plugins: uglifyPlugins,
     devtool: null
-  })))
+  }), require('webpack')))
   .pipe(gulp.dest('lib/'));
 });
 
@@ -59,7 +59,7 @@ gulp.task('build-dist-sourcemap', function() {
     },
     plugins: [],
     devtool: 'inline-source-map'
-  })))
+  }), require('webpack')))
   .pipe(gulp.dest('dist/'));
 });
 
@@ -75,7 +75,7 @@ gulp.task('build-dist-min', function() {
     },
     plugins: uglifyPlugins,
     devtool: null
-  })))
+  }), require('webpack')))
   .pipe(gulp.dest('dist/'));
 });
 
@@ -89,6 +89,7 @@ function slimBuildTarget() {
       library: 'Oidc'
     },
     plugins: [
+      new webpack.optimize.ModuleConcatenationPlugin(),
       new webpack.optimize.UglifyJsPlugin({
         compress: {
           warnings: false,
@@ -103,7 +104,7 @@ function slimBuildTarget() {
 // does not contain logs, or the full babel-polyfill. Instead it imports specific
 // core-js polyfills
 gulp.task('build-slim', function() {
-  gulp.src('index.js').pipe(webpackStream(createWebpackConfig(slimBuildTarget())))
+  gulp.src('index.js').pipe(webpackStream(createWebpackConfig(slimBuildTarget()), require('webpack')))
   .pipe(gulp.dest('dist/'))
 });
 
@@ -119,7 +120,7 @@ gulp.task('build-slim-rsa', function() {
     })
   );
 
-  gulp.src('index.js').pipe(webpackStream(createWebpackConfig(conf)))
+  gulp.src('index.js').pipe(webpackStream(createWebpackConfig(conf), require('webpack')))
   .pipe(gulp.dest('dist/'))
 });
 

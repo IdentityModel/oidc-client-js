@@ -8,10 +8,10 @@ var createWebpackConfig = function(options) {
       fs: 'empty' // Because of jsrsasign usage of fs
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /.js$/,
-          loaders: ['babel'],
+          use: ['babel-loader'],
           exclude: /node_modules/,
           include: __dirname
         }
