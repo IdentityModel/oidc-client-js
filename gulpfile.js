@@ -79,5 +79,50 @@ gulp.task('build-dist-min', function() {
   .pipe(gulp.dest('dist/'));
 });
 
+// Replace the babel-polyfill with specific core-js polyfills.
+function slimBuildTarget() {
+  return {
+    entry: ['./polyfills.js', './index.js'],
+    output: {
+      filename: 'oidc-client.slim.min.js',
+      libraryTarget: 'var',
+      library: 'Oidc'
+    },
+    plugins: [
+      new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          warnings: false,
+          screw_ie8: true,
+        },
+      })
+    ],
+  };
+}
+
+// Adds a configuration for slimming down the production build. This build
+// does not contain logs, or the full babel-polyfill. Instead it imports specific
+// core-js polyfills
+gulp.task('build-slim', function() {
+  gulp.src('index.js').pipe(webpackStream(createWebpackConfig(slimBuildTarget())))
+  .pipe(gulp.dest('dist/'))
+});
+
+// Creates a build with only RSA256 exponent+modulus support (no X509). This
+// build is ~140kB minified and ~36.5kb gzipped.
+gulp.task('build-slim-rsa', function() {
+  var conf = slimBuildTarget();
+  conf.output.filename = 'oidc-client.rsa256.slim.min.js';
+
+  conf.plugins.unshift(
+    new webpack.NormalModuleReplacementPlugin(/(.*)crypto-jsrsasign(\.*)/, (resource) => {
+      resource.request = resource.request.replace(/crypto-jsrsasign/, `crypto-rsa`);
+    })
+  );
+
+  gulp.src('index.js').pipe(webpackStream(createWebpackConfig(conf)))
+  .pipe(gulp.dest('dist/'))
+});
+
+
 // putting it all together
-gulp.task('build', ['build-lib-sourcemap', 'build-lib-min', 'build-dist-sourcemap', 'build-dist-min']);
+gulp.task('build', ['build-lib-sourcemap', 'build-lib-min', 'build-dist-sourcemap', 'build-dist-min', 'build-slim', 'build-slim-rsa']);

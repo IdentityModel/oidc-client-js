@@ -1,10 +1,12 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { jws, KEYUTIL as KeyUtil, X509, crypto, hextob64u } from 'jsrsasign';
+
+import cryptoLib from './crypto/crypto-jsrsasign';
 import Log from './Log';
 
-const AllowedSigningAlgs = ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'ES256', 'ES384', 'ES512'];
+const { jws, KeyUtil, X509, crypto, hextob64u, AllowedSigningAlgs } = cryptoLib;
+
 
 export default class JoseUtil {
 
@@ -86,7 +88,7 @@ export default class JoseUtil {
             Log.error("aud was not provided");
             return Promise.reject(new Error("aud was not provided"));
         }
-        var validAudience = payload.aud === audience || (Array.isArray(payload.aud) && payload.aud.indexOf(audience) >= 0); 
+        var validAudience = payload.aud === audience || (Array.isArray(payload.aud) && payload.aud.indexOf(audience) >= 0);
         if (!validAudience) {
             Log.error("Invalid audience in token", payload.aud);
             return Promise.reject(new Error("Invalid audience in token: " + payload.aud));

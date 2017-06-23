@@ -6,7 +6,10 @@
   "scripts": {
     "build": "gulp build",
     "start": "node sample/server.js",
-    "test": "mocha --compilers js:babel-register test/unit/*.spec.js"
+    "test": "mocha --compilers js:babel-register test/unit/*.spec.js",
+    "lint": "eslint ./src",
+    "build:slim": "gulp build-slim",
+    "build:slim:rsa": "gulp build-slim-rsa"
   },
   "repository": {
     "type": "git",
@@ -41,10 +44,15 @@
     "gulp": "^3.9.1",
     "mocha": "^2.4.5",
     "open": "0.0.5",
-    "webpack": "^1.12.14",
+    "webpack": "3.0.0",
     "webpack-stream": "^3.2.0"
   },
   "dependencies": {
+    "jsbn": "^1.1.0",
+    "core-js": "^2.4.1",
+    "crypto-js": "^3.1.9-1",
+    "eslint": "^4.0.0",
+    "base64-js": "^1.2.0",
     "jsrsasign": "^5.0.7"
   },
   "peerDependencies": {
