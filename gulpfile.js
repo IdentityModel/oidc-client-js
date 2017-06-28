@@ -74,7 +74,7 @@ gulp.task('build-dist-min', function() {
         library: 'Oidc'
     },
     plugins: uglifyPlugins,
-    devtool: null
+    devtool: false,
   }), require('webpack')))
   .pipe(gulp.dest('dist/'));
 });

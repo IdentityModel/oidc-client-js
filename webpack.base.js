@@ -18,7 +18,7 @@ var createWebpackConfig = function(options) {
       ]
     },
     // this is for the sourcemaps
-    devtool: options.devtool
+    devtool: options.devtool || false
   };
 };
 
