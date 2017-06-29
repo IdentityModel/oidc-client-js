@@ -9,6 +9,8 @@ export default class IFrameWindow {
 
     constructor(params) {
         Log.debug("IFrameWindow.ctor");
+        let fn=this.constructor.name+"#constructor";
+        console.log( fn+": params = ", params );
 
         this._promise = new Promise((resolve, reject) => {
             this._resolve = resolve;
@@ -101,7 +103,11 @@ export default class IFrameWindow {
             url = url || window.location.href;
             if (url) {
                 Log.debug("posting url message to parent");
-                window.parent.postMessage(url, location.protocol + "//" + location.host);
+                let fn = this.constructor.name+"#notifyParent";
+                // allowedOrigins = location.protocol + "//" + location.host; // Default
+                let allowedOrigins = this._origin;
+                console.log( fn+": allowedOrigins = ", allowedOrigins );
+                window.parent.postMessage( url, allowedOrigins );
             }
         }
     }
