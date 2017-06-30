@@ -12,6 +12,8 @@ export default class IFrameWindow {
         let fn=this.constructor.name+"#constructor";
         console.log( fn+": params = ", params );
 
+        this._origin = params.origin;
+
         this._promise = new Promise((resolve, reject) => {
             this._resolve = resolve;
             this._reject = reject;
@@ -23,6 +25,7 @@ export default class IFrameWindow {
         this._frame = window.document.createElement("iframe");
         this._frame.style.display = "none";
         window.document.body.appendChild(this._frame);
+
     }
 
     navigate(params) {
@@ -103,11 +106,7 @@ export default class IFrameWindow {
             url = url || window.location.href;
             if (url) {
                 Log.debug("posting url message to parent");
-                let fn = this.constructor.name+"#notifyParent";
-                // allowedOrigins = location.protocol + "//" + location.host; // Default
-                let allowedOrigins = this._origin;
-                console.log( fn+": allowedOrigins = ", allowedOrigins );
-                window.parent.postMessage( url, allowedOrigins );
+                window.parent.postMessage( url, this._origin );
             }
         }
     }
