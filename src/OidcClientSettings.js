@@ -56,7 +56,7 @@ export default class OidcClientSettings {
         this._clockSkew = clockSkew;
 
         this._stateStore = stateStore;
-        this._validator = new ResponseValidatorCtor(this);
+        this._validator = new ResponseValidatorCtor(this, MetadataServiceCtor);
         this._metadataService = new MetadataServiceCtor(this);
     }
 

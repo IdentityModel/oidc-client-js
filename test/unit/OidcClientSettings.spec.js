@@ -390,6 +390,16 @@ describe("OidcClientSettings", function () {
             });
             subject.metadataService.should.equal(temp);
         });
+
+        it("should used by the validator as well", function () {
+
+            let temp = {};
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                MetadataServiceCtor: function () { return temp }
+            });
+            subject.validator._metadataService.should.equal(temp);
+        });
     });
 
 });

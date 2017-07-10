@@ -45,6 +45,8 @@
     "webpack-stream": "^3.2.0"
   },
   "dependencies": {
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
     "jsrsasign": "^5.0.7"
   },
   "peerDependencies": {
