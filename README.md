@@ -1,7 +1,3 @@
-# GSU Customizations
-
-For user-info query, pass authorization header as a query string.  GLUU does not accept authorization header for this route.
-
 # oidc-client
 
 Library to provide OpenID Connect (OIDC) and OAuth2 protocol support for client-side, browser-based JavaScript client applications. 
