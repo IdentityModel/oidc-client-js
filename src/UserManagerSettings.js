@@ -29,20 +29,12 @@ export default class UserManagerSettings extends OidcClientSettings {
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
-        // iframeNavigator = new IFrameNavigator( pageOrigin ),
+        // iframeNavigator = new IFrameNavigator( pageOrigin ), // this would be nice, but doesn't work
         userStore = new WebStorageStateStore({ store: Global.sessionStorage }),
         pageOrigin = DefaultPageOrigin,
         scriptOrigin = DefaultScriptOrigin,
     } = {}) {
         super(arguments[0]);
-        let next = window;
-        let depth = 0;
-        while( next.parent !== next ) {
-            next = next.parent;
-            depth += 1;
-        }
-        this._iframe_depth = depth;
-        let fn=this._iframe_depth+">"+this.constructor.name+"#constructor";
 
         this._popup_redirect_uri = popup_redirect_uri;
         this._popup_post_logout_redirect_uri = popup_post_logout_redirect_uri;
@@ -58,17 +50,14 @@ export default class UserManagerSettings extends OidcClientSettings {
         this._checkSessionInterval = checkSessionInterval;
         this._revokeAccessTokenOnSignout = revokeAccessTokenOnSignout;
 
-        this._redirectNavigator = redirectNavigator;
-        this._popupNavigator = popupNavigator;
-        // this._iframeNavigator = iframeNavigator;
-        
-        this._userStore = userStore;
-
         this._pageOrigin = pageOrigin;
         this._scriptOrigin = scriptOrigin;
-        // console.log( fn+": pageOrigin = ", pageOrigin );
-        // console.log( fn+": scriptOrigin = ", scriptOrigin );
+
+        this._redirectNavigator = redirectNavigator;
+        this._popupNavigator = popupNavigator;
         this._iframeNavigator = new IFrameNavigator( this._pageOrigin );
+        
+        this._userStore = userStore;
     }
 
     get popup_redirect_uri() {

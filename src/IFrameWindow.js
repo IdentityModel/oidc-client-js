@@ -10,17 +10,7 @@ export default class IFrameWindow {
     constructor(params) {
         Log.debug("IFrameWindow.ctor");
 
-        // let next = window;
-        // let depth = 0;
-        // while( next.parent !== next ) {
-        //     next = next.parent;
-        //     depth += 1;
-        // }
-        // this._iframe_depth = depth;
-        // let fn=this._iframe_depth+">"+this.constructor.name+"#constructor";
-        // console.log( fn+": params = ", params );
         this._scriptOrigin = params.scriptOrigin;
-        // console.log( fn+": scriptOrigin = ", this._scriptOrigin );
 
         this._promise = new Promise((resolve, reject) => {
             this._resolve = resolve;
@@ -87,61 +77,29 @@ export default class IFrameWindow {
     }
 
     _message(e) {
-        let next = window;
-        let depth = 0;
-        while( next.parent !== next ) {
-            next = next.parent;
-            depth += 1;
-        }
-        let fn=depth+">"+this.constructor.name+"#_message";
-        // console.log( fn+": message = ", e );
-        // console.log( fn+": message origin = ", e.origin );
-        // console.warn( fn+": message origin match = ", e.origin === this._scriptOrigin );
-        // console.log( fn+": message source = ", e.source );
-        // console.warn( fn+": message source match = ", e.source === this._frame.contentWindow );
         Log.debug("IFrameWindow._message");
 
         if (this._timer &&
             e.origin === this._scriptOrigin &&
             e.source === this._frame.contentWindow
         ) {
-            // console.log( fn+": message meets processing criteria" );
-            console.log( fn+": message.data = ", e.data );
             let url = e.data;
             if (url) {
                 this._success({ url: url });
             }
             else {
-                console.log( fn+": message invalid" );
                 this._error("Invalid response from frame");
             }
         }
     }
 
-    // get _origin() {
-    //     // return location.protocol + "//" + location.host;
-    //     let url = document.currentScript.src;
-    //     var idx = url.indexOf("/", url.indexOf("//") + 2);
-    //     return url.substr(0, idx);
-    // }
-
     static notifyParent(url, pageOrigin) {
-        let next = window;
-        let depth = 0;
-        while( next.parent !== next ) {
-            next = next.parent;
-            depth += 1;
-        }
-        let fn=depth+">IFrameWindow.notifyParent";
-        // console.log( fn+": pageOrigin = ", pageOrigin );
         Log.debug("IFrameWindow.notifyParent");
 
         if (window.parent && window !== window.parent) {
             url = url || window.location.href;
             if (url) {
                 Log.debug("posting url message to parent");
-                console.log( fn+": postMessage with message = ", url );
-                console.log( fn+": postMessage with origin = ", pageOrigin );
                 window.parent.postMessage( url, pageOrigin );
             }
         }

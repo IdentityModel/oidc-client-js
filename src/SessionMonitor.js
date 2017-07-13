@@ -27,16 +27,6 @@ export default class SessionMonitor {
             Log.error("SessionMonitor ctor; error from getUser:", err.message);
         });
 
-        let next = window;
-        let depth = 0;
-        while( next.parent !== next ) {
-            next = next.parent;
-            depth += 1;
-        }
-        this._iframe_depth = depth;
-        let fn=this._iframe_depth+">"+this.constructor.name+"#constructor";
-        // console.log( fn+": pageOrigin = ", this._settings.pageOrigin );
-        // console.log( fn+": scriptOrigin = ", this._settings.scriptOrigin );
     }
 
     get _settings() {
