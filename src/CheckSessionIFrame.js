@@ -6,14 +6,25 @@ import Log from './Log';
 const DefaultInterval = 2000;
 
 export default class CheckSessionIFrame {
-    constructor(callback, client_id, url, interval) {
+    constructor(callback, client_id, url, interval, scriptOrigin ) {
         this._callback = callback;
         this._client_id = client_id;
         this._url = url;
         this._interval = interval || DefaultInterval;
 
+        let next = window;
+        let depth = 0;
+        while( next.parent !== next ) {
+            next = next.parent;
+            depth += 1;
+        }
+        this._iframe_depth = depth;
+
         var idx = url.indexOf("/", url.indexOf("//") + 2);
         this._frame_origin = url.substr(0, idx);
+
+        // let fn=this._iframe_depth+">"+this.constructor.name+"#constructor";
+        // console.log( fn+": frame_origin = ", this._frame_origin );
 
         this._frame = window.document.createElement("iframe");
         this._frame.style.display = "none";
@@ -58,6 +69,9 @@ export default class CheckSessionIFrame {
             this._session_state = session_state;
 
             this._timer = window.setInterval(() => {
+                let fn = this._iframe_depth+">"+this.constructor.name+"#start/timer";
+                console.log( fn+": postMessage with message = ", this._client_id + " " + this._session_state );
+                console.log( fn+": postMessage with origin = ", this._frame_origin );
                 this._frame.contentWindow.postMessage(this._client_id + " " + this._session_state, this._frame_origin);
             }, this._interval);
         }

@@ -26,6 +26,17 @@ export default class SessionMonitor {
             // catch to suppress errors since we're in a ctor
             Log.error("SessionMonitor ctor; error from getUser:", err.message);
         });
+
+        let next = window;
+        let depth = 0;
+        while( next.parent !== next ) {
+            next = next.parent;
+            depth += 1;
+        }
+        this._iframe_depth = depth;
+        let fn=this._iframe_depth+">"+this.constructor.name+"#constructor";
+        // console.log( fn+": pageOrigin = ", this._settings.pageOrigin );
+        // console.log( fn+": scriptOrigin = ", this._settings.scriptOrigin );
     }
 
     get _settings() {
@@ -57,7 +68,7 @@ export default class SessionMonitor {
                         let client_id = this._client_id;
                         let interval = this._checkSessionInterval;
 
-                        this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval);
+                        this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval, this._settings.scriptOrigin);
                         this._checkSessionIFrame.load().then(() => {
                             this._checkSessionIFrame.start(session_state);
                         });

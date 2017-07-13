@@ -97,7 +97,8 @@ export default class UserManager extends OidcClient {
             startUrl: url,
             popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
             popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget,
-            origin: args.origin || this.settings.origin,
+            pageOrigin: args.pageOrigin || this.settings.pageOrigin,
+            scriptOrigin: args.pageOrigin || this.settings.scriptOrigin,
         }).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
@@ -152,7 +153,8 @@ export default class UserManager extends OidcClient {
             return this._signin(args, this._iframeNavigator, {
                 startUrl: url,
                 silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout,
-                origin: args.origin || this.settings.origin,
+                pageOrigin: args.pageOrigin || this.settings.pageOrigin,
+                scriptOrigin: args.pageOrigin || this.settings.scriptOrigin,
             });
         }).then(user => {
             if (user) {
@@ -200,7 +202,8 @@ export default class UserManager extends OidcClient {
         return this._signinStart(args, this._iframeNavigator, {
             startUrl: url,
             silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout,
-            origin: args.origin || this.settings.origin,
+            pageOrigin: args.pageOrigin || this.settings.pageOrigin,
+            scriptOrigin: args.pageOrigin || this.settings.scriptOrigin,
         }).then(navResponse => {
             return this.processSigninResponse(navResponse.url).then(signinResponse => {
                 Log.debug("got signin response");
@@ -229,6 +232,7 @@ export default class UserManager extends OidcClient {
     _signinCallback(url, navigator) {
         Log.debug("_signinCallback");
         return navigator.callback(url);
+        // return navigator.callback(url, this.settings.pageOrigin);
     }
     _signout(args, navigator, navigatorParams = {}) {
         Log.debug("_signout");

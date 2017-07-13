@@ -11,6 +11,8 @@ import Global from './Global';
 
 const DefaultAccessTokenExpiringNotificationTime = 60;
 const DefaultCheckSessionInterval = 2000;
+const DefaultPageOrigin = location.protocol + "//" + location.host;
+const DefaultScriptOrigin = typeof document.currentScript === "undefined" ? location.protocol + "//" + location.host : document.currentScript.src.substr(0, document.currentScript.src.indexOf("/", document.currentScript.src.indexOf("//") + 2))
 
 export default class UserManagerSettings extends OidcClientSettings {
     constructor({
@@ -27,12 +29,20 @@ export default class UserManagerSettings extends OidcClientSettings {
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
-        iframeNavigator = new IFrameNavigator(),
+        // iframeNavigator = new IFrameNavigator( pageOrigin ),
         userStore = new WebStorageStateStore({ store: Global.sessionStorage }),
-        origin = location.protocol + "//" + location.host,
+        pageOrigin = DefaultPageOrigin,
+        scriptOrigin = DefaultScriptOrigin,
     } = {}) {
         super(arguments[0]);
-        let fn=this.constructor.name+"#constructor";
+        let next = window;
+        let depth = 0;
+        while( next.parent !== next ) {
+            next = next.parent;
+            depth += 1;
+        }
+        this._iframe_depth = depth;
+        let fn=this._iframe_depth+">"+this.constructor.name+"#constructor";
 
         this._popup_redirect_uri = popup_redirect_uri;
         this._popup_post_logout_redirect_uri = popup_post_logout_redirect_uri;
@@ -50,12 +60,15 @@ export default class UserManagerSettings extends OidcClientSettings {
 
         this._redirectNavigator = redirectNavigator;
         this._popupNavigator = popupNavigator;
-        this._iframeNavigator = iframeNavigator;
+        // this._iframeNavigator = iframeNavigator;
         
         this._userStore = userStore;
 
-        this._origin = origin;
-        console.log( fn+": origin = ", origin );
+        this._pageOrigin = pageOrigin;
+        this._scriptOrigin = scriptOrigin;
+        // console.log( fn+": pageOrigin = ", pageOrigin );
+        // console.log( fn+": scriptOrigin = ", scriptOrigin );
+        this._iframeNavigator = new IFrameNavigator( this._pageOrigin );
     }
 
     get popup_redirect_uri() {
@@ -108,5 +121,6 @@ export default class UserManagerSettings extends OidcClientSettings {
         return this._userStore;
     }
 
-    get origin() { return this._origin; }
+    get pageOrigin() { return this._pageOrigin; }
+    get scriptOrigin() { return this._scriptOrigin; }
 }
