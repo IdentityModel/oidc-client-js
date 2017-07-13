@@ -27,12 +27,12 @@ export default class UserManagerSettings extends OidcClientSettings {
         checkSessionInterval = DefaultCheckSessionInterval,
         revokeAccessTokenOnSignout = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
+        pageOrigin = DefaultPageOrigin,
+        scriptOrigin = DefaultScriptOrigin,
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
         // iframeNavigator = new IFrameNavigator( pageOrigin ), // this would be nice, but doesn't work
-        userStore = new WebStorageStateStore({ store: Global.sessionStorage }),
-        pageOrigin = DefaultPageOrigin,
-        scriptOrigin = DefaultScriptOrigin,
+        userStore = new WebStorageStateStore({ store: Global.sessionStorage })
     } = {}) {
         super(arguments[0]);
 

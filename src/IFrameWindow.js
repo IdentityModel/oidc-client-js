@@ -23,7 +23,6 @@ export default class IFrameWindow {
         this._frame = window.document.createElement("iframe");
         this._frame.style.display = "none";
         window.document.body.appendChild(this._frame);
-
     }
 
     navigate(params) {
@@ -100,7 +99,7 @@ export default class IFrameWindow {
             url = url || window.location.href;
             if (url) {
                 Log.debug("posting url message to parent");
-                window.parent.postMessage( url, pageOrigin );
+                window.parent.postMessage(url, pageOrigin);
             }
         }
     }

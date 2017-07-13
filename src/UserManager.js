@@ -232,7 +232,6 @@ export default class UserManager extends OidcClient {
     _signinCallback(url, navigator) {
         Log.debug("_signinCallback");
         return navigator.callback(url);
-        // return navigator.callback(url, this.settings.pageOrigin);
     }
     _signout(args, navigator, navigatorParams = {}) {
         Log.debug("_signout");

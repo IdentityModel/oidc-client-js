@@ -6,7 +6,7 @@ import Log from './Log';
 const DefaultInterval = 2000;
 
 export default class CheckSessionIFrame {
-    constructor(callback, client_id, url, interval, scriptOrigin ) {
+    constructor(callback, client_id, url, interval ) {
         this._callback = callback;
         this._client_id = client_id;
         this._url = url;

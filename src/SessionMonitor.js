@@ -26,7 +26,6 @@ export default class SessionMonitor {
             // catch to suppress errors since we're in a ctor
             Log.error("SessionMonitor ctor; error from getUser:", err.message);
         });
-
     }
 
     get _settings() {
@@ -58,7 +57,7 @@ export default class SessionMonitor {
                         let client_id = this._client_id;
                         let interval = this._checkSessionInterval;
 
-                        this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval, this._settings.scriptOrigin);
+                        this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval);
                         this._checkSessionIFrame.load().then(() => {
                             this._checkSessionIFrame.start(session_state);
                         });
