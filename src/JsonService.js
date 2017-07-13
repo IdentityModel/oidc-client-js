@@ -20,11 +20,6 @@ export default class JsonService {
         return new Promise((resolve, reject) => {
             
             var req = new this._XMLHttpRequest();
-            if (url.indexOf('userinfo') > -1) {
-                 Log.debug("token passed, setting Authorization header");
-                 url = url + "?access_token=" + token;
-             }
-
             req.open('GET', url);
 
             req.onload = function() {
@@ -43,7 +38,7 @@ export default class JsonService {
                 reject(Error("Network Error"));
             };
             
-            if (token && url.indexOf('userinfo') === -1) {
+            if (token) {
                 Log.debug("token passed, setting Authorization header");
                 req.setRequestHeader("Authorization", "Bearer " + token);
             }
