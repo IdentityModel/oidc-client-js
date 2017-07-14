@@ -35,7 +35,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         scriptOrigin = DefaultScriptOrigin,
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
-        // iframeNavigator = new IFrameNavigator( pageOrigin ), // this would be nice, but doesn't work
+        iframeNavigator, // = new IFrameNavigator( pageOrigin ), // this would be nice, but doesn't work
         userStore = new WebStorageStateStore({ store: Global.sessionStorage })
     } = {}) {
         super(arguments[0]);
@@ -59,7 +59,7 @@ export default class UserManagerSettings extends OidcClientSettings {
 
         this._redirectNavigator = redirectNavigator;
         this._popupNavigator = popupNavigator;
-        this._iframeNavigator = new IFrameNavigator( this._pageOrigin );
+        this._iframeNavigator = (typeof iframeNavigator === "undefined") ? new IFrameNavigator( this._pageOrigin ) : iframeNavigator;
         
         this._userStore = userStore;
     }
