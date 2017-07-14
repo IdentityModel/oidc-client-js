@@ -9,6 +9,10 @@ import IFrameNavigator from './IFrameNavigator';
 import WebStorageStateStore from './WebStorageStateStore';
 import Global from './Global';
 
+// Minimal definitions for testing
+let location = (typeof location === "undefined") ? {protocol:"test"} : location;
+let document = (typeof document === "undefined") ? {} : document;
+
 const DefaultAccessTokenExpiringNotificationTime = 60;
 const DefaultCheckSessionInterval = 2000;
 const DefaultPageOrigin = location.protocol + "//" + location.host;
