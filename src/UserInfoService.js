@@ -28,10 +28,10 @@ export default class UserInfoService {
         return this._metadataService.getUserInfoEndpoint().then(url => {
             Log.debug("received userinfo url", url);
 
-            return this._jsonService.getJson(url, token).then(claims => {
+            return this._jsonService.getJson( url, token, this._settings.userinfoAuthQuery ).then( claims => {
                 Log.debug("claims received", claims);
                 return claims;
-            });
+            } );
         });
     }
 }

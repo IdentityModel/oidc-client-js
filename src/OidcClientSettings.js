@@ -28,7 +28,8 @@ export default class OidcClientSettings {
         // other behavior
         stateStore = new WebStorageStateStore(),
         ResponseValidatorCtor = ResponseValidator,
-        MetadataServiceCtor = MetadataService
+        MetadataServiceCtor = MetadataService,
+        userinfoHeaderBug = false, // set true if your auth server ignores Authorization token in headers; this will send it as a query parameter
     } = {}) {
 
         this._authority = authority;
@@ -58,6 +59,8 @@ export default class OidcClientSettings {
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this);
         this._metadataService = new MetadataServiceCtor(this);
+
+        this._userinfoAuthQuery = userinfoHeaderBug;
     }
 
     // client config
@@ -179,4 +182,6 @@ export default class OidcClientSettings {
     get metadataService() {
         return this._metadataService;
     }
+
+    get userinfoAuthQuery() { return this._userinfoAuthQuery; }
 }

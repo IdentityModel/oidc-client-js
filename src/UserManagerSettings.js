@@ -36,7 +36,8 @@ export default class UserManagerSettings extends OidcClientSettings {
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
         iframeNavigator, // = new IFrameNavigator( pageOrigin ), // this would be nice, but doesn't work
-        userStore = new WebStorageStateStore({ store: Global.sessionStorage })
+        userStore = new WebStorageStateStore({ store: Global.sessionStorage }),
+        userinfoHeaderBug = false, // set true if your auth server ignores Authorization token in headers; this will send it as a query parameter
     } = {}) {
         super(arguments[0]);
 

@@ -9,7 +9,7 @@ export default class JsonService {
         this._XMLHttpRequest = XMLHttpRequestCtor;
     }
     
-    getJson(url, token) {
+    getJson( url, token, useQuery ) {
         Log.debug("JsonService.getJson", url);
         
         if (!url){
@@ -40,8 +40,14 @@ export default class JsonService {
             };
             
             if (token) {
-                Log.debug("token passed, setting Authorization header");
-                req.setRequestHeader("Authorization", "Bearer " + token);
+                if( true === useQuery ) {
+                    Log.debug("token passed, setting Authorization query");
+                    url += "?access_token=" + token;
+                    Log.debug("url with query: ", url);
+                } else {
+                    Log.debug("token passed, setting Authorization header");
+                    req.setRequestHeader("Authorization", "Bearer " + token);
+                }
             }
 
             req.send();
