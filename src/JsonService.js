@@ -20,6 +20,12 @@ export default class JsonService {
         return new Promise((resolve, reject) => {
             
             var req = new this._XMLHttpRequest();
+
+            if( token && useQuery ) {
+                url += "?access_token=" + token;
+                Log.debug( "token passed, setting Authorization query: ", url );
+            }
+
             req.open('GET', url);
 
             req.onload = function() {
@@ -38,16 +44,10 @@ export default class JsonService {
                 Log.error("network error");
                 reject(Error("Network Error"));
             };
-            
-            if (token) {
-                if( true === useQuery ) {
-                    Log.debug("token passed, setting Authorization query");
-                    url += "?access_token=" + token;
-                    Log.debug("url with query: ", url);
-                } else {
-                    Log.debug("token passed, setting Authorization header");
-                    req.setRequestHeader("Authorization", "Bearer " + token);
-                }
+
+            if( token && !useQuery ) {
+                Log.debug( "token passed, setting Authorization header" );
+                req.setRequestHeader( "Authorization", "Bearer " + token );
             }
 
             req.send();
