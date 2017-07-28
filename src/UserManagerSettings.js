@@ -10,8 +10,8 @@ import WebStorageStateStore from './WebStorageStateStore';
 import Global from './Global';
 
 // Minimal definitions for testing
-let location = (typeof location === "undefined") ? {protocol:"test"} : location;
-let document = (typeof document === "undefined") ? {} : document;
+let location = (typeof window == "undefined" || typeof window.location === "undefined") ? {protocol:"test:"} : window.location;
+let document = (typeof window == "undefined" || typeof window.document === "undefined") ? {host:"unknown"} : window.document;
 
 const DefaultAccessTokenExpiringNotificationTime = 60;
 const DefaultCheckSessionInterval = 2000;
