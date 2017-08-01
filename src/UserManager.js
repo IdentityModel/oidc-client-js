@@ -265,6 +265,7 @@ export default class UserManager extends OidcClient {
         Log.debug("UserManager.signoutRedirectCallback");
         return this._signoutEnd(url || this._redirectNavigator.url).then(response=>{
             Log.info("signoutRedirectCallback successful");
+            return response;
         });
     }
     signoutPopup(args = {}) {
