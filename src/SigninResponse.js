@@ -8,7 +8,8 @@ const OidcScope = "openid";
 export default class SigninResponse {
     constructor(url) {
 
-        var values = UrlUtility.parseUrlFragment(url, "#");
+        var delimiter = UrlUtility.hasFragment(url) ? "#" : "?";
+        var values = UrlUtility.parseUrlFragment(url, delimiter);
 
         this.error = values.error;
         this.error_description = values.error_description;

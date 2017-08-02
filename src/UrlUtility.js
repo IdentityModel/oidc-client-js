@@ -54,4 +54,8 @@ export default class UrlUtility {
         
         return {};
     }
+
+    static hasFragment(url) {
+        return url.indexOf("#") >= 0;
+    }
 }
