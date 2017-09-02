@@ -50,7 +50,8 @@ export default class State {
             Log.debug("got keys", keys);
 
             var promises = [];
-            for (let key of keys) {
+            for (let i = 0; i < keys; i++) {
+                let key = keys[i];
                 var p = storage.get(key).then(item => {
                     let remove = false;
 
