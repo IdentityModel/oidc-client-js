@@ -26,13 +26,13 @@ export default class Global {
     }
 
     static get localStorage() {
-        if (!testing) {
+        if (!testing && typeof window !== 'undefined') {
             return localStorage;
         }
     }
 
     static get sessionStorage() {
-        if (!testing) {
+        if (!testing && typeof window !== 'undefined') {
             return sessionStorage;
         }
     }
@@ -42,7 +42,7 @@ export default class Global {
     }
 
     static get XMLHttpRequest() {
-        if (!testing) {
+        if (!testing && typeof window !== 'undefined') {
             return request || XMLHttpRequest;
         }
     }
