@@ -167,7 +167,7 @@ export default class ResponseValidator {
             }
 
             for (let i = 0; i < values.length; i++) {
-                let value = value[i];
+                let value = values[i];
                 if (!result[name]) {
                     result[name] = value;
                 }
