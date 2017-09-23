@@ -8,6 +8,7 @@ import UserManagerSettings from '../../src/UserManagerSettings';
 import User from '../../src/User';
 
 import StubMetadataService from './StubMetadataService';
+import StubSilentRenewService from './StubSilentRenewService';
 import StubStateStore from './StubStateStore';
 import StubResponseValidator from './StubResponseValidator';
 import StubTokenRevocationClient from './StubTokenRevocationClient';
@@ -22,6 +23,7 @@ describe("UserManager", function () {
     let stubMetadataService;
     let stubStateStore;
     let stubValidator;
+    let stubSilentRenewService;
     let stubNavigator;
     let stubUserStore;
     let stubTokenRevocationClient;
@@ -37,6 +39,7 @@ describe("UserManager", function () {
         stubUserStore = new StubStateStore();
         stubStateStore = new StubStateStore();
         stubValidator = new StubResponseValidator();
+        stubSilentRenewService = new StubSilentRenewService();
         stubMetadataService = new StubMetadataService();
         stubTokenRevocationClient = new StubTokenRevocationClient();
 
@@ -52,7 +55,8 @@ describe("UserManager", function () {
         };
 
         subject = new UserManager(settings, 
-            null, null, 
+            () => stubSilentRenewService,
+            null, 
             () => stubTokenRevocationClient);
     });
 

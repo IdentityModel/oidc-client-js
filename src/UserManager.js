@@ -23,14 +23,16 @@ export default class UserManager extends OidcClient {
         super(settings);
 
         this._events = new UserManagerEvents(settings);
-
+        this._silentRenewService = new SilentRenewServiceCtor(this);
+        
         // order is important for the following properties; these services depend upon the events.
         if (this.settings.automaticSilentRenew) {
-            Log.debug("automaticSilentRenew is configured, setting up silent renew")
-            this._silentRenewService = new SilentRenewServiceCtor(this);
+            Log.debug("automaticSilentRenew is configured, setting up silent renew");
+            this.startSilentRenew();
         }
+
         if (this.settings.monitorSession) {
-            Log.debug("monitorSession is configured, setting up session monitor")
+            Log.debug("monitorSession is configured, setting up session monitor");
             this._sessionMonitor = new SessionMonitorCtor(this);
         }
 
@@ -429,7 +431,15 @@ export default class UserManager extends OidcClient {
 
         return this._tokenRevocationClient.revoke(access_token, required).then(() => true);
     }
-    
+
+    startSilentRenew() {
+        this._silentRenewService.start();
+    }
+
+    stopSilentRenew() {
+        this._silentRenewService.stop();
+    }
+
     get _userStoreKey() {
         return `user:${this.settings.authority}:${this.settings.client_id}`;
     }
