@@ -77,7 +77,7 @@ export default class UserManager extends OidcClient {
     removeUser() {
         Log.debug("UserManager.removeUser");
 
-        return this._storeUser(null).then(() => {
+        return this.storeUser(null).then(() => {
             Log.info("user removed from storage");
             this._events.unload();
         });
@@ -340,7 +340,7 @@ export default class UserManager extends OidcClient {
 
             let user = new User(signinResponse);
 
-            return this._storeUser(user).then(() => {
+            return this.storeUser(user).then(() => {
                 Log.debug("user stored");
 
                 this._events.load(user);
@@ -407,7 +407,7 @@ export default class UserManager extends OidcClient {
                     user.expires_at = null;
                     user.token_type = null;
 
-                    return this._storeUser(user).then(() => {
+                    return this.storeUser(user).then(() => {
                         Log.debug("user stored");
                         this._events.load(user);
                     });
@@ -458,15 +458,15 @@ export default class UserManager extends OidcClient {
         });
     }
 
-    _storeUser(user) {
+    storeUser(user) {
         if (user) {
-            Log.debug("_storeUser storing user");
+            Log.debug("storeUser storing user");
 
             var storageString = user.toStorageString();
             return this._userStore.set(this._userStoreKey, storageString);
         }
         else {
-            Log.debug("_storeUser removing user storage");
+            Log.debug("storeUser removing user storage");
             return this._userStore.remove(this._userStoreKey);
         }
     }
