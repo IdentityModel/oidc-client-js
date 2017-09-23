@@ -162,6 +162,11 @@ export class UserManager extends OidcClient {
 
   querySessionStatus(args?: any): Promise<any>;
 
+  revokeAccessToken(): Promise<void>;
+
+  startSilentRenew(): void;
+  stopSilentRenew(): void;
+  
   events: UserManagerEvents;
 }
 
