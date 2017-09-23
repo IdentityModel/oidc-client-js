@@ -47,7 +47,7 @@ export default class PopupWindow {
             Log.debug("Setting URL in popup");
 
             this._id = params.id;
-            if (this._id) {
+            if (this._id) { // Why is this._id tested here but not in _cleanup?
                 window["popupCallback_" + params.id] = this._callback.bind(this);
             }
 
@@ -77,7 +77,7 @@ export default class PopupWindow {
         window.clearInterval(this._checkForPopupClosedTimer);
         this._checkForPopupClosedTimer = null;
 
-        delete window["popupCallback_" + this._id];
+        delete window["popupCallback_" + this._id]; // why is this._id tested in navigate but not here?
 
         if (this._popup && !keepOpen) {
             this._popup.close();

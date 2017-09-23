@@ -9,8 +9,14 @@ import IFrameNavigator from './IFrameNavigator';
 import WebStorageStateStore from './WebStorageStateStore';
 import Global from './Global';
 
+// Minimal definitions for testing
+let location = (typeof window == "undefined" || typeof window.location === "undefined") ? {protocol:"test:"} : window.location;
+let document = (typeof window == "undefined" || typeof window.document === "undefined") ? {host:"unknown"} : window.document;
+
 const DefaultAccessTokenExpiringNotificationTime = 60;
 const DefaultCheckSessionInterval = 2000;
+const DefaultPageOrigin = location.protocol + "//" + location.host;
+const DefaultScriptOrigin = typeof document.currentScript === "undefined" ? location.protocol + "//" + location.host : document.currentScript.src.substr(0, document.currentScript.src.indexOf("/", document.currentScript.src.indexOf("//") + 2))
 
 export default class UserManagerSettings extends OidcClientSettings {
     constructor({
@@ -25,10 +31,13 @@ export default class UserManagerSettings extends OidcClientSettings {
         checkSessionInterval = DefaultCheckSessionInterval,
         revokeAccessTokenOnSignout = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
+        pageOrigin = DefaultPageOrigin,
+        scriptOrigin = DefaultScriptOrigin,
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
-        iframeNavigator = new IFrameNavigator(),
-        userStore = new WebStorageStateStore({ store: Global.sessionStorage })
+        iframeNavigator, // = new IFrameNavigator( pageOrigin ), // this would be nice, but doesn't work
+        userStore = new WebStorageStateStore({ store: Global.sessionStorage }),
+        userinfoHeaderBug = false, // set true if your auth server ignores Authorization token in headers; this will send it as a query parameter
     } = {}) {
         super(arguments[0]);
 
@@ -46,9 +55,12 @@ export default class UserManagerSettings extends OidcClientSettings {
         this._checkSessionInterval = checkSessionInterval;
         this._revokeAccessTokenOnSignout = revokeAccessTokenOnSignout;
 
+        this._pageOrigin = pageOrigin;
+        this._scriptOrigin = scriptOrigin;
+
         this._redirectNavigator = redirectNavigator;
         this._popupNavigator = popupNavigator;
-        this._iframeNavigator = iframeNavigator;
+        this._iframeNavigator = (typeof iframeNavigator === "undefined") ? new IFrameNavigator( this._pageOrigin ) : iframeNavigator;
         
         this._userStore = userStore;
     }
@@ -102,4 +114,7 @@ export default class UserManagerSettings extends OidcClientSettings {
     get userStore() {
         return this._userStore;
     }
+
+    get pageOrigin() { return this._pageOrigin; }
+    get scriptOrigin() { return this._scriptOrigin; }
 }
