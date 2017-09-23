@@ -312,7 +312,7 @@ describe("OidcClientSettings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
             });
-            subject.staleStateAge.should.equal(60);
+            subject.staleStateAge.should.equal(300);
         });
 
         it("should return value from initial settings", function () {
