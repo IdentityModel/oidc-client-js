@@ -3,7 +3,7 @@
 
 import Log from './Log';
 
-const DefaultTimeout = 5000;
+const DefaultTimeout = 30000;
 
 export default class IFrameWindow {
 
