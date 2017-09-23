@@ -255,8 +255,18 @@ export default class UserManager extends OidcClient {
             return user;
         });
     }
-    signoutRedirect(args) {
+    signoutRedirect(args = {}) {
         Log.debug("UserManager.signoutRedirect");
+        let postLogoutRedirectUri = args.post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
+        if (postLogoutRedirectUri){
+            args.post_logout_redirect_uri = postLogoutRedirectUri;
+            // we're putting a dummy entry in here because we 
+            // need a unique id from the state for notification
+            // to the parent window, which is necessary if we
+            // plan to return back to the client after signout
+            // and so we can close the popup after signout
+            args.state = args.state || {};
+        }
         return this._signoutStart(args, this._redirectNavigator).then(()=>{
             Log.info("signoutRedirect successful");
         });
