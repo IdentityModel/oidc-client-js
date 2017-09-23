@@ -99,6 +99,28 @@ describe("UserManagerSettings", function () {
 
     });
 
+    describe("includeIdTokenInSilentRenew", function () {
+        it("should return true value from initial settings", function () {
+            let subject = new UserManagerSettings({
+                includeIdTokenInSilentRenew: true,
+            });
+            subject.includeIdTokenInSilentRenew.should.be.true;
+        });
+
+        it("should return false value from initial settings", function () {
+            let subject = new UserManagerSettings({
+                includeIdTokenInSilentRenew: false,
+            });
+            subject.includeIdTokenInSilentRenew.should.be.false;
+        });
+
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.includeIdTokenInSilentRenew.should.be.true;
+        });
+    });
+
     describe("accessTokenExpiringNotificationTime", function () {
 
         it("should return value from initial settings", function () {

@@ -21,6 +21,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         silent_redirect_uri,
         silentRequestTimeout,
         automaticSilentRenew = false,
+        includeIdTokenInSilentRenew = true,
         monitorSession = true,
         checkSessionInterval = DefaultCheckSessionInterval,
         revokeAccessTokenOnSignout = false,
@@ -40,6 +41,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         this._silent_redirect_uri = silent_redirect_uri;
         this._silentRequestTimeout = silentRequestTimeout;
         this._automaticSilentRenew = !!automaticSilentRenew;
+        this._includeIdTokenInSilentRenew = includeIdTokenInSilentRenew;
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
         this._monitorSession = monitorSession;
@@ -74,6 +76,9 @@ export default class UserManagerSettings extends OidcClientSettings {
     }
     get automaticSilentRenew() {
         return !!(this.silent_redirect_uri && this._automaticSilentRenew);
+    }
+    get includeIdTokenInSilentRenew() {
+        return this._includeIdTokenInSilentRenew;
     }
     get accessTokenExpiringNotificationTime() {
         return this._accessTokenExpiringNotificationTime;

@@ -140,7 +140,7 @@ export default class UserManager extends OidcClient {
         args.prompt = "none";
 
         let setIdToken;
-        if (args.id_token_hint) {
+        if (args.id_token_hint || !this.settings.includeIdTokenInSilentRenew) {
             setIdToken = Promise.resolve();
         }
         else {
