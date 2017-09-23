@@ -26,7 +26,13 @@ export default class JsonService {
                 Log.debug("HTTP response received, status", req.status);
                 
                 if (req.status === 200) {
-                    resolve(JSON.parse(req.responseText));
+                    try {
+                        resolve(JSON.parse(req.responseText));
+                    }
+                    catch (e) {
+                        Log.error("Error parsing JSON response", e.message);
+                        reject(Error("Error parsing JSON response"));
+                    }
                 }
                 else {
                     reject(Error(req.statusText + " (" + req.status + ")"));
