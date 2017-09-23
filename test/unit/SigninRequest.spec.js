@@ -187,6 +187,15 @@ describe("SigninRequest", function() {
             subject.url.should.contain("request_uri=foo");
         });
 
+        it("should include extra query params", function() {
+            settings.extraQueryParams = {
+                'hd': 'domain.com',
+                'foo': 'bar'
+            };
+            subject = new SigninRequest(settings);
+            subject.url.should.contain('hd=domain.com&foo=bar');
+        });
+
     });
 
     describe("isOidc", function() {
