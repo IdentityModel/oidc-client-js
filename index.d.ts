@@ -142,6 +142,7 @@ export class UserManager extends OidcClient {
   clearStaleState(): Promise<void>;
 
   getUser(): Promise<User>;
+  storeUser(user:User): Promise<void>;
   removeUser(): Promise<void>;
 
   signinPopup(args?: any): Promise<User>;
