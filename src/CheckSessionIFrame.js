@@ -16,7 +16,9 @@ export default class CheckSessionIFrame {
         this._frame_origin = url.substr(0, idx);
 
         this._frame = window.document.createElement("iframe");
-        this._frame.style.display = "none";
+        //this._frame.style.display = "none";
+        this._frame.style.visibility = "hidden";
+        this._frame.style.position = "absolute";
         this._frame.src = url;
 
     }

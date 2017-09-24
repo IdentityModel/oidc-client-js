@@ -3,7 +3,7 @@
 
 import Log from './Log';
 
-const DefaultTimeout = 30000;
+const DefaultTimeout = 10000;
 
 export default class IFrameWindow {
 
@@ -19,7 +19,9 @@ export default class IFrameWindow {
         window.addEventListener("message", this._boundMessageEvent, false);
         
         this._frame = window.document.createElement("iframe");
-        this._frame.style.display = "none";
+        //this._frame.style.display = "none";
+        this._frame.style.visibility = "hidden";
+        this._frame.style.position = "absolute";
         window.document.body.appendChild(this._frame);
     }
 
