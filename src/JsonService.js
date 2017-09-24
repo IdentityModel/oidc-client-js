@@ -31,7 +31,7 @@ export default class JsonService {
                     }
                     catch (e) {
                         Log.error("Error parsing JSON response", e.message);
-                        reject(Error("Error parsing JSON response"));
+                        reject(e);
                     }
                 }
                 else {
