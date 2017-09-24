@@ -56,16 +56,22 @@ export default class IFrameWindow {
         this._reject(new Error(message));
     }
 
+    close() {
+        this._cleanup();
+    }
+
     _cleanup() {
-        Log.debug("IFrameWindow._cleanup");
+        if (this._frame) {
+            Log.debug("IFrameWindow._cleanup");
 
-        window.removeEventListener("message", this._boundMessageEvent, false);
-        window.clearTimeout(this._timer);
-        window.document.body.removeChild(this._frame);
+            window.removeEventListener("message", this._boundMessageEvent, false);
+            window.clearTimeout(this._timer);
+            window.document.body.removeChild(this._frame);
 
-        this._timer = null;
-        this._frame = null;
-        this._boundMessageEvent = null;
+            this._timer = null;
+            this._frame = null;
+            this._boundMessageEvent = null;
+        }
     }
 
     _timeout() {

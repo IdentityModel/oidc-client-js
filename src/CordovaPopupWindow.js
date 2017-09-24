@@ -85,6 +85,10 @@ export default class CordovaPopupWindow {
         this._reject(new Error(message));
     }
 
+    close() {
+        this._cleanup();
+    }
+
     _cleanup() {
         Log.debug("CordovaPopupWindow._cleanup");
 

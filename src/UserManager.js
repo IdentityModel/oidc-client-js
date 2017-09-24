@@ -318,20 +318,26 @@ export default class UserManager extends OidcClient {
     _signinStart(args, navigator, navigatorParams = {}) {
         Log.debug("_signinStart");
 
+        return navigator.prepare(navigatorParams).then(handle => {
+            Log.debug("got navigator window handle");
 
-        return this.createSigninRequest(args).then(signinRequest => {
-            Log.debug("got signin request");
+            return this.createSigninRequest(args).then(signinRequest => {
+                Log.debug("got signin request");
 
-            navigatorParams.url = signinRequest.url;
-            navigatorParams.id = signinRequest.state.id;
-
-            return navigator.prepare(navigatorParams).then(handle => {
-                Log.debug("got navigator window handle");
+                navigatorParams.url = signinRequest.url;
+                navigatorParams.id = signinRequest.state.id;
                 
                 return handle.navigate(navigatorParams);
+            }).catch(err => {
+                if (handle.close) {
+                    Log.debug("Error after preparing navigator, closing navigator window");
+                    handle.close();
+                }
+                throw err;
             });
         });
     }
+
     _signinEnd(url) {
         Log.debug("_signinEnd");
 
@@ -382,6 +388,12 @@ export default class UserManager extends OidcClient {
                         });
                     });
                 });
+            }).catch(err => {
+                if (handle.close) {
+                    Log.debug("Error after preparing navigator, closing navigator window");
+                    handle.close();
+                }
+                throw err;
             });
         });
     }

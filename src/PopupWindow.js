@@ -71,6 +71,10 @@ export default class PopupWindow {
         this._reject(new Error(message));
     }
 
+    close() {
+        this._cleanup(false);
+    }
+
     _cleanup(keepOpen) {
         Log.debug("PopupWindow._cleanup");
 
