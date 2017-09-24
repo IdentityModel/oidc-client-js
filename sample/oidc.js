@@ -118,6 +118,7 @@ module.exports = function(baseUrl, app) {
     prependBaseUrlToMetadata(baseUrl);
 
     app.get(metadataPath, function(req, res) {
+        //res.send("<h1>not json...</h1>"); return;
         res.json(metadata);
     });
 

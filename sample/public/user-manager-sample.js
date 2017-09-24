@@ -24,7 +24,7 @@ document.getElementById('popupSignout').addEventListener("click", popupSignout, 
 // config
 ///////////////////////////////
 Oidc.Log.logger = console;
-Oidc.Log.level = Oidc.Log.INFO;
+Oidc.Log.level = Oidc.Log.WARN;
 
 var settings = {
     authority: 'http://localhost:5000/oidc',
