@@ -164,7 +164,10 @@ module.exports = function(baseUrl, app) {
         var url = req.query.post_logout_redirect_uri;
         if (url) {
             var state = req.query.state;
-            res.redirect(url + "?state=" + state);;
+            if (state) {
+                url += "?state=" + state;
+            }
+            res.redirect(url);
         }
         else {
             res.send("logged out");

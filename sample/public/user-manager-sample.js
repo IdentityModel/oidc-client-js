@@ -152,7 +152,8 @@ function iframeSignin() {
 
 function startSignoutMainWindow(){
     mgr.signoutRedirect({state:'some data'}).then(function(resp) {
-        log("signed out", resp);
+    //mgr.signoutRedirect().then(function(resp) {
+            log("signed out", resp);
     }).catch(function(err) {
         log(err);
     });
