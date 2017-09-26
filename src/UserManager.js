@@ -83,6 +83,28 @@ export default class UserManager extends OidcClient {
         });
     }
 
+    signinRedirect(args) {
+        Log.debug("UserManager.signinRedirect");
+        return this._signinStart(args, this._redirectNavigator).then(()=>{
+            Log.info("signinRedirect successful");
+        });
+    }
+    signinRedirectCallback(url) {
+        Log.debug("UserManager.signinRedirectCallback");
+        return this._signinEnd(url || this._redirectNavigator.url).then(user => {
+            if (user) {
+                if (user.profile && user.profile.sub) {
+                    Log.info("signinRedirectCallback successful, signed in sub: ", user.profile.sub);
+                }
+                else {
+                    Log.info("signinRedirectCallback successful");
+                }
+            }
+
+            return user;
+        });
+    }
+    
     signinPopup(args = {}) {
         Log.debug("UserManager.signinPopup");
 
@@ -127,6 +149,7 @@ export default class UserManager extends OidcClient {
             return user;
         });
     }
+
     signinSilent(args = {}) {
         Log.debug("UserManager.signinSilent");
 
@@ -225,49 +248,55 @@ export default class UserManager extends OidcClient {
             return this._signinEnd(navResponse.url);
         });
     }
+    _signinStart(args, navigator, navigatorParams = {}) {
+        Log.debug("_signinStart");
+
+        return navigator.prepare(navigatorParams).then(handle => {
+            Log.debug("got navigator window handle");
+
+            return this.createSigninRequest(args).then(signinRequest => {
+                Log.debug("got signin request");
+
+                navigatorParams.url = signinRequest.url;
+                navigatorParams.id = signinRequest.state.id;
+                
+                return handle.navigate(navigatorParams);
+            }).catch(err => {
+                if (handle.close) {
+                    Log.debug("Error after preparing navigator, closing navigator window");
+                    handle.close();
+                }
+                throw err;
+            });
+        });
+    }
+    _signinEnd(url) {
+        Log.debug("_signinEnd");
+
+        return this.processSigninResponse(url).then(signinResponse => {
+            Log.debug("got signin response");
+
+            let user = new User(signinResponse);
+
+            return this.storeUser(user).then(() => {
+                Log.debug("user stored");
+
+                this._events.load(user);
+
+                return user;
+            });
+        });
+    }
     _signinCallback(url, navigator) {
         Log.debug("_signinCallback");
         return navigator.callback(url);
     }
-    _signout(args, navigator, navigatorParams = {}) {
-        Log.debug("_signout");
-        return this._signoutStart(args, navigator, navigatorParams).then(navResponse => {
-            return this._signoutEnd(navResponse.url);
-        });
-    }
 
-    signinRedirect(args) {
-        Log.debug("UserManager.signinRedirect");
-        return this._signinStart(args, this._redirectNavigator).then(()=>{
-            Log.info("signinRedirect successful");
-        });
-    }
-    signinRedirectCallback(url) {
-        Log.debug("UserManager.signinRedirectCallback");
-        return this._signinEnd(url || this._redirectNavigator.url).then(user => {
-            if (user) {
-                if (user.profile && user.profile.sub) {
-                    Log.info("signinRedirectCallback successful, signed in sub: ", user.profile.sub);
-                }
-                else {
-                    Log.info("signinRedirectCallback successful");
-                }
-            }
-
-            return user;
-        });
-    }
     signoutRedirect(args = {}) {
         Log.debug("UserManager.signoutRedirect");
         let postLogoutRedirectUri = args.post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
         if (postLogoutRedirectUri){
             args.post_logout_redirect_uri = postLogoutRedirectUri;
-            // we're putting a dummy entry in here because we 
-            // need a unique id from the state for notification
-            // to the parent window, which is necessary if we
-            // plan to return back to the client after signout
-            // and so we can close the popup after signout
-            args.state = args.state || {};
         }
         return this._signoutStart(args, this._redirectNavigator).then(()=>{
             Log.info("signoutRedirect successful");
@@ -280,6 +309,7 @@ export default class UserManager extends OidcClient {
             return response;
         });
     }
+
     signoutPopup(args = {}) {
         Log.debug("UserManager.signinPopup");
 
@@ -315,47 +345,12 @@ export default class UserManager extends OidcClient {
         });
     }
 
-    _signinStart(args, navigator, navigatorParams = {}) {
-        Log.debug("_signinStart");
-
-        return navigator.prepare(navigatorParams).then(handle => {
-            Log.debug("got navigator window handle");
-
-            return this.createSigninRequest(args).then(signinRequest => {
-                Log.debug("got signin request");
-
-                navigatorParams.url = signinRequest.url;
-                navigatorParams.id = signinRequest.state.id;
-                
-                return handle.navigate(navigatorParams);
-            }).catch(err => {
-                if (handle.close) {
-                    Log.debug("Error after preparing navigator, closing navigator window");
-                    handle.close();
-                }
-                throw err;
-            });
+    _signout(args, navigator, navigatorParams = {}) {
+        Log.debug("_signout");
+        return this._signoutStart(args, navigator, navigatorParams).then(navResponse => {
+            return this._signoutEnd(navResponse.url);
         });
     }
-
-    _signinEnd(url) {
-        Log.debug("_signinEnd");
-
-        return this.processSigninResponse(url).then(signinResponse => {
-            Log.debug("got signin response");
-
-            let user = new User(signinResponse);
-
-            return this.storeUser(user).then(() => {
-                Log.debug("user stored");
-
-                this._events.load(user);
-
-                return user;
-            });
-        });
-    }
-
     _signoutStart(args = {}, navigator, navigatorParams = {}) {
         Log.debug("_signoutStart");
 
