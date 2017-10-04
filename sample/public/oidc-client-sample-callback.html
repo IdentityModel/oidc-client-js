@@ -11,14 +11,6 @@
         <pre id='out'></pre>
         <script src='log.js'></script>
         <script src='oidc-client.js'></script>
-        <script>
-            Oidc.Log.logger = console;
-            Oidc.Log.level = Oidc.Log.INFO;
-            new Oidc.OidcClient().processSigninResponse().then(function(response) {
-                log("signin response success", response);
-            }).catch(function(err) {
-                log(err);
-            });
-        </script>
+        <script src='oidc-client-sample-callback.js'></script>
     </body>
 </html>
