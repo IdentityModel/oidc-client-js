@@ -11,6 +11,10 @@ var express = require('express');
 var app = express();
 
 var static = express.static(path.join(__dirname, 'public'));
+app.use(function (req, res, next) {
+    res.set('Content-Security-Policy', "default-src 'self'");
+    next();
+  });
 app.use(static);
 
 app.get("/oidc-client.js", function(req, res){
