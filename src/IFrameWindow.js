@@ -19,9 +19,14 @@ export default class IFrameWindow {
         window.addEventListener("message", this._boundMessageEvent, false);
         
         this._frame = window.document.createElement("iframe");
-        //this._frame.style.display = "none";
+
+        // shotgun approach
         this._frame.style.visibility = "hidden";
         this._frame.style.position = "absolute";
+        this._frame.style.display = "none";
+        this._frame.style.width = 0;
+        this._frame.style.height = 0;
+        
         window.document.body.appendChild(this._frame);
     }
 

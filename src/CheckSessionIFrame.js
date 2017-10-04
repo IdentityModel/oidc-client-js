@@ -16,11 +16,15 @@ export default class CheckSessionIFrame {
         this._frame_origin = url.substr(0, idx);
 
         this._frame = window.document.createElement("iframe");
-        //this._frame.style.display = "none";
+
+        // shotgun approach
         this._frame.style.visibility = "hidden";
         this._frame.style.position = "absolute";
-        this._frame.src = url;
+        this._frame.style.display = "none";
+        this._frame.style.width = 0;
+        this._frame.style.height = 0;
 
+        this._frame.src = url;
     }
     load() {
         return new Promise((resolve) => {
