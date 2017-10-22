@@ -134,6 +134,7 @@ export interface OidcClientSettings {
   stateStore?: StateStore;
   ResponseValidatorCtor?: ResponseValidatorCtor;
   MetadataServiceCtor?: MetadataServiceCtor;
+  extraQueryParams?: any;
 }
 
 export class UserManager extends OidcClient {
