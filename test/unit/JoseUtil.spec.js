@@ -104,7 +104,7 @@ describe("JoseUtil", function () {
 
     describe("validateJwt", function () {
 
-        it("should validate from RSA X509 key", function (done) {
+        it.only("should validate from RSA X509 key", function (done) {
 
             delete rsaKey.n;
             delete rsaKey.e;

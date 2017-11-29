@@ -31,7 +31,9 @@ export default class JoseUtil {
                     key = KeyUtil.getKey(key);
                 }
                 else if (key.x5c && key.x5c.length) {
-                    key = KeyUtil.getKey(X509.getPublicKeyFromCertPEM(key.x5c[0]));
+                    console.log(key.x5c[0])
+                    console.log(X509.getPublicKeyFromCertPEM(key.x5c[0]))
+                    key = KeyUtil.getKey(X509.getPublicKeyFromCertHexgetPublicKeyFromCertPEM(key.x5c[0]));
                 }
                 else {
                     Log.error("RSA key missing key material", key);
