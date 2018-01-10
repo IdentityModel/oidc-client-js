@@ -102,11 +102,13 @@ export interface SignoutRequest {
 export class OidcClient {
   constructor(settings: OidcClientSettings);
 
+  readonly settings: OidcClientSettings;
+
   createSigninRequest(args?: any): Promise<SigninRequest>;
-  processSigninResponse(): Promise<any>;
+  processSigninResponse(): Promise<SigninResponse>;
 
   createSignoutRequest(args?: any): Promise<SignoutRequest>;
-  processSignoutResponse(): Promise<any>;
+  processSignoutResponse(): Promise<SigninResponse>;
 
   clearStaleState(stateStore: StateStore): Promise<any>;
 }
@@ -134,11 +136,12 @@ export interface OidcClientSettings {
   stateStore?: StateStore;
   ResponseValidatorCtor?: ResponseValidatorCtor;
   MetadataServiceCtor?: MetadataServiceCtor;
-  extraQueryParams?: any;
 }
 
 export class UserManager extends OidcClient {
   constructor(settings: UserManagerSettings);
+
+  readonly settings: UserManagerSettings;
 
   clearStaleState(): Promise<void>;
 
@@ -234,7 +237,30 @@ export class WebStorageStateStore implements StateStore {
   getAllKeys(): Promise<string[]>;
 }
 
-export interface User {
+export interface SigninResponse {
+  new (url: string): SigninResponse;
+
+  access_token: string;
+  error: string;
+  error_description: string;
+  error_uri: string;
+  expires_at: number;
+  id_token: string;
+  profile: any;
+  scope: string;
+  session_state: any;
+  state: any;
+  token_type: string;
+
+  readonly expired: boolean | undefined;
+  readonly expires_in: number | undefined;
+  readonly isOpenIdConnect: boolean;
+  readonly scopes: string[];
+}
+
+export class User {
+  constructor(response: SigninResponse);
+
   id_token: string;
   session_state: any;
   access_token: string;
