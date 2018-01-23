@@ -102,43 +102,47 @@ export interface SignoutRequest {
 export class OidcClient {
   constructor(settings: OidcClientSettings);
 
+  readonly settings: OidcClientSettings;
+
   createSigninRequest(args?: any): Promise<SigninRequest>;
-  processSigninResponse(): Promise<any>;
+  processSigninResponse(): Promise<SigninResponse>;
 
   createSignoutRequest(args?: any): Promise<SignoutRequest>;
-  processSignoutResponse(): Promise<any>;
+  processSignoutResponse(): Promise<SigninResponse>;
 
   clearStaleState(stateStore: StateStore): Promise<any>;
 }
 
 export interface OidcClientSettings {
   authority?: string;
-  metadataUrl?: string;
+  readonly metadataUrl?: string;
   metadata?: any;
   signingKeys?: any[];
   client_id?: string;
-  response_type?: string;
-  scope?: string;
-  redirect_uri?: string;
-  post_logout_redirect_uri?: string;
-  popup_post_logout_redirect_uri?: string;
-  prompt?: string;
-  display?: string;
-  max_age?: number;
-  ui_locales?: string;
-  acr_values?: string;
-  filterProtocolClaims?: boolean;
-  loadUserInfo?: boolean;
-  staleStateAge?: number;
-  clockSkew?: number;
-  stateStore?: StateStore;
+  readonly response_type?: string;
+  readonly scope?: string;
+  readonly redirect_uri?: string;
+  readonly post_logout_redirect_uri?: string;
+  readonly popup_post_logout_redirect_uri?: string;
+  readonly prompt?: string;
+  readonly display?: string;
+  readonly max_age?: number;
+  readonly ui_locales?: string;
+  readonly acr_values?: string;
+  readonly filterProtocolClaims?: boolean;
+  readonly loadUserInfo?: boolean;
+  readonly staleStateAge?: number;
+  readonly clockSkew?: number;
+  readonly stateStore?: StateStore;
   ResponseValidatorCtor?: ResponseValidatorCtor;
   MetadataServiceCtor?: MetadataServiceCtor;
-  extraQueryParams?: any;
+  extraQueryParams?: {};
 }
 
 export class UserManager extends OidcClient {
   constructor(settings: UserManagerSettings);
+
+  readonly settings: UserManagerSettings;
 
   clearStaleState(): Promise<void>;
 
@@ -190,21 +194,21 @@ export interface UserManagerEvents extends AccessTokenEvents {
 }
 
 export interface UserManagerSettings extends OidcClientSettings {
-  popup_redirect_uri?: string;
-  popupWindowFeatures?: string;
-  popupWindowTarget?: any;
-  silent_redirect_uri?: any;
-  silentRequestTimeout?: any;
-  automaticSilentRenew?: boolean;
-  includeIdTokenInSilentRenew?: boolean;
-  monitorSession?: boolean;
-  checkSessionInterval?: number;
-  revokeAccessTokenOnSignout?: any;
-  accessTokenExpiringNotificationTime?: number;
-  redirectNavigator?: any;
-  popupNavigator?: any;
-  iframeNavigator?: any;
-  userStore?: any;
+  readonly popup_redirect_uri?: string;
+  readonly popupWindowFeatures?: string;
+  readonly popupWindowTarget?: any;
+  readonly silent_redirect_uri?: any;
+  readonly silentRequestTimeout?: any;
+  readonly automaticSilentRenew?: boolean;
+  readonly includeIdTokenInSilentRenew?: boolean;
+  readonly monitorSession?: boolean;
+  readonly checkSessionInterval?: number;
+  readonly revokeAccessTokenOnSignout?: any;
+  readonly accessTokenExpiringNotificationTime?: number;
+  readonly redirectNavigator?: any;
+  readonly popupNavigator?: any;
+  readonly iframeNavigator?: any;
+  readonly userStore?: any;
 }
 
 export interface WebStorageStateStoreSettings {
@@ -234,7 +238,30 @@ export class WebStorageStateStore implements StateStore {
   getAllKeys(): Promise<string[]>;
 }
 
-export interface User {
+export interface SigninResponse {
+  new (url: string): SigninResponse;
+
+  access_token: string;
+  error: string;
+  error_description: string;
+  error_uri: string;
+  expires_at: number;
+  id_token: string;
+  profile: any;
+  scope: string;
+  session_state: any;
+  state: any;
+  token_type: string;
+
+  readonly expired: boolean | undefined;
+  readonly expires_in: number | undefined;
+  readonly isOpenIdConnect: boolean;
+  readonly scopes: string[];
+}
+
+export class User {
+  constructor(response: SigninResponse);
+
   id_token: string;
   session_state: any;
   access_token: string;
