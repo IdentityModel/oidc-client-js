@@ -191,6 +191,9 @@ export interface UserManagerEvents extends AccessTokenEvents {
 
   addUserSignedOut(callback: (...ev: any[]) => void): void;
   removeUserSignedOut(callback: (...ev: any[]) => void): void;
+  
+  addUserSessionChanged(callback: (...ev: any[]) => void): void;
+  removeUserSessionChanged(callback: (...ev: any[]) => void): void;
 }
 
 export interface UserManagerSettings extends OidcClientSettings {
