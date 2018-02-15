@@ -42,7 +42,7 @@ gulp.task('build-lib-min', function() {
         libraryTarget: 'umd',
     },
     plugins: uglifyPlugins,
-    devtool: null
+    devtool: false
   })))
   .pipe(gulp.dest('lib/'));
 });
@@ -74,7 +74,7 @@ gulp.task('build-dist-min', function() {
         library: 'Oidc'
     },
     plugins: uglifyPlugins,
-    devtool: null
+    devtool: false
   })))
   .pipe(gulp.dest('dist/'));
 });

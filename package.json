@@ -30,7 +30,7 @@
   "homepage": "https://github.com/IdentityModel/oidc-client-js",
   "devDependencies": {
     "babel-core": "^6.7.2",
-    "babel-loader": "^6.2.4",
+    "babel-loader": "^7.1.2",
     "babel-plugin-add-module-exports": "^0.1.2",
     "babel-plugin-transform-es2015-classes": "^6.7.7",
     "babel-polyfill": "^6.9.1",
@@ -41,11 +41,11 @@
     "gulp": "^3.9.1",
     "mocha": "^2.4.5",
     "open": "0.0.5",
-    "webpack": "^1.12.14",
-    "webpack-stream": "^3.2.0"
+    "webpack": "^3.8.1",
+    "webpack-stream": "^4.0.0"
   },
   "dependencies": {
-    "jsrsasign": "^5.0.7"
+    "jsrsasign": "^8.0.4"
   },
   "peerDependencies": {
     "babel-polyfill": ">=6.9.1"
