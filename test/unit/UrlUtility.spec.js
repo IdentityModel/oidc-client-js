@@ -1,7 +1,7 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import UrlUtility from '../../src/UrlUtility';
+import { UrlUtility } from '../../src/UrlUtility';
 
 import chai from 'chai';
 chai.should();
@@ -53,13 +53,13 @@ describe("UrlUtility", function() {
         it("should use Global.location when no value is passed", function() {
             let w = {
                 location: {
-                    href : "a=apple&b=banana&c=carrot" 
+                    href : "a=apple&b=banana&c=carrot"
                 }
             };
             let result = UrlUtility.parseUrlFragment(null, "#", w);
             result.should.deep.equal({ a: "apple", b: "banana", c: "carrot" });
         });
-        
+
         it("should return empty object for empty string", function() {
             let result = UrlUtility.parseUrlFragment("");
             result.should.deep.equal({});

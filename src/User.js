@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import { Log } from './Log';
 
-export default class User {
+export class User {
     constructor({id_token, session_state, access_token, token_type, scope, profile, expires_at, state}) {
         this.id_token = id_token;
         this.session_state = session_state;

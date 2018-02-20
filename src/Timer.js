@@ -1,13 +1,13 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import Global from './Global';
-import Event from './Event';
+import { Log } from './Log';
+import { Global } from './Global';
+import { Event } from './Event';
 
 const TimerDuration = 5; // seconds
 
-export default class Timer extends Event {
+export class Timer extends Event {
 
     constructor(name, timer = Global.timer) {
         super(name);
@@ -30,8 +30,8 @@ export default class Timer extends Event {
         Log.debug("Timer.init timer " + this._name + " for duration:", duration);
         this._expiration = this.now + duration;
 
-        // we're using a fairly short timer and then checking the expiration in the 
-        // callback to handle scenarios where the browser device sleeps, and then 
+        // we're using a fairly short timer and then checking the expiration in the
+        // callback to handle scenarios where the browser device sleeps, and then
         // the timers end up getting delayed.
         var timerDuration = TimerDuration;
         if (duration < timerDuration) {

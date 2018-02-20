@@ -1,11 +1,11 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import ResponseValidator from '../../src/ResponseValidator';
-import Log from '../../src/Log';
-import JoseUtil from '../../src/JoseUtil';
+import { ResponseValidator } from '../../src/ResponseValidator';
+import { Log } from '../../src/Log';
+import { JoseUtil } from '../../src/JoseUtil';
 
-import StubMetadataService from './StubMetadataService';
+import { StubMetadataService } from './StubMetadataService';
 
 import chai from 'chai';
 chai.should();
@@ -296,7 +296,7 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should fail if the authority on the state is not the same as the settings", function (done) {
 
             stubState.authority = "something different";
@@ -306,7 +306,7 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should fail if the client_id on the state is not the same as the settings", function (done) {
 
             stubState.client_id = "something different";
@@ -316,9 +316,9 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should assign the authority on the settings if not already assigned", function (done) {
-            
+
             delete subject._settings.authority;
             stubState.authority = "something different";
 
@@ -329,9 +329,9 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should assign the client_id on the settings if not already assigned", function (done) {
-            
+
             delete subject._settings.client_id;
             stubState.client_id = "something different";
 
@@ -705,7 +705,7 @@ describe("ResponseValidator", function () {
         });
 
         it("should fail if audience doesn't match id_token", function (done) {
-            
+
             stubState.client_id = "invalid client_id";
             stubResponse.id_token = id_token;
             stubMetadataService.getIssuerResult = Promise.resolve("test");
@@ -715,7 +715,7 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should fail if nonce doesn't match id_token", function (done) {
 
             stubState.nonce = "invalid nonce";

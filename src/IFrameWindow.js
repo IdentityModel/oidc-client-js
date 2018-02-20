@@ -1,11 +1,11 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import { Log } from './Log';
 
 const DefaultTimeout = 10000;
 
-export default class IFrameWindow {
+export class IFrameWindow {
 
     constructor(params) {
         Log.debug("IFrameWindow.ctor");
@@ -17,7 +17,7 @@ export default class IFrameWindow {
 
         this._boundMessageEvent = this._message.bind(this);
         window.addEventListener("message", this._boundMessageEvent, false);
-        
+
         this._frame = window.document.createElement("iframe");
 
         // shotgun approach
@@ -26,7 +26,7 @@ export default class IFrameWindow {
         this._frame.style.display = "none";
         this._frame.style.width = 0;
         this._frame.style.height = 0;
-        
+
         window.document.body.appendChild(this._frame);
     }
 
@@ -42,7 +42,7 @@ export default class IFrameWindow {
             this._timer = window.setTimeout(this._timeout.bind(this), timeout);
             this._frame.src = params.url;
         }
-        
+
         return this.promise;
     }
 

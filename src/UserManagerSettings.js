@@ -1,18 +1,18 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import OidcClientSettings from './OidcClientSettings';
-import RedirectNavigator from './RedirectNavigator';
-import PopupNavigator from './PopupNavigator';
-import IFrameNavigator from './IFrameNavigator';
-import WebStorageStateStore from './WebStorageStateStore';
-import Global from './Global';
+import { Log } from './Log';
+import { OidcClientSettings } from './OidcClientSettings';
+import { RedirectNavigator } from './RedirectNavigator';
+import { PopupNavigator } from './PopupNavigator';
+import { IFrameNavigator } from './IFrameNavigator';
+import { WebStorageStateStore } from './WebStorageStateStore';
+import { Global } from './Global';
 
 const DefaultAccessTokenExpiringNotificationTime = 60;
 const DefaultCheckSessionInterval = 2000;
 
-export default class UserManagerSettings extends OidcClientSettings {
+export class UserManagerSettings extends OidcClientSettings {
     constructor({
         popup_redirect_uri,
         popup_post_logout_redirect_uri,
@@ -37,7 +37,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         this._popup_post_logout_redirect_uri = popup_post_logout_redirect_uri;
         this._popupWindowFeatures = popupWindowFeatures;
         this._popupWindowTarget = popupWindowTarget;
-        
+
         this._silent_redirect_uri = silent_redirect_uri;
         this._silentRequestTimeout = silentRequestTimeout;
         this._automaticSilentRenew = !!automaticSilentRenew;
@@ -51,7 +51,7 @@ export default class UserManagerSettings extends OidcClientSettings {
         this._redirectNavigator = redirectNavigator;
         this._popupNavigator = popupNavigator;
         this._iframeNavigator = iframeNavigator;
-        
+
         this._userStore = userStore;
     }
 
@@ -103,7 +103,7 @@ export default class UserManagerSettings extends OidcClientSettings {
     get iframeNavigator() {
         return this._iframeNavigator;
     }
-    
+
     get userStore() {
         return this._userStore;
     }

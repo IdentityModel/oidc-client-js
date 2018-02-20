@@ -1,7 +1,7 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Timer from '../../src/Timer';
+import { Timer } from '../../src/Timer';
 
 import chai from 'chai';
 chai.should();
@@ -82,13 +82,13 @@ describe("Timer", function () {
             subject._nowFunc = () => 109;
             stubWindowTimer.callback();
             cb.wasCalled.should.be.false;
-            
+
             subject._nowFunc = () => 110;
             stubWindowTimer.callback();
             cb.wasCalled.should.be.true;
         });
-        
-        
+
+
         it("should fire if timer late", function () {
             var cb = function () {
                 cb.wasCalled = true;
@@ -102,7 +102,7 @@ describe("Timer", function () {
             subject._nowFunc = () => 109;
             stubWindowTimer.callback();
             cb.wasCalled.should.be.false;
-            
+
             subject._nowFunc = () => 111;
             stubWindowTimer.callback();
             cb.wasCalled.should.be.true;
@@ -114,7 +114,7 @@ describe("Timer", function () {
 
             subject._nowFunc = () => 110;
             stubWindowTimer.callback();
-            
+
             stubWindowTimer.clearTimeoutWasCalled.should.be.true;
         });
     });
@@ -152,7 +152,7 @@ describe("Timer", function () {
 
             cb.wasCalled.should.be.true;
         });
-        
+
         it("should allow multiple callbacks", function () {
             var count = 0;
             var cb = function () {
@@ -180,7 +180,7 @@ describe("Timer", function () {
                 cb.wasCalled = true;
             };
             cb.wasCalled = false;
-            
+
             subject._nowFunc = () => 100;
             subject.addHandler(cb);
             subject.init(10);
@@ -191,7 +191,7 @@ describe("Timer", function () {
 
             cb.wasCalled.should.be.false;
         });
-        
+
         it("should remove individual callback", function () {
             var count = 0;
             var cb1 = function () {

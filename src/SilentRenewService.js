@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import { Log } from './Log';
 
-export default class SilentRenewService {
+export class SilentRenewService {
 
     constructor(userManager) {
         this._userManager = userManager;
@@ -13,7 +13,7 @@ export default class SilentRenewService {
         if (!this._callback) {
             this._callback = this._tokenExpiring.bind(this);
             this._userManager.events.addAccessTokenExpiring(this._callback);
-            
+
             // this will trigger loading of the user so the expiring events can be initialized
             this._userManager.getUser().then(user=>{
                 // deliberate nop
@@ -33,7 +33,7 @@ export default class SilentRenewService {
 
     _tokenExpiring() {
         Log.debug("SilentRenewService automatically renewing access token");
-        
+
         this._userManager.signinSilent().then(user => {
             Log.debug("Silent token renewal successful");
         }, err => {

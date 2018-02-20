@@ -1,17 +1,17 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import OidcClientSettings from './OidcClientSettings';
-import ErrorResponse from './ErrorResponse';
-import SigninRequest from './SigninRequest';
-import SigninResponse from './SigninResponse';
-import SignoutRequest from './SignoutRequest';
-import SignoutResponse from './SignoutResponse';
-import SigninState from './SigninState';
-import State from './State';
+import { Log } from './Log';
+import { OidcClientSettings } from './OidcClientSettings';
+import { ErrorResponse } from './ErrorResponse';
+import { SigninRequest } from './SigninRequest';
+import { SigninResponse } from './SigninResponse';
+import { SignoutRequest } from './SignoutRequest';
+import { SignoutResponse } from './SignoutResponse';
+import { SigninState } from './SigninState';
+import { State } from './State';
 
-export default class OidcClient {
+export class OidcClient {
     constructor(settings = {}) {
         if (settings instanceof OidcClientSettings) {
             this._settings = settings;
@@ -39,9 +39,9 @@ export default class OidcClient {
     }
 
     createSigninRequest({
-        response_type, scope, redirect_uri, 
+        response_type, scope, redirect_uri,
         // data was meant to be the place a caller could indicate the data to
-        // have round tripped, but people were getting confused, so i added state (since that matches the spec) 
+        // have round tripped, but people were getting confused, so i added state (since that matches the spec)
         // and so now if data is not passed, but state is then state will be used
         data, state, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
         resource, request, request_uri, extraQueryParams } = {},
@@ -62,7 +62,7 @@ export default class OidcClient {
         acr_values = acr_values || this._settings.acr_values;
         resource = resource || this._settings.resource;
         extraQueryParams = extraQueryParams || this._settings.extraQueryParams;
-        
+
         let authority = this._settings.authority;
 
         return this._metadataService.getAuthorizationEndpoint().then(url => {

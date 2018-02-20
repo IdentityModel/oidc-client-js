@@ -1,19 +1,19 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import MetadataService from './MetadataService';
-import Global from './Global';
+import { Log } from './Log';
+import { MetadataService } from './MetadataService';
+import { Global } from './Global';
 
 const AccessTokenTypeHint = "access_token";
 
-export default class TokenRevocationClient {
+export class TokenRevocationClient {
     constructor(settings, XMLHttpRequestCtor = Global.XMLHttpRequest, MetadataServiceCtor = MetadataService) {
         if (!settings) {
             Log.error("No settings provided");
             throw new Error("No settings provided.");
         }
-        
+
         this._settings = settings;
         this._XMLHttpRequestCtor = XMLHttpRequestCtor;
         this._metadataService = new MetadataServiceCtor(this._settings);
@@ -51,10 +51,10 @@ export default class TokenRevocationClient {
 
             var xhr = new this._XMLHttpRequestCtor();
             xhr.open("POST", url);
-            
+
             xhr.onload = () => {
                 Log.debug("HTTP response received, status", xhr.status);
-                
+
                 if (xhr.status === 200) {
                     resolve();
                 }
@@ -63,13 +63,13 @@ export default class TokenRevocationClient {
                 }
             };
 
-            var body = "client_id=" + encodeURIComponent(client_id); 
+            var body = "client_id=" + encodeURIComponent(client_id);
             if (client_secret) {
                 body += "&client_secret=" + encodeURIComponent(client_secret);
             }
             body += "&token_type_hint=" + encodeURIComponent(AccessTokenTypeHint);
             body += "&token=" + encodeURIComponent(accessToken);
-            
+
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.send(body);
         });

@@ -1,10 +1,10 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import WebStorageStateStore from './WebStorageStateStore';
-import ResponseValidator from './ResponseValidator';
-import MetadataService from './MetadataService';
+import { Log } from './Log';
+import { WebStorageStateStore } from './WebStorageStateStore';
+import { ResponseValidator } from './ResponseValidator';
+import { MetadataService } from './MetadataService';
 
 const OidcMetadataUrlPath = '.well-known/openid-configuration';
 
@@ -13,7 +13,7 @@ const DefaultScope = "openid";
 const DefaultStaleStateAge = 60 * 5; // seconds
 const DefaultClockSkewInSeconds = 60 * 5;
 
-export default class OidcClientSettings {
+export class OidcClientSettings {
     constructor({
         // metadata related
         authority, metadataUrl, metadata, signingKeys,

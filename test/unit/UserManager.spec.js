@@ -1,17 +1,17 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import UserManager from '../../src/UserManager';
-import Log from '../../src/Log';
-import Global from '../../src/Global';
-import UserManagerSettings from '../../src/UserManagerSettings';
-import User from '../../src/User';
+import { UserManager } from '../../src/UserManager';
+import { Log } from '../../src/Log';
+import { Global } from '../../src/Global';
+import { UserManagerSettings } from '../../src/UserManagerSettings';
+import { User } from '../../src/User';
 
-import StubMetadataService from './StubMetadataService';
-import StubSilentRenewService from './StubSilentRenewService';
-import StubStateStore from './StubStateStore';
-import StubResponseValidator from './StubResponseValidator';
-import StubTokenRevocationClient from './StubTokenRevocationClient';
+import { StubMetadataService } from './StubMetadataService';
+import { StubSilentRenewService } from './StubSilentRenewService';
+import { StubStateStore } from './StubStateStore';
+import { StubResponseValidator } from './StubResponseValidator';
+import { StubTokenRevocationClient } from './StubTokenRevocationClient';
 
 import chai from 'chai';
 chai.should();
@@ -54,9 +54,9 @@ describe("UserManager", function () {
             MetadataServiceCtor: () => stubMetadataService
         };
 
-        subject = new UserManager(settings, 
+        subject = new UserManager(settings,
             () => stubSilentRenewService,
-            null, 
+            null,
             () => stubTokenRevocationClient);
     });
 
@@ -81,13 +81,13 @@ describe("UserManager", function () {
         it("should be able to call getUser without recursion", function (done) {
 
             stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
-            
+
             subject.events.addUserLoaded(user => {
                 subject.getUser().then(user => {
                     done();
                 });
             });
-            
+
             subject.events.load({});
         });
 

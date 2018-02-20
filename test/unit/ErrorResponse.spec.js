@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import ErrorResponse from '../../src/ErrorResponse';
+import { Log } from '../../src/Log';
+import { ErrorResponse } from '../../src/ErrorResponse';
 
 import chai from 'chai';
 chai.should();
@@ -65,9 +65,9 @@ describe("ErrorResponse", function() {
         });
 
     });
-    
+
     describe("stack", function() {
-        
+
         it("should be set", function() {
             let subject = new ErrorResponse({error:"error"});
             subject.stack.should.be.ok;

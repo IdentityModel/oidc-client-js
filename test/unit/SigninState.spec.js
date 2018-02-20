@@ -1,18 +1,18 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import SigninState from '../../src/SigninState';
+import { Log } from '../../src/Log';
+import { SigninState } from '../../src/SigninState';
 
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 
 describe("SigninState", function() {
-    
+
     beforeEach(function(){
         Log.level = Log.NONE;
-        Log.logger = console; 
+        Log.logger = console;
     });
 
     describe("constructor", function() {
@@ -23,7 +23,7 @@ describe("SigninState", function() {
             subject.created.should.be.equal(6);
             subject.data.should.be.equal(7);
         });
-        
+
         it("should accept nonce", function() {
             var subject = new SigninState({ nonce: 5 });
             subject.nonce.should.be.equal(5);

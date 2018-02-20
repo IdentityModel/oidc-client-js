@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import OidcClientSettings from '../../src/OidcClientSettings';
-import Global from '../../src/Global';
+import { Log } from '../../src/Log';
+import { OidcClientSettings } from '../../src/OidcClientSettings';
+import { Global } from '../../src/Global';
 
 import chai from 'chai';
 chai.should();
@@ -24,7 +24,7 @@ describe("OidcClientSettings", function () {
             });
             subject.client_id.should.equal("client");
         });
-        
+
         it("should not allow setting if previously set", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',

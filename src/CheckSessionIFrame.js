@@ -1,11 +1,11 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import { Log } from './Log';
 
 const DefaultInterval = 2000;
 
-export default class CheckSessionIFrame {
+export class CheckSessionIFrame {
     constructor(callback, client_id, url, interval) {
         this._callback = callback;
         this._client_id = client_id;

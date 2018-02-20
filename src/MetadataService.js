@@ -1,12 +1,12 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import JsonService from './JsonService';
+import { Log } from './Log';
+import { JsonService } from './JsonService';
 
 const OidcMetadataUrlPath = '.well-known/openid-configuration';
 
-export default class MetadataService {
+export class MetadataService {
     constructor(settings, JsonServiceCtor = JsonService) {
         if (!settings) {
             Log.error("No settings passed to MetadataService");
@@ -59,7 +59,7 @@ export default class MetadataService {
                 return metadata;
             });
     }
-    
+
     getIssuer() {
         Log.debug("MetadataService.getIssuer");
         return this._getMetadataProperty("issuer");
@@ -79,7 +79,7 @@ export default class MetadataService {
         Log.debug("MetadataService.getTokenEndpoint");
         return this._getMetadataProperty("token_endpoint", true);
     }
-    
+
     getCheckSessionIframe() {
         Log.debug("MetadataService.getCheckSessionIframe");
         return this._getMetadataProperty("check_session_iframe", true);

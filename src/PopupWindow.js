@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import UrlUtility from './UrlUtility';
+import { Log } from './Log';
+import { UrlUtility } from './UrlUtility';
 
 const CheckForPopupClosedInterval = 500;
 const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100;';
@@ -10,7 +10,7 @@ const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=1
 
 const DefaultPopupTarget = "_blank";
 
-export default class PopupWindow {
+export class PopupWindow {
 
     constructor(params) {
         Log.debug("PopupWindow.ctor");
@@ -118,10 +118,10 @@ export default class PopupWindow {
             if (url) {
 
                 var data = UrlUtility.parseUrlFragment(url, delimiter);
-                
+
                 if (data.state) {
                     var name = "popupCallback_" + data.state;
-                    var callback = window.opener[name]; 
+                    var callback = window.opener[name];
                     if (callback) {
                         Log.debug("passing url message to opener");
                         callback(url, keepOpen);

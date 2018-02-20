@@ -1,16 +1,16 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import OidcClient from './OidcClient';
-import UserManagerSettings from './UserManagerSettings';
-import User from './User';
-import UserManagerEvents from './UserManagerEvents';
-import SilentRenewService from './SilentRenewService';
-import SessionMonitor from './SessionMonitor';
-import TokenRevocationClient from './TokenRevocationClient';
+import { Log } from './Log';
+import { OidcClient } from './OidcClient';
+import { UserManagerSettings } from './UserManagerSettings';
+import { User } from './User';
+import { UserManagerEvents } from './UserManagerEvents';
+import { SilentRenewService } from './SilentRenewService';
+import { SessionMonitor } from './SessionMonitor';
+import { TokenRevocationClient } from './TokenRevocationClient';
 
-export default class UserManager extends OidcClient {
+export class UserManager extends OidcClient {
     constructor(settings = {},
         SilentRenewServiceCtor = SilentRenewService,
         SessionMonitorCtor = SessionMonitor,
@@ -24,7 +24,7 @@ export default class UserManager extends OidcClient {
 
         this._events = new UserManagerEvents(settings);
         this._silentRenewService = new SilentRenewServiceCtor(this);
-        
+
         // order is important for the following properties; these services depend upon the events.
         if (this.settings.automaticSilentRenew) {
             Log.debug("automaticSilentRenew is configured, setting up silent renew");
@@ -104,7 +104,7 @@ export default class UserManager extends OidcClient {
             return user;
         });
     }
-    
+
     signinPopup(args = {}) {
         Log.debug("UserManager.signinPopup");
 
@@ -259,7 +259,7 @@ export default class UserManager extends OidcClient {
 
                 navigatorParams.url = signinRequest.url;
                 navigatorParams.id = signinRequest.state.id;
-                
+
                 return handle.navigate(navigatorParams);
             }).catch(err => {
                 if (handle.close) {
@@ -317,7 +317,7 @@ export default class UserManager extends OidcClient {
         args.post_logout_redirect_uri = url;
         args.display = "popup";
         if (args.post_logout_redirect_uri){
-            // we're putting a dummy entry in here because we 
+            // we're putting a dummy entry in here because we
             // need a unique id from the state for notification
             // to the parent window, which is necessary if we
             // plan to return back to the client after signout

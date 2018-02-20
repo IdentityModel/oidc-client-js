@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import UserManagerSettings from '../../src/UserManagerSettings';
+import { Log } from '../../src/Log';
+import { UserManagerSettings } from '../../src/UserManagerSettings';
 
 import chai from 'chai';
 chai.should();
@@ -36,7 +36,7 @@ describe("UserManagerSettings", function () {
         });
 
     });
-    
+
     describe("popupWindowFeatures", function () {
 
         it("should return value from initial settings", function () {
@@ -45,7 +45,7 @@ describe("UserManagerSettings", function () {
         });
 
     });
-    
+
     describe("popupWindowTarget", function () {
 
         it("should return value from initial settings", function () {
@@ -157,7 +157,7 @@ describe("UserManagerSettings", function () {
             subject.popupNavigator.should.equal(temp);
         });
     });
-    
+
     describe("iframeNavigator", function() {
         it("should return value from initial settings", function() {
             let temp = {};

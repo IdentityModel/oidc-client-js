@@ -1,11 +1,11 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import UrlUtility from './UrlUtility';
+import { UrlUtility } from './UrlUtility';
 
 const OidcScope = "openid";
 
-export default class SigninResponse {
+export class SigninResponse {
     constructor(url) {
 
         var values = UrlUtility.parseUrlFragment(url, "#");
@@ -13,7 +13,7 @@ export default class SigninResponse {
         this.error = values.error;
         this.error_description = values.error_description;
         this.error_uri = values.error_uri;
-        
+
         this.state = values.state;
         this.id_token = values.id_token;
         this.session_state = values.session_state;
@@ -48,7 +48,7 @@ export default class SigninResponse {
     get scopes() {
         return (this.scope || "").split(" ");
     }
-    
+
     get isOpenIdConnect() {
         return this.scopes.indexOf(OidcScope) >= 0 || !!this.id_token;
     }

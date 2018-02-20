@@ -1,21 +1,21 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import State from './State';
+import { Log } from './Log';
+import { State } from './State';
 import random from './random';
 
-export default class SigninState extends State {
+export class SigninState extends State {
     constructor({nonce, authority, client_id} = {}) {
         super(arguments[0]);
-        
+
         if (nonce === true) {
             this._nonce = random();
         }
         else if (nonce) {
             this._nonce = nonce;
         }
-        
+
         this._authority = authority;
         this._client_id = client_id;
     }
@@ -29,7 +29,7 @@ export default class SigninState extends State {
     get client_id() {
         return this._client_id;
     }
-    
+
     toStorageString() {
         Log.debug("SigninState.toStorageString");
         return JSON.stringify({

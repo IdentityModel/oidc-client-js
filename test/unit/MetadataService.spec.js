@@ -1,10 +1,10 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import MetadataService from '../../src/MetadataService';
+import { Log } from '../../src/Log';
+import { MetadataService } from '../../src/MetadataService';
 
-import StubJsonService from './StubJsonService';
+import { StubJsonService } from './StubJsonService';
 
 import chai from 'chai';
 chai.should();
@@ -18,7 +18,7 @@ describe("MetadataService", function() {
     beforeEach(function() {
         Log.logger = console;
         Log.level = Log.NONE;
-        
+
         settings = {};
         stubJsonService = new StubJsonService();
         subject = new MetadataService(settings, ()=>stubJsonService);
@@ -126,7 +126,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
      describe("_getMetadataProperty", function() {
 
         it("should return a promise", function() {
@@ -157,9 +157,9 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
          it("should fail if json call to load metadata fails", function(done) {
-             
+
             settings.metadataUrl = "http://sts/metadata";
             stubJsonService.result = Promise.reject(new Error("test"));
 
@@ -170,7 +170,7 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
     });
 
     describe("getAuthorizationEndpoint", function() {
@@ -187,7 +187,7 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
     });
 
     describe("getUserInfoEndpoint", function() {
@@ -235,7 +235,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
     describe("getCheckSessionIframe", function() {
 
         it("should return value from", function(done) {
@@ -264,7 +264,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
     describe("getIssuer", function() {
 
         it("should return value from", function(done) {
@@ -281,7 +281,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
     describe("getSigningKeys", function() {
 
         it("should return a promise", function() {
@@ -342,7 +342,7 @@ describe("MetadataService", function() {
         });
 
         it("should return keys from jwks_uri", function(done) {
-            
+
             settings.metadata = {
                 jwks_uri: "http://sts/metadata/keys"
             };
@@ -381,6 +381,6 @@ describe("MetadataService", function() {
                 done();
             })
         });
-        
+
     });
 });

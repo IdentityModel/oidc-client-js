@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import JoseUtil from '../../src/JoseUtil';
-import Log from '../../src/Log';
+import { JoseUtil } from '../../src/JoseUtil';
+import { Log } from '../../src/Log';
 
 import chai from 'chai';
 chai.should();
@@ -122,7 +122,7 @@ describe("JoseUtil", function () {
             JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow).then(()=>{
                 done();
             })
-    
+
         });
 
         it("should fail for unsupported key types", function (done) {
@@ -159,7 +159,7 @@ describe("JoseUtil", function () {
             var p1 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 1);
             var p2 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 10);
             Promise.all([p1, p2]).then(()=>{
-               done(); 
+               done();
             });
         });
 
@@ -213,7 +213,7 @@ describe("JoseUtil", function () {
             var p1 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 1);
             var p2 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 10)
             Promise.all([p1, p2]).then(()=>{
-               done(); 
+               done();
             });
         });
 

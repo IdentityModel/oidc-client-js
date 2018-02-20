@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import WebStorageStateStore from '../../src/WebStorageStateStore';
-import InMemoryWebStorage from '../../src/InMemoryWebStorage';
+import { Log } from '../../src/Log';
+import { WebStorageStateStore } from '../../src/WebStorageStateStore';
+import { InMemoryWebStorage } from '../../src/InMemoryWebStorage';
 
 import chai from 'chai';
 chai.should();
@@ -142,7 +142,7 @@ describe("WebStorageStateStore", function() {
                 done();
             });
         });
-        
+
         it("should return keys without prefix", function(done) {
             prefix = "foo.";
             subject = new WebStorageStateStore({ prefix: prefix, store: store });
@@ -155,7 +155,7 @@ describe("WebStorageStateStore", function() {
                 done();
             });
         });
-        
+
         it("should return empty keys when empty", function(done) {
             subject.getAllKeys().then(keys => {
                 keys.should.deep.equal([]);

@@ -1,10 +1,10 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import { Log } from './Log';
 import random from './random';
 
-export default class State {
+export class State {
     constructor({id, data, created} = {}) {
         this._id = id || random();
         this._data = data;
@@ -35,7 +35,7 @@ export default class State {
             created: this.created
         });
     }
-    
+
     static fromStorageString(storageString) {
         Log.debug("State.fromStorageString");
         return new State(JSON.parse(storageString));

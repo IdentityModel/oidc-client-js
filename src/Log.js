@@ -17,7 +17,7 @@ const DEBUG = 4;
 let logger;
 let level;
 
-export default class Log {
+export class Log {
     static get NONE() {return NONE};
     static get ERROR() {return ERROR};
     static get WARN() {return WARN};

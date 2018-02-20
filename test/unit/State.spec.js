@@ -1,21 +1,21 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import State from '../../src/State';
+import { Log } from '../../src/Log';
+import { State } from '../../src/State';
 
-import InMemoryWebStorage from '../../src/InMemoryWebStorage';
-import WebStorageStateStore from '../../src/WebStorageStateStore';
+import { InMemoryWebStorage } from '../../src/InMemoryWebStorage';
+import { WebStorageStateStore } from '../../src/WebStorageStateStore';
 
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 
 describe("State", function() {
-    
+
     beforeEach(function(){
         Log.level = Log.NONE;
-        Log.logger = console; 
+        Log.logger = console;
     });
 
     describe("constructor", function() {
@@ -68,7 +68,7 @@ describe("State", function() {
     describe("clearStaleState", function() {
 
         it("should remove old state entries", function(done) {
-            
+
             let oldNow = Date.now;
             Date.now = function() {
                 return 200 * 1000; // ms
@@ -95,10 +95,10 @@ describe("State", function() {
             inMemStore.setItem("junk4", "junk");
             inMemStore.setItem(prefix + s5.id, s5.toStorageString());
             inMemStore.setItem("junk5", "junk");
-            
+
             State.clearStaleState(store, 100).then(() => {
                 Log.debug("clearStaleState done");
-                
+
                 inMemStore.length.should.equal(8);
                 inMemStore.getItem(prefix + "s4").should.be.ok;
                 inMemStore.getItem(prefix + "s5").should.be.ok;

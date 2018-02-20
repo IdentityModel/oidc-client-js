@@ -13,7 +13,7 @@ const timer = {
 let testing = false;
 let request = null;
 
-export default class Global {
+export class Global {
 
     static _testing() {
         testing = true;
@@ -52,4 +52,4 @@ export default class Global {
             return timer;
         }
     }
-};
+}

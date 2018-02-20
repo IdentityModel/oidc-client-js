@@ -1,15 +1,15 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import MetadataService from './MetadataService';
-import UserInfoService from './UserInfoService';
-import ErrorResponse from './ErrorResponse';
-import JoseUtil from './JoseUtil';
+import { Log } from './Log';
+import { MetadataService } from './MetadataService';
+import { UserInfoService } from './UserInfoService';
+import { ErrorResponse } from './ErrorResponse';
+import { JoseUtil } from './JoseUtil';
 
 const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "c_hash"];
 
-export default class ResponseValidator {
+export class ResponseValidator {
 
     constructor(settings, MetadataServiceCtor = MetadataService, UserInfoServiceCtor = UserInfoService, joseUtil = JoseUtil) {
         if (!settings) {
@@ -67,17 +67,17 @@ export default class ResponseValidator {
             Log.error("State does not match");
             return Promise.reject(new Error("State does not match"));
         }
-        
+
         if (!state.client_id) {
             Log.error("No client_id on state");
             return Promise.reject(new Error("No client_id on state"));
         }
-        
+
         if (!state.authority) {
             Log.error("No authority on state");
             return Promise.reject(new Error("No authority on state"));
         }
-        
+
         // this allows the authority to be loaded from the signin state
         if (!this._settings.authority) {
             this._settings.authority = state.authority;
@@ -96,7 +96,7 @@ export default class ResponseValidator {
             Log.error("client_id mismatch on settings vs. signin state");
             return Promise.reject(new Error("client_id mismatch on settings vs. signin state"));
         }
-        
+
         // now that we know the state matches, take the stored data
         // and set it into the response so callers can get their state
         // this is important for both success & error outcomes
@@ -237,7 +237,7 @@ export default class ResponseValidator {
             Log.error("No nonce on state");
             return Promise.reject(new Error("No nonce on state"));
         }
-        
+
         let jwt = this._joseUtil.parseJwt(response.id_token);
         if (!jwt || !jwt.header || !jwt.payload) {
             Log.error("Failed to parse id_token", jwt);
@@ -268,7 +268,7 @@ export default class ResponseValidator {
                     if (keys.length > 1) {
                         Log.error("No kid found in id_token and more than one key found in metadata");
                         return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
-                    } 
+                    }
                     else {
                         // kid is mandatory only when there are multiple keys in the referenced JWK Set document
                         // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
@@ -287,20 +287,20 @@ export default class ResponseValidator {
                 }
 
                 let audience = state.client_id;
-                
+
                 let clockSkewInSeconds = this._settings.clockSkew;
                 Log.debug("Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
                 return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{
                     Log.debug("JWT validation successful");
-                    
+
                     if (!jwt.payload.sub) {
                         Log.error("No sub present in id_token");
                         return Promise.reject(new Error("No sub present in id_token"));
                     }
 
                     response.profile = jwt.payload;
-                    
+
                     return response;
                 });
             });
@@ -324,7 +324,7 @@ export default class ResponseValidator {
             Log.debug("alg not supported: ", alg);
             return [];
         }
-        
+
         Log.debug("Looking for keys that match kty: ", kty);
 
         keys = keys.filter(key => {
