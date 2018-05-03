@@ -175,7 +175,8 @@ export default class UserManager extends OidcClient {
         return setIdToken.then(() => {
             return this._signin(args, this._iframeNavigator, {
                 startUrl: url,
-                silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
+                silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout,
+                iframeOrigin: this.settings.iframeOrigin
             });
         }).then(user => {
             if (user) {
@@ -190,9 +191,9 @@ export default class UserManager extends OidcClient {
             return user;
         });
     }
-    signinSilentCallback(url) {
+    signinSilentCallback(url, iframeParentOrigin) {
         Log.debug("UserManager.signinSilentCallback");
-        return this._signinCallback(url, this._iframeNavigator).then(user => {
+        return this._signinCallback(url, this._iframeNavigator, iframeParentOrigin).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
                     Log.info("signinSilentCallback successful, signed in sub: ", user.profile.sub);
@@ -222,7 +223,8 @@ export default class UserManager extends OidcClient {
 
         return this._signinStart(args, this._iframeNavigator, {
             startUrl: url,
-            silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
+            silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout,
+            iframeOrigin: this.settings.iframeOrigin
         }).then(navResponse => {
             return this.processSigninResponse(navResponse.url).then(signinResponse => {
                 Log.debug("got signin response");
@@ -287,9 +289,9 @@ export default class UserManager extends OidcClient {
             });
         });
     }
-    _signinCallback(url, navigator) {
+    _signinCallback(url, navigator, iframeParentOrigin) {
         Log.debug("_signinCallback");
-        return navigator.callback(url);
+        return navigator.callback(url, iframeParentOrigin);
     }
 
     signoutRedirect(args = {}) {
