@@ -7,6 +7,7 @@ import MetadataService from '../../src/MetadataService';
 import StubJsonService from './StubJsonService';
 
 import chai from 'chai';
+import { Z_NO_COMPRESSION } from 'zlib';
 chai.should();
 let assert = chai.assert;
 
@@ -43,7 +44,9 @@ describe("MetadataService", function() {
     describe("getMetadata", function() {
 
         it("should return a promise", function() {
-            subject.getMetadata().should.be.instanceof(Promise);
+            var p = subject.getMetadata();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should use metadata on settings", function(done) {
@@ -130,7 +133,9 @@ describe("MetadataService", function() {
      describe("_getMetadataProperty", function() {
 
         it("should return a promise", function() {
-            subject._getMetadataProperty().should.be.instanceof(Promise);
+            var p = subject._getMetadataProperty();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should use metadata on settings", function(done) {
@@ -285,7 +290,9 @@ describe("MetadataService", function() {
     describe("getSigningKeys", function() {
 
         it("should return a promise", function() {
-            subject.getSigningKeys().should.be.instanceof(Promise);
+            var p = subject.getSigningKeys();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should use signingKeys on settings", function(done) {

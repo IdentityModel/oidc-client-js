@@ -1,7 +1,7 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { jws, KEYUTIL as KeyUtil, X509, crypto, hextob64u } from 'jsrsasign';
+import { jws, KEYUTIL as KeyUtil, X509, crypto, hextob64u, b64tohex } from 'jsrsasign';
 import Log from './Log';
 
 const AllowedSigningAlgs = ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'ES256', 'ES384', 'ES512'];
@@ -31,7 +31,8 @@ export default class JoseUtil {
                     key = KeyUtil.getKey(key);
                 }
                 else if (key.x5c && key.x5c.length) {
-                    key = KeyUtil.getKey(X509.getPublicKeyFromCertPEM(key.x5c[0]));
+                    var hex = b64tohex(key.x5c[0]);
+                    key = X509.getPublicKeyFromCertHex(hex);
                 }
                 else {
                     Log.error("RSA key missing key material", key);
