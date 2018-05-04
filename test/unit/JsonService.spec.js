@@ -33,6 +33,7 @@ describe("JsonService", function() {
         it("should return a promise", function() {
             let p = subject.getJson("http://test");
             p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
         
         it("should make GET request to url", function() {

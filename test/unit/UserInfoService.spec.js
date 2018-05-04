@@ -42,7 +42,9 @@ describe("UserInfoService", function() {
     describe("getClaims", function() {
 
         it("should return a promise", function() {
-            subject.getClaims().should.be.instanceof(Promise);
+            var p = subject.getClaims();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should require a token", function(done) {
