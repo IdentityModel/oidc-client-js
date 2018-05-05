@@ -80,7 +80,6 @@ gulp.task('build-dist-min', ['jsrsasign'], function() {
 });
 
 var gulp = require('gulp'),
-    useref = require('gulp-useref'),
     concat = require('gulp-concat');
 
 
