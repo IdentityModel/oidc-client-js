@@ -20,14 +20,10 @@ export class AccessTokenEvents {
     }
 
     load(container) {
-        Log.debug("AccessTokenEvents.load");
-
-        this._cancelTimers();
-
         // only register events if there's an access token and it has an expiration
         if (container.access_token && container.expires_in !== undefined) {
             let duration = container.expires_in;
-            Log.debug("access token present, remaining duration:", duration);
+            Log.debug("AccessTokenEvents.load: access token present, remaining duration:", duration);
 
             if (duration > 0) {
                 // only register expiring if we still have time
@@ -35,24 +31,28 @@ export class AccessTokenEvents {
                 if (expiring <= 0){
                     expiring = 1;
                 }
-                Log.debug("registering expiring timer in:", expiring);
+                
+                Log.debug("AccessTokenEvents.load: registering expiring timer in:", expiring);
                 this._accessTokenExpiring.init(expiring);
             }
+            else {
+                Log.debug("AccessTokenEvents.load: canceling existing expiring timer becase we're past expiration.");
+                this._accessTokenExpiring.cancel();
+            }
 
-            // always register expired. if it's negative, it will still fire
+            // if it's negative, it will still fire
             let expired = duration + 1;
-            Log.debug("registering expired timer in:", expired);
+            Log.debug("AccessTokenEvents.load: registering expired timer in:", expired);
             this._accessTokenExpired.init(expired);
+        }
+        else {
+            this._accessTokenExpiring.cancel();
+            this._accessTokenExpired.cancel();
         }
     }
 
     unload() {
-        Log.debug("AccessTokenEvents.unload");
-        this._cancelTimers();
-    }
-
-    _cancelTimers(){
-        Log.debug("canceling existing access token timers");
+        Log.debug("AccessTokenEvents.unload: canceling existing access token timers");
         this._accessTokenExpiring.cancel();
         this._accessTokenExpired.cancel();
     }

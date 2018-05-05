@@ -28,10 +28,11 @@ describe("Timer", function () {
 
     let subject;
     let stubWindowTimer;
+    let now = Date.now() / 1000;
 
     beforeEach(function () {
         stubWindowTimer = new StubWindowTimer();
-        subject = new Timer("test name", stubWindowTimer);
+        subject = new Timer("test name", stubWindowTimer, () => now);
     });
 
     describe("init", function () {
@@ -57,17 +58,26 @@ describe("Timer", function () {
             stubWindowTimer.duration.should.equal(3000);
         });
 
-        it("should cancel previous timer", function () {
+        it("should cancel previous timer if new time is not the same", function () {
             subject.init(10);
             stubWindowTimer.clearTimeoutWasCalled.should.be.false;
 
+            now = now + 1;
             subject.init(10);
 
             stubWindowTimer.clearTimeoutWasCalled.should.be.true;
         });
+        
+        it("should not cancel previous timer if new time is same", function () {
+            subject.init(10);
+            stubWindowTimer.clearTimeoutWasCalled.should.be.false;
+
+            subject.init(10);
+            stubWindowTimer.clearTimeoutWasCalled.should.be.false;
+        });
     });
 
-     describe("_callback", function () {
+    describe("_callback", function () {
 
         it("should fire when timer expires", function () {
             var cb = function () {
