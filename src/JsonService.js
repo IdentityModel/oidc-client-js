@@ -26,12 +26,18 @@ export class JsonService {
                 Log.debug("HTTP response received, status", req.status);
 
                 if (req.status === 200) {
-                    try {
-                        resolve(JSON.parse(req.responseText));
+                    var contentType = req.getResponseHeader("Content-Type");
+                    if (contentType && contentType.startsWith("application/json")) {
+                        try {
+                            resolve(JSON.parse(req.responseText));
+                        }
+                        catch (e) {
+                            Log.error("Error parsing JSON response", e.message);
+                            reject(e);
+                        }
                     }
-                    catch (e) {
-                        Log.error("Error parsing JSON response", e.message);
-                        reject(e);
+                    else {
+                        reject(Error("Invalid response Content-Type: " + contentType + ", from URL: " + url));
                     }
                 }
                 else {

@@ -60,6 +60,7 @@ describe("JsonService", function() {
             });
 
             stubHttpRequest.status = 200;
+            stubHttpRequest.responseHeaders.set('Content-Type', 'application/json');
             stubHttpRequest.responseText = JSON.stringify({foo:1, bar:'test'});
             stubHttpRequest.onload();
         });
@@ -94,12 +95,30 @@ describe("JsonService", function() {
 
             stubHttpRequest.onerror();
         });
+
+        it("should reject promise when http response content type is not json", function(done) {
+            let p = subject.getJson("http://test");
+
+            p.then(result => {
+                assert.fail();
+            }, error => {
+                error.should.be.instanceof(Error);
+                error.message.indexOf('text/html').should.be.above(-1);
+                done();
+            });
+
+            stubHttpRequest.status = 200;
+            stubHttpRequest.responseHeaders.set('Content-Type', 'text/html');
+            stubHttpRequest.responseText = JSON.stringify({foo:1, bar:'test'});
+            stubHttpRequest.onload();
+        });
     });
 });
 
 class StubXMLHttpRequest {
     constructor() {
         this.headers = new Map();
+        this.responseHeaders = new Map();
     }
 
     open(method, url) {
@@ -109,6 +128,10 @@ class StubXMLHttpRequest {
 
     setRequestHeader(header, value){
         this.headers.set(header, value);
+    }
+
+    getResponseHeader(name){
+        return this.responseHeaders.get(name);
     }
 
     send() {
