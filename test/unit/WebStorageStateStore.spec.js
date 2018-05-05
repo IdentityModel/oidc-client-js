@@ -24,7 +24,9 @@ describe("WebStorageStateStore", function() {
     describe("set", function() {
 
         it("should return a promise", function() {
-            subject.set("key", "value").should.be.instanceof(Promise);
+            var p = subject.set("key", "value");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should store item", function(done) {
@@ -49,7 +51,9 @@ describe("WebStorageStateStore", function() {
     describe("remove", function() {
 
         it("should return a promise", function() {
-            subject.remove("key").should.be.instanceof(Promise);
+            var p = subject.remove("key");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should remove item", function(done) {
@@ -94,7 +98,8 @@ describe("WebStorageStateStore", function() {
     describe("get", function() {
 
         it("should return a promise", function() {
-            subject.get("key").should.be.instanceof(Promise);
+            var p = subject.get("key");
+            p.should.be.instanceof(Promise);
         });
 
         it("should return value if exists", function(done) {
@@ -130,7 +135,9 @@ describe("WebStorageStateStore", function() {
     describe("getAllKeys", function() {
 
         it("should return a promise", function() {
-            subject.getAllKeys().should.be.instanceof(Promise);
+            var p = subject.getAllKeys();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should return keys", function(done) {

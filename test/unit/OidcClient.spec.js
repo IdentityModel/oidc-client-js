@@ -20,6 +20,7 @@ import { StubStateStore } from './StubStateStore';
 import { StubResponseValidator } from './StubResponseValidator';
 
 import chai from 'chai';
+import { Z_NO_COMPRESSION } from 'zlib';
 chai.should();
 let assert = chai.assert;
 
@@ -98,7 +99,9 @@ describe("OidcClient", function () {
 
         it("should return a promise", function () {
             stubMetadataService.getAuthorizationEndpointResult = Promise.resolve("http://sts/authorize");
-            subject.createSigninRequest().should.be.instanceof(Promise);
+            var p = subject.createSigninRequest();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should return SigninRequest", function (done) {
@@ -234,7 +237,9 @@ describe("OidcClient", function () {
     describe("processSigninResponse", function () {
 
         it("should return a promise", function () {
-            subject.processSigninResponse("state=state").should.be.instanceof(Promise);
+            var p = subject.processSigninResponse("state=state");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should fail if no state on response", function (done) {
@@ -273,7 +278,9 @@ describe("OidcClient", function () {
 
         it("should return a promise", function () {
             stubMetadataService.getEndSessionEndpointResult = Promise.resolve("http://sts/signout");
-            subject.createSignoutRequest().should.be.instanceof(Promise);
+            var p = subject.createSignoutRequest();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should return SignoutRequest", function (done) {
@@ -375,7 +382,9 @@ describe("OidcClient", function () {
     describe("processSignoutResponse", function () {
 
         it("should return a promise", function () {
-            subject.processSignoutResponse("state=state").should.be.instanceof(Promise);
+            var p = subject.processSignoutResponse("state=state");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should return result if no state on response", function (done) {
@@ -427,7 +436,9 @@ describe("OidcClient", function () {
     describe("clearStaleState", function () {
 
         it("should return a promise", function () {
-            subject.clearStaleState().should.be.instanceof(Promise);
+            var p = subject.clearStaleState();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should call State.clearStaleState", function () {

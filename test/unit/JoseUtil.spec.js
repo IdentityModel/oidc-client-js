@@ -104,14 +104,14 @@ describe("JoseUtil", function () {
 
     describe("validateJwt", function () {
 
-        it("should validate from RSA X509 key", function (done) {
-
+        it("should validate from RSA X509 key", function (done, fail) {
+            Log.level = Log.DEBUG;
             delete rsaKey.n;
             delete rsaKey.e;
 
             JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow).then(()=>{
                 done();
-            })
+            });
 
         });
 
