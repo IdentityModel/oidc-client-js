@@ -24,8 +24,8 @@ export class AccessTokenEvents {
 
         this._cancelTimers();
 
-        // only register events if there's an access token where we care about expiration
-        if (container.access_token) {
+        // only register events if there's an access token and it has an expiration
+        if (container.access_token && container.expires_in !== undefined) {
             let duration = container.expires_in;
             Log.debug("access token present, remaining duration:", duration);
 

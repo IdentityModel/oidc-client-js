@@ -102,6 +102,14 @@ describe("AccessTokenEvents", function () {
             assert.isUndefined(accessTokenExpiredTimer.duration);
         });
 
+        it("should not initialize timers if no expiration on access token", function () {
+            subject.load({
+                access_token:"token"
+            });
+
+            assert.isUndefined(accessTokenExpiringTimer.duration);
+            assert.isUndefined(accessTokenExpiredTimer.duration);
+        });
     });
 
     describe("unload", function () {
