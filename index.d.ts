@@ -81,8 +81,8 @@ export interface MetadataServiceCtor {
 }
 
 export interface ResponseValidator {
-  validateSigninResponse(state: any, response: any): Promise<any>;
-  validateSignoutResponse(state: any, response: any): Promise<any>;
+  validateSigninResponse(state: any, response: any): Promise<SigninResponse>;
+  validateSignoutResponse(state: any, response: any): Promise<SignoutRespsone>;
 }
 
 export interface ResponseValidatorCtor {
@@ -105,10 +105,10 @@ export class OidcClient {
   readonly settings: OidcClientSettings;
 
   createSigninRequest(args?: any): Promise<SigninRequest>;
-  processSigninResponse(): Promise<SigninResponse>;
+  processSigninResponse(url: string, stateStore: StateStore): Promise<SigninResponse>;
 
   createSignoutRequest(args?: any): Promise<SignoutRequest>;
-  processSignoutResponse(): Promise<SigninResponse>;
+  processSignoutResponse(url: string, stateStore: StateStore): Promise<SignoutResponse>;
 
   clearStaleState(stateStore: StateStore): Promise<any>;
 }
@@ -260,6 +260,15 @@ export interface SigninResponse {
   readonly expires_in: number | undefined;
   readonly isOpenIdConnect: boolean;
   readonly scopes: string[];
+}
+
+export interface SignoutRespsone {
+  new (url: string): SignoutResponse;
+
+  error: string;
+  error_description: string;
+  error_uri: string;
+  state: any;
 }
 
 export class User {
