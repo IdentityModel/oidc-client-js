@@ -19,6 +19,8 @@ export class SessionMonitor {
         this._userManager.events.addUserUnloaded(this._stop.bind(this));
 
         this._userManager.getUser().then(user => {
+            // doing this manually here since calling getUser 
+            // doesn't trigger load event.
             if (user) {
                 this._start(user);
             }
@@ -40,6 +42,9 @@ export class SessionMonitor {
     get _checkSessionInterval() {
         return this._settings.checkSessionInterval;
     }
+    get _stopCheckSessionOnError() {
+        return this._settings.stopCheckSessionOnError;
+    }
 
     _start(user) {
         let session_state = user.session_state;
@@ -56,8 +61,9 @@ export class SessionMonitor {
 
                         let client_id = this._client_id;
                         let interval = this._checkSessionInterval;
+                        let stopOnError = this._stopCheckSessionOnError;
 
-                        this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval);
+                        this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval, stopOnError);
                         this._checkSessionIFrame.load().then(() => {
                             this._checkSessionIFrame.start(session_state);
                         });

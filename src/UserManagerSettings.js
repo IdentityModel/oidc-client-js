@@ -24,6 +24,7 @@ export class UserManagerSettings extends OidcClientSettings {
         includeIdTokenInSilentRenew = true,
         monitorSession = true,
         checkSessionInterval = DefaultCheckSessionInterval,
+        stopCheckSessionOnError = true,
         revokeAccessTokenOnSignout = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
@@ -46,6 +47,7 @@ export class UserManagerSettings extends OidcClientSettings {
 
         this._monitorSession = monitorSession;
         this._checkSessionInterval = checkSessionInterval;
+        this._stopCheckSessionOnError = stopCheckSessionOnError;
         this._revokeAccessTokenOnSignout = revokeAccessTokenOnSignout;
 
         this._redirectNavigator = redirectNavigator;
@@ -89,6 +91,9 @@ export class UserManagerSettings extends OidcClientSettings {
     }
     get checkSessionInterval() {
         return this._checkSessionInterval;
+    }
+    get stopCheckSessionOnError(){
+        return this._stopCheckSessionOnError;
     }
     get revokeAccessTokenOnSignout() {
         return this._revokeAccessTokenOnSignout;

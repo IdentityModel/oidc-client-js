@@ -6,11 +6,12 @@ import { Log } from './Log';
 const DefaultInterval = 2000;
 
 export class CheckSessionIFrame {
-    constructor(callback, client_id, url, interval) {
+    constructor(callback, client_id, url, interval, stopOnError = true) {
         this._callback = callback;
         this._client_id = client_id;
         this._url = url;
         this._interval = interval || DefaultInterval;
+        this._stopOnError = stopOnError;
 
         var idx = url.indexOf("/", url.indexOf("//") + 2);
         this._frame_origin = url.substr(0, idx);
@@ -42,8 +43,10 @@ export class CheckSessionIFrame {
             e.source === this._frame.contentWindow
         ) {
             if (e.data === "error") {
-                Log.error("error message from check session op iframe");
-                this.stop();
+                Log.error("CheckSessionIFrame: error message from check session op iframe");
+                if (this._stopOnError) {
+                    this.stop();
+                }
             }
             else if (e.data === "changed") {
                 Log.debug("CheckSessionIFrame: changed message from check session op iframe");

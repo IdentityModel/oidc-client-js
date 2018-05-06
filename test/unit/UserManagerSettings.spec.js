@@ -200,4 +200,18 @@ describe("UserManagerSettings", function () {
             subject.checkSessionInterval.should.equal(2000);
         });
     });
+
+    describe("stopCheckSessionOnError", function() {
+        it("should return value from initial settings", function() {
+            let subject = new UserManagerSettings({
+                stopCheckSessionOnError : false
+            });
+            subject.stopCheckSessionOnError.should.be.false;
+        });
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.stopCheckSessionOnError.should.be.true;
+        });
+    });
 });
