@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var concat = require('gulp-concat');
 var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 var createWebpackConfig = require('./webpack.base');
@@ -79,10 +80,7 @@ gulp.task('build-dist-min', ['jsrsasign'], function() {
   .pipe(gulp.dest('dist/'));
 });
 
-var gulp = require('gulp'),
-    concat = require('gulp-concat');
-
-
+// this is used to manually build jsrsasign with the fewest modules to reduce its size
 var files = [
      'jsrsasign/header.js'
 
