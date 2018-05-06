@@ -82,7 +82,7 @@ export interface MetadataServiceCtor {
 
 export interface ResponseValidator {
   validateSigninResponse(state: any, response: any): Promise<SigninResponse>;
-  validateSignoutResponse(state: any, response: any): Promise<SignoutResposne>;
+  validateSignoutResponse(state: any, response: any): Promise<SignoutResponse>;
 }
 
 export interface ResponseValidatorCtor {
@@ -262,7 +262,7 @@ export interface SigninResponse {
   readonly scopes: string[];
 }
 
-export interface SignoutRespsone {
+export interface SignoutResponse {
   new (url: string): SignoutResponse;
 
   error: string;
