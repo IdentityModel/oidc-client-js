@@ -27,12 +27,12 @@ export class UserManager extends OidcClient {
 
         // order is important for the following properties; these services depend upon the events.
         if (this.settings.automaticSilentRenew) {
-            Log.debug("automaticSilentRenew is configured, setting up silent renew");
+            Log.debug("UserManager.ctor: automaticSilentRenew is configured, setting up silent renew");
             this.startSilentRenew();
         }
 
         if (this.settings.monitorSession) {
-            Log.debug("monitorSession is configured, setting up session monitor");
+            Log.debug("UserManager.ctor: monitorSession is configured, setting up session monitor");
             this._sessionMonitor = new SessionMonitorCtor(this);
         }
 
@@ -57,47 +57,41 @@ export class UserManager extends OidcClient {
     }
 
     getUser() {
-        Log.debug("UserManager.getUser");
-
         return this._loadUser().then(user => {
             if (user) {
-                Log.info("user loaded");
+                Log.info("UserManager.getUser: user loaded");
 
                 this._events.load(user, false);
 
                 return user;
             }
             else {
-                Log.info("user not found in storage");
+                Log.info("UserManager.getUser: user not found in storage");
                 return null;
             }
         });
     }
 
     removeUser() {
-        Log.debug("UserManager.removeUser");
-
         return this.storeUser(null).then(() => {
-            Log.info("user removed from storage");
+            Log.info("UserManager.removeUser: user removed from storage");
             this._events.unload();
         });
     }
 
     signinRedirect(args) {
-        Log.debug("UserManager.signinRedirect");
         return this._signinStart(args, this._redirectNavigator).then(()=>{
-            Log.info("signinRedirect successful");
+            Log.info("UserManager.signinRedirect: successful");
         });
     }
     signinRedirectCallback(url) {
-        Log.debug("UserManager.signinRedirectCallback");
         return this._signinEnd(url || this._redirectNavigator.url).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
-                    Log.info("signinRedirectCallback successful, signed in sub: ", user.profile.sub);
+                    Log.info("UserManager.signinRedirectCallback: successful, signed in sub: ", user.profile.sub);
                 }
                 else {
-                    Log.info("signinRedirectCallback successful");
+                    Log.info("UserManager.signinRedirectCallback: no sub");
                 }
             }
 
@@ -106,11 +100,9 @@ export class UserManager extends OidcClient {
     }
 
     signinPopup(args = {}) {
-        Log.debug("UserManager.signinPopup");
-
         let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
         if (!url) {
-            Log.error("No popup_redirect_uri or redirect_uri configured");
+            Log.error("UserManager.signinPopup: No popup_redirect_uri or redirect_uri configured");
             return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
         }
 
@@ -124,10 +116,10 @@ export class UserManager extends OidcClient {
         }).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
-                    Log.info("signinPopup successful, signed in sub: ", user.profile.sub);
+                    Log.info("UserManager.signinPopup: signinPopup successful, signed in sub: ", user.profile.sub);
                 }
                 else {
-                    Log.info("signinPopup successful");
+                    Log.info("UserManager.signinPopup: no sub");
                 }
             }
 
@@ -135,14 +127,13 @@ export class UserManager extends OidcClient {
         });
     }
     signinPopupCallback(url) {
-        Log.debug("UserManager.signinPopupCallback");
         return this._signinCallback(url, this._popupNavigator).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
-                    Log.info("signinPopupCallback successful, signed in sub: ", user.profile.sub);
+                    Log.info("UserManager.signinPopupCallback: successful, signed in sub: ", user.profile.sub);
                 }
                 else {
-                    Log.info("signinPopupCallback successful");
+                    Log.info("UserManager.signinPopupCallback: no sub");
                 }
             }
 
@@ -151,11 +142,9 @@ export class UserManager extends OidcClient {
     }
 
     signinSilent(args = {}) {
-        Log.debug("UserManager.signinSilent");
-
         let url = args.redirect_uri || this.settings.silent_redirect_uri;
         if (!url) {
-            Log.error("No silent_redirect_uri configured");
+            Log.error("UserManager.signinSilent: No silent_redirect_uri configured");
             return Promise.reject(new Error("No silent_redirect_uri configured"));
         }
 
@@ -180,10 +169,10 @@ export class UserManager extends OidcClient {
         }).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
-                    Log.info("signinSilent successful, signed in sub: ", user.profile.sub);
+                    Log.info("UserManager.signinSilent: successful, signed in sub: ", user.profile.sub);
                 }
                 else {
-                    Log.info("signinSilent successful");
+                    Log.info("UserManager.signinSilent: no sub");
                 }
             }
 
@@ -191,14 +180,13 @@ export class UserManager extends OidcClient {
         });
     }
     signinSilentCallback(url) {
-        Log.debug("UserManager.signinSilentCallback");
         return this._signinCallback(url, this._iframeNavigator).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
-                    Log.info("signinSilentCallback successful, signed in sub: ", user.profile.sub);
+                    Log.info("UserManager.signinSilentCallback: successful, signed in sub: ", user.profile.sub);
                 }
                 else {
-                    Log.info("signinSilentCallback successful");
+                    Log.info("UserManager.signinSilentCallback: no sub");
                 }
             }
 
@@ -207,11 +195,9 @@ export class UserManager extends OidcClient {
     }
 
     querySessionStatus(args = {}) {
-        Log.debug("UserManager.querySessionStatus");
-
         let url = args.redirect_uri || this.settings.silent_redirect_uri;
         if (!url) {
-            Log.error("No silent_redirect_uri configured");
+            Log.error("UserManager.querySessionStatus: No silent_redirect_uri configured");
             return Promise.reject(new Error("No silent_redirect_uri configured"));
         }
 
@@ -225,10 +211,10 @@ export class UserManager extends OidcClient {
             silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
         }).then(navResponse => {
             return this.processSigninResponse(navResponse.url).then(signinResponse => {
-                Log.debug("got signin response");
+                Log.debug("UserManager.querySessionStatus: got signin response");
 
                 if (signinResponse.session_state && signinResponse.profile.sub && signinResponse.profile.sid) {
-                    Log.info("querySessionStatus success for sub: ",  signinResponse.profile.sub);
+                    Log.info("UserManager.querySessionStatus: querySessionStatus success for sub: ",  signinResponse.profile.sub);
                     return {
                         session_state: signinResponse.session_state,
                         sub: signinResponse.profile.sub,
@@ -243,19 +229,17 @@ export class UserManager extends OidcClient {
     }
 
     _signin(args, navigator, navigatorParams = {}) {
-        Log.debug("_signin");
         return this._signinStart(args, navigator, navigatorParams).then(navResponse => {
             return this._signinEnd(navResponse.url);
         });
     }
     _signinStart(args, navigator, navigatorParams = {}) {
-        Log.debug("_signinStart");
 
         return navigator.prepare(navigatorParams).then(handle => {
-            Log.debug("got navigator window handle");
+            Log.debug("UserManager._signinStart: got navigator window handle");
 
             return this.createSigninRequest(args).then(signinRequest => {
-                Log.debug("got signin request");
+                Log.debug("UserManager._signinStart: got signin request");
 
                 navigatorParams.url = signinRequest.url;
                 navigatorParams.id = signinRequest.state.id;
@@ -263,7 +247,7 @@ export class UserManager extends OidcClient {
                 return handle.navigate(navigatorParams);
             }).catch(err => {
                 if (handle.close) {
-                    Log.debug("Error after preparing navigator, closing navigator window");
+                    Log.debug("UserManager._signinStart: Error after preparing navigator, closing navigator window");
                     handle.close();
                 }
                 throw err;
@@ -271,15 +255,13 @@ export class UserManager extends OidcClient {
         });
     }
     _signinEnd(url) {
-        Log.debug("_signinEnd");
-
         return this.processSigninResponse(url).then(signinResponse => {
-            Log.debug("got signin response");
+            Log.debug("UserManager._signinEnd: got signin response");
 
             let user = new User(signinResponse);
 
             return this.storeUser(user).then(() => {
-                Log.debug("user stored");
+                Log.debug("UserManager._signinEnd: user stored");
 
                 this._events.load(user);
 
@@ -288,31 +270,27 @@ export class UserManager extends OidcClient {
         });
     }
     _signinCallback(url, navigator) {
-        Log.debug("_signinCallback");
+        Log.debug("UserManager._signinCallback");
         return navigator.callback(url);
     }
 
     signoutRedirect(args = {}) {
-        Log.debug("UserManager.signoutRedirect");
         let postLogoutRedirectUri = args.post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
         if (postLogoutRedirectUri){
             args.post_logout_redirect_uri = postLogoutRedirectUri;
         }
         return this._signoutStart(args, this._redirectNavigator).then(()=>{
-            Log.info("signoutRedirect successful");
+            Log.info("UserManager.signoutRedirect: successful");
         });
     }
     signoutRedirectCallback(url) {
-        Log.debug("UserManager.signoutRedirectCallback");
         return this._signoutEnd(url || this._redirectNavigator.url).then(response=>{
-            Log.info("signoutRedirectCallback successful");
+            Log.info("UserManager.signoutRedirectCallback: successful");
             return response;
         });
     }
 
     signoutPopup(args = {}) {
-        Log.debug("UserManager.signinPopup");
-
         let url = args.post_logout_redirect_uri || this.settings.popup_post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
         args.post_logout_redirect_uri = url;
         args.display = "popup";
@@ -330,7 +308,7 @@ export class UserManager extends OidcClient {
             popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
             popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
         }).then(() => {
-            Log.info("signoutPopup successful");
+            Log.info("UserManager.signinPopup: successful");
         });
     }
     signoutPopupCallback(url, keepOpen) {
@@ -338,42 +316,39 @@ export class UserManager extends OidcClient {
             url = null;
             keepOpen = true;
         }
-        Log.debug("UserManager.signoutPopupCallback");
+
         let delimiter = '?';
         return this._popupNavigator.callback(url, keepOpen, delimiter).then(() => {
-            Log.info("signoutPopupCallback successful");
+            Log.info("UserManager.signoutPopupCallback: successful");
         });
     }
 
     _signout(args, navigator, navigatorParams = {}) {
-        Log.debug("_signout");
         return this._signoutStart(args, navigator, navigatorParams).then(navResponse => {
             return this._signoutEnd(navResponse.url);
         });
     }
     _signoutStart(args = {}, navigator, navigatorParams = {}) {
-        Log.debug("_signoutStart");
-
         return navigator.prepare(navigatorParams).then(handle => {
-            Log.debug("got navigator window handle");
+            Log.debug("UserManager._signoutStart: got navigator window handle");
 
             return this._loadUser().then(user => {
-                Log.debug("loaded current user from storage");
+                Log.debug("UserManager._signoutStart: loaded current user from storage");
 
                 var revokePromise = this._settings.revokeAccessTokenOnSignout ? this._revokeInternal(user) : Promise.resolve();
                 return revokePromise.then(() => {
 
                     var id_token = args.id_token_hint || user && user.id_token;
                     if (id_token) {
-                        Log.debug("Setting id_token into signout request");
+                        Log.debug("UserManager._signoutStart: Setting id_token into signout request");
                         args.id_token_hint = id_token;
                     }
 
                     return this.removeUser().then(() => {
-                        Log.debug("user removed, creating signout request");
+                        Log.debug("UserManager._signoutStart: user removed, creating signout request");
 
                         return this.createSignoutRequest(args).then(signoutRequest => {
-                            Log.debug("got signout request");
+                            Log.debug("UserManager._signoutStart: got signout request");
 
                             navigatorParams.url = signoutRequest.url;
                             if (signoutRequest.state) {
@@ -385,7 +360,7 @@ export class UserManager extends OidcClient {
                 });
             }).catch(err => {
                 if (handle.close) {
-                    Log.debug("Error after preparing navigator, closing navigator window");
+                    Log.debug("UserManager._signoutStart: Error after preparing navigator, closing navigator window");
                     handle.close();
                 }
                 throw err;
@@ -393,46 +368,40 @@ export class UserManager extends OidcClient {
         });
     }
     _signoutEnd(url) {
-        Log.debug("_signoutEnd");
-
         return this.processSignoutResponse(url).then(signoutResponse => {
-            Log.debug("got signout response");
+            Log.debug("UserManager._signoutEnd: got signout response");
 
             return signoutResponse;
         });
     }
 
     revokeAccessToken() {
-        Log.debug("UserManager.revokeAccessToken");
-
         return this._loadUser().then(user => {
             return this._revokeInternal(user, true).then(success => {
                 if (success) {
-                    Log.debug("removing token properties from user and re-storing");
+                    Log.debug("UserManager.revokeAccessToken: removing token properties from user and re-storing");
 
                     user.access_token = null;
                     user.expires_at = null;
                     user.token_type = null;
 
                     return this.storeUser(user).then(() => {
-                        Log.debug("user stored");
+                        Log.debug("UserManager.revokeAccessToken: user stored");
                         this._events.load(user);
                     });
                 }
             });
         }).then(()=>{
-            Log.info("access token revoked successfully");
+            Log.info("UserManager.revokeAccessToken: access token revoked successfully");
         });
     }
 
     _revokeInternal(user, required) {
-        Log.debug("checking if token revocation is necessary");
-
         var access_token = user && user.access_token;
 
         // check for JWT vs. reference token
         if (!access_token || access_token.indexOf('.') >= 0) {
-            Log.debug("no need to revoke due to no user, token, or JWT format");
+            Log.debug("UserManager.revokeAccessToken: no need to revoke due to no user, token, or JWT format");
             return Promise.resolve(false);
         }
 
@@ -452,28 +421,26 @@ export class UserManager extends OidcClient {
     }
 
     _loadUser() {
-        Log.debug("_loadUser");
-
         return this._userStore.get(this._userStoreKey).then(storageString => {
             if (storageString) {
-                Log.debug("user storageString loaded");
+                Log.debug("UserManager._loadUser: user storageString loaded");
                 return User.fromStorageString(storageString);
             }
 
-            Log.debug("no user storageString");
+            Log.debug("UserManager._loadUser: no user storageString");
             return null;
         });
     }
 
     storeUser(user) {
         if (user) {
-            Log.debug("storeUser storing user");
+            Log.debug("UserManager.storeUser: storing user");
 
             var storageString = user.toStorageString();
             return this._userStore.set(this._userStoreKey, storageString);
         }
         else {
-            Log.debug("storeUser removing user storage");
+            Log.debug("storeUser.storeUser: removing user");
             return this._userStore.remove(this._userStoreKey);
         }
     }

@@ -42,12 +42,11 @@ export class State {
     }
 
     static clearStaleState(storage, age) {
-        Log.debug("State.clearStaleState");
 
         var cutoff = Date.now() / 1000 - age;
 
         return storage.getAllKeys().then(keys => {
-            Log.debug("got keys", keys);
+            Log.debug("State.clearStaleState: got keys", keys);
 
             var promises = [];
             for (let i = 0; i < keys.length; i++) {
@@ -59,24 +58,24 @@ export class State {
                         try {
                             var state = State.fromStorageString(item)
 
-                            Log.debug("got item from key: ", key, state.created);
+                            Log.debug("State.clearStaleState: got item from key: ", key, state.created);
 
                             if (state.created <= cutoff) {
                                 remove = true;
                             }
                         }
                         catch (e) {
-                            Log.error("Error parsing state for key", key, e.message);
+                            Log.error("State.clearStaleState: Error parsing state for key", key, e.message);
                             remove = true;
                         }
                     }
                     else {
-                        Log.debug("no item in storage for key: ", key);
+                        Log.debug("State.clearStaleState: no item in storage for key: ", key);
                         remove = true;
                     }
 
                     if (remove) {
-                        Log.debug("removed item for key: ", key);
+                        Log.debug("State.clearStaleState: removed item for key: ", key);
                         return storage.remove(key);
                     }
                 });
@@ -84,7 +83,7 @@ export class State {
                 promises.push(p);
             }
 
-            Log.debug("waiting on promise count:", promises.length);
+            Log.debug("State.clearStaleState: waiting on promise count:", promises.length);
             return Promise.all(promises);
         });
     }

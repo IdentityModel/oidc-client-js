@@ -22,7 +22,7 @@ export class Event {
     }
 
     raise(...params) {
-        Log.debug("Raising event: " + this._name);
+        Log.debug("Event: Raising event: " + this._name);
         for (let i = 0; i < this._callbacks.length; i++) {
             this._callbacks[i](...params);
         }

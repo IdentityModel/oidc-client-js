@@ -14,27 +14,27 @@ export class SigninRequest {
         request, request_uri, extraQueryParams,
     }) {
         if (!url) {
-            Log.error("No url passed to SigninRequest");
+            Log.error("SigninRequest.ctor: No url passed");
             throw new Error("url");
         }
         if (!client_id) {
-            Log.error("No client_id passed to SigninRequest");
+            Log.error("SigninRequest.ctor: No client_id passed");
             throw new Error("client_id");
         }
         if (!redirect_uri) {
-            Log.error("No redirect_uri passed to SigninRequest");
+            Log.error("SigninRequest.ctor: No redirect_uri passed");
             throw new Error("redirect_uri");
         }
         if (!response_type) {
-            Log.error("No response_type passed to SigninRequest");
+            Log.error("SigninRequest.ctor: No response_type passed");
             throw new Error("response_type");
         }
         if (!scope) {
-            Log.error("No scope passed to SigninRequest");
+            Log.error("SigninRequest.ctor: No scope passed");
             throw new Error("scope");
         }
         if (!authority) {
-            Log.error("No authority passed to SigninRequest");
+            Log.error("SigninRequest.ctor: No authority passed");
             throw new Error("authority");
         }
 

@@ -9,8 +9,6 @@ const DefaultPopupTarget = "_blank";
 export class CordovaPopupWindow {
 
     constructor(params) {
-        Log.debug("CordovaPopupWindow.ctor");
-
         this._promise = new Promise((resolve, reject) => {
             this._resolve = resolve;
             this._reject = reject;
@@ -20,7 +18,7 @@ export class CordovaPopupWindow {
         this.target = params.popupWindowTarget || DefaultPopupTarget;
         
         this.redirect_uri = params.startUrl;
-        Log.debug("redirect_uri: " + this.redirect_uri);
+        Log.debug("CordovaPopupWindow.ctor: redirect_uri: " + this.redirect_uri);
     }
 
     _isInAppBrowserInstalled(cordovaMetadata) {
@@ -30,8 +28,6 @@ export class CordovaPopupWindow {
     }
     
     navigate(params) {
-        Log.debug("CordovaPopupWindow.navigate");
-
         if (!params || !params.url) {
             this._error("No url provided");
         } else {
@@ -45,7 +41,7 @@ export class CordovaPopupWindow {
             }
             this._popup = cordova.InAppBrowser.open(params.url, this.target, this.features);
             if (this._popup) {
-                Log.debug("popup successfully created");
+                Log.debug("CordovaPopupWindow.navigate: popup successfully created");
                 
                 this._exitCallbackEvent = this._exitCallback.bind(this); 
                 this._loadStartCallbackEvent = this._loadStartCallback.bind(this);
@@ -75,7 +71,7 @@ export class CordovaPopupWindow {
     _success(data) {
         this._cleanup();
 
-        Log.debug("Successful response from cordova popup window");
+        Log.debug("CordovaPopupWindow: Successful response from cordova popup window");
         this._resolve(data);
     }
     _error(message) {
@@ -90,9 +86,8 @@ export class CordovaPopupWindow {
     }
 
     _cleanup() {
-        Log.debug("CordovaPopupWindow._cleanup");
-
         if (this._popup){
+            Log.debug("CordovaPopupWindow: cleaning up popup");
             this._popup.removeEventListener("exit", this._exitCallbackEvent, false);
             this._popup.removeEventListener("loadstart", this._loadStartCallbackEvent, false);
             this._popup.close();

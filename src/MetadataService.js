@@ -9,7 +9,7 @@ const OidcMetadataUrlPath = '.well-known/openid-configuration';
 export class MetadataService {
     constructor(settings, JsonServiceCtor = JsonService) {
         if (!settings) {
-            Log.error("No settings passed to MetadataService");
+            Log.error("MetadataService: No settings passed to MetadataService");
             throw new Error("settings");
         }
 
@@ -38,77 +38,68 @@ export class MetadataService {
     }
 
     getMetadata() {
-        Log.debug("MetadataService.getMetadata");
-
         if (this._settings.metadata) {
-            Log.debug("Returning metadata from settings");
+            Log.debug("MetadataService.getMetadata: Returning metadata from settings");
             return Promise.resolve(this._settings.metadata);
         }
 
         if (!this.metadataUrl) {
-            Log.error("No authority or metadataUrl configured on settings");
+            Log.error("MetadataService.getMetadata: No authority or metadataUrl configured on settings");
             return Promise.reject(new Error("No authority or metadataUrl configured on settings"));
         }
 
-        Log.debug("getting metadata from", this.metadataUrl);
+        Log.debug("MetadataService.getMetadata: getting metadata from", this.metadataUrl);
 
         return this._jsonService.getJson(this.metadataUrl)
             .then(metadata => {
-                Log.debug("json received");
+                Log.debug("MetadataService.getMetadata: json received");
                 this._settings.metadata = metadata;
                 return metadata;
             });
     }
 
     getIssuer() {
-        Log.debug("MetadataService.getIssuer");
         return this._getMetadataProperty("issuer");
     }
 
     getAuthorizationEndpoint() {
-        Log.debug("MetadataService.getAuthorizationEndpoint");
         return this._getMetadataProperty("authorization_endpoint");
     }
 
     getUserInfoEndpoint() {
-        Log.debug("MetadataService.getUserInfoEndpoint");
         return this._getMetadataProperty("userinfo_endpoint");
     }
 
     getTokenEndpoint() {
-        Log.debug("MetadataService.getTokenEndpoint");
         return this._getMetadataProperty("token_endpoint", true);
     }
 
     getCheckSessionIframe() {
-        Log.debug("MetadataService.getCheckSessionIframe");
         return this._getMetadataProperty("check_session_iframe", true);
     }
 
     getEndSessionEndpoint() {
-        Log.debug("MetadataService.getEndSessionEndpoint");
         return this._getMetadataProperty("end_session_endpoint", true);
     }
 
     getRevocationEndpoint() {
-        Log.debug("MetadataService.getRevocationEndpoint");
         return this._getMetadataProperty("revocation_endpoint", true);
     }
 
     _getMetadataProperty(name, optional=false) {
-        Log.debug("MetadataService._getMetadataProperty", name);
+        Log.debug("MetadataService.getMetadataProperty for: " + name);
 
         return this.getMetadata().then(metadata => {
-            Log.debug("metadata recieved");
+            Log.debug("MetadataService.getMetadataProperty: metadata recieved");
 
             if (metadata[name] === undefined) {
 
                 if (optional === true) {
-                    Log.warn("Metadata does not contain optional property " + name);
+                    Log.warn("MetadataService.getMetadataProperty: Metadata does not contain optional property " + name);
                     return undefined;
                 }
                 else {
-                    Log.error("Metadata does not contain property " + name);
+                    Log.error("MetadataService.getMetadataProperty: Metadata does not contain property " + name);
                     throw new Error("Metadata does not contain property " + name);
                 }
             }
@@ -118,21 +109,19 @@ export class MetadataService {
     }
 
     getSigningKeys() {
-        Log.debug("MetadataService.getSigningKeys");
-
         if (this._settings.signingKeys) {
-            Log.debug("Returning signingKeys from settings");
+            Log.debug("MetadataService.getSigningKeys: Returning signingKeys from settings");
             return Promise.resolve(this._settings.signingKeys);
         }
 
         return this._getMetadataProperty("jwks_uri").then(jwks_uri => {
-            Log.debug("jwks_uri received", jwks_uri);
+            Log.debug("MetadataService.getSigningKeys: jwks_uri received", jwks_uri);
 
             return this._jsonService.getJson(jwks_uri).then(keySet => {
-                Log.debug("key set received", keySet);
+                Log.debug("MetadataService.getSigningKeys: key set received", keySet);
 
                 if (!keySet.keys) {
-                    Log.error("Missing keys on keyset");
+                    Log.error("MetadataService.getSigningKeys: Missing keys on keyset");
                     throw new Error("Missing keys on keyset");
                 }
 

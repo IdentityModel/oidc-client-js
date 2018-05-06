@@ -66,7 +66,7 @@ export class OidcClient {
         let authority = this._settings.authority;
 
         return this._metadataService.getAuthorizationEndpoint().then(url => {
-            Log.debug("Received authorization endpoint", url);
+            Log.debug("OidcClient.createSigninRequest: Received authorization endpoint", url);
 
             let signinRequest = new SigninRequest({
                 url,
@@ -95,7 +95,7 @@ export class OidcClient {
         var response = new SigninResponse(url);
 
         if (!response.state) {
-            Log.error("No state in response");
+            Log.error("OidcClient.processSigninResponse: No state in response");
             return Promise.reject(new Error("No state in response"));
         }
 
@@ -103,13 +103,13 @@ export class OidcClient {
 
         return stateStore.remove(response.state).then(storedStateString => {
             if (!storedStateString) {
-                Log.error("No matching state found in storage");
+                Log.error("OidcClient.processSigninResponse: No matching state found in storage");
                 throw new Error("No matching state found in storage");
             }
 
             let state = SigninState.fromStorageString(storedStateString);
 
-            Log.debug("Received state from storage; validating response");
+            Log.debug("OidcClient.processSigninResponse: Received state from storage; validating response");
             return this._validator.validateSigninResponse(state, response);
         });
     }
@@ -123,11 +123,11 @@ export class OidcClient {
 
         return this._metadataService.getEndSessionEndpoint().then(url => {
             if (!url) {
-                Log.error("No end session endpoint url returned");
+                Log.error("OidcClient.createSignoutRequest: No end session endpoint url returned");
                 throw new Error("no end session endpoint");
             }
 
-            Log.debug("Received end session endpoint", url);
+            Log.debug("OidcClient.createSignoutRequest: Received end session endpoint", url);
 
             let request = new SignoutRequest({
                 url,
@@ -138,7 +138,7 @@ export class OidcClient {
 
             var signoutState = request.state;
             if (signoutState) {
-                Log.debug("Signout request has state to persist");
+                Log.debug("OidcClient.createSignoutRequest: Signout request has state to persist");
 
                 stateStore = stateStore || this._stateStore;
                 stateStore.set(signoutState.id, signoutState.toStorageString());
@@ -153,10 +153,10 @@ export class OidcClient {
 
         var response = new SignoutResponse(url);
         if (!response.state) {
-            Log.debug("No state in response");
+            Log.debug("OidcClient.processSignoutResponse: No state in response");
 
             if (response.error) {
-                Log.warn("Response was error", response.error);
+                Log.warn("OidcClient.processSignoutResponse: Response was error: ", response.error);
                 return Promise.reject(new ErrorResponse(response));
             }
 
@@ -169,13 +169,13 @@ export class OidcClient {
 
         return stateStore.remove(stateKey).then(storedStateString => {
             if (!storedStateString) {
-                Log.error("No matching state found in storage");
+                Log.error("OidcClient.processSignoutResponse: No matching state found in storage");
                 throw new Error("No matching state found in storage");
             }
 
             let state = State.fromStorageString(storedStateString);
 
-            Log.debug("Received state from storage; validating response");
+            Log.debug("OidcClient.processSignoutResponse: Received state from storage; validating response");
             return this._validator.validateSignoutResponse(state, response);
         });
     }

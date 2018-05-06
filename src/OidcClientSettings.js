@@ -74,7 +74,7 @@ export class OidcClientSettings {
             this._client_id = value;
         }
         else {
-            Log.error("client_id has already been assigned.")
+            Log.error("OidcClientSettings.set_client_id: client_id has already been assigned.")
             throw new Error("client_id has already been assigned.")
         }
     }
@@ -126,7 +126,7 @@ export class OidcClientSettings {
             this._authority = value;
         }
         else {
-            Log.error("authority has already been assigned.")
+            Log.error("OidcClientSettings.set_authority: authority has already been assigned.")
             throw new Error("authority has already been assigned.")
         }
     }

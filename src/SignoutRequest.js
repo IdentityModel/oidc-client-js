@@ -8,7 +8,7 @@ import { State } from './State';
 export class SignoutRequest {
     constructor({url, id_token_hint, post_logout_redirect_uri, data}) {
         if (!url) {
-            Log.error("No url passed to SignoutRequest");
+            Log.error("SignoutRequest.ctor: No url passed");
             throw new Error("url");
         }
 

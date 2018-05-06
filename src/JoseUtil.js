@@ -36,7 +36,7 @@ export class JoseUtil {
                     key = X509.getPublicKeyFromCertHex(hex);
                 }
                 else {
-                    Log.error("RSA key missing key material", key);
+                    Log.error("JoseUtil.validateJwt: RSA key missing key material", key);
                     return Promise.reject(new Error("RSA key missing key material"));
                 }
             }
@@ -45,12 +45,12 @@ export class JoseUtil {
                     key = KeyUtil.getKey(key);
                 }
                 else {
-                    Log.error("EC key missing key material", key);
+                    Log.error("JoseUtil.validateJwt: EC key missing key material", key);
                     return Promise.reject(new Error("EC key missing key material"));
                 }
             }
             else {
-                Log.error("Unsupported key type", key && key.kty);
+                Log.error("JoseUtil.validateJwt: Unsupported key type", key && key.kty);
                 return Promise.reject(new Error("Unsupported key type: " + key && key.kty));
             }
 
@@ -63,8 +63,6 @@ export class JoseUtil {
     }
 
     static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
-        Log.debug("JoseUtil._validateJwt");
-
         if (!clockSkew) {
             clockSkew = 0;
         }
@@ -76,21 +74,21 @@ export class JoseUtil {
         var payload = JoseUtil.parseJwt(jwt).payload;
 
         if (!payload.iss) {
-            Log.error("issuer was not provided");
+            Log.error("JoseUtil._validateJwt: issuer was not provided");
             return Promise.reject(new Error("issuer was not provided"));
         }
         if (payload.iss !== issuer) {
-            Log.error("Invalid issuer in token", payload.iss);
+            Log.error("JoseUtil._validateJwt: Invalid issuer in token", payload.iss);
             return Promise.reject(new Error("Invalid issuer in token: " + payload.iss));
         }
 
         if (!payload.aud) {
-            Log.error("aud was not provided");
+            Log.error("JoseUtil._validateJwt: aud was not provided");
             return Promise.reject(new Error("aud was not provided"));
         }
         var validAudience = payload.aud === audience || (Array.isArray(payload.aud) && payload.aud.indexOf(audience) >= 0);
         if (!validAudience) {
-            Log.error("Invalid audience in token", payload.aud);
+            Log.error("JoseUtil._validateJwt: Invalid audience in token", payload.aud);
             return Promise.reject(new Error("Invalid audience in token: " + payload.aud));
         }
 
@@ -98,31 +96,31 @@ export class JoseUtil {
         var upperNow = now - clockSkew;
 
         if (!payload.iat) {
-            Log.error("iat was not provided");
+            Log.error("JoseUtil._validateJwt: iat was not provided");
             return Promise.reject(new Error("iat was not provided"));
         }
         if (lowerNow < payload.iat) {
-            Log.error("iat is in the future", payload.iat);
+            Log.error("JoseUtil._validateJwt: iat is in the future", payload.iat);
             return Promise.reject(new Error("iat is in the future: " + payload.iat));
         }
 
         if (payload.nbf && lowerNow < payload.nbf) {
-            Log.error("nbf is in the future", payload.nbf);
+            Log.error("JoseUtil._validateJwt: nbf is in the future", payload.nbf);
             return Promise.reject(new Error("nbf is in the future: " + payload.nbf));
         }
 
         if (!payload.exp) {
-            Log.error("exp was not provided");
+            Log.error("JoseUtil._validateJwt: exp was not provided");
             return Promise.reject(new Error("exp was not provided"));
         }
         if (payload.exp < upperNow) {
-            Log.error("exp is in the past", payload.exp);
+            Log.error("JoseUtil._validateJwt: exp is in the past", payload.exp);
             return Promise.reject(new Error("exp is in the past:" + payload.exp));
         }
 
         try {
             if (!jws.JWS.verify(jwt, key, AllowedSigningAlgs)) {
-                Log.error("signature validation failed");
+                Log.error("JoseUtil._validateJwt: signature validation failed");
                 return Promise.reject(new Error("signature validation failed"));
             }
         }
@@ -135,7 +133,6 @@ export class JoseUtil {
     }
 
     static hashString(value, alg) {
-        Log.debug("JoseUtil.hashString", value, alg);
         try {
             return crypto.Util.hashString(value, alg);
         }
@@ -145,7 +142,6 @@ export class JoseUtil {
     }
 
     static hexToBase64Url(value) {
-        Log.debug("JoseUtil.hexToBase64Url", value);
         try {
             return hextob64u(value);
         }

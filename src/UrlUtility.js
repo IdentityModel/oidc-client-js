@@ -22,8 +22,6 @@ export class UrlUtility {
     }
 
     static parseUrlFragment(value, delimiter = "#", global = Global) {
-        Log.debug("UrlUtility.parseUrlFragment");
-
         if (typeof value !== 'string'){
             value = global.location.href;
         }
@@ -41,7 +39,7 @@ export class UrlUtility {
         while (m = regex.exec(value)) {
             params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
             if (counter++ > 50) {
-                Log.error("response exceeded expected number of parameters", value);
+                Log.error("UrlUtility.parseUrlFragment: response exceeded expected number of parameters", value);
                 return {
                     error: "Response exceeded expected number of parameters"
                 };

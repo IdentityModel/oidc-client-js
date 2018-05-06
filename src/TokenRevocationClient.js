@@ -10,7 +10,7 @@ const AccessTokenTypeHint = "access_token";
 export class TokenRevocationClient {
     constructor(settings, XMLHttpRequestCtor = Global.XMLHttpRequest, MetadataServiceCtor = MetadataService) {
         if (!settings) {
-            Log.error("No settings provided");
+            Log.error("TokenRevocationClient.ctor: No settings provided");
             throw new Error("No settings provided.");
         }
 
@@ -20,17 +20,15 @@ export class TokenRevocationClient {
     }
 
     revoke(accessToken, required) {
-        Log.debug("TokenRevocationClient.revoke");
-
         if (!accessToken) {
-            Log.error("No accessToken provided");
+            Log.error("TokenRevocationClient.revoke: No accessToken provided");
             throw new Error("No accessToken provided.");
         }
 
         return this._metadataService.getRevocationEndpoint().then(url => {
             if (!url) {
                 if (required) {
-                    Log.error("Revocation not supported");
+                    Log.error("TokenRevocationClient.revoke: Revocation not supported");
                     throw new Error("Revocation not supported");
                 }
 
@@ -38,6 +36,7 @@ export class TokenRevocationClient {
                 return;
             }
 
+            Log.error("TokenRevocationClient.revoke: Revoking access token");
             var client_id = this._settings.client_id;
             var client_secret = this._settings.client_secret;
             return this._revoke(url, client_id, client_secret, accessToken);
@@ -45,7 +44,6 @@ export class TokenRevocationClient {
     }
 
     _revoke(url, client_id, client_secret, accessToken) {
-        Log.debug("Calling revocation endpoint");
 
         return new Promise((resolve, reject) => {
 
@@ -53,7 +51,7 @@ export class TokenRevocationClient {
             xhr.open("POST", url);
 
             xhr.onload = () => {
-                Log.debug("HTTP response received, status", xhr.status);
+                Log.debug("TokenRevocationClient.revoke: HTTP response received, status", xhr.status);
 
                 if (xhr.status === 200) {
                     resolve();

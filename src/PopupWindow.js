@@ -13,8 +13,6 @@ const DefaultPopupTarget = "_blank";
 export class PopupWindow {
 
     constructor(params) {
-        Log.debug("PopupWindow.ctor");
-
         this._promise = new Promise((resolve, reject) => {
             this._resolve = resolve;
             this._reject = reject;
@@ -25,7 +23,7 @@ export class PopupWindow {
 
         this._popup = window.open('', target, features);
         if (this._popup) {
-            Log.debug("popup successfully created");
+            Log.debug("PopupWindow.ctor: popup successfully created");
             this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);
         }
     }
@@ -35,16 +33,15 @@ export class PopupWindow {
     }
 
     navigate(params) {
-        Log.debug("PopupWindow.navigate");
-
         if (!this._popup) {
-            this._error("Error opening popup window");
+            this._error("PopupWindow.navigate: Error opening popup window");
         }
         else if (!params || !params.url) {
+            this._error("PopupWindow.navigate: no url provided");
             this._error("No url provided");
         }
         else {
-            Log.debug("Setting URL in popup");
+            Log.debug("PopupWindow.navigate: Setting URL in popup");
 
             this._id = params.id;
             if (this._id) {
@@ -61,12 +58,13 @@ export class PopupWindow {
     _success(data) {
         this._cleanup();
 
-        Log.debug("Successful response from popup window");
+        Log.debug("PopupWindow.callback: Successful response from popup window");
         this._resolve(data);
     }
     _error(message) {
         this._cleanup();
 
+        Log.debug("PopupWindow.error: ", message);
         Log.error(message);
         this._reject(new Error(message));
     }
@@ -76,7 +74,7 @@ export class PopupWindow {
     }
 
     _cleanup(keepOpen) {
-        Log.debug("PopupWindow._cleanup");
+        Log.debug("PopupWindow.cleanup");
 
         window.clearInterval(this._checkForPopupClosedTimer);
         this._checkForPopupClosedTimer = null;
@@ -90,48 +88,43 @@ export class PopupWindow {
     }
 
     _checkForPopupClosed() {
-        Log.debug("PopupWindow._checkForPopupClosed");
-
         if (!this._popup || this._popup.closed) {
-            this._error("Popup window closed");
+            this._error("PopupWindow.checkForPopupClosed: Popup window closed");
         }
     }
 
     _callback(url, keepOpen) {
-        Log.debug("PopupWindow._callback");
-
         this._cleanup(keepOpen);
 
         if (url) {
+            Log.debug("PopupWindow.callback success");
             this._success({ url: url });
         }
         else {
+            Log.debug("PopupWindow.callback: Invalid response from popup");
             this._error("Invalid response from popup");
         }
     }
 
     static notifyOpener(url, keepOpen, delimiter) {
-        Log.debug("PopupWindow.notifyOpener");
-
         if (window.opener) {
             url = url || window.location.href;
             if (url) {
-
                 var data = UrlUtility.parseUrlFragment(url, delimiter);
 
                 if (data.state) {
                     var name = "popupCallback_" + data.state;
                     var callback = window.opener[name];
                     if (callback) {
-                        Log.debug("passing url message to opener");
+                        Log.debug("PopupWindow.notifyOpener: passing url message to opener");
                         callback(url, keepOpen);
                     }
                     else {
-                        Log.warn("no matching callback found on opener");
+                        Log.warn("PopupWindow.notifyOpener: no matching callback found on opener");
                     }
                 }
                 else {
-                    Log.warn("no state found in response url");
+                    Log.warn("PopupWindow.notifyOpener: no state found in response url");
                 }
             }
         }

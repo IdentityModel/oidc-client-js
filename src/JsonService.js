@@ -10,12 +10,12 @@ export class JsonService {
     }
 
     getJson(url, token) {
-        Log.debug("JsonService.getJson", url);
-
         if (!url){
-            Log.error("No url passed");
+            Log.error("JsonService.getJson: No url passed");
             throw new Error("url");
         }
+
+        Log.debug("JsonService.getJson, url: ", url);
 
         return new Promise((resolve, reject) => {
 
@@ -23,7 +23,7 @@ export class JsonService {
             req.open('GET', url);
 
             req.onload = function() {
-                Log.debug("HTTP response received, status", req.status);
+                Log.debug("JsonService.getJson: HTTP response received, status", req.status);
 
                 if (req.status === 200) {
                     var contentType = req.getResponseHeader("Content-Type");
@@ -32,7 +32,7 @@ export class JsonService {
                             resolve(JSON.parse(req.responseText));
                         }
                         catch (e) {
-                            Log.error("Error parsing JSON response", e.message);
+                            Log.error("JsonService.getJson: Error parsing JSON response", e.message);
                             reject(e);
                         }
                     }
@@ -46,12 +46,12 @@ export class JsonService {
             };
 
             req.onerror = function() {
-                Log.error("network error");
+                Log.error("JsonService.getJson: network error");
                 reject(Error("Network Error"));
             };
 
             if (token) {
-                Log.debug("token passed, setting Authorization header");
+                Log.debug("JsonService.getJson: token passed, setting Authorization header");
                 req.setRequestHeader("Authorization", "Bearer " + token);
             }
 
