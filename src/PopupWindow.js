@@ -56,16 +56,15 @@ export class PopupWindow {
     }
 
     _success(data) {
-        this._cleanup();
-
         Log.debug("PopupWindow.callback: Successful response from popup window");
+
+        this._cleanup();
         this._resolve(data);
     }
     _error(message) {
+        Log.error("PopupWindow.error: ", message);
+        
         this._cleanup();
-
-        Log.debug("PopupWindow.error: ", message);
-        Log.error(message);
         this._reject(new Error(message));
     }
 
@@ -89,7 +88,7 @@ export class PopupWindow {
 
     _checkForPopupClosed() {
         if (!this._popup || this._popup.closed) {
-            this._error("PopupWindow.checkForPopupClosed: Popup window closed");
+            this._error("Popup window closed");
         }
     }
 
@@ -127,6 +126,9 @@ export class PopupWindow {
                     Log.warn("PopupWindow.notifyOpener: no state found in response url");
                 }
             }
+        }
+        else {
+            Log.warn("PopupWindow.notifyOpener: no window.opener. Can't complete notification.");
         }
     }
 }

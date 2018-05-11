@@ -138,6 +138,9 @@ export class UserManager extends OidcClient {
             }
 
             return user;
+        }).catch(err=>{
+            Log.error("UserManager.signinPopupCallback error: " + err && err.message);
+            
         });
     }
 
