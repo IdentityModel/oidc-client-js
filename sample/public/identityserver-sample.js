@@ -24,7 +24,7 @@ document.getElementById('popupSignout').addEventListener("click", popupSignout, 
 // config
 ///////////////////////////////
 Oidc.Log.logger = console;
-Oidc.Log.level = Oidc.Log.WARN;
+Oidc.Log.level = Oidc.Log.DEBUG;
 
 var settings = {
     authority: 'https://demo.identityserver.io/',
