@@ -9,7 +9,7 @@ const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=1
 //const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100;resizable=yes';
 
 const DefaultPopupTarget = "_blank";
-
+const Popupwindowname = "popup";
 export class PopupWindow {
 
     constructor(params) {
@@ -20,8 +20,10 @@ export class PopupWindow {
 
         let target = params.popupWindowTarget || DefaultPopupTarget;
         let features = params.popupWindowFeatures || DefaultPopupFeatures;
+        let popupwindowname = params.popupWindowName || Popupwindowname;
 
-        this._popup = window.open('', target, features);
+
+        this._popup = window.open('/',popupwindowname,features);
         if (this._popup) {
             Log.debug("PopupWindow.ctor: popup successfully created");
             this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);
@@ -49,7 +51,9 @@ export class PopupWindow {
             }
 
             this._popup.focus();
-            this._popup.window.location = params.url;
+            this._popup.window.location.href = 'about:blank';
+            this._popup.window.location.href = params.url;
+       
         }
 
         return this.promise;
