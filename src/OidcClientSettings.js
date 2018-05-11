@@ -10,7 +10,7 @@ const OidcMetadataUrlPath = '.well-known/openid-configuration';
 
 const DefaultResponseType = "id_token";
 const DefaultScope = "openid";
-const DefaultStaleStateAge = 60 * 5; // seconds
+const DefaultStaleStateAge = 60 * 15; // seconds
 const DefaultClockSkewInSeconds = 60 * 5;
 
 export class OidcClientSettings {
