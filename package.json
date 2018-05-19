@@ -49,7 +49,7 @@
   "dependencies": {
     "jsrsasign": "^8.0.12"
   },
-  "peerDependencies": {
+  "optionalDependencies": {
     "babel-polyfill": ">=6.9.1"
   },
   "typings": "index.d.ts"
