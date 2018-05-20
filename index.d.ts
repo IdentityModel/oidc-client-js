@@ -119,6 +119,7 @@ export interface OidcClientSettings {
   metadata?: any;
   signingKeys?: any[];
   client_id?: string;
+  client_secret?: string;
   readonly response_type?: string;
   readonly scope?: string;
   readonly redirect_uri?: string;
