@@ -66,9 +66,15 @@ export class CheckSessionIFrame {
 
             this._session_state = session_state;
 
-            this._timer = window.setInterval(() => {
+            let send = () => {
                 this._frame.contentWindow.postMessage(this._client_id + " " + this._session_state, this._frame_origin);
-            }, this._interval);
+            };
+            
+            // trigger now
+            send();
+
+            // and setup timer
+            this._timer = window.setInterval(send, this._interval);
         }
     }
 
