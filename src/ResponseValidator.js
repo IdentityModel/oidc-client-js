@@ -219,6 +219,49 @@ export class ResponseValidator {
         });
     }
 
+    _getSigningKeyForJwt(jwt) {
+        return this._metadataService.getSigningKeys().then(keys => {
+            const kid = jwt.header.kid;
+            if (!keys) {
+                Log.error("ResponseValidator._validateIdToken: No signing keys from metadata");
+                return Promise.reject(new Error("No signing keys from metadata"));
+            }
+
+            Log.debug("ResponseValidator._validateIdToken: Received signing keys");
+            let key;
+            if (!kid) {
+                keys = this._filterByAlg(keys, jwt.header.alg);
+
+                if (keys.length > 1) {
+                    Log.error("ResponseValidator._validateIdToken: No kid found in id_token and more than one key found in metadata");
+                    return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
+                } else {
+                    // kid is mandatory only when there are multiple keys in the referenced JWK Set document
+                    // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
+                    key = keys[0];
+                }
+            } else {
+                key = keys.filter(key => {
+                    return key.kid === kid;
+                })[0];
+            }
+            return Promise.resolve(key);
+        });
+    }
+
+    _getSigningKeyForJwtWithSingleRetry(jwt) {
+        return this._getSigningKeyForJwt(jwt).then(key => {
+            // Refreshing signingKeys if no suitable verification key is present for given jwt header.
+            if (!key) {
+                // set to undefined, to trigger network call to jwks_uri.
+                this._metadataService.resetSigningKeys();
+                return this._getSigningKeyForJwt(jwt);
+            } else {
+                return Promise.resolve(key);
+            }
+        });
+    }
+
     _validateIdToken(state, response) {
         if (!state.nonce) {
             Log.error("ResponseValidator._validateIdToken: No nonce on state");
@@ -236,38 +279,9 @@ export class ResponseValidator {
             return Promise.reject(new Error("Invalid nonce in id_token"));
         }
 
-        var kid = jwt.header.kid;
-
         return this._metadataService.getIssuer().then(issuer => {
             Log.debug("ResponseValidator._validateIdToken: Received issuer");
-
-            return this._metadataService.getSigningKeys().then(keys => {
-                if (!keys) {
-                    Log.error("ResponseValidator._validateIdToken: No signing keys from metadata");
-                    return Promise.reject(new Error("No signing keys from metadata"));
-                }
-
-                Log.debug("ResponseValidator._validateIdToken: Received signing keys");
-                let key;
-                if (!kid) {
-                    keys = this._filterByAlg(keys, jwt.header.alg);
-
-                    if (keys.length > 1) {
-                        Log.error("ResponseValidator._validateIdToken: No kid found in id_token and more than one key found in metadata");
-                        return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
-                    }
-                    else {
-                        // kid is mandatory only when there are multiple keys in the referenced JWK Set document
-                        // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
-                        key = keys[0];
-                    }
-                }
-                else {
-                    key = keys.filter(key => {
-                        return key.kid === kid;
-                    })[0];
-                }
-
+            return this._getSigningKeyForJwtWithSingleRetry(jwt).then(key => {
                 if (!key) {
                     Log.error("ResponseValidator._validateIdToken: No key matching kid or alg found in signing keys");
                     return Promise.reject(new Error("No key matching kid or alg found in signing keys"));

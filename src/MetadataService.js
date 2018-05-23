@@ -37,6 +37,11 @@ export class MetadataService {
         return this._metadataUrl;
     }
 
+    resetSigningKeys() {
+        this._settings = this._settings || {}
+        this._settings.signingKeys = undefined
+    }
+
     getMetadata() {
         if (this._settings.metadata) {
             Log.debug("MetadataService.getMetadata: Returning metadata from settings");
