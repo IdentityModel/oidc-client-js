@@ -111,6 +111,8 @@ export class OidcClient {
   processSignoutResponse(url: string, stateStore: StateStore): Promise<SignoutResponse>;
 
   clearStaleState(stateStore: StateStore): Promise<any>;
+
+  get metadataService(): MetadataService;
 }
 
 export interface OidcClientSettings {
