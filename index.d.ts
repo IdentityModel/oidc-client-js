@@ -112,7 +112,7 @@ export class OidcClient {
 
   clearStaleState(stateStore: StateStore): Promise<any>;
 
-  get metadataService(): MetadataService;
+  readonly metadataService: MetadataService;
 }
 
 export interface OidcClientSettings {
