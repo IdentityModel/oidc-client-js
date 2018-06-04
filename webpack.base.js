@@ -4,12 +4,13 @@ var createWebpackConfig = function(options) {
     entry: options.entry,
     output: options.output,
     plugins: options.plugins,
+    mode: options.mode,
     node: {
       fs: 'empty', // Because of jsrsasign usage of fs
       buffer: 'empty',
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /.js$/,
           loaders: ['babel-loader'],
