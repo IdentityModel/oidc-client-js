@@ -105,10 +105,10 @@ export class OidcClient {
   readonly settings: OidcClientSettings;
 
   createSigninRequest(args?: any): Promise<SigninRequest>;
-  processSigninResponse(url: string, stateStore: StateStore): Promise<SigninResponse>;
+  processSigninResponse(url?: string, stateStore?: StateStore): Promise<SigninResponse>;
 
   createSignoutRequest(args?: any): Promise<SignoutRequest>;
-  processSignoutResponse(url: string, stateStore: StateStore): Promise<SignoutResponse>;
+  processSignoutResponse(url?: string, stateStore?: StateStore): Promise<SignoutResponse>;
 
   clearStaleState(stateStore: StateStore): Promise<any>;
 
