@@ -18,7 +18,7 @@ app.use(function (req, res, next) {
 app.use(static);
 
 app.get("/oidc-client.js", function(req, res){
-    res.sendFile(path.join(__dirname, '../dist/oidc-client.js'));
+    res.sendFile(path.join(__dirname, '../../dist/oidc-client.js'));
 });
 
 var oidc = require('./oidc.js');
