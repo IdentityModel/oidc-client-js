@@ -346,3 +346,21 @@ export interface OidcMetadata {
   response_modes_supported: string[];
   code_challenge_methods_supported: string[];
 }
+
+export interface CheckSessionIFrame {
+  new (callback: () => void, client_id: string, url: string, interval?: number, stopOnError?: boolean): CheckSessionIFrame
+
+  load(): Promise<void>;
+
+  start(session_state: string): void;
+
+  stop(): void;
+}
+
+export interface CheckSessionIFrameCtor {
+  (callback: () => void, client_id: string, url: string, interval?: number, stopOnError?: boolean): CheckSessionIFrame;
+}
+
+export class SessionMonitor {
+  constructor(userManager: UserManager, CheckSessionIFrameCtor: CheckSessionIFrameCtor);
+}
