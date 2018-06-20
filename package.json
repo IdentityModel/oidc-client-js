@@ -5,7 +5,7 @@
   "main": "lib/oidc-client.min.js",
   "scripts": {
     "build": "gulp build",
-    "start": "node sample/server.js",
+    "start": "node samples/VanillaJS/server.js",
     "test": "mocha --compilers js:babel-register test/unit/*.spec.js",
     "all": "gulp build & mocha --compilers js:babel-register test/unit/*.spec.js"
   },
