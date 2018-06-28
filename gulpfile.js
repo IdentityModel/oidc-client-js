@@ -3,6 +3,7 @@ var concat = require('gulp-concat');
 var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 var createWebpackConfig = require('./webpack.base');
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // entry points for both configs
 var npmEntry ='./index.js';
@@ -35,7 +36,16 @@ gulp.task('build-lib-min', ['jsrsasign'], function() {
         libraryTarget:'umd',
     },
     plugins: [],
-    devtool: false
+    devtool: false,
+    optimization: {
+      minimizer: [
+        new UglifyJsPlugin({
+          uglifyOptions: {
+            keep_fnames: true
+          }
+        })
+      ]
+    }
   }), webpack))
   .pipe(gulp.dest('lib/'));
 });
@@ -69,7 +79,16 @@ gulp.task('build-dist-min', ['jsrsasign'], function() {
         library:'Oidc'
     },
     plugins: [],
-    devtool: false
+    devtool: false,
+    optimization: {
+      minimizer: [
+        new UglifyJsPlugin({
+          uglifyOptions: {
+            keep_fnames: true
+          }
+        })
+      ]
+    }
   }), webpack))
   .pipe(gulp.dest('dist/'));
 });
