@@ -4,9 +4,6 @@ var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 var createWebpackConfig = require('./webpack.base');
 
-var Uglify = require('uglifyjs-webpack-plugin');
-var uglifyPlugin = new Uglify();
-
 // entry points for both configs
 var npmEntry ='./index.js';
 var classicEntry = ['babel-polyfill', npmEntry];
@@ -15,6 +12,7 @@ var classicEntry = ['babel-polyfill', npmEntry];
 gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    mode: 'development',
     entry: npmEntry,
     output: {
         filename:'oidc-client.js',
@@ -22,7 +20,7 @@ gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
     },
     plugins: [],
     devtool:'inline-source-map'
-  })))
+  }), webpack))
   .pipe(gulp.dest('lib/'));
 });
 
@@ -30,14 +28,15 @@ gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
 gulp.task('build-lib-min', ['jsrsasign'], function() {
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    mode: 'production',
     entry: npmEntry,
     output: {
         filename:'oidc-client.min.js',
         libraryTarget:'umd',
     },
-    plugins: [uglifyPlugin],
+    plugins: [],
     devtool: false
-  })))
+  }), webpack))
   .pipe(gulp.dest('lib/'));
 });
 
@@ -45,6 +44,7 @@ gulp.task('build-lib-min', ['jsrsasign'], function() {
 gulp.task('build-dist-sourcemap', ['jsrsasign'], function() {
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    mode: 'development',
     entry: classicEntry,
     output: {
         filename:'oidc-client.js',
@@ -53,7 +53,7 @@ gulp.task('build-dist-sourcemap', ['jsrsasign'], function() {
     },
     plugins: [],
     devtool:'inline-source-map'
-  })))
+  }), webpack))
   .pipe(gulp.dest('dist/'));
 });
 
@@ -61,15 +61,16 @@ gulp.task('build-dist-sourcemap', ['jsrsasign'], function() {
 gulp.task('build-dist-min', ['jsrsasign'], function() {
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    mode: 'production',
     entry: classicEntry,
     output: {
         filename:'oidc-client.min.js',
         libraryTarget:'var',
         library:'Oidc'
     },
-    plugins: [uglifyPlugin],
+    plugins: [],
     devtool: false
-  })))
+  }), webpack))
   .pipe(gulp.dest('dist/'));
 });
 
