@@ -1,15 +1,16 @@
 // create a webpack configuration with all common parts included here
 var createWebpackConfig = function(options) {
   return {
+    mode: options.mode,
     entry: options.entry,
     output: options.output,
     plugins: options.plugins,
     node: {
       fs: 'empty', // Because of jsrsasign usage of fs
-      buffer: 'empty',
+      buffer: 'empty'
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /.js$/,
           loaders: ['babel-loader'],
@@ -19,7 +20,8 @@ var createWebpackConfig = function(options) {
       ]
     },
     // this is for the sourcemaps
-    devtool: options.devtool
+    devtool: options.devtool,
+    optimization: options.optimization
   };
 };
 
