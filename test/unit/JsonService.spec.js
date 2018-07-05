@@ -14,7 +14,7 @@ describe("JsonService", function() {
 
     beforeEach(function(){
         stubHttpRequest = new StubXMLHttpRequest();
-        subject = new JsonService(()=>stubHttpRequest);
+        subject = new JsonService(null, ()=>stubHttpRequest);
     });
 
     describe("getJson", function() {
@@ -109,6 +109,21 @@ describe("JsonService", function() {
 
             stubHttpRequest.status = 200;
             stubHttpRequest.responseHeaders.set('Content-Type', 'text/html');
+            stubHttpRequest.responseText = JSON.stringify({foo:1, bar:'test'});
+            stubHttpRequest.onload();
+        });
+
+        it("should accept custom content type in response", function(done) {
+            subject = new JsonService(['foo/bar'], ()=>stubHttpRequest);
+            let p = subject.getJson("http://test");
+
+            p.then(result => {
+                result.foo.should.equal(1);
+                done();
+            });
+
+            stubHttpRequest.status = 200;
+            stubHttpRequest.responseHeaders.set('Content-Type', 'foo/bar');
             stubHttpRequest.responseText = JSON.stringify({foo:1, bar:'test'});
             stubHttpRequest.onload();
         });

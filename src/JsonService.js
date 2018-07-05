@@ -5,7 +5,17 @@ import { Log } from './Log';
 import { Global } from './Global';
 
 export class JsonService {
-    constructor(XMLHttpRequestCtor = Global.XMLHttpRequest) {
+    constructor(additionalContentTypes = null, XMLHttpRequestCtor = Global.XMLHttpRequest) {
+        if (additionalContentTypes && Array.isArray(additionalContentTypes))
+        {
+            this._contentTypes = additionalContentTypes.slice();
+        }
+        else
+        {
+            this._contentTypes = [];
+        }
+        this._contentTypes.push('application/json');
+
         this._XMLHttpRequest = XMLHttpRequestCtor;
     }
 
@@ -22,23 +32,36 @@ export class JsonService {
             var req = new this._XMLHttpRequest();
             req.open('GET', url);
 
+            var allowedContentTypes = this._contentTypes;
+
             req.onload = function() {
                 Log.debug("JsonService.getJson: HTTP response received, status", req.status);
 
                 if (req.status === 200) {
+
                     var contentType = req.getResponseHeader("Content-Type");
-                    if (contentType && contentType.startsWith("application/json")) {
-                        try {
-                            resolve(JSON.parse(req.responseText));
-                        }
-                        catch (e) {
-                            Log.error("JsonService.getJson: Error parsing JSON response", e.message);
-                            reject(e);
+                    if (contentType) {
+
+                        var found = allowedContentTypes.find(item=>{
+                            if (contentType.startsWith(item)) {
+                                return true;
+                            }
+                        });
+
+                        if (found) {
+                            try {
+                                resolve(JSON.parse(req.responseText));
+                                return;
+                            }
+                            catch (e) {
+                                Log.error("JsonService.getJson: Error parsing JSON response", e.message);
+                                reject(e);
+                                return;
+                            }
                         }
                     }
-                    else {
-                        reject(Error("Invalid response Content-Type: " + contentType + ", from URL: " + url));
-                    }
+
+                    reject(Error("Invalid response Content-Type: " + contentType + ", from URL: " + url));
                 }
                 else {
                     reject(Error(req.statusText + " (" + req.status + ")"));
