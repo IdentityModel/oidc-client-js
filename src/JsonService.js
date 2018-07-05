@@ -27,7 +27,7 @@ export class JsonService {
 
                 if (req.status === 200) {
                     var contentType = req.getResponseHeader("Content-Type");
-                    if (contentType && contentType.startsWith("application/json")) {
+                    if (contentType && (contentType.startsWith("application/json") || contentType.startsWith("application/jwk-set+json"))) {
                         try {
                             resolve(JSON.parse(req.responseText));
                         }
