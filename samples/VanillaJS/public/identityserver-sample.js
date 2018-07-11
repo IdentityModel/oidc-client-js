@@ -7,6 +7,7 @@
 document.getElementById('clearState').addEventListener("click", clearState, false);
 document.getElementById('getUser').addEventListener("click", getUser, false);
 document.getElementById('removeUser').addEventListener("click", removeUser, false);
+document.getElementById('querySessionStatus').addEventListener("click", querySessionStatus, false);
 
 document.getElementById('startSigninMainWindow').addEventListener("click", startSigninMainWindow, false);
 document.getElementById('endSigninMainWindow').addEventListener("click", endSigninMainWindow, false);
@@ -145,6 +146,14 @@ function popupSignout() {
 function iframeSignin() {
     mgr.signinSilent({state:'some data'}).then(function(user) {
         log("signed in", user);
+    }).catch(function(err) {
+        log(err);
+    });
+}
+
+function querySessionStatus() {
+    mgr.querySessionStatus().then(function(status) {
+        log("user's session status", status);
     }).catch(function(err) {
         log(err);
     });
