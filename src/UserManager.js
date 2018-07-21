@@ -316,8 +316,8 @@ export class UserManager extends OidcClient {
     }
     signoutPopupCallback(url, keepOpen) {
         if (typeof(keepOpen) === 'undefined' && typeof(url) === 'boolean') {
+            keepOpen = url;
             url = null;
-            keepOpen = true;
         }
 
         let delimiter = '?';
