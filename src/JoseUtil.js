@@ -23,7 +23,7 @@ export class JoseUtil {
         }
     }
 
-    static validateJwt(jwt, key, issuer, audience, clockSkew, now) {
+    static validateJwt(jwt, key, issuer, audience, clockSkew, now, issuerValidationFunction) {
         Log.debug("JoseUtil.validateJwt");
 
         try {
@@ -54,7 +54,7 @@ export class JoseUtil {
                 return Promise.reject(new Error("Unsupported key type: " + key && key.kty));
             }
 
-            return JoseUtil._validateJwt(jwt, key, issuer, audience, clockSkew, now);
+            return JoseUtil._validateJwt(jwt, key, issuer, audience, clockSkew, now, issuerValidationFunction);
         }
         catch (e) {
             Log.error(e && e.message || e);
@@ -62,7 +62,7 @@ export class JoseUtil {
         }
     }
 
-    static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
+    static _validateJwt(jwt, key, issuer, audience, clockSkew, now, issuerValidationFunction) {
         if (!clockSkew) {
             clockSkew = 0;
         }
@@ -77,7 +77,20 @@ export class JoseUtil {
             Log.error("JoseUtil._validateJwt: issuer was not provided");
             return Promise.reject(new Error("issuer was not provided"));
         }
-        if (payload.iss !== issuer) {
+
+        let issuerIsValid = false;
+
+        if(issuerValidationFunction && typeof issuerValidationFunction === "function")
+        {
+            Log.debug("JoseUtil - calling issuer validation function");         
+            issuerIsValid =  issuerValidationFunction(payload.iss, issuer);  
+        }
+        else
+        {
+            issuerIsValid = payload.iss === issuer
+        }
+
+        if (!issuerIsValid) {
             Log.error("JoseUtil._validateJwt: Invalid issuer in token", payload.iss);
             return Promise.reject(new Error("Invalid issuer in token: " + payload.iss));
         }

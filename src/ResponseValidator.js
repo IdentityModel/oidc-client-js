@@ -219,7 +219,7 @@ export class ResponseValidator {
         });
     }
 
-    _validateIdToken(state, response) {
+     _validateIdToken(state, response) {
         if (!state.nonce) {
             Log.error("ResponseValidator._validateIdToken: No nonce on state");
             return Promise.reject(new Error("No nonce on state"));
@@ -276,9 +276,9 @@ export class ResponseValidator {
                 let audience = state.client_id;
 
                 let clockSkewInSeconds = this._settings.clockSkew;
-                Log.debug("ResponseValidator._validateIdToken: Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
+                Log.debug("ResponseValidator._validateIdToken: Validating JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
-                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{
+                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds, null, this._settings.issuerValidationFunction).then(()=>{
                     Log.debug("ResponseValidator._validateIdToken: JWT validation successful");
 
                     if (!jwt.payload.sub) {

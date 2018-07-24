@@ -29,8 +29,9 @@ export class OidcClientSettings {
         stateStore = new WebStorageStateStore(),
         ResponseValidatorCtor = ResponseValidator,
         MetadataServiceCtor = MetadataService,
+        issuerValidationFunction,
         // extra query params
-        extraQueryParams = {}
+        extraQueryParams = {}        
     } = {}) {
 
         this._authority = authority;
@@ -57,11 +58,13 @@ export class OidcClientSettings {
         this._staleStateAge = staleStateAge;
         this._clockSkew = clockSkew;
 
-        this._stateStore = stateStore;
-        this._validator = new ResponseValidatorCtor(this);
-        this._metadataService = new MetadataServiceCtor(this);
+        this._stateStore = stateStore;        
+        this._issuerValidationFunction = issuerValidationFunction;
 
         this._extraQueryParams = typeof extraQueryParams === 'object' ? extraQueryParams : {};
+
+        this._validator = new ResponseValidatorCtor(this);
+        this._metadataService = new MetadataServiceCtor(this);
     }
 
     // client config
@@ -182,6 +185,11 @@ export class OidcClientSettings {
     }
     get metadataService() {
         return this._metadataService;
+    }
+
+    get issuerValidationFunction()
+    {
+        return this._issuerValidationFunction;
     }
 
     // extra query params

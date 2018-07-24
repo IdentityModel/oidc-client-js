@@ -439,4 +439,22 @@ describe("OidcClientSettings", function () {
         });
     })
 
+
+    describe("issuerValidationFunction", function () {
+
+        it("should return value from initial settings", function () {
+            let settings = new OidcClientSettings({
+                client_id: 'client',
+                issuerValidationFunction: true
+            });
+            settings.issuerValidationFunction.should.equal(true);
+
+            settings = new OidcClientSettings({
+                client_id: 'client',
+                issuerValidationFunction: false
+            });
+            settings.issuerValidationFunction.should.equal(false);
+        });
+    });
+
 });

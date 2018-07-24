@@ -243,6 +243,25 @@ describe("JoseUtil", function () {
         });
 
 
+        it("should call issuer function if available", function (done) {
+            let testIssuerText="some issuer";
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, testIssuerText, expectedAudience, 0, expectedNow, (actual, expected)=>{ 
+                return actual === expectedIssuer && expected === testIssuerText
+            }
+            ).catch(e => {
+                done();
+            });
+        });
+
+
+        it("should ignore issuer function parameter if invalid", function (done) {
+
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, "some issuer", expectedAudience, 0, expectedNow, 23).catch(e => {
+                e.message.should.contain("issuer");
+                done();
+            });
+        });
+
     });
 
 });
