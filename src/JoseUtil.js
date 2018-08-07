@@ -23,7 +23,7 @@ export class JoseUtil {
         }
     }
 
-    static validateJwt(jwt, key, issuer, audience, clockSkew, now) {
+    static validateJwt(jwt, key, issuer, audience, clockSkew, now, timeInsensitive) {
         Log.debug("JoseUtil.validateJwt");
 
         try {
@@ -54,7 +54,7 @@ export class JoseUtil {
                 return Promise.reject(new Error("Unsupported key type: " + key && key.kty));
             }
 
-            return JoseUtil._validateJwt(jwt, key, issuer, audience, clockSkew, now);
+            return JoseUtil._validateJwt(jwt, key, issuer, audience, clockSkew, now, timeInsensitive);
         }
         catch (e) {
             Log.error(e && e.message || e);
@@ -62,7 +62,7 @@ export class JoseUtil {
         }
     }
 
-    static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
+    static _validateJwt(jwt, key, issuer, audience, clockSkew, now, timeInsensitive) {
         if (!clockSkew) {
             clockSkew = 0;
         }
@@ -92,30 +92,32 @@ export class JoseUtil {
             return Promise.reject(new Error("Invalid audience in token: " + payload.aud));
         }
 
-        var lowerNow = now + clockSkew;
-        var upperNow = now - clockSkew;
+        if (!timeInsensitive) {
+            var lowerNow = now + clockSkew;
+            var upperNow = now - clockSkew;
 
-        if (!payload.iat) {
-            Log.error("JoseUtil._validateJwt: iat was not provided");
-            return Promise.reject(new Error("iat was not provided"));
-        }
-        if (lowerNow < payload.iat) {
-            Log.error("JoseUtil._validateJwt: iat is in the future", payload.iat);
-            return Promise.reject(new Error("iat is in the future: " + payload.iat));
-        }
+            if (!payload.iat) {
+                Log.error("JoseUtil._validateJwt: iat was not provided");
+                return Promise.reject(new Error("iat was not provided"));
+            }
+            if (lowerNow < payload.iat) {
+                Log.error("JoseUtil._validateJwt: iat is in the future", payload.iat);
+                return Promise.reject(new Error("iat is in the future: " + payload.iat));
+            }
 
-        if (payload.nbf && lowerNow < payload.nbf) {
-            Log.error("JoseUtil._validateJwt: nbf is in the future", payload.nbf);
-            return Promise.reject(new Error("nbf is in the future: " + payload.nbf));
-        }
+            if (payload.nbf && lowerNow < payload.nbf) {
+                Log.error("JoseUtil._validateJwt: nbf is in the future", payload.nbf);
+                return Promise.reject(new Error("nbf is in the future: " + payload.nbf));
+            }
 
-        if (!payload.exp) {
-            Log.error("JoseUtil._validateJwt: exp was not provided");
-            return Promise.reject(new Error("exp was not provided"));
-        }
-        if (payload.exp < upperNow) {
-            Log.error("JoseUtil._validateJwt: exp is in the past", payload.exp);
-            return Promise.reject(new Error("exp is in the past:" + payload.exp));
+            if (!payload.exp) {
+                Log.error("JoseUtil._validateJwt: exp was not provided");
+                return Promise.reject(new Error("exp was not provided"));
+            }
+            if (payload.exp < upperNow) {
+                Log.error("JoseUtil._validateJwt: exp is in the past", payload.exp);
+                return Promise.reject(new Error("exp is in the past:" + payload.exp));
+            }
         }
 
         try {
