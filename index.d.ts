@@ -175,7 +175,7 @@ export class UserManager extends OidcClient {
 
   startSilentRenew(): void;
   stopSilentRenew(): void;
-  
+
   events: UserManagerEvents;
 }
 
@@ -194,7 +194,7 @@ export interface UserManagerEvents extends AccessTokenEvents {
 
   addUserSignedOut(callback: (...ev: any[]) => void): void;
   removeUserSignedOut(callback: (...ev: any[]) => void): void;
-  
+
   addUserSessionChanged(callback: (...ev: any[]) => void): void;
   removeUserSessionChanged(callback: (...ev: any[]) => void): void;
 }
@@ -209,6 +209,7 @@ export interface UserManagerSettings extends OidcClientSettings {
   readonly includeIdTokenInSilentRenew?: boolean;
   readonly monitorSession?: boolean;
   readonly checkSessionInterval?: number;
+  readonly query_status_response_type?: string;
   readonly revokeAccessTokenOnSignout?: any;
   readonly accessTokenExpiringNotificationTime?: number;
   readonly redirectNavigator?: any;
