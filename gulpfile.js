@@ -7,10 +7,10 @@ var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // entry points for both configs
 var npmEntry ='./index.js';
-var classicEntry = ['babel-polyfill', npmEntry];
+var classicEntry = ['babel-polyfill', 'webcrypto-shim', npmEntry];
 
 // npm compliant build with source-maps
-gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
+gulp.task('build-lib-sourcemap', function() {
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'development',
@@ -26,7 +26,7 @@ gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
 });
 
 // npm compliant build without source-maps & minified
-gulp.task('build-lib-min', ['jsrsasign'], function() {
+gulp.task('build-lib-min', function() {
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'production',
@@ -51,7 +51,7 @@ gulp.task('build-lib-min', ['jsrsasign'], function() {
 });
 
 // classic build with sourcemaps
-gulp.task('build-dist-sourcemap', ['jsrsasign'], function() {
+gulp.task('build-dist-sourcemap', function() {
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'development',
@@ -68,7 +68,7 @@ gulp.task('build-dist-sourcemap', ['jsrsasign'], function() {
 });
 
 // classic build without sourcemaps & minified
-gulp.task('build-dist-min', ['jsrsasign'], function() {
+gulp.task('build-dist-min', function() {
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'production',
@@ -91,68 +91,6 @@ gulp.task('build-dist-min', ['jsrsasign'], function() {
     }
   }), webpack))
   .pipe(gulp.dest('dist/'));
-});
-
-// this is used to manually build jsrsasign with the fewest modules to reduce its size
-var files = [
-     'jsrsasign/header.js'
-
-    ,'jsrsasign/ext/yahoo-min.js'
-
-    ,'jsrsasign/ext/cj/cryptojs-312-core-fix-min.js'
-    ,'jsrsasign/ext/cj/x64-core_min.js'
-//    ,'jsrsasign/ext/cj/cipher-core_min.js'
-//    ,'jsrsasign/ext/cj/aes_min.js'
-//    ,'jsrsasign/ext/cj/tripledes_min.js'
-    ,'jsrsasign/ext/cj/enc-base64_min.js'
-//    ,'jsrsasign/ext/cj/md5_min.js'
-//    ,'jsrsasign/ext/cj/sha1_min.js'
-    ,'jsrsasign/ext/cj/sha256_min.js'
-//    ,'jsrsasign/ext/cj/sha224_min.js'
-    ,'jsrsasign/ext/cj/sha512_min.js'
-    ,'jsrsasign/ext/cj/sha384_min.js'
-//    ,'jsrsasign/ext/cj/ripemd160_min.js'
-//    ,'jsrsasign/ext/cj/hmac_min.js'
-//    ,'jsrsasign/ext/cj/pbkdf2_min.js'
-
-    ,'jsrsasign/ext/base64-min.js'
-    ,'jsrsasign/ext/jsbn-min.js'
-    ,'jsrsasign/ext/jsbn2-min.js'
-    ,'jsrsasign/ext/prng4-min.js'
-    ,'jsrsasign/ext/rng-min.js'
-    ,'jsrsasign/ext/rsa-min.js'
-//    ,'jsrsasign/ext/rsa2-min.js'
-    ,'jsrsasign/ext/ec-min.js'
-//    ,'jsrsasign/ext/ec-patch-min.js'
-    ,'jsrsasign/ext/json-sans-eval-min.js'
-
-//	,'jsrsasign/min/asn1-1.0.min.js'
-  	,'jsrsasign/min/asn1hex-1.1.min.js'
-//  	,'jsrsasign/min/asn1x509-1.0.min.js'
-//  	,'jsrsasign/min/asn1cms-1.0.min.js'
-//  	,'jsrsasign/min/asn1tsp-1.0.min.js'
-//  	,'jsrsasign/min/asn1cades-1.0.min.js'
-//  	,'jsrsasign/min/asn1csr-1.0.min.js'
-//  	,'jsrsasign/min/asn1ocsp-1.0.min.js'
-  	,'jsrsasign/min/base64x-1.1.min.js'
-  	,'jsrsasign/min/crypto-1.1.min.js'
-  	,'jsrsasign/min/ecdsa-modified-1.0.min.js'
-  	,'jsrsasign/min/ecparam-1.0.min.js'
-//  	,'jsrsasign/min/dsa-2.0.min.js'
-  	,'jsrsasign/min/keyutil-1.0.min.js'
-  	,'jsrsasign/min/rsapem-1.1.min.js'
-  	,'jsrsasign/min/rsasign-1.2.min.js'
-  	,'jsrsasign/min/x509-1.1.min.js'
-  	,'jsrsasign/min/jws-3.3.min.js'
-//  	,'jsrsasign/min/jwsjs-2.0.min.js'
-
-    ,'jsrsasign/footer.js'
-];
-
-gulp.task('jsrsasign', function () {
-    return gulp.src(files)
-        .pipe(concat('jsrsasign.js'))
-        .pipe(gulp.dest('jsrsasign/dist/'));
 });
 
 // putting it all together
