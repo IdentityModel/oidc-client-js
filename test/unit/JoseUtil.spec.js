@@ -3,11 +3,18 @@
 
 import { JoseUtil } from '../../src/JoseUtil';
 import { Log } from '../../src/Log';
+// Shims
+//import atob from "atob";
+//import crypto from "webcrypto-shim";
+//if(!global.atob) { global.atob = atob; }
+//if(!global.crypto) { global.crypto = crypto; }
 
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
 let expect = chai.expect;
+
+
 
 describe("JoseUtil", function () {
 
@@ -101,39 +108,32 @@ describe("JoseUtil", function () {
 
     });
 
-
     describe("validateJwt", function () {
 
-        it("should validate from RSA X509 key", function (done, fail) {
+        it("should validate from RSA X509 key", function () {
             Log.level = Log.DEBUG;
             delete rsaKey.n;
             delete rsaKey.e;
 
-            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow).then(()=>{
-                done();
-            });
-
+            return JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow);
         });
 
-        it("should validate from RSA exponent and modulus", function (done) {
+        it("should validate from RSA exponent and modulus", function () {
 
             delete rsaKey.x5c;
 
-            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow).then(()=>{
-                done();
-            })
-
+            return JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow);
         });
 
         it("should fail for unsupported key types", function (done) {
 
             rsaKey.kty = "foo";
 
-            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow).catch(e => {
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 0, expectedNow)
+            .catch(e => {
                 e.message.should.contain("foo");
                 done();
-            });
-
+            }).then(result => { Log.error(result); true.should.be.false; done(); });
         });
 
         it("should fail for mismatched keys", function (done) {
@@ -154,13 +154,11 @@ describe("JoseUtil", function () {
 
         });
 
-        it("should allow nbf within clock skew", function (done) {
+        it("should allow nbf within clock skew", function () {
 
             var p1 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 1);
             var p2 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, notBefore - 10);
-            Promise.all([p1, p2]).then(()=>{
-               done();
-            });
+            return Promise.all([p1, p2]);
         });
 
         it("should now allow nbf outside clock skew", function (done) {
@@ -181,13 +179,11 @@ describe("JoseUtil", function () {
 
         });
 
-        it("should allow iat within clock skew", function (done) {
+        it("should allow iat within clock skew", function () {
 
             var p1 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 1);
             var p2 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, issuedAt - 10);
-            Promise.all([p1, p2]).then(()=>{
-                done();
-            });
+            return Promise.all([p1, p2]);
         });
 
         it("should now allow iat outside clock skew", function (done) {
@@ -208,13 +204,11 @@ describe("JoseUtil", function () {
 
         });
 
-        it("should allow exp within clock skew", function (done) {
+        it("should allow exp within clock skew", function () {
 
             var p1 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 1);
-            var p2 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 10)
-            Promise.all([p1, p2]).then(()=>{
-               done();
-            });
+            var p2 = JoseUtil.validateJwt(jwtFromRsa, rsaKey, expectedIssuer, expectedAudience, 10, expires + 10);
+            return Promise.all([p1, p2]);
         });
 
         it("should now allow exp outside clock skew", function (done) {
@@ -242,7 +236,22 @@ describe("JoseUtil", function () {
             });
         });
 
+    });
 
+    describe('hashUtil', function() {
+        it('should hash', function() {
+
+            let access_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSIsImtpZCI6ImEzck1VZ01Gdjl0UGNsTGE2eUYzekFrZnF1RSJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo0NDMzMy9jb3JlIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzMzMvY29yZS9yZXNvdXJjZXMiLCJleHAiOjE0NTkxMzM1MDEsIm5iZiI6MTQ1OTEyOTkwMSwiY2xpZW50X2lkIjoianMudG9rZW5tYW5hZ2VyIiwic2NvcGUiOlsib3BlbmlkIiwicHJvZmlsZSIsImVtYWlsIiwicmVhZCIsIndyaXRlIl0sInN1YiI6Ijg4NDIxMTEzIiwiYXV0aF90aW1lIjoxNDU5MTI5ODk4LCJpZHAiOiJpZHNydiIsImFtciI6WyJwYXNzd29yZCJdfQ.ldCBx4xF_WIj6S9unppYAzXFKMs5ce7sKuse-nleFbzwRbZ-VNubLOlnpsFzquJIyTlGLekqLWnsfpAmaORQBtv5ZoaUHxC_s5APLWGC9Io19tF8NxWVmX2OK3cwHWQ5HtFkILQdYR9l3Bf5RIQK4ixbrKJN7OyzoLAen0FgEXDn-dXMAhFJDl123G7pBaayQb8ic44y808cfKlu3wwP2QkDEzgW-L0avvjN95zji5528c32L2LBMveRklcOXO6Gb0alcFw6PysfJotsNo9WahJWu404mSl3Afc-4jCWjoTL7PBL-xciPmq9iCNAgqVS7GN1s1WsnBW2R4kGLy-kcQ";
+            let alg = "RS256";
+            let at_hash = "JgDUCyoatJyEmGiiWbwOhA";
+
+            return JoseUtil.hashString(access_token, alg).then(hash => {
+                var left = hash.substr(0, hash.length / 2);
+                var left_b64u = JoseUtil.hexToBase64Url(left);
+    
+                left_b64u.should.be.equal(at_hash);
+            });
+        });
     });
 
 });

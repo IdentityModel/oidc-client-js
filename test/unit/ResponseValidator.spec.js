@@ -663,6 +663,8 @@ describe("ResponseValidator", function () {
                 subject._validateIdTokenWasCalled.should.be.true;
                 subject._validateAccessTokenWasCalled.should.be.true;
                 done();
+            }, reason => {
+                done(reason);
             });
 
         });
