@@ -6,7 +6,6 @@ var createWebpackConfig = function(options) {
     output: options.output,
     plugins: options.plugins,
     node: {
-      fs: 'empty', // Because of jsrsasign usage of fs
       buffer: 'empty'
     },
     module: {

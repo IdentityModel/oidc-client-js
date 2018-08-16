@@ -1,25 +1,40 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { jws, KEYUTIL as KeyUtil, X509, crypto, hextob64u, b64tohex } from '../jsrsasign/dist/jsrsasign.js';
 //import { jws, KEYUTIL as KeyUtil, X509, crypto, hextob64u, b64tohex } from 'jsrsasign';
 import { Log } from './Log';
+import { TextEncoder } from 'text-encoding-shim';
 
 const AllowedSigningAlgs = ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'ES256', 'ES384', 'ES512'];
 
 export class JoseUtil {
 
+    static getCrypto() {
+        return window.crypto || window.msCrypto; // for IE11
+    }
+
     static parseJwt(jwt) {
         Log.debug("JoseUtil.parseJwt");
-        try {
-            var token = jws.JWS.parse(jwt);
-            return {
-                header: token.headerObj,
-                payload: token.payloadObj
-            }
+        if(jwt == null) {
+            return;
         }
-        catch (e) {
+
+        try {
+            const tokenParts = jwt.split('.');
+            const headerBase64 = JoseUtil._padBase64(tokenParts[0]);
+            const headerJson = JoseUtil._b64DecodeUnicode(headerBase64);
+            const header = JSON.parse(headerJson);
+            const payloadBase64 = JoseUtil._padBase64(tokenParts[1]);
+            const payloadJson = JoseUtil._b64DecodeUnicode(payloadBase64);
+            const payload = JSON.parse(payloadJson);
+
+            return {
+                header: header,
+                payload: payload
+            };
+        } catch (e) {
             Log.error(e);
+            console.warn(e);
         }
     }
 
@@ -27,39 +42,39 @@ export class JoseUtil {
         Log.debug("JoseUtil.validateJwt");
 
         try {
-            if (key.kty === "RSA") {
-                if (key.e && key.n) {
-                    key = KeyUtil.getKey(key);
-                }
-                else if (key.x5c && key.x5c.length) {
-                    var hex = b64tohex(key.x5c[0]);
-                    key = X509.getPublicKeyFromCertHex(hex);
-                }
-                else {
-                    Log.error("JoseUtil.validateJwt: RSA key missing key material", key);
-                    return Promise.reject(new Error("RSA key missing key material"));
-                }
-            }
-            else if (key.kty === "EC") {
-                if (key.crv && key.x && key.y) {
-                    key = KeyUtil.getKey(key);
-                }
-                else {
-                    Log.error("JoseUtil.validateJwt: EC key missing key material", key);
-                    return Promise.reject(new Error("EC key missing key material"));
-                }
-            }
-            else {
-                Log.error("JoseUtil.validateJwt: Unsupported key type", key && key.kty);
-                return Promise.reject(new Error("Unsupported key type: " + key && key.kty));
-            }
-
             return JoseUtil._validateJwt(jwt, key, issuer, audience, clockSkew, now);
-        }
-        catch (e) {
+        } catch (e) {
             Log.error(e && e.message || e);
-            return Promise.reject("JWT validation failed");
+            return Promise.reject(new Error("JWT validation failed: " + e));
         }
+    }
+
+    static _getKey(jwt, key) {
+        const keys = jwt.keys;
+        const kid = key.kid;
+        const kty = key.kty;
+
+        if (kid && keys) {
+            key = keys.find(k => k['kid'] === kid /* && k['use'] === 'sig' */ );
+        } else {
+            let matchingKeys = keys.filter(
+                k => k['kty'] === kty && k['use'] === 'sig'
+            );
+
+            if (matchingKeys.length === 1) {
+                key = matchingKeys[0];
+            } else if (matchingKeys.length > 1) {
+                let error = 'More than one matching key found. Please specify a kid in the id_token header.';
+                console.error(error);
+                return Promise.reject(new Error(error));
+            } else {
+                let error = 'No matching key found';
+                console.error(error);
+                return Promise.reject(new Error(error));
+            }
+        }
+
+        return Promise.resolve(key);
     }
 
     static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
@@ -119,34 +134,103 @@ export class JoseUtil {
         }
 
         try {
-            if (!jws.JWS.verify(jwt, key, AllowedSigningAlgs)) {
-                Log.error("JoseUtil._validateJwt: signature validation failed");
-                return Promise.reject(new Error("signature validation failed"));
-            }
-        }
-        catch (e) {
+            return JoseUtil._verifyJwtSignature(jwt, key);
+        } catch (e) {
             Log.error(e && e.message || e);
-            return Promise.reject(new Error("signature validation failed"));
+            return Promise.reject(new Error("signature validation failed: " + e));
+        }
+    }
+
+    static _verifyJwtSignature(jwt, key) {
+        var alg = JoseUtil.parseJwt(jwt).header.alg;
+        var msg = '';
+        if(AllowedSigningAlgs.indexOf(alg) === -1) {
+            msg = 'Algorithm ' + alg + ' in header is not allowed';
+            Log.error(msg);
+            return Promise.reject(new Error(msg));
         }
 
-        return Promise.resolve();
+        if(alg.substr(0, 2).toUpperCase() !== key.kty.substr(0, 2).toUpperCase()) {
+            msg = 'Algorithm ' + key.kty + ' in key doesn\'t match signature';
+            Log.error(msg);
+            return Promise.reject(new Error(msg));
+        }
+ 
+        var splitted = jwt.split('.');
+        var body = splitted[1];
+        var sig = splitted[2];
+
+        let inferredAlg = this._inferHashAlgorithm(alg);
+
+        return crypto.subtle.importKey('jwk', key, inferredAlg, true, ['verify'])
+            .catch(reason => new Error('Error while loading key: ' + reason))
+            .then(cryptokey => crypto.subtle.verify(alg, cyptokey, new TextEncoder().encode(sig), TextEncoder.encode(body)))
+            .catch(reason => new Error('Error while veryfing signature: ' + reason))
+            .then(result => result ? Promise.resolve() : Promise.reject(new Error("signature validation failed")));
     }
 
     static hashString(value, alg) {
         try {
-            return crypto.Util.hashString(value, alg);
-        }
-        catch (e) {
+            const valueAsBytes = new TextEncoder().encode(value);
+            console.log('Hashing using ' + this._inferHashAlgorithm(alg) + ' ' );
+            return this.getCrypto().subtle.digest(this._inferHashAlgorithm(alg), valueAsBytes)
+                .catch(reason => Promise.reject(new Error('Error in hashString during digest: ' + reason)))
+                .then(resultBytes => {
+                    return String.fromCharCode.apply(null, new Uint16Array(resultBytes));
+                } )
+                .catch(reason => {
+                    return Promise.reject(reason.constructor.name === "Error" ? reason : new Error('Error in hashString during encoding: ' + reason))
+                })
+                ;
+        } catch (e) {
             Log.error(e);
+            return Promise.reject(new Error('Error while hashing: ' + e));
         }
     }
 
     static hexToBase64Url(value) {
         try {
-            return hextob64u(value);
-        }
-        catch (e) {
+            var s = (value.length % 2 == 1) ? "0" + value : value;
+            s = s.replace(/\=/g, "");
+            s = s.replace(/\+/g, "-");
+            s = s.replace(/\//g, "_");
+            return s;
+        } catch (e) {
             Log.error(e);
         }
+    }
+
+    static _padBase64(base64data) {
+        while (base64data.length % 4 !== 0) {
+            base64data += '=';
+        }
+        return base64data;
+    }
+
+    static _b64DecodeUnicode(str) {
+        const base64 = str.replace(/\-/g, '+').replace(/\_/g, '/');
+
+        return decodeURIComponent(
+            atob(base64)
+            .split('')
+            .map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join('')
+        );
+    }
+
+    static _inferHashAlgorithm(alg) {
+    
+        if (!alg.match(/^.S[0-9]{3}$/)) {
+          throw new Error('Algorithm not supported: ' + alg);
+        }
+    
+        return 'sha-' + alg.substr(2);
+      }
+
+    static _getCrypto() {
+        // IE11 is prefixed
+        return window.crypto || window.msCrypto || global.crypto || global.msCrypto;
     }
 }

@@ -362,21 +362,22 @@ export class ResponseValidator {
         }
 
         let sha = "sha" + hashBits;
-        var hash = this._joseUtil.hashString(response.access_token, sha);
-        if (!hash) {
-            Log.error("ResponseValidator._validateAccessToken: access_token hash failed:", sha);
-            return Promise.reject(new Error("Failed to validate at_hash"));
-        }
-
-        var left = hash.substr(0, hash.length / 2);
-        var left_b64u = this._joseUtil.hexToBase64Url(left);
-        if (left_b64u !== response.profile.at_hash) {
-            Log.error("ResponseValidator._validateAccessToken: Failed to validate at_hash", left_b64u, response.profile.at_hash);
-            return Promise.reject(new Error("Failed to validate at_hash"));
-        }
-
-        Log.debug("ResponseValidator._validateAccessToken: success");
-
-        return Promise.resolve(response);
+        return this._joseUtil.hashString(response.access_token, sha).then(hash => {
+            if (!hash) {
+                Log.error("ResponseValidator._validateAccessToken: access_token hash failed:", sha);
+                return Promise.reject(new Error("Failed to validate at_hash"));
+            }
+    
+            var left = hash.substr(0, hash.length / 2);
+            var left_b64u = this._joseUtil.hexToBase64Url(left);
+            if (left_b64u !== response.profile.at_hash) {
+                Log.error("ResponseValidator._validateAccessToken: Failed to validate at_hash", left_b64u, response.profile.at_hash);
+                return Promise.reject(new Error("Failed to validate at_hash"));
+            }
+    
+            Log.debug("ResponseValidator._validateAccessToken: success");
+    
+            return Promise.resolve(response);    
+        });
     }
 }
