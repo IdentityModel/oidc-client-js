@@ -201,6 +201,21 @@ describe("UserManagerSettings", function () {
         });
     });
 
+    describe("query_status_response_type", function() {
+        it("should return value from initial settings", function() {
+            let temp = 'type';
+            let subject = new UserManagerSettings({
+                query_status_response_type : temp
+            });
+            subject.query_status_response_type.should.equal(temp);
+        });
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.query_status_response_type.should.equal("id_token");
+        });
+    });
+
     describe("stopCheckSessionOnError", function() {
         it("should return value from initial settings", function() {
             let subject = new UserManagerSettings({
