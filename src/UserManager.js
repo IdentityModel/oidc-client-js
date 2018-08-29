@@ -100,17 +100,18 @@ export class UserManager extends OidcClient {
     }
 
     signinPopup(args = {}) {
-        let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
-        if (!url) {
+        let redirectUri = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
+        if (!redirectUri) {
             Log.error("UserManager.signinPopup: No popup_redirect_uri or redirect_uri configured");
             return Promise.reject(new Error("No popup_redirect_uri or redirect_uri configured"));
         }
 
-        args.redirect_uri = url;
+        args.redirect_uri = redirectUri;
         args.display = "popup";
 
         return this._signin(args, this._popupNavigator, {
-            startUrl: url,
+            startUrl: this.settings.authority,
+            redirectUri: redirectUri,
             popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
             popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
         }).then(user => {
