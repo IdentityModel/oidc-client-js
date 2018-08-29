@@ -21,7 +21,7 @@ export class PopupWindow {
         let target = params.popupWindowTarget || DefaultPopupTarget;
         let features = params.popupWindowFeatures || DefaultPopupFeatures;
 
-        this._popup = window.open('', target, features);
+        this._popup = window.open(params.startUrl, target, features);
         if (this._popup) {
             Log.debug("PopupWindow.ctor: popup successfully created");
             this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);
