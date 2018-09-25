@@ -42,6 +42,7 @@
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "mocha": "^5.2.0",
+    "mocha-cli": "^1.0.1",
     "open": "0.0.5",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^4.16.0",

@@ -23,12 +23,12 @@ export class Log {
     static get WARN() {return WARN};
     static get INFO() {return INFO};
     static get DEBUG() {return DEBUG};
-    
+
     static reset(){
         level = INFO;
         logger = nopLogger;
     }
-    
+
     static get level(){
         return level;
     }
@@ -40,7 +40,7 @@ export class Log {
             throw new Error("Invalid log level");
         }
     }
-    
+
     static get logger(){
         return logger;
     }
@@ -57,25 +57,25 @@ export class Log {
             throw new Error("Invalid logger");
         }
     }
-    
+
     static debug(...args){
         if (level >= DEBUG){
-            logger.debug.apply(logger, Array.from(args));
+            logger.debug(...args);
         }
     }
     static info(...args){
         if (level >= INFO){
-            logger.info.apply(logger, Array.from(args));
+            logger.info(...args);
         }
     }
     static warn(...args){
         if (level >= WARN){
-            logger.warn.apply(logger, Array.from(args));
+            logger.warn(...args);
         }
     }
     static error(...args){
         if (level >= ERROR){
-            logger.error.apply(logger, Array.from(args));
+            logger.error(...args);
         }
     }
 }
