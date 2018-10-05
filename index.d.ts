@@ -209,6 +209,7 @@ export interface UserManagerSettings extends OidcClientSettings {
   readonly includeIdTokenInSilentRenew?: boolean;
   readonly monitorSession?: boolean;
   readonly checkSessionInterval?: number;
+  readonly stopCheckSessionOnError?: boolean;
   readonly revokeAccessTokenOnSignout?: any;
   readonly accessTokenExpiringNotificationTime?: number;
   readonly redirectNavigator?: any;
