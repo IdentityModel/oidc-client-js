@@ -216,7 +216,7 @@ export class UserManager extends OidcClient {
             return this.processSigninResponse(navResponse.url).then(signinResponse => {
                 Log.debug("UserManager.querySessionStatus: got signin response");
 
-                if (signinResponse.session_state && signinResponse.profile.sub && signinResponse.profile.sid) {
+                if (signinResponse.session_state && signinResponse.profile.sub) {
                     Log.info("UserManager.querySessionStatus: querySessionStatus success for sub: ",  signinResponse.profile.sub);
                     return {
                         session_state: signinResponse.session_state,
