@@ -126,7 +126,7 @@ var files = [
 //    ,'jsrsasign/ext/ec-patch-min.js'
     ,'jsrsasign/ext/json-sans-eval-min.js'
 
-//	,'jsrsasign/min/asn1-1.0.min.js'
+	  ,'jsrsasign/min/asn1-1.0.min.js'
   	,'jsrsasign/min/asn1hex-1.1.min.js'
 //  	,'jsrsasign/min/asn1x509-1.0.min.js'
 //  	,'jsrsasign/min/asn1cms-1.0.min.js'
