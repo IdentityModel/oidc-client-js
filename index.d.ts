@@ -210,6 +210,7 @@ export interface UserManagerSettings extends OidcClientSettings {
   readonly monitorSession?: boolean;
   readonly checkSessionInterval?: number;
   readonly query_status_response_type?: string;
+  readonly stopCheckSessionOnError?: boolean;
   readonly revokeAccessTokenOnSignout?: any;
   readonly accessTokenExpiringNotificationTime?: number;
   readonly redirectNavigator?: any;
