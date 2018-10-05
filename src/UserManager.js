@@ -205,7 +205,7 @@ export class UserManager extends OidcClient {
 
         args.redirect_uri = url;
         args.prompt = "none";
-        args.response_type = this.settings.query_status_response_type;
+        args.response_type = args.response_type || this.settings.query_status_response_type;
         args.scope = "openid";
 
         return this._signinStart(args, this._iframeNavigator, {
