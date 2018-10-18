@@ -310,7 +310,7 @@ export class UserManager extends OidcClient {
             popupWindowFeatures: args.popupWindowFeatures || this.settings.popupWindowFeatures,
             popupWindowTarget: args.popupWindowTarget || this.settings.popupWindowTarget
         }).then(() => {
-            Log.info("UserManager.signinPopup: successful");
+            Log.info("UserManager.signoutPopup: successful");
         });
     }
     signoutPopupCallback(url, keepOpen) {
