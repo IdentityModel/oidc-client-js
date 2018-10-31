@@ -121,6 +121,18 @@ describe("UserManager", function () {
             }
             subject.signinSilent({silentRequestTimeout:234});
         });
+
+        it("should pass prompt from params", function(done){
+
+            settings.silent_redirect_uri = "http://client/silent_callback";
+            subject = new UserManager(settings);
+
+            subject._signin = function(args, nav, navArgs){
+                args.prompt.should.equal("foo");
+                done();
+            }
+            subject.signinSilent({prompt:"foo"});
+        });
     });
 
 });
