@@ -151,7 +151,7 @@ export class UserManager extends OidcClient {
         }
 
         args.redirect_uri = url;
-        args.prompt = "none";
+        args.prompt = args.prompt || "none";
 
         let setIdToken;
         if (args.id_token_hint || !this.settings.includeIdTokenInSilentRenew) {
