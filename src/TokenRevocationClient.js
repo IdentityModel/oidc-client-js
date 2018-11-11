@@ -60,6 +60,10 @@ export class TokenRevocationClient {
                     reject(Error(xhr.statusText + " (" + xhr.status + ")"));
                 }
             };
+            xhr.onerror = () => { 
+                Log.debug("TokenRevocationClient.revoke: Failed to connect to server.")
+                reject("Failed to connect to server");
+            };
 
             var body = "client_id=" + encodeURIComponent(client_id);
             if (client_secret) {
