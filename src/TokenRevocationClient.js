@@ -61,8 +61,8 @@ export class TokenRevocationClient {
                 }
             };
             xhr.onerror = () => { 
-                Log.debug("TokenRevocationClient.revoke: Failed to connect to server.")
-                reject("Failed to connect to server");
+                Log.debug("TokenRevocationClient.revoke: Network Error.")
+                reject("Network Error");
             };
 
             var body = "client_id=" + encodeURIComponent(client_id);
