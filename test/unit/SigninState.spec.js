@@ -34,6 +34,21 @@ describe("SigninState", function() {
             subject.nonce.should.be.ok;
         });
 
+        it("should accept code_verifier", function() {
+            var subject = new SigninState({ code_verifier: 5 });
+            subject.code_verifier.should.be.equal(5);
+        });
+
+        it("should generate code_verifier", function() {
+            var subject = new SigninState({ code_verifier: true });
+            subject.code_verifier.should.be.ok;
+        });
+
+        it("should generate code_challenge", function() {
+            var subject = new SigninState({ code_verifier: true });
+            subject.code_challenge.should.be.ok;
+        });
+
         it("should accept client_id", function() {
             var subject = new SigninState({ client_id: "client" });
             subject.client_id.should.be.equal("client");
