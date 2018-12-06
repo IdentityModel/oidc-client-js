@@ -243,16 +243,21 @@ export class ResponseValidator {
         };
 
         return this._tokenClient.exchangeCode(request).then(tokenResponse => {
-            if (tokenResponse.id_token) {
+            
+            for(var key in tokenResponse) {
+                response[key] = tokenResponse[key];
+            }
+
+            if (response.id_token) {
                 Log.debug("ResponseValidator._validateCode: token response successful, parsing id_token");
-                var jwt = this._joseUtil.parseJwt(tokenResponse.id_token);
-                tokenResponse.profile = jwt.payload;
+                var jwt = this._joseUtil.parseJwt(response.id_token);
+                response.profile = jwt.payload;
             }
             else {
                 Log.debug("ResponseValidator._validateCode: token response successful, returning response");
             }
             
-            return tokenResponse;
+            return response;
         });
     }
 

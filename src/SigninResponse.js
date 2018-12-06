@@ -23,11 +23,7 @@ export class SigninResponse {
         this.scope = values.scope;
         this.profile = undefined; // will be set from ResponseValidator
 
-        let expires_in = parseInt(values.expires_in);
-        if (typeof expires_in === 'number' && expires_in > 0) {
-            let now = parseInt(Date.now() / 1000);
-            this.expires_at = now + expires_in;
-        }
+        this.expires_in = values.expires_in;
     }
 
     get expires_in() {
@@ -36,6 +32,13 @@ export class SigninResponse {
             return this.expires_at - now;
         }
         return undefined;
+    }
+    set expires_in(value){
+        let expires_in = parseInt(value);
+        if (typeof expires_in === 'number' && expires_in > 0) {
+            let now = parseInt(Date.now() / 1000);
+            this.expires_at = now + expires_in;
+        }
     }
 
     get expired() {
