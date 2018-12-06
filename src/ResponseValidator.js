@@ -215,6 +215,11 @@ export class ResponseValidator {
     }
 
     _validateTokens(state, response) {
+        if (response.code) {
+            Log.debug("ResponseValidator._validateTokens: Validating code");
+            return this._processCode(state, response);
+        }
+
         if (response.id_token) {
             if (response.access_token) {
                 Log.debug("ResponseValidator._validateTokens: Validating id_token and access_token");
@@ -225,16 +230,11 @@ export class ResponseValidator {
             return this._validateIdToken(state, response);
         }
 
-        if (response.code) {
-            Log.debug("ResponseValidator._validateTokens: Validating code");
-            return this._validateCode(state, response);
-        }
-
-        Log.debug("ResponseValidator._validateTokens: No id_token to validate");
+        Log.debug("ResponseValidator._validateTokens: No code to process or id_token to validate");
         return Promise.resolve(response);
     }
 
-    _validateCode(state, response) {
+    _processCode(state, response) {
         var request = {
             client_id: state.client_id,
             code : response.code,
@@ -249,12 +249,13 @@ export class ResponseValidator {
             }
 
             if (response.id_token) {
-                Log.debug("ResponseValidator._validateCode: token response successful, parsing id_token");
+                Log.debug("ResponseValidator._processCode: token response successful, parsing id_token");
                 var jwt = this._joseUtil.parseJwt(response.id_token);
                 response.profile = jwt.payload;
+                //return this._validateIdToken(state, response);
             }
             else {
-                Log.debug("ResponseValidator._validateCode: token response successful, returning response");
+                Log.debug("ResponseValidator._processCode: token response successful, returning response");
             }
             
             return response;

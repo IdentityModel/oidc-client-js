@@ -65,6 +65,10 @@ export class OidcClient {
 
         let authority = this._settings.authority;
 
+        if (SigninRequest.isCode(response_type) && response_type !== "code") {
+            return Promise.reject(new Error("OpenID Connect hybrid flow is not supported"));
+        }
+
         return this._metadataService.getAuthorizationEndpoint().then(url => {
             Log.debug("OidcClient.createSigninRequest: Received authorization endpoint", url);
 
