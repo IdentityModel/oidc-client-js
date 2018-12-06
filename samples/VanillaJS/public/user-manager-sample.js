@@ -27,17 +27,17 @@ Oidc.Log.logger = console;
 Oidc.Log.level = Oidc.Log.WARN;
 
 var settings = {
-    authority: 'http://localhost:5000/oidc',
+    authority: 'http://localhost:15000/oidc',
     client_id: 'js.tokenmanager',
-    redirect_uri: 'http://localhost:5000/user-manager-sample.html',
-    post_logout_redirect_uri: 'http://localhost:5000/user-manager-sample.html',
+    redirect_uri: 'http://localhost:15000/user-manager-sample.html',
+    post_logout_redirect_uri: 'http://localhost:15000/user-manager-sample.html',
     response_type: 'id_token token',
     scope: 'openid email roles',
     
-    popup_redirect_uri:'http://localhost:5000/user-manager-sample-popup-signin.html',
-    popup_post_logout_redirect_uri:'http://localhost:5000/user-manager-sample-popup-signout.html',
+    popup_redirect_uri:'http://localhost:15000/user-manager-sample-popup-signin.html',
+    popup_post_logout_redirect_uri:'http://localhost:15000/user-manager-sample-popup-signout.html',
     
-    silent_redirect_uri:'http://localhost:5000/user-manager-sample-silent.html',
+    silent_redirect_uri:'http://localhost:15000/user-manager-sample-silent.html',
     automaticSilentRenew:true,
     //silentRequestTimeout:10000,
 
@@ -119,7 +119,7 @@ function endSigninMainWindow() {
 }
 
 function startSigninMainWindowDiffCallbackPage() {
-    mgr.signinRedirect({state:'some data', redirect_uri: 'http://localhost:5000/user-manager-sample-callback.html'}).then(function() {
+    mgr.signinRedirect({state:'some data', redirect_uri: 'http://localhost:15000/user-manager-sample-callback.html'}).then(function() {
         log("signinRedirect done");
     }).catch(function(err) {
         log(err);
