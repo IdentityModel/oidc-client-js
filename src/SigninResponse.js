@@ -14,6 +14,7 @@ export class SigninResponse {
         this.error_description = values.error_description;
         this.error_uri = values.error_uri;
 
+        this.code = values.code;
         this.state = values.state;
         this.id_token = values.id_token;
         this.session_state = values.session_state;

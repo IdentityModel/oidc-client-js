@@ -70,8 +70,8 @@ export class MetadataService {
         return this._getMetadataProperty("userinfo_endpoint");
     }
 
-    getTokenEndpoint() {
-        return this._getMetadataProperty("token_endpoint", true);
+    getTokenEndpoint(optional=true) {
+        return this._getMetadataProperty("token_endpoint", optional);
     }
 
     getCheckSessionIframe() {

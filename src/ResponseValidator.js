@@ -4,6 +4,7 @@
 import { Log } from './Log';
 import { MetadataService } from './MetadataService';
 import { UserInfoService } from './UserInfoService';
+import { TokenClient } from './TokenClient';
 import { ErrorResponse } from './ErrorResponse';
 import { JoseUtil } from './JoseUtil';
 
@@ -11,7 +12,11 @@ const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "
 
 export class ResponseValidator {
 
-    constructor(settings, MetadataServiceCtor = MetadataService, UserInfoServiceCtor = UserInfoService, joseUtil = JoseUtil) {
+    constructor(settings, 
+        MetadataServiceCtor = MetadataService,
+        UserInfoServiceCtor = UserInfoService, 
+        joseUtil = JoseUtil,
+        TokenClientCtor = TokenClient) {
         if (!settings) {
             Log.error("ResponseValidator.ctor: No settings passed to ResponseValidator");
             throw new Error("settings");
@@ -21,6 +26,7 @@ export class ResponseValidator {
         this._metadataService = new MetadataServiceCtor(this._settings);
         this._userInfoService = new UserInfoServiceCtor(this._settings);
         this._joseUtil = joseUtil;
+        this._tokenClient = new TokenClientCtor(this._settings);
     }
 
     validateSigninResponse(state, response) {
@@ -112,6 +118,16 @@ export class ResponseValidator {
         if (!state.nonce && response.id_token) {
             Log.error("ResponseValidator._processSigninParams: Not expecting id_token in response");
             return Promise.reject(new Error("Unexpected id_token in response"));
+        }
+
+        if (state.code_verifier && !response.code) {
+            Log.error("ResponseValidator._processSigninParams: Expecting code in response");
+            return Promise.reject(new Error("No code in response"));
+        }
+
+        if (!state.code_verifier && response.code) {
+            Log.error("ResponseValidator._processSigninParams: Not expecting code in response");
+            return Promise.reject(new Error("Unexpected code in response"));
         }
 
         return Promise.resolve(response);
@@ -209,8 +225,25 @@ export class ResponseValidator {
             return this._validateIdToken(state, response);
         }
 
+        if (response.code) {
+            Log.debug("ResponseValidator._validateTokens: Validating code");
+            return this._validateCode(state, response);
+        }
+
         Log.debug("ResponseValidator._validateTokens: No id_token to validate");
         return Promise.resolve(response);
+    }
+
+    _validateCode(state, response) {
+        var args = {
+            code : response.code,
+            redirect_uri: state.redirect_uri,
+            code_verifier: state.code_verifier,
+        };
+        return this._tokenClient.exchangeCode(args).then(tokenResponse => {
+            response.id_token = tokenResponse.id_token;
+            response.access_token = tokenResponse.access_token;
+        });
     }
 
     _validateIdTokenAndAccessToken(state, response) {

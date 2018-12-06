@@ -40,7 +40,7 @@ export class SigninRequest {
 
         let oidc = SigninRequest.isOidc(response_type);
         let code = SigninRequest.isCode(response_type);
-        this.state = new SigninState({ nonce: oidc, data, client_id, authority, code_verifier: code });
+        this.state = new SigninState({ nonce: oidc, data, client_id, authority, redirect_uri, code_verifier: code });
 
         url = UrlUtility.addQueryParam(url, "client_id", client_id);
         url = UrlUtility.addQueryParam(url, "redirect_uri", redirect_uri);
