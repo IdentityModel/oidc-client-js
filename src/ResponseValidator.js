@@ -235,14 +235,24 @@ export class ResponseValidator {
     }
 
     _validateCode(state, response) {
-        var args = {
+        var request = {
+            client_id: state.client_id,
             code : response.code,
             redirect_uri: state.redirect_uri,
             code_verifier: state.code_verifier,
         };
-        return this._tokenClient.exchangeCode(args).then(tokenResponse => {
-            response.id_token = tokenResponse.id_token;
-            response.access_token = tokenResponse.access_token;
+
+        return this._tokenClient.exchangeCode(request).then(tokenResponse => {
+            if (tokenResponse.id_token) {
+                Log.debug("ResponseValidator._validateCode: token response successful, parsing id_token");
+                var jwt = this._joseUtil.parseJwt(tokenResponse.id_token);
+                tokenResponse.profile = jwt.payload;
+            }
+            else {
+                Log.debug("ResponseValidator._validateCode: token response successful, returning response");
+            }
+            
+            return tokenResponse;
         });
     }
 

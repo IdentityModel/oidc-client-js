@@ -18,7 +18,6 @@ export class TokenClient {
     }
 
     exchangeCode(args = {}) {
-        args.client_id = args.client_id || settings.client_id;
         args.grant_type = args.grant_type || "authorization_code";
 
         if (!args.code) {
