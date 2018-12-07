@@ -249,16 +249,39 @@ export class ResponseValidator {
             }
 
             if (response.id_token) {
-                Log.debug("ResponseValidator._processCode: token response successful, parsing id_token");
-                var jwt = this._joseUtil.parseJwt(response.id_token);
-                response.profile = jwt.payload;
-                //return this._validateIdToken(state, response);
+                Log.debug("ResponseValidator._processCode: token response successful, processing id_token");
+                return this._validateIdTokenAttributes(state, response);
             }
             else {
                 Log.debug("ResponseValidator._processCode: token response successful, returning response");
             }
             
             return response;
+        });
+    }
+
+    _validateIdTokenAttributes(state, response) {
+        return this._metadataService.getIssuer().then(issuer => {
+
+            let audience = state.client_id;
+            let clockSkewInSeconds = this._settings.clockSkew;
+            Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
+
+            return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds).then(payload => {
+            
+                if (state.nonce && state.nonce !== payload.nonce) {
+                    Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
+                    return Promise.reject(new Error("Invalid nonce in id_token"));
+                }
+
+                if (!payload.sub) {
+                    Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
+                    return Promise.reject(new Error("No sub present in id_token"));
+                }
+
+                response.profile = payload;
+                return response;
+            });
         });
     }
 

@@ -62,7 +62,7 @@ export class JoseUtil {
         }
     }
 
-    static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
+    static validateJwtAttributes(jwt, issuer, audience, clockSkew, now) {
         if (!clockSkew) {
             clockSkew = 0;
         }
@@ -91,6 +91,10 @@ export class JoseUtil {
             Log.error("JoseUtil._validateJwt: Invalid audience in token", payload.aud);
             return Promise.reject(new Error("Invalid audience in token: " + payload.aud));
         }
+        if (payload.azp && payload.azp !== audience) {
+            Log.error("JoseUtil._validateJwt: Invalid azp in token", payload.azp);
+            return Promise.reject(new Error("Invalid azp in token: " + payload.azp));
+        }
 
         var lowerNow = now + clockSkew;
         var upperNow = now - clockSkew;
@@ -118,18 +122,25 @@ export class JoseUtil {
             return Promise.reject(new Error("exp is in the past:" + payload.exp));
         }
 
-        try {
-            if (!jws.JWS.verify(jwt, key, AllowedSigningAlgs)) {
-                Log.error("JoseUtil._validateJwt: signature validation failed");
+        return Promise.resolve(payload);
+    }
+
+    static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
+
+        return JoseUtil.validateJwtAttributes(jwt, issuer, audience, clockSkew, now).then(payload => {
+            try {
+                if (!jws.JWS.verify(jwt, key, AllowedSigningAlgs)) {
+                    Log.error("JoseUtil._validateJwt: signature validation failed");
+                    return Promise.reject(new Error("signature validation failed"));
+                }
+
+                return payload;
+            }
+            catch (e) {
+                Log.error(e && e.message || e);
                 return Promise.reject(new Error("signature validation failed"));
             }
-        }
-        catch (e) {
-            Log.error(e && e.message || e);
-            return Promise.reject(new Error("signature validation failed"));
-        }
-
-        return Promise.resolve();
+        });
     }
 
     static hashString(value, alg) {
