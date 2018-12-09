@@ -30,11 +30,8 @@ Oidc.Log.level = Oidc.Log.DEBUG;
 var url = window.location.origin;
 
 var settings = {
-    //authority: 'https://demo.identityserver.io',
-    authority: 'http://localhost:5000',
-    //authority: 'http://35.246.79.26/openid-connect-server-webapp',
-    client_id: 'js_code',
-    //client_id: 'client0',
+    authority: 'https://demo.identityserver.io',
+    client_id: 'native.code',
     redirect_uri: url + '/code-identityserver-sample.html',
     post_logout_redirect_uri: url + '/code-identityserver-sample.html',
     response_type: 'code',
