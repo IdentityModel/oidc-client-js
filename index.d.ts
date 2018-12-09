@@ -123,6 +123,7 @@ export interface OidcClientSettings {
   client_id?: string;
   client_secret?: string;
   readonly response_type?: string;
+  readonly response_mode?: string;
   readonly scope?: string;
   readonly redirect_uri?: string;
   readonly post_logout_redirect_uri?: string;

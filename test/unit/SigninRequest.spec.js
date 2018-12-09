@@ -175,6 +175,12 @@ describe("SigninRequest", function() {
             subject.url.should.contain("resource=foo");
         });
 
+        it("should include response_mode", function() {
+            settings.response_mode = "foo";
+            subject = new SigninRequest(settings);
+            subject.url.should.contain("response_mode=foo");
+        });
+
         it("should include request", function() {
             settings.request = "foo";
             subject = new SigninRequest(settings);
@@ -201,7 +207,6 @@ describe("SigninRequest", function() {
             subject = new SigninRequest(settings);
             subject.url.should.contain("code_challenge=");
             subject.url.should.contain("code_challenge_method=S256");
-            subject.url.should.contain("response_mode=fragment");
         });
         
         it("should include hybrid flow params", function() {
@@ -210,7 +215,6 @@ describe("SigninRequest", function() {
             subject.url.should.contain("nonce=");
             subject.url.should.contain("code_challenge=");
             subject.url.should.contain("code_challenge_method=S256");
-            subject.url.should.contain("response_mode=fragment");
         });
     });
 

@@ -6,9 +6,9 @@ import { UrlUtility } from './UrlUtility';
 const OidcScope = "openid";
 
 export class SigninResponse {
-    constructor(url) {
+    constructor(url, delimiter = "#") {
 
-        var values = UrlUtility.parseUrlFragment(url, "#");
+        var values = UrlUtility.parseUrlFragment(url, delimiter);
 
         this.error = values.error;
         this.error_description = values.error_description;

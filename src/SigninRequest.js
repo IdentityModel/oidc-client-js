@@ -10,7 +10,7 @@ export class SigninRequest {
         // mandatory
         url, client_id, redirect_uri, response_type, scope, authority,
         // optional
-        data, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource,
+        data, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, response_mode,
         request, request_uri, extraQueryParams,
     }) {
         if (!url) {
@@ -54,10 +54,9 @@ export class SigninRequest {
         if (code) {
             url = UrlUtility.addQueryParam(url, "code_challenge", this.state.code_challenge);
             url = UrlUtility.addQueryParam(url, "code_challenge_method", "S256");
-            url = UrlUtility.addQueryParam(url, "response_mode", "fragment");
         }
 
-        var optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri };
+        var optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri, response_mode };
         for(let key in optional){
             if (optional[key]) {
                 url = UrlUtility.addQueryParam(url, key, optional[key]);

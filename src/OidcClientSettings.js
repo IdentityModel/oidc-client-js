@@ -21,7 +21,7 @@ export class OidcClientSettings {
         client_id, client_secret, response_type = DefaultResponseType, scope = DefaultScope,
         redirect_uri, post_logout_redirect_uri,
         // optional protocol
-        prompt, display, max_age, ui_locales, acr_values, resource,
+        prompt, display, max_age, ui_locales, acr_values, resource, response_mode,
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
         staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
@@ -51,6 +51,7 @@ export class OidcClientSettings {
         this._ui_locales = ui_locales;
         this._acr_values = acr_values;
         this._resource = resource;
+        this._response_mode = response_mode;
 
         this._filterProtocolClaims = !!filterProtocolClaims;
         this._loadUserInfo = !!loadUserInfo;
@@ -113,6 +114,9 @@ export class OidcClientSettings {
     }
     get resource() {
         return this._resource;
+    }
+    get response_mode() {
+        return this._response_mode;
     }
 
 

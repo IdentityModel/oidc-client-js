@@ -163,6 +163,26 @@ describe("OidcClientSettings", function () {
         });
     });
 
+    describe("resource", function () {
+        it("should return value from initial settings", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                resource: "foo"
+            });
+            subject.resource.should.equal("foo");
+        });
+    });
+
+    describe("response_mode", function () {
+        it("should return value from initial settings", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                response_mode: "foo"
+            });
+            subject.response_mode.should.equal("foo");
+        });
+    });
+
     describe("authority", function () {
         it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({

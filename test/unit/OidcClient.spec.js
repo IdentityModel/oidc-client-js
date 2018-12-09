@@ -120,6 +120,7 @@ describe("OidcClient", function () {
             var p = subject.createSigninRequest({
                 data: 'foo',
                 response_type: 'bar',
+                response_mode: 'mode',
                 scope: 'baz',
                 redirect_uri: 'quux',
                 prompt: 'p',
@@ -152,6 +153,7 @@ describe("OidcClient", function () {
                 url.should.contain("resource=res");
                 url.should.contain("request=req");
                 url.should.contain("request_uri=req_uri");
+                url.should.contain("response_mode=mode");
 
                 done();
             });
