@@ -27,19 +27,24 @@ document.getElementById('popupSignout').addEventListener("click", popupSignout, 
 Oidc.Log.logger = console;
 Oidc.Log.level = Oidc.Log.DEBUG;
 
+var url = window.location.origin;
+
 var settings = {
-    //authority: 'https://demo.identityserver.io/',
-    authority: 'http://localhost:5000/',
+    //authority: 'https://demo.identityserver.io',
+    authority: 'http://localhost:5000',
+    //authority: 'http://35.246.79.26/openid-connect-server-webapp',
     client_id: 'js_code',
-    redirect_uri: 'http://localhost:15000/code-identityserver-sample.html',
-    post_logout_redirect_uri: 'http://localhost:15000/code-identityserver-sample.html',
+    //client_id: 'client0',
+    redirect_uri: url + '/code-identityserver-sample.html',
+    post_logout_redirect_uri: url + '/code-identityserver-sample.html',
     response_type: 'code',
-    scope: 'openid profile email api1',
+    //response_mode: 'fragment',
+    scope: 'openid profile',
     
-    popup_redirect_uri:'http://localhost:15000/code-identityserver-sample-popup-signin.html',
-    popup_post_logout_redirect_uri:'http://localhost:15000/code-identityserver-sample-popup-signout.html',
+    popup_redirect_uri: url + '/code-identityserver-sample-popup-signin.html',
+    popup_post_logout_redirect_uri: url + '/code-identityserver-sample-popup-signout.html',
     
-    silent_redirect_uri:'http://localhost:15000/code-identityserver-sample-silent.html',
+    silent_redirect_uri: url + '/code-identityserver-sample-silent.html',
     automaticSilentRenew:true,
     //silentRequestTimeout:10000,
 
@@ -121,7 +126,7 @@ function endSigninMainWindow() {
 }
 
 function startSigninMainWindowDiffCallbackPage() {
-    mgr.signinRedirect({state:'some data', redirect_uri: 'http://localhost:15000/code-identityserver-sample-callback.html'}).then(function() {
+    mgr.signinRedirect({state:'some data', redirect_uri: url + '/code-identityserver-sample-callback.html'}).then(function() {
         log("signinRedirect done");
     }).catch(function(err) {
         log(err);

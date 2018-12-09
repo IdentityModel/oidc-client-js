@@ -12,7 +12,7 @@ var app = express();
 
 var static = express.static(path.join(__dirname, 'public'));
 app.use(function (req, res, next) {
-    res.set('Content-Security-Policy', "default-src 'self' https://demo.identityserver.io http://localhost:5000");
+    //res.set('Content-Security-Policy', "default-src 'self' https://demo.identityserver.io http://localhost:" + port);
     next();
   });
 app.use(static);
