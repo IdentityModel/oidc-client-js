@@ -97,10 +97,9 @@ export class OidcClient {
     processSigninResponse(url, stateStore) {
         Log.debug("OidcClient.processSigninResponse");
 
-        let delimiter = "#";
-        if (this._settings.response_mode === "query" || SigninRequest.isCode(this._settings.response_type)) {
-            delimiter = "?";
-        }
+        let useQuery = this._settings.response_mode === "query" || 
+            (!this._settings.response_mode && SigninRequest.isCode(this._settings.response_type));
+        let delimiter = useQuery ? "?" : "#";
 
         var response = new SigninResponse(url, delimiter);
 
