@@ -237,11 +237,12 @@ export class ResponseValidator {
     _processCode(state, response) {
         var request = {
             client_id: state.client_id,
+            client_secret: this._settings.client_secret,
             code : response.code,
             redirect_uri: state.redirect_uri,
             code_verifier: state.code_verifier,
         };
-
+        
         return this._tokenClient.exchangeCode(request).then(tokenResponse => {
             
             for(var key in tokenResponse) {
