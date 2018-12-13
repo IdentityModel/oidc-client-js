@@ -125,10 +125,39 @@ export class JsonService {
                     }
 
                     reject(Error("Invalid response Content-Type: " + contentType + ", from URL: " + url));
+                    return;
                 }
-                else {
-                    reject(Error(req.statusText + " (" + req.status + ")"));
+
+                if (req.status === 400) {
+
+                    var contentType = req.getResponseHeader("Content-Type");
+                    if (contentType) {
+
+                        var found = allowedContentTypes.find(item=>{
+                            if (contentType.startsWith(item)) {
+                                return true;
+                            }
+                        });
+
+                        if (found) {
+                            try {
+                                var payload = JSON.parse(req.responseText);
+                                if (payload && payload.error) {
+                                    Log.error("JsonService.postForm: Error from server: ", payload.error);
+                                    reject(new Error(payload.error));
+                                    return;
+                                }
+                            }
+                            catch (e) {
+                                Log.error("JsonService.postForm: Error parsing JSON response", e.message);
+                                reject(e);
+                                return;
+                            }
+                        }
+                    }
                 }
+
+                reject(Error(req.statusText + " (" + req.status + ")"));
             };
 
             req.onerror = function() {
