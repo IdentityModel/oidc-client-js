@@ -167,12 +167,19 @@ export class JsonService {
 
             let body = "";
             for(let key in payload) {
-                if (body.length > 0) {
-                    body += "&";
+
+                let value = payload[key];
+
+                if (value) {
+
+                    if (body.length > 0) {
+                        body += "&";
+                    }
+
+                    body += encodeURIComponent(key);
+                    body += "=";
+                    body += encodeURIComponent(value);
                 }
-                body += encodeURIComponent(key);
-                body += "=";
-                body += encodeURIComponent(payload[key]);
             }
 
             req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
