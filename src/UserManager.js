@@ -9,12 +9,14 @@ import { UserManagerEvents } from './UserManagerEvents';
 import { SilentRenewService } from './SilentRenewService';
 import { SessionMonitor } from './SessionMonitor';
 import { TokenRevocationClient } from './TokenRevocationClient';
+import { TokenClient } from './TokenClient';
 
 export class UserManager extends OidcClient {
     constructor(settings = {},
         SilentRenewServiceCtor = SilentRenewService,
         SessionMonitorCtor = SessionMonitor,
-        TokenRevocationClientCtor = TokenRevocationClient
+        TokenRevocationClientCtor = TokenRevocationClient,
+        TokenClientCtor = TokenClient
     ) {
 
         if (!(settings instanceof UserManagerSettings)) {
@@ -37,6 +39,7 @@ export class UserManager extends OidcClient {
         }
 
         this._tokenRevocationClient = new TokenRevocationClientCtor(this._settings);
+        this._tokenClient = new TokenClientCtor(this._settings);
     }
 
     get _redirectNavigator() {
@@ -144,6 +147,51 @@ export class UserManager extends OidcClient {
     }
 
     signinSilent(args = {}) {
+        // first determine if we have a refresh token, or need to use iframe
+        return this._loadUser().then(user => {
+            if (user && user.refresh_token) {
+                args.refresh_token = user.refresh_token;
+                return this._useRefreshToken(args);
+            }
+            else {
+                args.id_token_hint = args.id_token_hint || (this.settings.includeIdTokenInSilentRenew && user.id_token);
+                return this._signinSilentIframe(args);
+            }
+        });
+    }
+
+    _useRefreshToken(args = {}) {
+        return this._tokenClient.exchangeRefreshToken(args).then(result => {
+            if (!result) {
+                Log.error("UserManager._useRefreshToken: No response returned from token endpoint");
+                return Promise.reject("No response returned from token endpoint");
+            }
+            if (!result.access_token) {
+                Log.error("UserManager._useRefreshToken: No access token returned from token endpoint");
+                return Promise.reject("No access token returned from token endpoint");
+            }
+
+            Log.debug("UserManager._useRefreshToken: refresh token response success");
+
+            return this._loadUser().then(user => {
+                if (user) {
+                    user.access_token = result.access_token;
+                    user.refresh_token = result.refresh_token || user.refresh_token;
+                    user.expires_in = result.expires_in;
+
+                    return this.storeUser(user).then(()=>{
+                        this._events.load(user);
+                        return user;
+                    });
+                }
+                else {
+                    return null;
+                }
+            });
+        });;
+    }
+    
+    _signinSilentIframe(args = {}) {
         let url = args.redirect_uri || this.settings.silent_redirect_uri;
         if (!url) {
             Log.error("UserManager.signinSilent: No silent_redirect_uri configured");
@@ -153,21 +201,9 @@ export class UserManager extends OidcClient {
         args.redirect_uri = url;
         args.prompt = args.prompt || "none";
 
-        let setIdToken;
-        if (args.id_token_hint || !this.settings.includeIdTokenInSilentRenew) {
-            setIdToken = Promise.resolve();
-        }
-        else {
-            setIdToken = this._loadUser().then(user => {
-                args.id_token_hint = user && user.id_token;
-            });
-        }
-
-        return setIdToken.then(() => {
-            return this._signin(args, this._iframeNavigator, {
-                startUrl: url,
-                silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
-            });
+        return this._signin(args, this._iframeNavigator, {
+            startUrl: url,
+            silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
         }).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
@@ -181,6 +217,7 @@ export class UserManager extends OidcClient {
             return user;
         });
     }
+
     signinSilentCallback(url) {
         return this._signinCallback(url, this._iframeNavigator).then(user => {
             if (user) {
@@ -384,6 +421,7 @@ export class UserManager extends OidcClient {
                     Log.debug("UserManager.revokeAccessToken: removing token properties from user and re-storing");
 
                     user.access_token = null;
+                    user.refresh_token = null;
                     user.expires_at = null;
                     user.token_type = null;
 
@@ -399,15 +437,41 @@ export class UserManager extends OidcClient {
     }
 
     _revokeInternal(user, required) {
-        var access_token = user && user.access_token;
+        if (user) {
+            var access_token = user.access_token;
+            var refresh_token = user.refresh_token;
 
+            return this._revokeAccessTokenInternal(access_token, require)
+                .then(atSuccess => {
+                    return this._revokeRefreshTokenInternal(refresh_token, required)
+                        .then(rtSuccess => {
+                            if (!atSuccess && !rtSuccess) {
+                                Log.debug("UserManager.revokeAccessToken: no need to revoke due to no token(s), or JWT format");
+                            }
+                            
+                            return atSuccess || rtSuccess;
+                        });
+                });
+        }
+
+        return Promise.resolve(false);
+    }
+
+    _revokeAccessTokenInternal(access_token, required) {
         // check for JWT vs. reference token
         if (!access_token || access_token.indexOf('.') >= 0) {
-            Log.debug("UserManager.revokeAccessToken: no need to revoke due to no user, token, or JWT format");
             return Promise.resolve(false);
         }
 
         return this._tokenRevocationClient.revoke(access_token, required).then(() => true);
+    }
+
+    _revokeRefreshTokenInternal(refresh_token, required) {
+        if (!refresh_token) {
+            return Promise.resolve(false);
+        }
+
+        return this._tokenRevocationClient.revoke(refresh_token, required, "refresh_token").then(() => true);
     }
 
     startSilentRenew() {

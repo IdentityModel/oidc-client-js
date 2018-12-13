@@ -33,7 +33,7 @@ describe("UserManager", function () {
         Global._testing();
 
         Log.logger = console;
-        Log.level = Log.NONE;
+        Log.level = Log.DEBUG;
 
         stubNavigator = {};
         stubUserStore = new StubStateStore();
@@ -95,7 +95,9 @@ describe("UserManager", function () {
 
     describe("signinSilent", function(){
 
-        it("should pass silentRequestTimeout from settings", function(done){
+        it("should pass silentRequestTimeout from settings", function(done) {
+
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
 
             settings.silentRequestTimeout = 123;
             settings.silent_redirect_uri = "http://client/silent_callback";
@@ -112,6 +114,8 @@ describe("UserManager", function () {
 
         it("should pass silentRequestTimeout from params", function(done){
 
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
+
             settings.silent_redirect_uri = "http://client/silent_callback";
             subject = new UserManager(settings);
 
@@ -123,6 +127,8 @@ describe("UserManager", function () {
         });
 
         it("should pass prompt from params", function(done){
+
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
 
             settings.silent_redirect_uri = "http://client/silent_callback";
             subject = new UserManager(settings);
