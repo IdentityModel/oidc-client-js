@@ -86,6 +86,10 @@ export class MetadataService {
         return this._getMetadataProperty("revocation_endpoint", true);
     }
 
+    getKeysEndpoint() {
+        return this._getMetadataProperty("jwks_uri", true);
+    }
+
     _getMetadataProperty(name, optional=false) {
         Log.debug("MetadataService.getMetadataProperty for: " + name);
 
