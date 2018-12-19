@@ -73,6 +73,8 @@ export interface MetadataService {
 
   getRevocationEndpoint(): Promise<string | undefined>;
 
+  getKeysEndpoint(): Promise<string | undefined>;
+
   getSigningKeys(): Promise<any[]>;
 }
 
