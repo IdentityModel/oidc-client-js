@@ -108,6 +108,7 @@ describe("UserManager", function () {
 
                 navArgs.silentRequestTimeout.should.equal(123);
                 done();
+                return Promise.resolve()
             }
             subject.signinSilent();
         });
@@ -122,6 +123,7 @@ describe("UserManager", function () {
             subject._signin = function(args, nav, navArgs){
                 navArgs.silentRequestTimeout.should.equal(234);
                 done();
+                return Promise.resolve()
             }
             subject.signinSilent({silentRequestTimeout:234});
         });
@@ -136,9 +138,21 @@ describe("UserManager", function () {
             subject._signin = function(args, nav, navArgs){
                 args.prompt.should.equal("foo");
                 done();
+                return Promise.resolve()
             }
             subject.signinSilent({prompt:"foo"});
         });
+
+        it("should work when having no User present", function(done) {
+            settings.silent_redirect_uri = "http://client/silent_callback";
+            subject = new UserManager(settings);
+
+            subject._signin = function(){
+                done();
+                return Promise.resolve()
+            }
+            subject.signinSilent({prompt:"foo"});
+        })
     });
 
 });
