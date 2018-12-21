@@ -158,7 +158,7 @@ export class UserManager extends OidcClient {
                 return this._useRefreshToken(args);
             }
             else {
-                args.id_token_hint = args.id_token_hint || (this.settings.includeIdTokenInSilentRenew && user.id_token);
+                args.id_token_hint = args.id_token_hint || (this.settings.includeIdTokenInSilentRenew && user && user.id_token);
                 return this._signinSilentIframe(args);
             }
         });
