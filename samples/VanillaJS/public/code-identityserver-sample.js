@@ -36,7 +36,8 @@ var settings = {
     post_logout_redirect_uri: url + '/code-identityserver-sample.html',
     response_type: 'code',
     //response_mode: 'fragment',
-    scope: 'openid profile api offline_access',
+    scope: 'openid profile api',
+    //scope: 'openid profile api offline_access',
     
     popup_redirect_uri: url + '/code-identityserver-sample-popup-signin.html',
     popup_post_logout_redirect_uri: url + '/code-identityserver-sample-popup-signout.html',
