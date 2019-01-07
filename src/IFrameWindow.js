@@ -105,11 +105,12 @@ export class IFrameWindow {
 
     static notifyParent(url) {
         Log.debug("IFrameWindow.notifyParent");
-
-        url = url || window.location.href;
-        if (url) {
-            Log.debug("IFrameWindow.notifyParent: posting url message to parent");
-            window.parent.postMessage(url, location.protocol + "//" + location.host);
+        if (window.frameElement) {
+            url = url || window.location.href;
+            if (url) {
+                Log.debug("IFrameWindow.notifyParent: posting url message to parent");
+                window.parent.postMessage(url, location.protocol + "//" + location.host);
+            }
         }
     }
 }
