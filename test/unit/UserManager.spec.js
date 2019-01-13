@@ -33,7 +33,7 @@ describe("UserManager", function () {
         Global._testing();
 
         Log.logger = console;
-        Log.level = Log.NONE;
+        Log.level = Log.DEBUG;
 
         stubNavigator = {};
         stubUserStore = new StubStateStore();
@@ -95,7 +95,9 @@ describe("UserManager", function () {
 
     describe("signinSilent", function(){
 
-        it("should pass silentRequestTimeout from settings", function(done){
+        it("should pass silentRequestTimeout from settings", function(done) {
+
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
 
             settings.silentRequestTimeout = 123;
             settings.silent_redirect_uri = "http://client/silent_callback";
@@ -106,11 +108,14 @@ describe("UserManager", function () {
 
                 navArgs.silentRequestTimeout.should.equal(123);
                 done();
+                return Promise.resolve()
             }
             subject.signinSilent();
         });
 
         it("should pass silentRequestTimeout from params", function(done){
+
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
 
             settings.silent_redirect_uri = "http://client/silent_callback";
             subject = new UserManager(settings);
@@ -118,9 +123,36 @@ describe("UserManager", function () {
             subject._signin = function(args, nav, navArgs){
                 navArgs.silentRequestTimeout.should.equal(234);
                 done();
+                return Promise.resolve()
             }
             subject.signinSilent({silentRequestTimeout:234});
         });
+
+        it("should pass prompt from params", function(done){
+
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
+
+            settings.silent_redirect_uri = "http://client/silent_callback";
+            subject = new UserManager(settings);
+
+            subject._signin = function(args, nav, navArgs){
+                args.prompt.should.equal("foo");
+                done();
+                return Promise.resolve()
+            }
+            subject.signinSilent({prompt:"foo"});
+        });
+
+        it("should work when having no User present", function(done) {
+            settings.silent_redirect_uri = "http://client/silent_callback";
+            subject = new UserManager(settings);
+
+            subject._signin = function(){
+                done();
+                return Promise.resolve()
+            }
+            subject.signinSilent({prompt:"foo"});
+        })
     });
 
 });

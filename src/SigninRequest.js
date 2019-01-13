@@ -10,7 +10,7 @@ export class SigninRequest {
         // mandatory
         url, client_id, redirect_uri, response_type, scope, authority,
         // optional
-        data, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource,
+        data, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, response_mode,
         request, request_uri, extraQueryParams,
     }) {
         if (!url) {
@@ -39,7 +39,8 @@ export class SigninRequest {
         }
 
         let oidc = SigninRequest.isOidc(response_type);
-        this.state = new SigninState({ nonce: oidc, data, client_id, authority });
+        let code = SigninRequest.isCode(response_type);
+        this.state = new SigninState({ nonce: oidc, data, client_id, authority, redirect_uri, code_verifier: code });
 
         url = UrlUtility.addQueryParam(url, "client_id", client_id);
         url = UrlUtility.addQueryParam(url, "redirect_uri", redirect_uri);
@@ -50,8 +51,12 @@ export class SigninRequest {
         if (oidc) {
             url = UrlUtility.addQueryParam(url, "nonce", this.state.nonce);
         }
+        if (code) {
+            url = UrlUtility.addQueryParam(url, "code_challenge", this.state.code_challenge);
+            url = UrlUtility.addQueryParam(url, "code_challenge_method", "S256");
+        }
 
-        var optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri };
+        var optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri, response_mode };
         for(let key in optional){
             if (optional[key]) {
                 url = UrlUtility.addQueryParam(url, key, optional[key]);
@@ -75,6 +80,13 @@ export class SigninRequest {
     static isOAuth(response_type) {
         var result = response_type.split(/\s+/g).filter(function(item) {
             return item === "token";
+        });
+        return !!(result[0]);
+    }
+    
+    static isCode(response_type) {
+        var result = response_type.split(/\s+/g).filter(function(item) {
+            return item === "code";
         });
         return !!(result[0]);
     }

@@ -6,6 +6,7 @@ import { MetadataService } from './MetadataService';
 import { Global } from './Global';
 
 const AccessTokenTypeHint = "access_token";
+const RefreshTokenTypeHint = "refresh_token";
 
 export class TokenRevocationClient {
     constructor(settings, XMLHttpRequestCtor = Global.XMLHttpRequest, MetadataServiceCtor = MetadataService) {
@@ -19,10 +20,15 @@ export class TokenRevocationClient {
         this._metadataService = new MetadataServiceCtor(this._settings);
     }
 
-    revoke(accessToken, required) {
-        if (!accessToken) {
-            Log.error("TokenRevocationClient.revoke: No accessToken provided");
-            throw new Error("No accessToken provided.");
+    revoke(token, required, type = "access_token") {
+        if (!token) {
+            Log.error("TokenRevocationClient.revoke: No token provided");
+            throw new Error("No token provided.");
+        }
+
+        if (type !== AccessTokenTypeHint && type != RefreshTokenTypeHint) {
+            Log.error("TokenRevocationClient.revoke: Invalid token type");
+            throw new Error("Invalid token type.");
         }
 
         return this._metadataService.getRevocationEndpoint().then(url => {
@@ -36,14 +42,14 @@ export class TokenRevocationClient {
                 return;
             }
 
-            Log.error("TokenRevocationClient.revoke: Revoking access token");
+            Log.debug("TokenRevocationClient.revoke: Revoking " + type);
             var client_id = this._settings.client_id;
             var client_secret = this._settings.client_secret;
-            return this._revoke(url, client_id, client_secret, accessToken);
+            return this._revoke(url, client_id, client_secret, token, type);
         });
     }
 
-    _revoke(url, client_id, client_secret, accessToken) {
+    _revoke(url, client_id, client_secret, token, type) {
 
         return new Promise((resolve, reject) => {
 
@@ -60,13 +66,17 @@ export class TokenRevocationClient {
                     reject(Error(xhr.statusText + " (" + xhr.status + ")"));
                 }
             };
+            xhr.onerror = () => { 
+                Log.debug("TokenRevocationClient.revoke: Network Error.")
+                reject("Network Error");
+            };
 
             var body = "client_id=" + encodeURIComponent(client_id);
             if (client_secret) {
                 body += "&client_secret=" + encodeURIComponent(client_secret);
             }
-            body += "&token_type_hint=" + encodeURIComponent(AccessTokenTypeHint);
-            body += "&token=" + encodeURIComponent(accessToken);
+            body += "&token_type_hint=" + encodeURIComponent(type);
+            body += "&token=" + encodeURIComponent(token);
 
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.send(body);

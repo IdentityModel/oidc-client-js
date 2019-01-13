@@ -4,6 +4,7 @@
 import { Log } from './Log';
 import { MetadataService } from './MetadataService';
 import { UserInfoService } from './UserInfoService';
+import { TokenClient } from './TokenClient';
 import { ErrorResponse } from './ErrorResponse';
 import { JoseUtil } from './JoseUtil';
 
@@ -11,7 +12,11 @@ const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "
 
 export class ResponseValidator {
 
-    constructor(settings, MetadataServiceCtor = MetadataService, UserInfoServiceCtor = UserInfoService, joseUtil = JoseUtil) {
+    constructor(settings, 
+        MetadataServiceCtor = MetadataService,
+        UserInfoServiceCtor = UserInfoService, 
+        joseUtil = JoseUtil,
+        TokenClientCtor = TokenClient) {
         if (!settings) {
             Log.error("ResponseValidator.ctor: No settings passed to ResponseValidator");
             throw new Error("settings");
@@ -21,6 +26,7 @@ export class ResponseValidator {
         this._metadataService = new MetadataServiceCtor(this._settings);
         this._userInfoService = new UserInfoServiceCtor(this._settings);
         this._joseUtil = joseUtil;
+        this._tokenClient = new TokenClientCtor(this._settings);
     }
 
     validateSigninResponse(state, response) {
@@ -114,6 +120,16 @@ export class ResponseValidator {
             return Promise.reject(new Error("Unexpected id_token in response"));
         }
 
+        if (state.code_verifier && !response.code) {
+            Log.error("ResponseValidator._processSigninParams: Expecting code in response");
+            return Promise.reject(new Error("No code in response"));
+        }
+
+        if (!state.code_verifier && response.code) {
+            Log.error("ResponseValidator._processSigninParams: Not expecting code in response");
+            return Promise.reject(new Error("Unexpected code in response"));
+        }
+
         return Promise.resolve(response);
     }
 
@@ -199,6 +215,11 @@ export class ResponseValidator {
     }
 
     _validateTokens(state, response) {
+        if (response.code) {
+            Log.debug("ResponseValidator._validateTokens: Validating code");
+            return this._processCode(state, response);
+        }
+
         if (response.id_token) {
             if (response.access_token) {
                 Log.debug("ResponseValidator._validateTokens: Validating id_token and access_token");
@@ -209,8 +230,60 @@ export class ResponseValidator {
             return this._validateIdToken(state, response);
         }
 
-        Log.debug("ResponseValidator._validateTokens: No id_token to validate");
+        Log.debug("ResponseValidator._validateTokens: No code to process or id_token to validate");
         return Promise.resolve(response);
+    }
+
+    _processCode(state, response) {
+        var request = {
+            client_id: state.client_id,
+            client_secret: this._settings.client_secret,
+            code : response.code,
+            redirect_uri: state.redirect_uri,
+            code_verifier: state.code_verifier,
+        };
+        
+        return this._tokenClient.exchangeCode(request).then(tokenResponse => {
+            
+            for(var key in tokenResponse) {
+                response[key] = tokenResponse[key];
+            }
+
+            if (response.id_token) {
+                Log.debug("ResponseValidator._processCode: token response successful, processing id_token");
+                return this._validateIdTokenAttributes(state, response);
+            }
+            else {
+                Log.debug("ResponseValidator._processCode: token response successful, returning response");
+            }
+            
+            return response;
+        });
+    }
+
+    _validateIdTokenAttributes(state, response) {
+        return this._metadataService.getIssuer().then(issuer => {
+
+            let audience = state.client_id;
+            let clockSkewInSeconds = this._settings.clockSkew;
+            Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
+
+            return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds).then(payload => {
+            
+                if (state.nonce && state.nonce !== payload.nonce) {
+                    Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
+                    return Promise.reject(new Error("Invalid nonce in id_token"));
+                }
+
+                if (!payload.sub) {
+                    Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
+                    return Promise.reject(new Error("No sub present in id_token"));
+                }
+
+                response.profile = payload;
+                return response;
+            });
+        });
     }
 
     _validateIdTokenAndAccessToken(state, response) {

@@ -175,6 +175,12 @@ describe("SigninRequest", function() {
             subject.url.should.contain("resource=foo");
         });
 
+        it("should include response_mode", function() {
+            settings.response_mode = "foo";
+            subject = new SigninRequest(settings);
+            subject.url.should.contain("response_mode=foo");
+        });
+
         it("should include request", function() {
             settings.request = "foo";
             subject = new SigninRequest(settings);
@@ -196,6 +202,20 @@ describe("SigninRequest", function() {
             subject.url.should.contain('hd=domain.com&foo=bar');
         });
 
+        it("should include code flow params", function() {
+            settings.response_type = "code";
+            subject = new SigninRequest(settings);
+            subject.url.should.contain("code_challenge=");
+            subject.url.should.contain("code_challenge_method=S256");
+        });
+        
+        it("should include hybrid flow params", function() {
+            settings.response_type = "code id_token";
+            subject = new SigninRequest(settings);
+            subject.url.should.contain("nonce=");
+            subject.url.should.contain("code_challenge=");
+            subject.url.should.contain("code_challenge_method=S256");
+        });
     });
 
     describe("isOidc", function() {
@@ -213,6 +233,20 @@ describe("SigninRequest", function() {
             SigninRequest.isOAuth("id_token token").should.be.true;
             SigninRequest.isOAuth("token id_token").should.be.true;
             SigninRequest.isOAuth("id_token").should.be.false;
+        });
+    });
+
+    describe("isCode", function() {
+        it("should indicate if response_type is code", function() {
+            SigninRequest.isCode("code").should.be.true;
+            SigninRequest.isCode("id_token code").should.be.true;
+            SigninRequest.isCode("code id_token").should.be.true;
+            SigninRequest.isCode("id_token token code").should.be.true;
+            SigninRequest.isCode("id_token code token").should.be.true;
+            SigninRequest.isCode("code id_token token").should.be.true;
+
+            SigninRequest.isCode("id_token token").should.be.false;
+            SigninRequest.isCode("token id_token").should.be.false;
         });
     });
 

@@ -11,6 +11,7 @@ import { Global } from './Global';
 
 const DefaultAccessTokenExpiringNotificationTime = 60;
 const DefaultCheckSessionInterval = 2000;
+const DefaultQuerySessionStatusResponseType = "id_token";
 
 export class UserManagerSettings extends OidcClientSettings {
     constructor({
@@ -25,6 +26,7 @@ export class UserManagerSettings extends OidcClientSettings {
         monitorSession = true,
         checkSessionInterval = DefaultCheckSessionInterval,
         stopCheckSessionOnError = true,
+        query_status_response_type = DefaultQuerySessionStatusResponseType,
         revokeAccessTokenOnSignout = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
@@ -48,6 +50,7 @@ export class UserManagerSettings extends OidcClientSettings {
         this._monitorSession = monitorSession;
         this._checkSessionInterval = checkSessionInterval;
         this._stopCheckSessionOnError = stopCheckSessionOnError;
+        this._query_status_response_type = query_status_response_type;
         this._revokeAccessTokenOnSignout = revokeAccessTokenOnSignout;
 
         this._redirectNavigator = redirectNavigator;
@@ -94,6 +97,9 @@ export class UserManagerSettings extends OidcClientSettings {
     }
     get stopCheckSessionOnError(){
         return this._stopCheckSessionOnError;
+    }
+    get query_status_response_type(){
+        return this._query_status_response_type;
     }
     get revokeAccessTokenOnSignout() {
         return this._revokeAccessTokenOnSignout;

@@ -70,8 +70,8 @@ export class MetadataService {
         return this._getMetadataProperty("userinfo_endpoint");
     }
 
-    getTokenEndpoint() {
-        return this._getMetadataProperty("token_endpoint", true);
+    getTokenEndpoint(optional=true) {
+        return this._getMetadataProperty("token_endpoint", optional);
     }
 
     getCheckSessionIframe() {
@@ -84,6 +84,10 @@ export class MetadataService {
 
     getRevocationEndpoint() {
         return this._getMetadataProperty("revocation_endpoint", true);
+    }
+
+    getKeysEndpoint() {
+        return this._getMetadataProperty("jwks_uri", true);
     }
 
     _getMetadataProperty(name, optional=false) {

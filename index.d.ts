@@ -73,6 +73,8 @@ export interface MetadataService {
 
   getRevocationEndpoint(): Promise<string | undefined>;
 
+  getKeysEndpoint(): Promise<string | undefined>;
+
   getSigningKeys(): Promise<any[]>;
 }
 
@@ -123,6 +125,7 @@ export interface OidcClientSettings {
   client_id?: string;
   client_secret?: string;
   readonly response_type?: string;
+  readonly response_mode?: string;
   readonly scope?: string;
   readonly redirect_uri?: string;
   readonly post_logout_redirect_uri?: string;
@@ -176,7 +179,7 @@ export class UserManager extends OidcClient {
 
   startSilentRenew(): void;
   stopSilentRenew(): void;
-  
+
   events: UserManagerEvents;
 }
 
@@ -195,7 +198,7 @@ export interface UserManagerEvents extends AccessTokenEvents {
 
   addUserSignedOut(callback: (...ev: any[]) => void): void;
   removeUserSignedOut(callback: (...ev: any[]) => void): void;
-  
+
   addUserSessionChanged(callback: (...ev: any[]) => void): void;
   removeUserSessionChanged(callback: (...ev: any[]) => void): void;
 }
@@ -210,6 +213,8 @@ export interface UserManagerSettings extends OidcClientSettings {
   readonly includeIdTokenInSilentRenew?: boolean;
   readonly monitorSession?: boolean;
   readonly checkSessionInterval?: number;
+  readonly query_status_response_type?: string;
+  readonly stopCheckSessionOnError?: boolean;
   readonly revokeAccessTokenOnSignout?: any;
   readonly accessTokenExpiringNotificationTime?: number;
   readonly redirectNavigator?: any;

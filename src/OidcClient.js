@@ -44,7 +44,7 @@ export class OidcClient {
         // have round tripped, but people were getting confused, so i added state (since that matches the spec)
         // and so now if data is not passed, but state is then state will be used
         data, state, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
-        resource, request, request_uri, extraQueryParams } = {},
+        resource, request, request_uri, response_mode, extraQueryParams } = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSigninRequest");
@@ -61,9 +61,14 @@ export class OidcClient {
         ui_locales = ui_locales || this._settings.ui_locales;
         acr_values = acr_values || this._settings.acr_values;
         resource = resource || this._settings.resource;
+        response_mode = response_mode || this._settings.response_mode;
         extraQueryParams = extraQueryParams || this._settings.extraQueryParams;
 
         let authority = this._settings.authority;
+
+        if (SigninRequest.isCode(response_type) && response_type !== "code") {
+            return Promise.reject(new Error("OpenID Connect hybrid flow is not supported"));
+        }
 
         return this._metadataService.getAuthorizationEndpoint().then(url => {
             Log.debug("OidcClient.createSigninRequest: Received authorization endpoint", url);
@@ -77,7 +82,7 @@ export class OidcClient {
                 data: data || state,
                 authority,
                 prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
-                resource, request, request_uri, extraQueryParams,
+                resource, request, request_uri, extraQueryParams, response_mode
             });
 
             var signinState = signinRequest.state;
@@ -92,7 +97,11 @@ export class OidcClient {
     processSigninResponse(url, stateStore) {
         Log.debug("OidcClient.processSigninResponse");
 
-        var response = new SigninResponse(url);
+        let useQuery = this._settings.response_mode === "query" || 
+            (!this._settings.response_mode && SigninRequest.isCode(this._settings.response_type));
+        let delimiter = useQuery ? "?" : "#";
+
+        var response = new SigninResponse(url, delimiter);
 
         if (!response.state) {
             Log.error("OidcClient.processSigninResponse: No state in response");

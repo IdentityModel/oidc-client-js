@@ -34,6 +34,26 @@ describe("SigninState", function() {
             subject.nonce.should.be.ok;
         });
 
+        it("should accept redirect_uri", function() {
+            var subject = new SigninState({ redirect_uri: "http://cb" });
+            subject.redirect_uri.should.be.equal("http://cb");
+        });
+
+        it("should accept code_verifier", function() {
+            var subject = new SigninState({ code_verifier: 5 });
+            subject.code_verifier.should.be.equal(5);
+        });
+
+        it("should generate code_verifier", function() {
+            var subject = new SigninState({ code_verifier: true });
+            subject.code_verifier.should.be.ok;
+        });
+
+        it("should generate code_challenge", function() {
+            var subject = new SigninState({ code_verifier: true });
+            subject.code_challenge.should.be.ok;
+        });
+
         it("should accept client_id", function() {
             var subject = new SigninState({ client_id: "client" });
             subject.client_id.should.be.equal("client");
@@ -46,7 +66,7 @@ describe("SigninState", function() {
     });
 
     it("can serialize and then deserialize", function() {
-        var subject1 = new SigninState({ nonce: true, data: { foo: "test" }, created: 1000, client_id:"client", authority:"authority" });
+        var subject1 = new SigninState({ nonce: true, data: { foo: "test" }, created: 1000, client_id:"client", authority:"authority", redirect_uri:"http://cb", code_verifier:true });
 
         var storage = subject1.toStorageString();
         var subject2 = SigninState.fromStorageString(storage);

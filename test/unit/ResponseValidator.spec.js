@@ -397,6 +397,31 @@ describe("ResponseValidator", function () {
 
         });
 
+        it("should fail if request was code flow but no code in response", function (done) {
+
+            stubResponse.id_token = id_token;
+            stubState.code_verifier = "secret";
+            delete stubResponse.code;
+
+            subject._processSigninParams(stubState, stubResponse).then(null, err => {
+                err.message.should.contain("code");
+                done();
+            });
+
+        });
+        
+        it("should fail if request was not code flow no code in response", function (done) {
+
+            stubResponse.id_token = id_token;
+            stubResponse.code = "code";
+
+            subject._processSigninParams(stubState, stubResponse).then(null, err => {
+                err.message.should.contain("code");
+                done();
+            });
+
+        });
+
         it("should return data for successful responses", function (done) {
 
             stubResponse.id_token = id_token;

@@ -95,4 +95,109 @@ export class JsonService {
             req.send();
         });
     }
+
+    postForm(url, payload) {
+        if (!url){
+            Log.error("JsonService.postForm: No url passed");
+            throw new Error("url");
+        }
+
+        Log.debug("JsonService.postForm, url: ", url);
+
+        return new Promise((resolve, reject) => {
+
+            var req = new this._XMLHttpRequest();
+            req.open('POST', url);
+
+            var allowedContentTypes = this._contentTypes;
+
+            req.onload = function() {
+                Log.debug("JsonService.postForm: HTTP response received, status", req.status);
+
+                if (req.status === 200) {
+
+                    var contentType = req.getResponseHeader("Content-Type");
+                    if (contentType) {
+
+                        var found = allowedContentTypes.find(item=>{
+                            if (contentType.startsWith(item)) {
+                                return true;
+                            }
+                        });
+
+                        if (found) {
+                            try {
+                                resolve(JSON.parse(req.responseText));
+                                return;
+                            }
+                            catch (e) {
+                                Log.error("JsonService.postForm: Error parsing JSON response", e.message);
+                                reject(e);
+                                return;
+                            }
+                        }
+                    }
+
+                    reject(Error("Invalid response Content-Type: " + contentType + ", from URL: " + url));
+                    return;
+                }
+
+                if (req.status === 400) {
+
+                    var contentType = req.getResponseHeader("Content-Type");
+                    if (contentType) {
+
+                        var found = allowedContentTypes.find(item=>{
+                            if (contentType.startsWith(item)) {
+                                return true;
+                            }
+                        });
+
+                        if (found) {
+                            try {
+                                var payload = JSON.parse(req.responseText);
+                                if (payload && payload.error) {
+                                    Log.error("JsonService.postForm: Error from server: ", payload.error);
+                                    reject(new Error(payload.error));
+                                    return;
+                                }
+                            }
+                            catch (e) {
+                                Log.error("JsonService.postForm: Error parsing JSON response", e.message);
+                                reject(e);
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                reject(Error(req.statusText + " (" + req.status + ")"));
+            };
+
+            req.onerror = function() {
+                Log.error("JsonService.postForm: network error");
+                reject(Error("Network Error"));
+            };
+
+            let body = "";
+            for(let key in payload) {
+
+                let value = payload[key];
+
+                if (value) {
+
+                    if (body.length > 0) {
+                        body += "&";
+                    }
+
+                    body += encodeURIComponent(key);
+                    body += "=";
+                    body += encodeURIComponent(value);
+                }
+            }
+
+            req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            req.send(body);
+        });
+    }
 }

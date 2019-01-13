@@ -20,7 +20,6 @@ import { StubStateStore } from './StubStateStore';
 import { StubResponseValidator } from './StubResponseValidator';
 
 import chai from 'chai';
-import { Z_NO_COMPRESSION } from 'zlib';
 chai.should();
 let assert = chai.assert;
 
@@ -121,6 +120,7 @@ describe("OidcClient", function () {
             var p = subject.createSigninRequest({
                 data: 'foo',
                 response_type: 'bar',
+                response_mode: 'mode',
                 scope: 'baz',
                 redirect_uri: 'quux',
                 prompt: 'p',
@@ -153,6 +153,7 @@ describe("OidcClient", function () {
                 url.should.contain("resource=res");
                 url.should.contain("request=req");
                 url.should.contain("request_uri=req_uri");
+                url.should.contain("response_mode=mode");
 
                 done();
             });
@@ -193,6 +194,30 @@ describe("OidcClient", function () {
                 url.should.contain("acr_values=av");
                 url.should.contain("resource=res");
 
+                done();
+            });
+        });
+
+        it("should fail if hybrid code id_token requested", function (done) {
+            var p = subject.createSigninRequest({response_type:"code id_token"});
+            p.then(null, err => {
+                err.message.should.contain("hybrid");
+                done();
+            });
+        });
+
+        it("should fail if hybrid code token requested", function (done) {
+            var p = subject.createSigninRequest({response_type:"code token"});
+            p.then(null, err => {
+                err.message.should.contain("hybrid");
+                done();
+            });
+        });
+
+        it("should fail if hybrid code id_token token requested", function (done) {
+            var p = subject.createSigninRequest({response_type:"code id_token token"});
+            p.then(null, err => {
+                err.message.should.contain("hybrid");
                 done();
             });
         });

@@ -4,10 +4,11 @@
 import { Log } from './Log';
 
 export class User {
-    constructor({id_token, session_state, access_token, token_type, scope, profile, expires_at, state}) {
+    constructor({id_token, session_state, access_token, refresh_token, token_type, scope, profile, expires_at, state}) {
         this.id_token = id_token;
         this.session_state = session_state;
         this.access_token = access_token;
+        this.refresh_token = refresh_token;
         this.token_type = token_type;
         this.scope = scope;
         this.profile = profile;
@@ -21,6 +22,13 @@ export class User {
             return this.expires_at - now;
         }
         return undefined;
+    }
+    set expires_in(value) {
+        let expires_in = parseInt(value);
+        if (typeof expires_in === 'number' && expires_in > 0) {
+            let now = parseInt(Date.now() / 1000);
+            this.expires_at = now + expires_in;
+        }
     }
 
     get expired() {
@@ -41,6 +49,7 @@ export class User {
             id_token: this.id_token,
             session_state: this.session_state,
             access_token: this.access_token,
+            refresh_token: this.refresh_token,
             token_type: this.token_type,
             scope: this.scope,
             profile: this.profile,

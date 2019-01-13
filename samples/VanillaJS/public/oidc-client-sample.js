@@ -18,10 +18,10 @@ Oidc.Log.logger = console;
 Oidc.Log.level = Oidc.Log.INFO;
 
 var settings = {
-    authority: 'http://localhost:5000/oidc',
+    authority: 'http://localhost:15000/oidc',
     client_id: 'js.tokenmanager',
-    redirect_uri: 'http://localhost:5000/oidc-client-sample.html',
-    post_logout_redirect_uri: 'http://localhost:5000/oidc-client-sample.html',
+    redirect_uri: 'http://localhost:15000/oidc-client-sample.html',
+    post_logout_redirect_uri: 'http://localhost:15000/oidc-client-sample.html',
     response_type: 'id_token token',
     scope: 'openid email roles',
 
@@ -55,7 +55,7 @@ function processSigninResponse() {
 }
 
 function signinDifferentCallback(){
-    client.createSigninRequest({ state: { bar: 15 }, redirect_uri: 'http://localhost:5000/oidc-client-sample-callback.html' }).then(function(req) {
+    client.createSigninRequest({ state: { bar: 15 }, redirect_uri: 'http://localhost:15000/oidc-client-sample-callback.html' }).then(function(req) {
         log("signin request", req, "<a href='" + req.url + "'>go signin</a>");
         if (followLinks()) {
             window.location = req.url;

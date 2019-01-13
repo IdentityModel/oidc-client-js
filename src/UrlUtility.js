@@ -31,6 +31,14 @@ export class UrlUtility {
             value = value.substr(idx + 1);
         }
 
+        if (delimiter === "?") {
+            // if we're doing query, then strip off hash fragment before we parse
+            idx = value.indexOf('#');
+            if (idx >= 0) {
+                value = value.substr(0, idx);
+            }
+        }
+
         var params = {},
             regex = /([^&=]+)=([^&]*)/g,
             m;
