@@ -1,13 +1,13 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { Log } from './Log';
-import { OidcClientSettings } from './OidcClientSettings';
-import { RedirectNavigator } from './RedirectNavigator';
-import { PopupNavigator } from './PopupNavigator';
-import { IFrameNavigator } from './IFrameNavigator';
-import { WebStorageStateStore } from './WebStorageStateStore';
-import { Global } from './Global';
+import { Log } from './Log.js';
+import { OidcClientSettings } from './OidcClientSettings.js';
+import { RedirectNavigator } from './RedirectNavigator.js';
+import { PopupNavigator } from './PopupNavigator.js';
+import { IFrameNavigator } from './IFrameNavigator.js';
+import { WebStorageStateStore } from './WebStorageStateStore.js';
+import { Global } from './Global.js';
 
 const DefaultAccessTokenExpiringNotificationTime = 60;
 const DefaultCheckSessionInterval = 2000;

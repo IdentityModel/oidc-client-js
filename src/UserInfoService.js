@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { JsonService } from './JsonService';
-import { MetadataService } from './MetadataService';
-import { Log } from './Log';
+import { JsonService } from './JsonService.js';
+import { MetadataService } from './MetadataService.js';
+import { Log } from './Log.js';
 
 export class UserInfoService {
     constructor(settings, JsonServiceCtor = JsonService, MetadataServiceCtor = MetadataService) {

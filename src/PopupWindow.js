@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { Log } from './Log';
-import { UrlUtility } from './UrlUtility';
+import { Log } from './Log.js';
+import { UrlUtility } from './UrlUtility.js';
 
 const CheckForPopupClosedInterval = 500;
 const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100;';

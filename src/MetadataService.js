@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { Log } from './Log';
-import { JsonService } from './JsonService';
+import { Log } from './Log.js';
+import { JsonService } from './JsonService.js';
 
 const OidcMetadataUrlPath = '.well-known/openid-configuration';
 

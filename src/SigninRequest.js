@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { Log } from './Log';
-import { UrlUtility } from './UrlUtility';
-import { SigninState } from './SigninState';
+import { Log } from './Log.js';
+import { UrlUtility } from './UrlUtility.js';
+import { SigninState } from './SigninState.js';
 
 export class SigninRequest {
     constructor({
