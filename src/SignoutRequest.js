@@ -6,7 +6,7 @@ import { UrlUtility } from './UrlUtility';
 import { State } from './State';
 
 export class SignoutRequest {
-    constructor({url, id_token_hint, post_logout_redirect_uri, data}) {
+    constructor({url, id_token_hint, post_logout_redirect_uri, data, extraQueryParams}) {
         if (!url) {
             Log.error("SignoutRequest.ctor: No url passed");
             throw new Error("url");
@@ -24,6 +24,10 @@ export class SignoutRequest {
 
                 url = UrlUtility.addQueryParam(url, "state", this.state.id);
             }
+        }
+
+        for(let key in extraQueryParams){
+            url = UrlUtility.addQueryParam(url, key, extraQueryParams[key])
         }
 
         this.url = url;
