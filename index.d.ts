@@ -250,13 +250,14 @@ export class WebStorageStateStore implements StateStore {
 }
 
 export interface SigninResponse {
-  new (url: string): SigninResponse;
+  new (url: string, delimiter: string = '#'): SigninResponse;
 
   access_token: string;
+  code: string;
   error: string;
   error_description: string;
   error_uri: string;
-  expires_at: number;
+  expires_in: number;
   id_token: string;
   profile: any;
   scope: string;
@@ -279,17 +280,21 @@ export interface SignoutResponse {
   state: any;
 }
 
-export class User {
-  constructor(response: SigninResponse);
-
+export interface UserSettings {
   id_token: string;
   session_state: any;
   access_token: string;
+  refresh_token: string;
   token_type: string;
   scope: string;
   profile: any;
   expires_at: number;
   state: any;
+}
+
+export class User extends UserSettings {
+  constructor(settings: UserSettings);
+
   toStorageString(): string;
 
   readonly expires_in: number | undefined;
