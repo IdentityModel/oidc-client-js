@@ -292,9 +292,19 @@ export interface UserSettings {
   state: any;
 }
 
-export class User extends UserSettings {
+export class User {
   constructor(settings: UserSettings);
 
+  id_token: string;
+  session_state: any;
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  scope: string;
+  profile: any;
+  expires_at: number;
+  state: any;
+  
   toStorageString(): string;
 
   readonly expires_in: number | undefined;
