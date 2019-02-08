@@ -1,16 +1,14 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import { Log } from './Log';
 
 const DefaultPopupFeatures = 'location=no,toolbar=no,zoom=no';
 const DefaultPopupTarget = "_blank";
 
-export default class CordovaPopupWindow {
+export class CordovaPopupWindow {
 
     constructor(params) {
-        Log.info("CordovaPopupWindow.ctor");
-
         this._promise = new Promise((resolve, reject) => {
             this._resolve = resolve;
             this._reject = reject;
@@ -20,7 +18,7 @@ export default class CordovaPopupWindow {
         this.target = params.popupWindowTarget || DefaultPopupTarget;
         
         this.redirect_uri = params.startUrl;
-        Log.info("redirect_uri: " + this.redirect_uri);
+        Log.debug("CordovaPopupWindow.ctor: redirect_uri: " + this.redirect_uri);
     }
 
     _isInAppBrowserInstalled(cordovaMetadata) {
@@ -30,8 +28,6 @@ export default class CordovaPopupWindow {
     }
     
     navigate(params) {
-        Log.info("CordovaPopupWindow.navigate");
-
         if (!params || !params.url) {
             this._error("No url provided");
         } else {
@@ -45,7 +41,7 @@ export default class CordovaPopupWindow {
             }
             this._popup = cordova.InAppBrowser.open(params.url, this.target, this.features);
             if (this._popup) {
-                Log.info("popup successfully created");
+                Log.debug("CordovaPopupWindow.navigate: popup successfully created");
                 
                 this._exitCallbackEvent = this._exitCallback.bind(this); 
                 this._loadStartCallbackEvent = this._loadStartCallback.bind(this);
@@ -75,7 +71,7 @@ export default class CordovaPopupWindow {
     _success(data) {
         this._cleanup();
 
-        Log.info("Successful response from cordova popup window");
+        Log.debug("CordovaPopupWindow: Successful response from cordova popup window");
         this._resolve(data);
     }
     _error(message) {
@@ -85,10 +81,13 @@ export default class CordovaPopupWindow {
         this._reject(new Error(message));
     }
 
-    _cleanup() {
-        Log.info("CordovaPopupWindow._cleanup");
+    close() {
+        this._cleanup();
+    }
 
+    _cleanup() {
         if (this._popup){
+            Log.debug("CordovaPopupWindow: cleaning up popup");
             this._popup.removeEventListener("exit", this._exitCallbackEvent, false);
             this._popup.removeEventListener("loadstart", this._loadStartCallbackEvent, false);
             this._popup.close();

@@ -1,11 +1,11 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import ResponseValidator from '../../src/ResponseValidator';
-import Log from '../../src/Log';
-import JoseUtil from '../../src/JoseUtil';
+import { ResponseValidator } from '../../src/ResponseValidator';
+import { Log } from '../../src/Log';
+import { JoseUtil } from '../../src/JoseUtil';
 
-import StubMetadataService from './StubMetadataService';
+import { StubMetadataService } from './StubMetadataService';
 
 import chai from 'chai';
 chai.should();
@@ -16,7 +16,7 @@ class MockJoseUtility {
     parseJwt(...args) {
         this.parseJwtWasCalled = true;
         if (this.parseJwtResult) {
-            Log.info("MockJoseUtility.parseJwt", this.parseJwtResult)
+            Log.debug("MockJoseUtility.parseJwt", this.parseJwtResult)
             return this.parseJwtResult;
         }
         return JoseUtil.parseJwt(...args);
@@ -25,7 +25,7 @@ class MockJoseUtility {
     validateJwt(...args) {
         this.validateJwtWasCalled = true;
         if (this.validateJwtResult) {
-            Log.info("MockJoseUtility.validateJwt", this.validateJwtResult)
+            Log.debug("MockJoseUtility.validateJwt", this.validateJwtResult)
             return this.validateJwtResult;
         }
         return JoseUtil.validateJwt(...args);
@@ -34,7 +34,7 @@ class MockJoseUtility {
     hashString(...args) {
         this.hashStringWasCalled = true;
         if (this.hashStringResult) {
-            Log.info("MockJoseUtility.hashString", this.hashStringResult)
+            Log.debug("MockJoseUtility.hashString", this.hashStringResult)
             return this.hashStringResult;
         }
         return JoseUtil.hashString(...args);
@@ -43,7 +43,7 @@ class MockJoseUtility {
     hexToBase64Url(...args) {
         this.hexToBase64UrlCalled = true;
         if (this.hexToBase64UrlResult) {
-            Log.info("MockJoseUtility.hexToBase64Url", this.hexToBase64UrlResult)
+            Log.debug("MockJoseUtility.hexToBase64Url", this.hexToBase64UrlResult)
             return this.hexToBase64UrlResult;
         }
         return JoseUtil.hexToBase64Url(...args);
@@ -67,15 +67,15 @@ class MockResponseValidator extends ResponseValidator {
     }
 
     _mock(name, ...args) {
-        Log.info("mock called", name);
+        Log.debug("mock called", name);
         this[name + "WasCalled"] = true;
 
         if (this[name + "Result"]) {
-            Log.info("mock returning result", this[name + "Result"]);
+            Log.debug("mock returning result", this[name + "Result"]);
             return this[name + "Result"];
         }
 
-        Log.info("mock calling super");
+        Log.debug("mock calling super");
         return super[name](...args);
     }
 
@@ -168,9 +168,9 @@ describe("ResponseValidator", function () {
 
     });
 
-    describe("validateSignoutResponse", function (done) {
+    describe("validateSignoutResponse", function () {
 
-        it("should validate that the client state matches response state", function () {
+        it("should validate that the client state matches response state", function (done) {
 
             stubResponse.state = "not_the_id";
             subject.validateSignoutResponse(stubState, stubResponse).then(null, err => {
@@ -211,7 +211,7 @@ describe("ResponseValidator", function () {
 
     });
 
-    describe("validateSigninResponse", function (done) {
+    describe("validateSigninResponse", function () {
 
         it("should process signin params", function (done) {
 
@@ -296,7 +296,7 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should fail if the authority on the state is not the same as the settings", function (done) {
 
             stubState.authority = "something different";
@@ -306,7 +306,7 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should fail if the client_id on the state is not the same as the settings", function (done) {
 
             stubState.client_id = "something different";
@@ -316,9 +316,9 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should assign the authority on the settings if not already assigned", function (done) {
-            
+
             delete subject._settings.authority;
             stubState.authority = "something different";
 
@@ -329,9 +329,9 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should assign the client_id on the settings if not already assigned", function (done) {
-            
+
             delete subject._settings.client_id;
             stubState.client_id = "something different";
 
@@ -343,7 +343,7 @@ describe("ResponseValidator", function () {
             });
         });
 
-        it("should validate that the client state matches response state", function () {
+        it("should validate that the client state matches response state", function (done) {
 
             stubResponse.state = "not_the_id";
             subject._processSigninParams(stubState, stubResponse).then(null, err => {
@@ -392,6 +392,31 @@ describe("ResponseValidator", function () {
 
             subject._processSigninParams(stubState, stubResponse).then(null, err => {
                 err.message.should.contain("id_token");
+                done();
+            });
+
+        });
+
+        it("should fail if request was code flow but no code in response", function (done) {
+
+            stubResponse.id_token = id_token;
+            stubState.code_verifier = "secret";
+            delete stubResponse.code;
+
+            subject._processSigninParams(stubState, stubResponse).then(null, err => {
+                err.message.should.contain("code");
+                done();
+            });
+
+        });
+        
+        it("should fail if request was not code flow no code in response", function (done) {
+
+            stubResponse.id_token = id_token;
+            stubResponse.code = "code";
+
+            subject._processSigninParams(stubState, stubResponse).then(null, err => {
+                err.message.should.contain("code");
                 done();
             });
 
@@ -705,7 +730,7 @@ describe("ResponseValidator", function () {
         });
 
         it("should fail if audience doesn't match id_token", function (done) {
-            
+
             stubState.client_id = "invalid client_id";
             stubResponse.id_token = id_token;
             stubMetadataService.getIssuerResult = Promise.resolve("test");
@@ -715,7 +740,7 @@ describe("ResponseValidator", function () {
                 done();
             });
         });
-        
+
         it("should fail if nonce doesn't match id_token", function (done) {
 
             stubState.nonce = "invalid nonce";
@@ -837,7 +862,7 @@ describe("ResponseValidator", function () {
             };
 
             subject._validateAccessToken(stubResponse).then(null, err => {
-                Log.info(err);
+                Log.debug(err);
                 err.message.should.contain("id_token");
                 done();
             });
@@ -852,7 +877,7 @@ describe("ResponseValidator", function () {
             mockJoseUtility.parseJwtResult = { header: { alg: "bad" } };
 
             subject._validateAccessToken(stubResponse).then(null, err => {
-                Log.info(err);
+                Log.debug(err);
                 err.message.should.contain("alg");
                 done();
             });

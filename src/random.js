@@ -1,3 +1,5 @@
+// NOTICE: the code in this file originally developed by Microsoft
+// original source: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/lib/adal.js#L1029
 //----------------------------------------------------------------------
 // AdalJS v1.0.8
 // @preserve Copyright (c) Microsoft Open Technologies, Inc.
@@ -16,8 +18,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //----------------------------------------------------------------------
-// NOTICE: the code in this file originally developed by Microsoft
-// original source: https://github.com/AzureAD/azure-activedirectory-library-for-js/blob/master/lib/adal.js#L1029
 
 export default function random() {
     var guidHolder = 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx';

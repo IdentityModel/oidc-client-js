@@ -1,12 +1,12 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import Timer from './Timer';
+import { Log } from './Log';
+import { Timer } from './Timer';
 
-const DefaultAccessTokenExpiringNotificationTime = 60;
+const DefaultAccessTokenExpiringNotificationTime = 60; // seconds
 
-export default class AccessTokenEvents {
+export class AccessTokenEvents {
 
     constructor({
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
@@ -20,14 +20,10 @@ export default class AccessTokenEvents {
     }
 
     load(container) {
-        Log.info("AccessTokenEvents.load");
-        
-        this._cancelTimers();
-
-        // only register events if there's an access token where we care about expiration
-        if (container.access_token) {
+        // only register events if there's an access token and it has an expiration
+        if (container.access_token && container.expires_in !== undefined) {
             let duration = container.expires_in;
-            Log.info("access token present, remaining duration:", duration);
+            Log.debug("AccessTokenEvents.load: access token present, remaining duration:", duration);
 
             if (duration > 0) {
                 // only register expiring if we still have time
@@ -35,24 +31,28 @@ export default class AccessTokenEvents {
                 if (expiring <= 0){
                     expiring = 1;
                 }
-                Log.info("registering expiring timer in:", expiring);
+                
+                Log.debug("AccessTokenEvents.load: registering expiring timer in:", expiring);
                 this._accessTokenExpiring.init(expiring);
             }
+            else {
+                Log.debug("AccessTokenEvents.load: canceling existing expiring timer becase we're past expiration.");
+                this._accessTokenExpiring.cancel();
+            }
 
-            // always register expired. if it's negative, it will still fire
+            // if it's negative, it will still fire
             let expired = duration + 1;
-            Log.info("registering expired timer in:", expired);
+            Log.debug("AccessTokenEvents.load: registering expired timer in:", expired);
             this._accessTokenExpired.init(expired);
+        }
+        else {
+            this._accessTokenExpiring.cancel();
+            this._accessTokenExpired.cancel();
         }
     }
 
     unload() {
-        Log.info("AccessTokenEvents.unload");
-        this._cancelTimers();
-    }
-    
-    _cancelTimers(){
-        Log.info("canceling existing access token timers");
+        Log.debug("AccessTokenEvents.unload: canceling existing access token timers");
         this._accessTokenExpiring.cancel();
         this._accessTokenExpired.cancel();
     }

@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import OidcClientSettings from '../../src/OidcClientSettings';
-import Global from '../../src/Global';
+import { Log } from '../../src/Log';
+import { OidcClientSettings } from '../../src/OidcClientSettings';
+import { Global } from '../../src/Global';
 
 import chai from 'chai';
 chai.should();
@@ -24,7 +24,7 @@ describe("OidcClientSettings", function () {
             });
             subject.client_id.should.equal("client");
         });
-        
+
         it("should not allow setting if previously set", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
@@ -160,6 +160,26 @@ describe("OidcClientSettings", function () {
                 acr_values: "foo"
             });
             subject.acr_values.should.equal("foo");
+        });
+    });
+
+    describe("resource", function () {
+        it("should return value from initial settings", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                resource: "foo"
+            });
+            subject.resource.should.equal("foo");
+        });
+    });
+
+    describe("response_mode", function () {
+        it("should return value from initial settings", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                response_mode: "foo"
+            });
+            subject.response_mode.should.equal("foo");
         });
     });
 
@@ -312,7 +332,7 @@ describe("OidcClientSettings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
             });
-            subject.staleStateAge.should.equal(60);
+            subject.staleStateAge.should.equal(900);
         });
 
         it("should return value from initial settings", function () {
@@ -391,5 +411,52 @@ describe("OidcClientSettings", function () {
             subject.metadataService.should.equal(temp);
         });
     });
+
+    describe("extraQueryParams", function() {
+
+        it("should use default value", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client'
+            });
+            subject.extraQueryParams.should.deep.equal({});
+        });
+
+        it("should return value from initial settings", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                extraQueryParams: {
+                    'hd': 'domain.com'
+                }
+            });
+            subject.extraQueryParams.should.deep.equal({ 'hd': 'domain.com' });
+        });
+
+        it("should not set value from initial settings if not object, but set default value ({})", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                extraQueryParams: 123456
+            });
+            subject.extraQueryParams.should.deep.equal({});
+        });
+
+        it("should set it if object", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+            });
+            subject.extraQueryParams = { 'hd': 'domain.com' };
+            subject.extraQueryParams.should.deep.equal({ 'hd': 'domain.com' });
+        });
+
+        it("should clear it if not object", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                extraQueryParams: {
+                    'hd': 'domain.com',
+                }
+            });
+            subject.extraQueryParams = undefined;
+            subject.extraQueryParams.should.deep.equal({});
+        });
+    })
 
 });

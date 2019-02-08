@@ -1,16 +1,17 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import UserManager from '../../src/UserManager';
-import Log from '../../src/Log';
-import Global from '../../src/Global';
-import UserManagerSettings from '../../src/UserManagerSettings';
-import User from '../../src/User';
+import { UserManager } from '../../src/UserManager';
+import { Log } from '../../src/Log';
+import { Global } from '../../src/Global';
+import { UserManagerSettings } from '../../src/UserManagerSettings';
+import { User } from '../../src/User';
 
-import StubMetadataService from './StubMetadataService';
-import StubStateStore from './StubStateStore';
-import StubResponseValidator from './StubResponseValidator';
-import StubTokenRevocationClient from './StubTokenRevocationClient';
+import { StubMetadataService } from './StubMetadataService';
+import { StubSilentRenewService } from './StubSilentRenewService';
+import { StubStateStore } from './StubStateStore';
+import { StubResponseValidator } from './StubResponseValidator';
+import { StubTokenRevocationClient } from './StubTokenRevocationClient';
 
 import chai from 'chai';
 chai.should();
@@ -22,6 +23,7 @@ describe("UserManager", function () {
     let stubMetadataService;
     let stubStateStore;
     let stubValidator;
+    let stubSilentRenewService;
     let stubNavigator;
     let stubUserStore;
     let stubTokenRevocationClient;
@@ -31,12 +33,13 @@ describe("UserManager", function () {
         Global._testing();
 
         Log.logger = console;
-        Log.level = Log.NONE;
+        Log.level = Log.DEBUG;
 
         stubNavigator = {};
         stubUserStore = new StubStateStore();
         stubStateStore = new StubStateStore();
         stubValidator = new StubResponseValidator();
+        stubSilentRenewService = new StubSilentRenewService();
         stubMetadataService = new StubMetadataService();
         stubTokenRevocationClient = new StubTokenRevocationClient();
 
@@ -51,8 +54,9 @@ describe("UserManager", function () {
             MetadataServiceCtor: () => stubMetadataService
         };
 
-        subject = new UserManager(settings, 
-            null, null, 
+        subject = new UserManager(settings,
+            () => stubSilentRenewService,
+            null,
             () => stubTokenRevocationClient);
     });
 
@@ -77,13 +81,13 @@ describe("UserManager", function () {
         it("should be able to call getUser without recursion", function (done) {
 
             stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
-            
+
             subject.events.addUserLoaded(user => {
                 subject.getUser().then(user => {
                     done();
                 });
             });
-            
+
             subject.events.load({});
         });
 
@@ -91,22 +95,27 @@ describe("UserManager", function () {
 
     describe("signinSilent", function(){
 
-        it("should pass silentRequestTimeout from settings", function(done){
+        it("should pass silentRequestTimeout from settings", function(done) {
+
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
 
             settings.silentRequestTimeout = 123;
             settings.silent_redirect_uri = "http://client/silent_callback";
             subject = new UserManager(settings);
 
             subject._signin = function(args, nav, navArgs){
-                Log.info("_signin", args, nav, navArgs);
+                Log.debug("_signin", args, nav, navArgs);
 
                 navArgs.silentRequestTimeout.should.equal(123);
                 done();
+                return Promise.resolve()
             }
             subject.signinSilent();
         });
 
         it("should pass silentRequestTimeout from params", function(done){
+
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
 
             settings.silent_redirect_uri = "http://client/silent_callback";
             subject = new UserManager(settings);
@@ -114,9 +123,36 @@ describe("UserManager", function () {
             subject._signin = function(args, nav, navArgs){
                 navArgs.silentRequestTimeout.should.equal(234);
                 done();
+                return Promise.resolve()
             }
             subject.signinSilent({silentRequestTimeout:234});
         });
+
+        it("should pass prompt from params", function(done){
+
+            stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
+
+            settings.silent_redirect_uri = "http://client/silent_callback";
+            subject = new UserManager(settings);
+
+            subject._signin = function(args, nav, navArgs){
+                args.prompt.should.equal("foo");
+                done();
+                return Promise.resolve()
+            }
+            subject.signinSilent({prompt:"foo"});
+        });
+
+        it("should work when having no User present", function(done) {
+            settings.silent_redirect_uri = "http://client/silent_callback";
+            subject = new UserManager(settings);
+
+            subject._signin = function(){
+                done();
+                return Promise.resolve()
+            }
+            subject.signinSilent({prompt:"foo"});
+        })
     });
 
 });

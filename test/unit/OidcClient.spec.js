@@ -1,23 +1,23 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Global from '../../src/Global';
-import OidcClient from '../../src/OidcClient';
-import SigninRequest from '../../src/SigninRequest';
-import SigninResponse from '../../src/SigninResponse';
-import ErrorResponse from '../../src/ErrorResponse';
-import SignoutRequest from '../../src/SignoutRequest';
-import SignoutResponse from '../../src/SignoutResponse';
-import State from '../../src/State';
-import SigninState from '../../src/SigninState';
-import OidcClientSettings from '../../src/OidcClientSettings';
-import MetadataService from '../../src/MetadataService';
+import { Global } from '../../src/Global';
+import { OidcClient } from '../../src/OidcClient';
+import { SigninRequest } from '../../src/SigninRequest';
+import { SigninResponse } from '../../src/SigninResponse';
+import { ErrorResponse } from '../../src/ErrorResponse';
+import { SignoutRequest } from '../../src/SignoutRequest';
+import { SignoutResponse } from '../../src/SignoutResponse';
+import { State } from '../../src/State';
+import { SigninState } from '../../src/SigninState';
+import { OidcClientSettings } from '../../src/OidcClientSettings';
+import { MetadataService } from '../../src/MetadataService';
 
-import Log from '../../src/Log';
+import { Log } from '../../src/Log';
 
-import StubMetadataService from './StubMetadataService';
-import StubStateStore from './StubStateStore';
-import StubResponseValidator from './StubResponseValidator';
+import { StubMetadataService } from './StubMetadataService';
+import { StubStateStore } from './StubStateStore';
+import { StubResponseValidator } from './StubResponseValidator';
 
 import chai from 'chai';
 chai.should();
@@ -31,16 +31,16 @@ describe("OidcClient", function () {
     let stubValidator;
 
     beforeEach(function () {
-        
+
         Global._testing();
-        
+
         Log.logger = console;
         Log.level = Log.NONE;
 
         stubStore = new StubStateStore();
         stubValidator = new StubResponseValidator();
         stubMetadataService = new StubMetadataService();
-        
+
         settings = {
             authority: 'authority',
             client_id: 'client',
@@ -98,7 +98,9 @@ describe("OidcClient", function () {
 
         it("should return a promise", function () {
             stubMetadataService.getAuthorizationEndpointResult = Promise.resolve("http://sts/authorize");
-            subject.createSigninRequest().should.be.instanceof(Promise);
+            var p = subject.createSigninRequest();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should return SigninRequest", function (done) {
@@ -118,6 +120,7 @@ describe("OidcClient", function () {
             var p = subject.createSigninRequest({
                 data: 'foo',
                 response_type: 'bar',
+                response_mode: 'mode',
                 scope: 'baz',
                 redirect_uri: 'quux',
                 prompt: 'p',
@@ -127,7 +130,9 @@ describe("OidcClient", function () {
                 id_token_hint: 'ith',
                 login_hint: 'lh',
                 acr_values: 'av',
-                resource: 'res'
+                resource: 'res',
+                request: 'req',
+                request_uri: 'req_uri'
             });
 
             p.then(request => {
@@ -146,6 +151,9 @@ describe("OidcClient", function () {
                 url.should.contain("login_hint=lh");
                 url.should.contain("acr_values=av");
                 url.should.contain("resource=res");
+                url.should.contain("request=req");
+                url.should.contain("request_uri=req_uri");
+                url.should.contain("response_mode=mode");
 
                 done();
             });
@@ -190,6 +198,30 @@ describe("OidcClient", function () {
             });
         });
 
+        it("should fail if hybrid code id_token requested", function (done) {
+            var p = subject.createSigninRequest({response_type:"code id_token"});
+            p.then(null, err => {
+                err.message.should.contain("hybrid");
+                done();
+            });
+        });
+
+        it("should fail if hybrid code token requested", function (done) {
+            var p = subject.createSigninRequest({response_type:"code token"});
+            p.then(null, err => {
+                err.message.should.contain("hybrid");
+                done();
+            });
+        });
+
+        it("should fail if hybrid code id_token token requested", function (done) {
+            var p = subject.createSigninRequest({response_type:"code id_token token"});
+            p.then(null, err => {
+                err.message.should.contain("hybrid");
+                done();
+            });
+        });
+
         it("should fail if metadata fails", function (done) {
 
             stubMetadataService.getAuthorizationEndpointResult = Promise.reject(new Error("test"));
@@ -230,7 +262,9 @@ describe("OidcClient", function () {
     describe("processSigninResponse", function () {
 
         it("should return a promise", function () {
-            subject.processSigninResponse("state=state").should.be.instanceof(Promise);
+            var p = subject.processSigninResponse("state=state");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should fail if no state on response", function (done) {
@@ -269,7 +303,9 @@ describe("OidcClient", function () {
 
         it("should return a promise", function () {
             stubMetadataService.getEndSessionEndpointResult = Promise.resolve("http://sts/signout");
-            subject.createSignoutRequest().should.be.instanceof(Promise);
+            var p = subject.createSignoutRequest();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should return SignoutRequest", function (done) {
@@ -371,7 +407,9 @@ describe("OidcClient", function () {
     describe("processSignoutResponse", function () {
 
         it("should return a promise", function () {
-            subject.processSignoutResponse("state=state").should.be.instanceof(Promise);
+            var p = subject.processSignoutResponse("state=state");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should return result if no state on response", function (done) {
@@ -406,9 +444,9 @@ describe("OidcClient", function () {
                 done();
             });
         });
-        
+
         it("should call validator with state even if error in response", function (done) {
-           
+
             stubStore.item = new State({ id: '1', data:"bar" }).toStorageString();
 
             subject.processSignoutResponse("state=1&error=foo").then(response => {
@@ -423,7 +461,9 @@ describe("OidcClient", function () {
     describe("clearStaleState", function () {
 
         it("should return a promise", function () {
-            subject.clearStaleState().should.be.instanceof(Promise);
+            var p = subject.clearStaleState();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should call State.clearStaleState", function () {

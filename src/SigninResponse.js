@@ -1,19 +1,20 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import UrlUtility from './UrlUtility';
+import { UrlUtility } from './UrlUtility';
 
 const OidcScope = "openid";
 
-export default class SigninResponse {
-    constructor(url) {
+export class SigninResponse {
+    constructor(url, delimiter = "#") {
 
-        var values = UrlUtility.parseUrlFragment(url, "#");
+        var values = UrlUtility.parseUrlFragment(url, delimiter);
 
         this.error = values.error;
         this.error_description = values.error_description;
         this.error_uri = values.error_uri;
-        
+
+        this.code = values.code;
         this.state = values.state;
         this.id_token = values.id_token;
         this.session_state = values.session_state;
@@ -22,11 +23,7 @@ export default class SigninResponse {
         this.scope = values.scope;
         this.profile = undefined; // will be set from ResponseValidator
 
-        let expires_in = parseInt(values.expires_in);
-        if (typeof expires_in === 'number' && expires_in > 0) {
-            let now = parseInt(Date.now() / 1000);
-            this.expires_at = now + expires_in;
-        }
+        this.expires_in = values.expires_in;
     }
 
     get expires_in() {
@@ -35,6 +32,13 @@ export default class SigninResponse {
             return this.expires_at - now;
         }
         return undefined;
+    }
+    set expires_in(value){
+        let expires_in = parseInt(value);
+        if (typeof expires_in === 'number' && expires_in > 0) {
+            let now = parseInt(Date.now() / 1000);
+            this.expires_at = now + expires_in;
+        }
     }
 
     get expired() {
@@ -48,7 +52,7 @@ export default class SigninResponse {
     get scopes() {
         return (this.scope || "").split(" ");
     }
-    
+
     get isOpenIdConnect() {
         return this.scopes.indexOf(OidcScope) >= 0 || !!this.id_token;
     }

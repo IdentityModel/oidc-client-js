@@ -1,10 +1,10 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
+import { Log } from './Log';
 import random from './random';
 
-export default class State {
+export class State {
     constructor({id, data, created} = {}) {
         this._id = id || random();
         this._data = data;
@@ -28,29 +28,29 @@ export default class State {
     }
 
     toStorageString() {
-        Log.info("State.toStorageString");
+        Log.debug("State.toStorageString");
         return JSON.stringify({
             id: this.id,
             data: this.data,
             created: this.created
         });
     }
-    
+
     static fromStorageString(storageString) {
-        Log.info("State.fromStorageString");
+        Log.debug("State.fromStorageString");
         return new State(JSON.parse(storageString));
     }
 
     static clearStaleState(storage, age) {
-        Log.info("State.clearStaleState");
 
         var cutoff = Date.now() / 1000 - age;
 
         return storage.getAllKeys().then(keys => {
-            Log.info("got keys", keys);
+            Log.debug("State.clearStaleState: got keys", keys);
 
             var promises = [];
-            for (let key of keys) {
+            for (let i = 0; i < keys.length; i++) {
+                let key = keys[i];
                 var p = storage.get(key).then(item => {
                     let remove = false;
 
@@ -58,24 +58,24 @@ export default class State {
                         try {
                             var state = State.fromStorageString(item)
 
-                            Log.info("got item from key: ", key, state.created);
+                            Log.debug("State.clearStaleState: got item from key: ", key, state.created);
 
                             if (state.created <= cutoff) {
                                 remove = true;
                             }
                         }
                         catch (e) {
-                            Log.error("Error parsing state for key", key, e.message);
+                            Log.error("State.clearStaleState: Error parsing state for key", key, e.message);
                             remove = true;
                         }
                     }
                     else {
-                        Log.info("no item in storage for key: ", key);
+                        Log.debug("State.clearStaleState: no item in storage for key: ", key);
                         remove = true;
                     }
 
                     if (remove) {
-                        Log.info("removed item for key: ", key);
+                        Log.debug("State.clearStaleState: removed item for key: ", key);
                         return storage.remove(key);
                     }
                 });
@@ -83,7 +83,7 @@ export default class State {
                 promises.push(p);
             }
 
-            Log.info("waiting on promise count:", promises.length);
+            Log.debug("State.clearStaleState: waiting on promise count:", promises.length);
             return Promise.all(promises);
         });
     }

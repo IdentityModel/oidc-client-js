@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import WebStorageStateStore from '../../src/WebStorageStateStore';
-import InMemoryWebStorage from '../../src/InMemoryWebStorage';
+import { Log } from '../../src/Log';
+import { WebStorageStateStore } from '../../src/WebStorageStateStore';
+import { InMemoryWebStorage } from '../../src/InMemoryWebStorage';
 
 import chai from 'chai';
 chai.should();
@@ -24,7 +24,9 @@ describe("WebStorageStateStore", function() {
     describe("set", function() {
 
         it("should return a promise", function() {
-            subject.set("key", "value").should.be.instanceof(Promise);
+            var p = subject.set("key", "value");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should store item", function(done) {
@@ -34,7 +36,7 @@ describe("WebStorageStateStore", function() {
             })
         });
 
-        it("should use prefix if specified", function() {
+        it("should use prefix if specified", function(done) {
             prefix = "foo.";
             subject = new WebStorageStateStore({ prefix: prefix, store: store });
 
@@ -49,7 +51,9 @@ describe("WebStorageStateStore", function() {
     describe("remove", function() {
 
         it("should return a promise", function() {
-            subject.remove("key").should.be.instanceof(Promise);
+            var p = subject.remove("key");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should remove item", function(done) {
@@ -94,7 +98,8 @@ describe("WebStorageStateStore", function() {
     describe("get", function() {
 
         it("should return a promise", function() {
-            subject.get("key").should.be.instanceof(Promise);
+            var p = subject.get("key");
+            p.should.be.instanceof(Promise);
         });
 
         it("should return value if exists", function(done) {
@@ -130,7 +135,9 @@ describe("WebStorageStateStore", function() {
     describe("getAllKeys", function() {
 
         it("should return a promise", function() {
-            subject.getAllKeys().should.be.instanceof(Promise);
+            var p = subject.getAllKeys();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should return keys", function(done) {
@@ -142,7 +149,7 @@ describe("WebStorageStateStore", function() {
                 done();
             });
         });
-        
+
         it("should return keys without prefix", function(done) {
             prefix = "foo.";
             subject = new WebStorageStateStore({ prefix: prefix, store: store });
@@ -155,7 +162,7 @@ describe("WebStorageStateStore", function() {
                 done();
             });
         });
-        
+
         it("should return empty keys when empty", function(done) {
             subject.getAllKeys().then(keys => {
                 keys.should.deep.equal([]);

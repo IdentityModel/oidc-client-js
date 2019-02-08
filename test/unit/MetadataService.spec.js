@@ -1,12 +1,13 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import MetadataService from '../../src/MetadataService';
+import { Log } from '../../src/Log';
+import { MetadataService } from '../../src/MetadataService';
 
-import StubJsonService from './StubJsonService';
+import { StubJsonService } from './StubJsonService';
 
 import chai from 'chai';
+import { Z_NO_COMPRESSION } from 'zlib';
 chai.should();
 let assert = chai.assert;
 
@@ -18,7 +19,7 @@ describe("MetadataService", function() {
     beforeEach(function() {
         Log.logger = console;
         Log.level = Log.NONE;
-        
+
         settings = {};
         stubJsonService = new StubJsonService();
         subject = new MetadataService(settings, ()=>stubJsonService);
@@ -31,6 +32,7 @@ describe("MetadataService", function() {
                 new MetadataService();
             }
             catch (e) {
+                Log.debug(e.message);
                 e.message.should.contain('settings');
                 return;
             }
@@ -42,10 +44,13 @@ describe("MetadataService", function() {
     describe("getMetadata", function() {
 
         it("should return a promise", function() {
-            subject.getMetadata().should.be.instanceof(Promise);
+            var p = subject.getMetadata();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should use metadata on settings", function(done) {
+            Log.level = Log.DEBUG;
             settings.metadata = "test";
 
             let p = subject.getMetadata();
@@ -124,11 +129,13 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
      describe("_getMetadataProperty", function() {
 
         it("should return a promise", function() {
-            subject._getMetadataProperty().should.be.instanceof(Promise);
+            var p = subject._getMetadataProperty();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should use metadata on settings", function(done) {
@@ -155,9 +162,9 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
          it("should fail if json call to load metadata fails", function(done) {
-             
+
             settings.metadataUrl = "http://sts/metadata";
             stubJsonService.result = Promise.reject(new Error("test"));
 
@@ -168,7 +175,7 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
     });
 
     describe("getAuthorizationEndpoint", function() {
@@ -185,7 +192,7 @@ describe("MetadataService", function() {
                 done();
             });
         });
-        
+
     });
 
     describe("getUserInfoEndpoint", function() {
@@ -233,7 +240,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
     describe("getCheckSessionIframe", function() {
 
         it("should return value from", function(done) {
@@ -262,7 +269,7 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
     describe("getIssuer", function() {
 
         it("should return value from", function(done) {
@@ -279,11 +286,13 @@ describe("MetadataService", function() {
         });
 
     });
-    
+
     describe("getSigningKeys", function() {
 
         it("should return a promise", function() {
-            subject.getSigningKeys().should.be.instanceof(Promise);
+            var p = subject.getSigningKeys();
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
         });
 
         it("should use signingKeys on settings", function(done) {
@@ -340,7 +349,7 @@ describe("MetadataService", function() {
         });
 
         it("should return keys from jwks_uri", function(done) {
-            
+
             settings.metadata = {
                 jwks_uri: "http://sts/metadata/keys"
             };
@@ -373,33 +382,6 @@ describe("MetadataService", function() {
 
             p.then(keys => {
                 settings.signingKeys.should.deep.equal([{
-                    use:'sig',
-                    kid:"test"
-                }]);
-                done();
-            })
-        });
-        
-        it("should filter signing keys", function(done) {
-            settings.metadata = {
-                jwks_uri: "http://sts/metadata/keys"
-            };
-            stubJsonService.result = Promise.resolve({
-                keys:[
-                {
-                    use:'sig',
-                    kid:"test"
-                },
-                {
-                    use:'enc',
-                    kid:"test"
-                }]
-            });
-
-            let p = subject.getSigningKeys();
-
-            p.then(keys => {
-                keys.should.deep.equal([{
                     use:'sig',
                     kid:"test"
                 }]);

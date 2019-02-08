@@ -1,19 +1,19 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import WebStorageStateStore from './WebStorageStateStore';
-import ResponseValidator from './ResponseValidator';
-import MetadataService from './MetadataService';
+import { Log } from './Log';
+import { WebStorageStateStore } from './WebStorageStateStore';
+import { ResponseValidator } from './ResponseValidator';
+import { MetadataService } from './MetadataService';
 
 const OidcMetadataUrlPath = '.well-known/openid-configuration';
 
 const DefaultResponseType = "id_token";
 const DefaultScope = "openid";
-const DefaultStaleStateAge = 60; // seconds
+const DefaultStaleStateAge = 60 * 15; // seconds
 const DefaultClockSkewInSeconds = 60 * 5;
 
-export default class OidcClientSettings {
+export class OidcClientSettings {
     constructor({
         // metadata related
         authority, metadataUrl, metadata, signingKeys,
@@ -21,14 +21,16 @@ export default class OidcClientSettings {
         client_id, client_secret, response_type = DefaultResponseType, scope = DefaultScope,
         redirect_uri, post_logout_redirect_uri,
         // optional protocol
-        prompt, display, max_age, ui_locales, acr_values, resource,
+        prompt, display, max_age, ui_locales, acr_values, resource, response_mode,
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
         staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
         // other behavior
         stateStore = new WebStorageStateStore(),
         ResponseValidatorCtor = ResponseValidator,
-        MetadataServiceCtor = MetadataService
+        MetadataServiceCtor = MetadataService,
+        // extra query params
+        extraQueryParams = {}
     } = {}) {
 
         this._authority = authority;
@@ -49,6 +51,7 @@ export default class OidcClientSettings {
         this._ui_locales = ui_locales;
         this._acr_values = acr_values;
         this._resource = resource;
+        this._response_mode = response_mode;
 
         this._filterProtocolClaims = !!filterProtocolClaims;
         this._loadUserInfo = !!loadUserInfo;
@@ -58,6 +61,8 @@ export default class OidcClientSettings {
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this);
         this._metadataService = new MetadataServiceCtor(this);
+
+        this._extraQueryParams = typeof extraQueryParams === 'object' ? extraQueryParams : {};
     }
 
     // client config
@@ -70,7 +75,7 @@ export default class OidcClientSettings {
             this._client_id = value;
         }
         else {
-            Log.error("client_id has already been assigned.")
+            Log.error("OidcClientSettings.set_client_id: client_id has already been assigned.")
             throw new Error("client_id has already been assigned.")
         }
     }
@@ -110,6 +115,9 @@ export default class OidcClientSettings {
     get resource() {
         return this._resource;
     }
+    get response_mode() {
+        return this._response_mode;
+    }
 
 
     // metadata
@@ -122,7 +130,7 @@ export default class OidcClientSettings {
             this._authority = value;
         }
         else {
-            Log.error("authority has already been assigned.")
+            Log.error("OidcClientSettings.set_authority: authority has already been assigned.")
             throw new Error("authority has already been assigned.")
         }
     }
@@ -178,5 +186,17 @@ export default class OidcClientSettings {
     }
     get metadataService() {
         return this._metadataService;
+    }
+
+    // extra query params
+    get extraQueryParams() {
+        return this._extraQueryParams;
+    }
+    set extraQueryParams(value) {
+        if (typeof value === 'object'){
+            this._extraQueryParams = value;
+        } else {
+            this._extraQueryParams = {};
+        }
     }
 }

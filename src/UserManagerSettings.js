@@ -1,27 +1,32 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import OidcClientSettings from './OidcClientSettings';
-import RedirectNavigator from './RedirectNavigator';
-import PopupNavigator from './PopupNavigator';
-import IFrameNavigator from './IFrameNavigator';
-import WebStorageStateStore from './WebStorageStateStore';
-import Global from './Global';
+import { Log } from './Log';
+import { OidcClientSettings } from './OidcClientSettings';
+import { RedirectNavigator } from './RedirectNavigator';
+import { PopupNavigator } from './PopupNavigator';
+import { IFrameNavigator } from './IFrameNavigator';
+import { WebStorageStateStore } from './WebStorageStateStore';
+import { Global } from './Global';
 
 const DefaultAccessTokenExpiringNotificationTime = 60;
 const DefaultCheckSessionInterval = 2000;
+const DefaultQuerySessionStatusResponseType = "id_token";
 
-export default class UserManagerSettings extends OidcClientSettings {
+export class UserManagerSettings extends OidcClientSettings {
     constructor({
         popup_redirect_uri,
+        popup_post_logout_redirect_uri,
         popupWindowFeatures,
         popupWindowTarget,
         silent_redirect_uri,
         silentRequestTimeout,
         automaticSilentRenew = false,
+        includeIdTokenInSilentRenew = true,
         monitorSession = true,
         checkSessionInterval = DefaultCheckSessionInterval,
+        stopCheckSessionOnError = true,
+        query_status_response_type = DefaultQuerySessionStatusResponseType,
         revokeAccessTokenOnSignout = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
@@ -32,27 +37,34 @@ export default class UserManagerSettings extends OidcClientSettings {
         super(arguments[0]);
 
         this._popup_redirect_uri = popup_redirect_uri;
+        this._popup_post_logout_redirect_uri = popup_post_logout_redirect_uri;
         this._popupWindowFeatures = popupWindowFeatures;
         this._popupWindowTarget = popupWindowTarget;
-        
+
         this._silent_redirect_uri = silent_redirect_uri;
         this._silentRequestTimeout = silentRequestTimeout;
         this._automaticSilentRenew = !!automaticSilentRenew;
+        this._includeIdTokenInSilentRenew = includeIdTokenInSilentRenew;
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
         this._monitorSession = monitorSession;
         this._checkSessionInterval = checkSessionInterval;
+        this._stopCheckSessionOnError = stopCheckSessionOnError;
+        this._query_status_response_type = query_status_response_type;
         this._revokeAccessTokenOnSignout = revokeAccessTokenOnSignout;
 
         this._redirectNavigator = redirectNavigator;
         this._popupNavigator = popupNavigator;
         this._iframeNavigator = iframeNavigator;
-        
+
         this._userStore = userStore;
     }
 
     get popup_redirect_uri() {
         return this._popup_redirect_uri;
+    }
+    get popup_post_logout_redirect_uri() {
+        return this._popup_post_logout_redirect_uri;
     }
     get popupWindowFeatures() {
         return this._popupWindowFeatures;
@@ -70,6 +82,9 @@ export default class UserManagerSettings extends OidcClientSettings {
     get automaticSilentRenew() {
         return !!(this.silent_redirect_uri && this._automaticSilentRenew);
     }
+    get includeIdTokenInSilentRenew() {
+        return this._includeIdTokenInSilentRenew;
+    }
     get accessTokenExpiringNotificationTime() {
         return this._accessTokenExpiringNotificationTime;
     }
@@ -79,6 +94,12 @@ export default class UserManagerSettings extends OidcClientSettings {
     }
     get checkSessionInterval() {
         return this._checkSessionInterval;
+    }
+    get stopCheckSessionOnError(){
+        return this._stopCheckSessionOnError;
+    }
+    get query_status_response_type(){
+        return this._query_status_response_type;
     }
     get revokeAccessTokenOnSignout() {
         return this._revokeAccessTokenOnSignout;
@@ -93,7 +114,7 @@ export default class UserManagerSettings extends OidcClientSettings {
     get iframeNavigator() {
         return this._iframeNavigator;
     }
-    
+
     get userStore() {
         return this._userStore;
     }

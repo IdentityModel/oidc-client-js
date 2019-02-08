@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>identityserver test against https://demo.identityserver.io/</title>
+        <link rel='stylesheet' href='app.css'>
+    </head>
+    <body>
+        <div>
+            <a href='/'>home</a>
+            <a href='code-identityserver-sample.html'>clear url</a>
+        </div>
+        <div>
+            <button id='clearState'>clear stale state</button>
+            <button id='getUser'>get user</button>
+            <button id='removeUser'>remove user</button>
+            <button id='querySessionStatus'>query user status at token server</button>
+        </div>
+        <div>
+            <button id='startSigninMainWindow'>start signin main window</button>
+            <button id='endSigninMainWindow'>end signin main window</button>
+            <button id='startSigninMainWindowDiffCallbackPage'>start signin main window with different callback page</button>
+        </div>
+        <div>
+            <button id='popupSignin'>signin with popup</button>
+            <button id='iframeSignin'>signin silent/renew access token</button>
+        </div>
+        <div>
+            <button id='startSignoutMainWindow'>start signout main window</button>
+            <button id='endSignoutMainWindow'>end signout main window</button>
+        </div>
+        <div>
+            <button id='popupSignout'>signout with popup</button>
+        </div>
+        
+        <pre id='out'></pre>
+        
+        <script src='oidc-client.js'></script>
+        <script src='log.js'></script>
+        <script src='code-identityserver-sample.js'></script>
+    </body>
+</html>

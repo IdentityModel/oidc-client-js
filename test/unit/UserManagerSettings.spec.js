@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import UserManagerSettings from '../../src/UserManagerSettings';
+import { Log } from '../../src/Log';
+import { UserManagerSettings } from '../../src/UserManagerSettings';
 
 import chai from 'chai';
 chai.should();
@@ -36,7 +36,7 @@ describe("UserManagerSettings", function () {
         });
 
     });
-    
+
     describe("popupWindowFeatures", function () {
 
         it("should return value from initial settings", function () {
@@ -45,7 +45,7 @@ describe("UserManagerSettings", function () {
         });
 
     });
-    
+
     describe("popupWindowTarget", function () {
 
         it("should return value from initial settings", function () {
@@ -99,6 +99,28 @@ describe("UserManagerSettings", function () {
 
     });
 
+    describe("includeIdTokenInSilentRenew", function () {
+        it("should return true value from initial settings", function () {
+            let subject = new UserManagerSettings({
+                includeIdTokenInSilentRenew: true,
+            });
+            subject.includeIdTokenInSilentRenew.should.be.true;
+        });
+
+        it("should return false value from initial settings", function () {
+            let subject = new UserManagerSettings({
+                includeIdTokenInSilentRenew: false,
+            });
+            subject.includeIdTokenInSilentRenew.should.be.false;
+        });
+
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.includeIdTokenInSilentRenew.should.be.true;
+        });
+    });
+
     describe("accessTokenExpiringNotificationTime", function () {
 
         it("should return value from initial settings", function () {
@@ -135,7 +157,7 @@ describe("UserManagerSettings", function () {
             subject.popupNavigator.should.equal(temp);
         });
     });
-    
+
     describe("iframeNavigator", function() {
         it("should return value from initial settings", function() {
             let temp = {};
@@ -176,6 +198,35 @@ describe("UserManagerSettings", function () {
             let subject = new UserManagerSettings({
             });
             subject.checkSessionInterval.should.equal(2000);
+        });
+    });
+
+    describe("query_status_response_type", function() {
+        it("should return value from initial settings", function() {
+            let temp = 'type';
+            let subject = new UserManagerSettings({
+                query_status_response_type : temp
+            });
+            subject.query_status_response_type.should.equal(temp);
+        });
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.query_status_response_type.should.equal("id_token");
+        });
+    });
+
+    describe("stopCheckSessionOnError", function() {
+        it("should return value from initial settings", function() {
+            let subject = new UserManagerSettings({
+                stopCheckSessionOnError : false
+            });
+            subject.stopCheckSessionOnError.should.be.false;
+        });
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.stopCheckSessionOnError.should.be.true;
         });
     });
 });

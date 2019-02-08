@@ -1,19 +1,24 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from './Log';
-import MetadataService from './MetadataService';
-import UserInfoService from './UserInfoService';
-import ErrorResponse from './ErrorResponse';
-import JoseUtil from './JoseUtil';
+import { Log } from './Log';
+import { MetadataService } from './MetadataService';
+import { UserInfoService } from './UserInfoService';
+import { TokenClient } from './TokenClient';
+import { ErrorResponse } from './ErrorResponse';
+import { JoseUtil } from './JoseUtil';
 
 const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "c_hash"];
 
-export default class ResponseValidator {
+export class ResponseValidator {
 
-    constructor(settings, MetadataServiceCtor = MetadataService, UserInfoServiceCtor = UserInfoService, joseUtil = JoseUtil) {
+    constructor(settings, 
+        MetadataServiceCtor = MetadataService,
+        UserInfoServiceCtor = UserInfoService, 
+        joseUtil = JoseUtil,
+        TokenClientCtor = TokenClient) {
         if (!settings) {
-            Log.error("No settings passed to ResponseValidator");
+            Log.error("ResponseValidator.ctor: No settings passed to ResponseValidator");
             throw new Error("settings");
         }
 
@@ -21,17 +26,18 @@ export default class ResponseValidator {
         this._metadataService = new MetadataServiceCtor(this._settings);
         this._userInfoService = new UserInfoServiceCtor(this._settings);
         this._joseUtil = joseUtil;
+        this._tokenClient = new TokenClientCtor(this._settings);
     }
 
     validateSigninResponse(state, response) {
-        Log.info("ResponseValidator.validateSigninResponse");
+        Log.debug("ResponseValidator.validateSigninResponse");
 
         return this._processSigninParams(state, response).then(response => {
-            Log.info("state processed");
+            Log.debug("ResponseValidator.validateSigninResponse: state processed");
             return this._validateTokens(state, response).then(response => {
-                Log.info("tokens validated");
+                Log.debug("ResponseValidator.validateSigninResponse: tokens validated");
                 return this._processClaims(response).then(response => {
-                    Log.info("claims processed");
+                    Log.debug("ResponseValidator.validateSigninResponse: claims processed");
                     return response;
                 });
             });
@@ -39,21 +45,19 @@ export default class ResponseValidator {
     }
 
     validateSignoutResponse(state, response) {
-        Log.info("ResponseValidator.validateSignoutResponse");
-
         if (state.id !== response.state) {
-            Log.error("State does not match");
+            Log.error("ResponseValidator.validateSignoutResponse: State does not match");
             return Promise.reject(new Error("State does not match"));
         }
 
         // now that we know the state matches, take the stored data
         // and set it into the response so callers can get their state
         // this is important for both success & error outcomes
-        Log.info("state validated");
+        Log.debug("ResponseValidator.validateSignoutResponse: state validated");
         response.state = state.data;
 
         if (response.error) {
-            Log.warn("Response was error", response.error);
+            Log.warn("ResponseValidator.validateSignoutResponse: Response was error", response.error);
             return Promise.reject(new ErrorResponse(response));
         }
 
@@ -61,30 +65,28 @@ export default class ResponseValidator {
     }
 
     _processSigninParams(state, response) {
-        Log.info("ResponseValidator._processSigninParams");
-
         if (state.id !== response.state) {
-            Log.error("State does not match");
+            Log.error("ResponseValidator._processSigninParams: State does not match");
             return Promise.reject(new Error("State does not match"));
         }
-        
+
         if (!state.client_id) {
-            Log.error("No client_id on state");
+            Log.error("ResponseValidator._processSigninParams: No client_id on state");
             return Promise.reject(new Error("No client_id on state"));
         }
-        
+
         if (!state.authority) {
-            Log.error("No authority on state");
+            Log.error("ResponseValidator._processSigninParams: No authority on state");
             return Promise.reject(new Error("No authority on state"));
         }
-        
+
         // this allows the authority to be loaded from the signin state
         if (!this._settings.authority) {
             this._settings.authority = state.authority;
         }
         // ensure we're using the correct authority if the authority is not loaded from signin state
         else if (this._settings.authority && this._settings.authority !== state.authority) {
-            Log.error("authority mismatch on settings vs. signin state");
+            Log.error("ResponseValidator._processSigninParams: authority mismatch on settings vs. signin state");
             return Promise.reject(new Error("authority mismatch on settings vs. signin state"));
         }
         // this allows the client_id to be loaded from the signin state
@@ -93,59 +95,73 @@ export default class ResponseValidator {
         }
         // ensure we're using the correct client_id if the client_id is not loaded from signin state
         else if (this._settings.client_id && this._settings.client_id !== state.client_id) {
-            Log.error("client_id mismatch on settings vs. signin state");
+            Log.error("ResponseValidator._processSigninParams: client_id mismatch on settings vs. signin state");
             return Promise.reject(new Error("client_id mismatch on settings vs. signin state"));
         }
-        
+
         // now that we know the state matches, take the stored data
         // and set it into the response so callers can get their state
         // this is important for both success & error outcomes
-        Log.info("state validated");
+        Log.debug("ResponseValidator._processSigninParams: state validated");
         response.state = state.data;
 
         if (response.error) {
-            Log.warn("Response was error", response.error);
+            Log.warn("ResponseValidator._processSigninParams: Response was error", response.error);
             return Promise.reject(new ErrorResponse(response));
         }
 
         if (state.nonce && !response.id_token) {
-            Log.error("Expecting id_token in response");
+            Log.error("ResponseValidator._processSigninParams: Expecting id_token in response");
             return Promise.reject(new Error("No id_token in response"));
         }
 
         if (!state.nonce && response.id_token) {
-            Log.error("Not expecting id_token in response");
+            Log.error("ResponseValidator._processSigninParams: Not expecting id_token in response");
             return Promise.reject(new Error("Unexpected id_token in response"));
+        }
+
+        if (state.code_verifier && !response.code) {
+            Log.error("ResponseValidator._processSigninParams: Expecting code in response");
+            return Promise.reject(new Error("No code in response"));
+        }
+
+        if (!state.code_verifier && response.code) {
+            Log.error("ResponseValidator._processSigninParams: Not expecting code in response");
+            return Promise.reject(new Error("Unexpected code in response"));
         }
 
         return Promise.resolve(response);
     }
 
     _processClaims(response) {
-        Log.info("ResponseValidator._processClaims");
-
         if (response.isOpenIdConnect) {
-            Log.info("response is OIDC, processing claims");
+            Log.debug("ResponseValidator._processClaims: response is OIDC, processing claims");
 
             response.profile = this._filterProtocolClaims(response.profile);
 
             if (this._settings.loadUserInfo && response.access_token) {
-                Log.info("loading user info");
+                Log.debug("ResponseValidator._processClaims: loading user info");
 
                 return this._userInfoService.getClaims(response.access_token).then(claims => {
+                    Log.debug("ResponseValidator._processClaims: user info claims received from user info endpoint");
+
+                    if (claims.sub !== response.profile.sub) {
+                        Log.error("ResponseValidator._processClaims: sub from user info endpoint does not match sub in access_token");
+                        return Promise.reject(new Error("sub from user info endpoint does not match sub in access_token"));
+                    }
 
                     response.profile = this._mergeClaims(response.profile, claims);
-                    Log.info("user info claims received, updated profile:", response.profile);
+                    Log.debug("ResponseValidator._processClaims: user info claims received, updated profile:", response.profile);
 
                     return response;
                 });
             }
             else {
-                Log.info("not loading user info");
+                Log.debug("ResponseValidator._processClaims: not loading user info");
             }
         }
         else {
-            Log.info("response is not OIDC, not processing claims");
+            Log.debug("ResponseValidator._processClaims: response is not OIDC, not processing claims");
         }
 
         return Promise.resolve(response);
@@ -160,7 +176,8 @@ export default class ResponseValidator {
                 values = [values];
             }
 
-            for (let value of values) {
+            for (let i = 0; i < values.length; i++) {
+                let value = values[i];
                 if (!result[name]) {
                     result[name] = value;
                 }
@@ -179,7 +196,7 @@ export default class ResponseValidator {
     }
 
     _filterProtocolClaims(claims) {
-        Log.info("ResponseValidator._filterProtocolClaims, incoming claims:", claims);
+        Log.debug("ResponseValidator._filterProtocolClaims, incoming claims:", claims);
 
         var result = Object.assign({}, claims);
 
@@ -188,164 +205,250 @@ export default class ResponseValidator {
                 delete result[type];
             });
 
-            Log.info("protocol claims filtered", result);
+            Log.debug("ResponseValidator._filterProtocolClaims: protocol claims filtered", result);
         }
         else {
-            Log.info("protocol claims not filtered")
+            Log.debug("ResponseValidator._filterProtocolClaims: protocol claims not filtered")
         }
 
         return result;
     }
 
     _validateTokens(state, response) {
-        Log.info("ResponseValidator._validateTokens");
+        if (response.code) {
+            Log.debug("ResponseValidator._validateTokens: Validating code");
+            return this._processCode(state, response);
+        }
 
         if (response.id_token) {
-
             if (response.access_token) {
-                Log.info("Validating id_token and access_token");
+                Log.debug("ResponseValidator._validateTokens: Validating id_token and access_token");
                 return this._validateIdTokenAndAccessToken(state, response);
             }
 
-            Log.info("Validating id_token");
+            Log.debug("ResponseValidator._validateTokens: Validating id_token");
             return this._validateIdToken(state, response);
         }
 
-        Log.info("No id_token to validate");
+        Log.debug("ResponseValidator._validateTokens: No code to process or id_token to validate");
         return Promise.resolve(response);
     }
 
-    _validateIdTokenAndAccessToken(state, response) {
-        Log.info("ResponseValidator._validateIdTokenAndAccessToken");
+    _processCode(state, response) {
+        var request = {
+            client_id: state.client_id,
+            client_secret: this._settings.client_secret,
+            code : response.code,
+            redirect_uri: state.redirect_uri,
+            code_verifier: state.code_verifier,
+        };
+        
+        return this._tokenClient.exchangeCode(request).then(tokenResponse => {
+            
+            for(var key in tokenResponse) {
+                response[key] = tokenResponse[key];
+            }
 
+            if (response.id_token) {
+                Log.debug("ResponseValidator._processCode: token response successful, processing id_token");
+                return this._validateIdTokenAttributes(state, response);
+            }
+            else {
+                Log.debug("ResponseValidator._processCode: token response successful, returning response");
+            }
+            
+            return response;
+        });
+    }
+
+    _validateIdTokenAttributes(state, response) {
+        return this._metadataService.getIssuer().then(issuer => {
+
+            let audience = state.client_id;
+            let clockSkewInSeconds = this._settings.clockSkew;
+            Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
+
+            return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds).then(payload => {
+            
+                if (state.nonce && state.nonce !== payload.nonce) {
+                    Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
+                    return Promise.reject(new Error("Invalid nonce in id_token"));
+                }
+
+                if (!payload.sub) {
+                    Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
+                    return Promise.reject(new Error("No sub present in id_token"));
+                }
+
+                response.profile = payload;
+                return response;
+            });
+        });
+    }
+
+    _validateIdTokenAndAccessToken(state, response) {
         return this._validateIdToken(state, response).then(response => {
             return this._validateAccessToken(response);
         });
     }
 
     _validateIdToken(state, response) {
-        Log.info("ResponseValidator._validateIdToken");
-
         if (!state.nonce) {
-            Log.error("No nonce on state");
+            Log.error("ResponseValidator._validateIdToken: No nonce on state");
             return Promise.reject(new Error("No nonce on state"));
         }
-        
+
         let jwt = this._joseUtil.parseJwt(response.id_token);
         if (!jwt || !jwt.header || !jwt.payload) {
-            Log.error("Failed to parse id_token", jwt);
+            Log.error("ResponseValidator._validateIdToken: Failed to parse id_token", jwt);
             return Promise.reject(new Error("Failed to parse id_token"));
         }
 
         if (state.nonce !== jwt.payload.nonce) {
-            Log.error("Invalid nonce in id_token");
+            Log.error("ResponseValidator._validateIdToken: Invalid nonce in id_token");
             return Promise.reject(new Error("Invalid nonce in id_token"));
         }
 
         var kid = jwt.header.kid;
 
         return this._metadataService.getIssuer().then(issuer => {
-            Log.info("Received issuer");
+            Log.debug("ResponseValidator._validateIdToken: Received issuer");
 
             return this._metadataService.getSigningKeys().then(keys => {
                 if (!keys) {
-                    Log.error("No signing keys from metadata");
+                    Log.error("ResponseValidator._validateIdToken: No signing keys from metadata");
                     return Promise.reject(new Error("No signing keys from metadata"));
                 }
 
-                Log.info("Received signing keys");
+                Log.debug("ResponseValidator._validateIdToken: Received signing keys");
+                let key;
                 if (!kid) {
+                    keys = this._filterByAlg(keys, jwt.header.alg);
+
                     if (keys.length > 1) {
-                        Log.error("No kid found in id_token");
-                        return Promise.reject(new Error("No kid found in id_token"));
-                    } 
+                        Log.error("ResponseValidator._validateIdToken: No kid found in id_token and more than one key found in metadata");
+                        return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
+                    }
                     else {
                         // kid is mandatory only when there are multiple keys in the referenced JWK Set document
                         // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
-                        kid = keys[0].kid;
+                        key = keys[0];
                     }
                 }
-
-                let key = keys.filter(key => {
-                    return key.kid === kid;
-                })[0];
+                else {
+                    key = keys.filter(key => {
+                        return key.kid === kid;
+                    })[0];
+                }
 
                 if (!key) {
-                    Log.error("No key matching kid found in signing keys");
-                    return Promise.reject(new Error("No key matching kid found in signing keys"));
+                    Log.error("ResponseValidator._validateIdToken: No key matching kid or alg found in signing keys");
+                    return Promise.reject(new Error("No key matching kid or alg found in signing keys"));
                 }
 
                 let audience = state.client_id;
-                
+
                 let clockSkewInSeconds = this._settings.clockSkew;
-                Log.info("Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
+                Log.debug("ResponseValidator._validateIdToken: Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
                 return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{
-                    Log.info("JWT validation successful");
-                    
+                    Log.debug("ResponseValidator._validateIdToken: JWT validation successful");
+
+                    if (!jwt.payload.sub) {
+                        Log.error("ResponseValidator._validateIdToken: No sub present in id_token");
+                        return Promise.reject(new Error("No sub present in id_token"));
+                    }
+
                     response.profile = jwt.payload;
-                    
+
                     return response;
                 });
             });
         });
     }
 
-    _validateAccessToken(response) {
-        Log.info("ResponseValidator._validateAccessToken");
+    _filterByAlg(keys, alg){
+        var kty = null;
+        if (alg.startsWith("RS")) {
+            kty = "RSA";
+        }
+        else if (alg.startsWith("PS")) {
+            kty = "PS";
+        }
+        else if (alg.startsWith("ES")) {
+            kty = "EC";
+        }
+        else {
+            Log.debug("ResponseValidator._filterByAlg: alg not supported: ", alg);
+            return [];
+        }
 
+        Log.debug("ResponseValidator._filterByAlg: Looking for keys that match kty: ", kty);
+
+        keys = keys.filter(key => {
+            return key.kty === kty;
+        });
+
+        Log.debug("ResponseValidator._filterByAlg: Number of keys that match kty: ", kty, keys.length);
+
+        return keys;
+    }
+
+    _validateAccessToken(response) {
         if (!response.profile) {
-            Log.error("No profile loaded from id_token");
+            Log.error("ResponseValidator._validateAccessToken: No profile loaded from id_token");
             return Promise.reject(new Error("No profile loaded from id_token"));
         }
 
         if (!response.profile.at_hash) {
-            Log.error("No at_hash in id_token");
+            Log.error("ResponseValidator._validateAccessToken: No at_hash in id_token");
             return Promise.reject(new Error("No at_hash in id_token"));
         }
 
         if (!response.id_token) {
-            Log.error("No id_token");
+            Log.error("ResponseValidator._validateAccessToken: No id_token");
             return Promise.reject(new Error("No id_token"));
         }
 
         let jwt = this._joseUtil.parseJwt(response.id_token);
         if (!jwt || !jwt.header) {
-            Log.error("Failed to parse id_token", jwt);
+            Log.error("ResponseValidator._validateAccessToken: Failed to parse id_token", jwt);
             return Promise.reject(new Error("Failed to parse id_token"));
         }
 
         var hashAlg = jwt.header.alg;
         if (!hashAlg || hashAlg.length !== 5) {
-            Log.error("Unsupported alg:", hashAlg);
+            Log.error("ResponseValidator._validateAccessToken: Unsupported alg:", hashAlg);
             return Promise.reject(new Error("Unsupported alg: " + hashAlg));
         }
 
         var hashBits = hashAlg.substr(2, 3);
         if (!hashBits) {
-            Log.error("Unsupported alg:", hashAlg, hashBits);
+            Log.error("ResponseValidator._validateAccessToken: Unsupported alg:", hashAlg, hashBits);
             return Promise.reject(new Error("Unsupported alg: " + hashAlg));
         }
 
         hashBits = parseInt(hashBits);
         if (hashBits !== 256 && hashBits !== 384 && hashBits !== 512) {
-            Log.error("Unsupported alg:", hashAlg, hashBits);
+            Log.error("ResponseValidator._validateAccessToken: Unsupported alg:", hashAlg, hashBits);
             return Promise.reject(new Error("Unsupported alg: " + hashAlg));
         }
 
         let sha = "sha" + hashBits;
         var hash = this._joseUtil.hashString(response.access_token, sha);
         if (!hash) {
-            Log.error("access_token hash failed:", sha);
+            Log.error("ResponseValidator._validateAccessToken: access_token hash failed:", sha);
             return Promise.reject(new Error("Failed to validate at_hash"));
         }
 
         var left = hash.substr(0, hash.length / 2);
         var left_b64u = this._joseUtil.hexToBase64Url(left);
         if (left_b64u !== response.profile.at_hash) {
-            Log.error("Failed to validate at_hash", left_b64u, response.profile.at_hash);
+            Log.error("ResponseValidator._validateAccessToken: Failed to validate at_hash", left_b64u, response.profile.at_hash);
             return Promise.reject(new Error("Failed to validate at_hash"));
         }
+
+        Log.debug("ResponseValidator._validateAccessToken: success");
 
         return Promise.resolve(response);
     }

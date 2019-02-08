@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import SigninResponse from '../../src/SigninResponse';
+import { Log } from '../../src/Log';
+import { SigninResponse } from '../../src/SigninResponse';
 
 import chai from 'chai';
 chai.should();
@@ -31,6 +31,11 @@ describe("SigninResponse", function () {
         it("should read state", function () {
             let subject = new SigninResponse("state=foo");
             subject.state.should.equal("foo");
+        });
+
+        it("should read code", function () {
+            let subject = new SigninResponse("code=foo");
+            subject.code.should.equal("foo");
         });
 
         it("should read id_token", function () {

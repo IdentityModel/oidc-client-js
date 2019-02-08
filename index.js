@@ -1,18 +1,21 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-export const Log = require('./src/Log');
-export const OidcClient = require('./src/OidcClient');
-export const OidcClientSettings = require('./src/OidcClientSettings');
-export const WebStorageStateStore = require('./src/WebStorageStateStore');
-export const InMemoryWebStorage = require('./src/InMemoryWebStorage');
-export const UserManager = require('./src/UserManager');
-export const AccessTokenEvents = require('./src/AccessTokenEvents');
-export const MetadataService = require('./src/MetadataService');
-export const CordovaPopupNavigator = require('./src/CordovaPopupNavigator');
-export const CordovaIFrameNavigator = require('./src/CordovaIFrameNavigator');
-export const CheckSessionIFrame = require('./src/CheckSessionIFrame');
-export const TokenRevocationClient = require('./src/TokenRevocationClient');
+import { Log } from './src/Log';
+import { OidcClient } from './src/OidcClient';
+import { OidcClientSettings } from './src/OidcClientSettings';
+import { WebStorageStateStore } from './src/WebStorageStateStore';
+import { InMemoryWebStorage } from './src/InMemoryWebStorage';
+import { UserManager } from './src/UserManager';
+import { AccessTokenEvents } from './src/AccessTokenEvents';
+import { MetadataService } from './src/MetadataService';
+import { CordovaPopupNavigator } from './src/CordovaPopupNavigator';
+import { CordovaIFrameNavigator } from './src/CordovaIFrameNavigator';
+import { CheckSessionIFrame } from './src/CheckSessionIFrame';
+import { TokenRevocationClient } from './src/TokenRevocationClient';
+import { SessionMonitor } from './src/SessionMonitor';
+import { Global } from './src/Global';
+import { User } from './src/User';
 
 export default {
     Log,
@@ -26,5 +29,8 @@ export default {
     CordovaPopupNavigator,
     CordovaIFrameNavigator,
     CheckSessionIFrame,
-    TokenRevocationClient
+    TokenRevocationClient,
+    SessionMonitor,
+    Global,
+    User
 };

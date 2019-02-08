@@ -1,8 +1,8 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import Log from '../../src/Log';
-import SignoutRequest from '../../src/SignoutRequest';
+import { Log } from '../../src/Log';
+import { SignoutRequest } from '../../src/SignoutRequest';
 
 import chai from 'chai';
 chai.should();
@@ -52,15 +52,15 @@ describe("SignoutRequest", function() {
         it("should include post_logout_redirect_uri if id_token_hint also provided", function() {
             subject.url.should.contain("post_logout_redirect_uri=loggedout");
         });
-        
-        it("should not include post_logout_redirect_uri if no id_token_hint provided", function() {
+
+        it("should include post_logout_redirect_uri if no id_token_hint provided", function() {
 
             delete settings.id_token_hint;
             subject = new SignoutRequest(settings);
 
-            subject.url.should.not.contain("post_logout_redirect_uri=loggedout");
+            subject.url.should.contain("post_logout_redirect_uri=loggedout");
         });
-        
+
         it("should include state if post_logout_redirect_uri provided", function() {
             subject.url.should.contain("state=" + subject.state.id);
         });
