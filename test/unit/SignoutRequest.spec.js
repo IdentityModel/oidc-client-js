@@ -80,6 +80,15 @@ describe("SignoutRequest", function() {
             url.should.contain("state=" + subject.state.id);
         });
 
+        it("should include extra query params", function() {
+            settings.extraQueryParams = {
+                'TargetResource': 'logouturl.com',
+                'InErrorResource': 'errorurl.com'
+            };
+            subject = new SignoutRequest(settings);
+            subject.url.should.contain('TargetResource=logouturl.com&InErrorResource=errorurl.com');
+        });
+
     });
 
 });

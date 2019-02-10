@@ -123,12 +123,13 @@ export class OidcClient {
         });
     }
 
-    createSignoutRequest({id_token_hint, data, state, post_logout_redirect_uri} = {},
+    createSignoutRequest({id_token_hint, data, state, post_logout_redirect_uri, extraQueryParams } = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSignoutRequest");
 
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
+        extraQueryParams = extraQueryParams || this._settings.extraQueryParams;
 
         return this._metadataService.getEndSessionEndpoint().then(url => {
             if (!url) {
@@ -142,7 +143,8 @@ export class OidcClient {
                 url,
                 id_token_hint,
                 post_logout_redirect_uri,
-                data: data || state
+                data: data || state,
+                extraQueryParams
             });
 
             var signoutState = request.state;
