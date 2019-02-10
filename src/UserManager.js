@@ -478,7 +478,7 @@ export class UserManager extends OidcClient {
             var access_token = user.access_token;
             var refresh_token = user.refresh_token;
 
-            return this._revokeAccessTokenInternal(access_token, require)
+            return this._revokeAccessTokenInternal(access_token, required)
                 .then(atSuccess => {
                     return this._revokeRefreshTokenInternal(refresh_token, required)
                         .then(rtSuccess => {
