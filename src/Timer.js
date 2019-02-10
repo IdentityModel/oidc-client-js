@@ -1,9 +1,9 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { Log } from './Log';
-import { Global } from './Global';
-import { Event } from './Event';
+import { Log } from './Log.js';
+import { Global } from './Global.js';
+import { Event } from './Event.js';
 
 const TimerDuration = 5; // seconds
 
