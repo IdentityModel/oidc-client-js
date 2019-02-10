@@ -51,8 +51,5 @@
   "dependencies": {
     "jsrsasign": "^8.0.12"
   },
-  "optionalDependencies": {
-    "babel-polyfill": ">=6.9.1"
-  },
   "typings": "index.d.ts"
 }
