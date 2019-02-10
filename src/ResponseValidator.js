@@ -187,7 +187,12 @@ export class ResponseValidator {
                     }
                 }
                 else if (result[name] !== value) {
-                    result[name] = [result[name], value];
+                    if (typeof value === 'object') {
+                        result[name] = this._mergeClaims(result[name], value);
+                    } 
+                    else {
+                        result[name] = [result[name], value];
+                    }
                 }
             }
         }
