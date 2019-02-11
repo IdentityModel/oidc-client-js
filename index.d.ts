@@ -258,7 +258,6 @@ export interface SigninResponse {
   error: string;
   error_description: string;
   error_uri: string;
-  expires_in: number;
   id_token: string;
   profile: any;
   scope: string;
