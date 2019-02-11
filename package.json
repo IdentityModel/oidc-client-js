@@ -48,8 +48,5 @@
     "webpack": "^4.16.0",
     "webpack-stream": "^4.0.3"
   },
-  "dependencies": {
-    "jsrsasign": "^8.0.12"
-  },
   "typings": "index.d.ts"
 }
