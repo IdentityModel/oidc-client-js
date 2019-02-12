@@ -251,7 +251,7 @@ export class WebStorageStateStore implements StateStore {
 }
 
 export interface SigninResponse {
-  new (url: string, delimiter: string = '#'): SigninResponse;
+  new (url: string, delimiter?: string): SigninResponse;
 
   access_token: string;
   code: string;
