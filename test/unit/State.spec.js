@@ -9,12 +9,11 @@ import { WebStorageStateStore } from '../../src/WebStorageStateStore';
 
 import chai from 'chai';
 chai.should();
-let assert = chai.assert;
 
 describe("State", function() {
 
     beforeEach(function(){
-        Log.level = Log.NONE;
+        Log.level = Log.DEBUG;
         Log.logger = console;
     });
 
@@ -71,7 +70,7 @@ describe("State", function() {
 
             let oldNow = Date.now;
             Date.now = function() {
-                return 200 * 1000; // ms
+                return 240 * 1000; // 4 minutes in ms.
             };
 
             let prefix = "prefix.";
@@ -80,8 +79,8 @@ describe("State", function() {
 
             let s1 = new State({ id: "s1", created: 50 });
             let s2 = new State({ id: "s2", created: 99 });
-            let s3 = new State({ id: "s3", created: 100 });
-            let s4 = new State({ id: "s4", created: 101 });
+            let s3 = new State({ id: "s3", created: 120 });
+            let s4 = new State({ id: "s4", created: 121 });
             let s5 = new State({ id: "s5", created: 150 });
 
             inMemStore.setItem("junk0", "junk");
@@ -96,7 +95,7 @@ describe("State", function() {
             inMemStore.setItem(prefix + s5.id, s5.toStorageString());
             inMemStore.setItem("junk5", "junk");
 
-            State.clearStaleState(store, 100).then(() => {
+            State.clearStaleState(store, 120).then(() => {
                 Log.debug("clearStaleState done");
 
                 inMemStore.length.should.equal(8);
@@ -108,8 +107,5 @@ describe("State", function() {
             });
 
         });
-
     });
-
-
 });

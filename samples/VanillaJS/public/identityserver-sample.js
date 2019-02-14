@@ -41,7 +41,7 @@ var settings = {
     
     silent_redirect_uri:'http://localhost:15000/identityserver-sample-silent.html',
     automaticSilentRenew:true,
-    //silentRequestTimeout:10000,
+    //silentRequestTimeoutInSeconds:10000,
 
     filterProtocolClaims: true,
     loadUserInfo: true

@@ -196,6 +196,6 @@ export class OidcClient {
 
         stateStore = stateStore || this._stateStore;
 
-        return State.clearStaleState(stateStore, this.settings.staleStateAge);
+        return State.clearStaleState(stateStore, this.settings.staleStateAgeInSeconds);
     }
 }

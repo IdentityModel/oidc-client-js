@@ -326,39 +326,39 @@ describe("OidcClientSettings", function () {
         });
     });
 
-    describe("staleStateAge", function () {
+    describe("staleStateAgeInSeconds", function () {
 
         it("should use default value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
             });
-            subject.staleStateAge.should.equal(900);
+            subject.staleStateAgeInSeconds.should.equal(900); // 15 minutes
         });
 
         it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
-                staleStateAge: 100
+                staleStateAgeInSeconds: 120
             });
-            subject.staleStateAge.should.equal(100);
+            subject.staleStateAgeInSeconds.should.equal(120); // 2 minutes
         });
     });
 
-    describe("clockSkew", function () {
+    describe("clockSkewInSeconds", function () {
 
         it("should use default value", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client'
             });
-            subject.clockSkew.should.equal(5 * 60); // 5 mins
+            subject.clockSkewInSeconds.should.equal(5 * 60); // 5 minutes
         });
 
         it("should return value from initial settings", function () {
             let subject = new OidcClientSettings({
                 client_id: 'client',
-                clockSkew: 10
+                clockSkewInSeconds: 60
             });
-            subject.clockSkew.should.equal(10);
+            subject.clockSkewInSeconds.should.equal(60);  // 1 minute
         });
     });
 

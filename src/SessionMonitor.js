@@ -39,8 +39,8 @@ export class SessionMonitor {
     get _client_id() {
         return this._settings.client_id;
     }
-    get _checkSessionInterval() {
-        return this._settings.checkSessionInterval;
+    get _checkSessionIntervalInSeconds() {
+        return this._settings.checkSessionIntervalInSeconds;
     }
     get _stopCheckSessionOnError() {
         return this._settings.stopCheckSessionOnError;
@@ -60,10 +60,10 @@ export class SessionMonitor {
                         Log.debug("SessionMonitor._start: Initializing check session iframe")
 
                         let client_id = this._client_id;
-                        let interval = this._checkSessionInterval;
+                        let intervalInSeconds = this._checkSessionIntervalInSeconds;
                         let stopOnError = this._stopCheckSessionOnError;
 
-                        this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval, stopOnError);
+                        this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, intervalInSeconds, stopOnError);
                         this._checkSessionIFrame.load().then(() => {
                             this._checkSessionIFrame.start(session_state);
                         });

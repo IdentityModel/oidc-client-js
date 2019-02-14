@@ -6,7 +6,6 @@ import { UserManagerSettings } from '../../src/UserManagerSettings';
 
 import chai from 'chai';
 chai.should();
-let assert = chai.assert;
 
 describe("UserManagerSettings", function () {
 
@@ -64,11 +63,11 @@ describe("UserManagerSettings", function () {
 
     });
 
-    describe("silentRequestTimeout", function () {
+    describe("silentRequestTimeoutInSeconds", function () {
 
         it("should return value from initial settings", function () {
-            let subject = new UserManagerSettings({ silentRequestTimeout: 123 });
-            subject.silentRequestTimeout.should.equal(123);
+            let subject = new UserManagerSettings({ silentRequestTimeoutInSeconds: 123 });
+            subject.silentRequestTimeoutInSeconds.should.equal(123);
         });
 
     });
@@ -121,19 +120,19 @@ describe("UserManagerSettings", function () {
         });
     });
 
-    describe("accessTokenExpiringNotificationTime", function () {
+    describe("accessTokenExpiringThresholdInSeconds", function () {
 
         it("should return value from initial settings", function () {
             let subject = new UserManagerSettings({
-                accessTokenExpiringNotificationTime: 10
+                accessTokenExpiringThresholdInSeconds: 10
             });
-            subject.accessTokenExpiringNotificationTime.should.equal(10);
+            subject.accessTokenExpiringThresholdInSeconds.should.equal(10);
         });
 
         it("should use default value", function () {
             let subject = new UserManagerSettings({
             });
-            subject.accessTokenExpiringNotificationTime.should.equal(60);
+            subject.accessTokenExpiringThresholdInSeconds.should.equal(60);
         });
 
     });
@@ -187,17 +186,17 @@ describe("UserManagerSettings", function () {
         });
     });
 
-    describe("checkSessionInterval", function() {
+    describe("checkSessionIntervalInSeconds", function() {
         it("should return value from initial settings", function() {
             let subject = new UserManagerSettings({
-                checkSessionInterval : 6000
+                checkSessionIntervalInSeconds : 6
             });
-            subject.checkSessionInterval.should.equal(6000);
+            subject.checkSessionIntervalInSeconds.should.equal(6);
         });
         it("should use default value", function () {
             let subject = new UserManagerSettings({
             });
-            subject.checkSessionInterval.should.equal(2000);
+            subject.checkSessionIntervalInSeconds.should.equal(2);
         });
     });
 

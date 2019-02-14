@@ -3,14 +3,14 @@
 
 import { Log } from './Log.js';
 
-const DefaultInterval = 2000;
+const DefaultIntervalInSeconds = 2;
 
 export class CheckSessionIFrame {
-    constructor(callback, client_id, url, interval, stopOnError = true) {
+    constructor(callback, client_id, url, intervalInSeconds, stopOnError = true) {
         this._callback = callback;
         this._client_id = client_id;
         this._url = url;
-        this._interval = interval || DefaultInterval;
+        this._intervalInSeconds = intervalInSeconds || DefaultIntervalInSeconds;
         this._stopOnError = stopOnError;
 
         var idx = url.indexOf("/", url.indexOf("//") + 2);
@@ -74,7 +74,7 @@ export class CheckSessionIFrame {
             send();
 
             // and setup timer
-            this._timer = window.setInterval(send, this._interval);
+            this._timer = window.setInterval(send, this._intervalInSeconds * 1000);
         }
     }
 

@@ -44,7 +44,7 @@ var settings = {
     
     silent_redirect_uri: url + '/code-identityserver-sample-silent.html',
     automaticSilentRenew:true,
-    //silentRequestTimeout:10000,
+    //silentRequestTimeoutInSeconds:10000,
 
     filterProtocolClaims: true,
     loadUserInfo: true,

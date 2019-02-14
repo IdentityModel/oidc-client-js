@@ -270,7 +270,7 @@ export class ResponseValidator {
         return this._metadataService.getIssuer().then(issuer => {
 
             let audience = state.client_id;
-            let clockSkewInSeconds = this._settings.clockSkew;
+            let clockSkewInSeconds = this._settings.clockSkewInSeconds;
             Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
             return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds).then(payload => {
@@ -353,7 +353,7 @@ export class ResponseValidator {
 
                 let audience = state.client_id;
 
-                let clockSkewInSeconds = this._settings.clockSkew;
+                let clockSkewInSeconds = this._settings.clockSkewInSeconds;
                 Log.debug("ResponseValidator._validateIdToken: Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
                 return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{

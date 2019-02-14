@@ -10,8 +10,8 @@ const OidcMetadataUrlPath = '.well-known/openid-configuration';
 
 const DefaultResponseType = "id_token";
 const DefaultScope = "openid";
-const DefaultStaleStateAge = 60 * 15; // seconds
-const DefaultClockSkewInSeconds = 60 * 5;
+const DefaultStaleStateAgeInSeconds = 60 * 15;  // 15 minutes
+const DefaultClockSkewInSeconds = 60 * 5;       // 5 minutes
 
 export class OidcClientSettings {
     constructor({
@@ -24,7 +24,7 @@ export class OidcClientSettings {
         prompt, display, max_age, ui_locales, acr_values, resource, response_mode,
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
-        staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
+        staleStateAgeInSeconds = DefaultStaleStateAgeInSeconds, clockSkewInSeconds = DefaultClockSkewInSeconds,
         userInfoJwtIssuer = 'OP',
         // other behavior
         stateStore = new WebStorageStateStore(),
@@ -56,8 +56,8 @@ export class OidcClientSettings {
 
         this._filterProtocolClaims = !!filterProtocolClaims;
         this._loadUserInfo = !!loadUserInfo;
-        this._staleStateAge = staleStateAge;
-        this._clockSkew = clockSkew;
+        this._staleStateAgeInSeconds = staleStateAgeInSeconds;
+        this._clockSkewInSeconds = clockSkewInSeconds;
         this._userInfoJwtIssuer = userInfoJwtIssuer;
 
         this._stateStore = stateStore;
@@ -173,11 +173,11 @@ export class OidcClientSettings {
     get loadUserInfo() {
         return this._loadUserInfo;
     }
-    get staleStateAge() {
-        return this._staleStateAge;
+    get staleStateAgeInSeconds() {
+        return this._staleStateAgeInSeconds;
     }
-    get clockSkew() {
-        return this._clockSkew;
+    get clockSkewInSeconds() {
+        return this._clockSkewInSeconds;
     }
     get userInfoJwtIssuer() {
         return this._userInfoJwtIssuer;

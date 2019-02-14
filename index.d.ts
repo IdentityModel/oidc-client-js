@@ -137,8 +137,8 @@ export interface OidcClientSettings {
   readonly acr_values?: string;
   readonly filterProtocolClaims?: boolean;
   readonly loadUserInfo?: boolean;
-  readonly staleStateAge?: number;
-  readonly clockSkew?: number;
+  readonly staleStateAgeInSeconds?: number;
+  readonly clockSkewInSeconds?: number;
   readonly stateStore?: StateStore;
   readonly userInfoJwtIssuer?: 'ANY' | 'OP' | string;
   ResponseValidatorCtor?: ResponseValidatorCtor;
@@ -208,15 +208,15 @@ export interface UserManagerSettings extends OidcClientSettings {
   readonly popupWindowFeatures?: string;
   readonly popupWindowTarget?: any;
   readonly silent_redirect_uri?: any;
-  readonly silentRequestTimeout?: any;
+  readonly silentRequestTimeoutInSeconds?: any;
   readonly automaticSilentRenew?: boolean;
   readonly includeIdTokenInSilentRenew?: boolean;
   readonly monitorSession?: boolean;
-  readonly checkSessionInterval?: number;
+  readonly checkSessionIntervalInSeconds?: number;
   readonly query_status_response_type?: string;
   readonly stopCheckSessionOnError?: boolean;
   readonly revokeAccessTokenOnSignout?: any;
-  readonly accessTokenExpiringNotificationTime?: number;
+  readonly accessTokenExpiringThresholdInSeconds?: number;
   readonly redirectNavigator?: any;
   readonly popupNavigator?: any;
   readonly iframeNavigator?: any;
@@ -368,7 +368,7 @@ export interface OidcMetadata {
 }
 
 export interface CheckSessionIFrame {
-  new (callback: () => void, client_id: string, url: string, interval?: number, stopOnError?: boolean): CheckSessionIFrame
+  new (callback: () => void, client_id: string, url: string, intervalInSeconds?: number, stopOnError?: boolean): CheckSessionIFrame
 
   load(): Promise<void>;
 
@@ -378,7 +378,7 @@ export interface CheckSessionIFrame {
 }
 
 export interface CheckSessionIFrameCtor {
-  (callback: () => void, client_id: string, url: string, interval?: number, stopOnError?: boolean): CheckSessionIFrame;
+  (callback: () => void, client_id: string, url: string, intervalInSeconds?: number, stopOnError?: boolean): CheckSessionIFrame;
 }
 
 export class SessionMonitor {

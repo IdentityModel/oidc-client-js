@@ -4,16 +4,16 @@
 import { Log } from './Log.js';
 import { Timer } from './Timer.js';
 
-const DefaultAccessTokenExpiringNotificationTime = 60; // seconds
+const DefaultAccessTokenExpiringThreshholdInSeconds = 60;
 
 export class AccessTokenEvents {
 
     constructor({
-        accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
+        accessTokenExpiringThreshholdInSeconds = DefaultAccessTokenExpiringThreshholdInSeconds,
         accessTokenExpiringTimer = new Timer("Access token expiring"),
         accessTokenExpiredTimer = new Timer("Access token expired")
     } = {}) {
-        this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
+        this._accessTokenExpiringThresholdInSeconds = accessTokenExpiringThreshholdInSeconds;
 
         this._accessTokenExpiring = accessTokenExpiringTimer;
         this._accessTokenExpired = accessTokenExpiredTimer;
@@ -27,7 +27,7 @@ export class AccessTokenEvents {
 
             if (duration > 0) {
                 // only register expiring if we still have time
-                let expiring = duration - this._accessTokenExpiringNotificationTime;
+                let expiring = duration - this._accessTokenExpiringThresholdInSeconds;
                 if (expiring <= 0){
                     expiring = 1;
                 }
