@@ -47,10 +47,10 @@ describe("State", function() {
         it("should use date.now for created", function() {
             var oldNow = Date.now;
             Date.now = function() {
-                return 123 * 1000; // ms
+                return 60 * 1000; // 1 minute in ms.
             };
             var subject = new State();
-            subject.created.should.be.equal(123);
+            subject.created.should.be.equal(60);
             Date.now = oldNow;
         });
     });
