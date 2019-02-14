@@ -1,10 +1,10 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { Log } from './Log';
-import { WebStorageStateStore } from './WebStorageStateStore';
-import { ResponseValidator } from './ResponseValidator';
-import { MetadataService } from './MetadataService';
+import { Log } from './Log.js';
+import { WebStorageStateStore } from './WebStorageStateStore.js';
+import { ResponseValidator } from './ResponseValidator.js';
+import { MetadataService } from './MetadataService.js';
 
 const OidcMetadataUrlPath = '.well-known/openid-configuration';
 
@@ -25,6 +25,7 @@ export class OidcClientSettings {
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
         staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
+        userInfoJwtIssuer = 'OP',
         // other behavior
         stateStore = new WebStorageStateStore(),
         ResponseValidatorCtor = ResponseValidator,
@@ -57,6 +58,7 @@ export class OidcClientSettings {
         this._loadUserInfo = !!loadUserInfo;
         this._staleStateAge = staleStateAge;
         this._clockSkew = clockSkew;
+        this._userInfoJwtIssuer = userInfoJwtIssuer;
 
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this);
@@ -176,6 +178,9 @@ export class OidcClientSettings {
     }
     get clockSkew() {
         return this._clockSkew;
+    }
+    get userInfoJwtIssuer() {
+        return this._userInfoJwtIssuer;
     }
 
     get stateStore() {

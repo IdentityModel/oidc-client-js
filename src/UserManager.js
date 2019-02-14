@@ -1,16 +1,16 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { Log } from './Log';
-import { OidcClient } from './OidcClient';
-import { UserManagerSettings } from './UserManagerSettings';
-import { User } from './User';
-import { UserManagerEvents } from './UserManagerEvents';
-import { SilentRenewService } from './SilentRenewService';
-import { SessionMonitor } from './SessionMonitor';
-import { TokenRevocationClient } from './TokenRevocationClient';
-import { TokenClient } from './TokenClient';
-import { JoseUtil } from './JoseUtil';
+import { Log } from './Log.js';
+import { OidcClient } from './OidcClient.js';
+import { UserManagerSettings } from './UserManagerSettings.js';
+import { User } from './User.js';
+import { UserManagerEvents } from './UserManagerEvents.js';
+import { SilentRenewService } from './SilentRenewService.js';
+import { SessionMonitor } from './SessionMonitor.js';
+import { TokenRevocationClient } from './TokenRevocationClient.js';
+import { TokenClient } from './TokenClient.js';
+import { JoseUtil } from './JoseUtil.js';
 
 
 export class UserManager extends OidcClient {
@@ -478,7 +478,7 @@ export class UserManager extends OidcClient {
             var access_token = user.access_token;
             var refresh_token = user.refresh_token;
 
-            return this._revokeAccessTokenInternal(access_token, require)
+            return this._revokeAccessTokenInternal(access_token, required)
                 .then(atSuccess => {
                     return this._revokeRefreshTokenInternal(refresh_token, required)
                         .then(rtSuccess => {

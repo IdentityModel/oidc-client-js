@@ -140,6 +140,7 @@ export interface OidcClientSettings {
   readonly staleStateAge?: number;
   readonly clockSkew?: number;
   readonly stateStore?: StateStore;
+  readonly userInfoJwtIssuer?: 'ANY' | 'OP' | string;
   ResponseValidatorCtor?: ResponseValidatorCtor;
   MetadataServiceCtor?: MetadataServiceCtor;
   extraQueryParams?: {};
@@ -250,14 +251,13 @@ export class WebStorageStateStore implements StateStore {
 }
 
 export interface SigninResponse {
-  new (url: string, delimiter: string = '#'): SigninResponse;
+  new (url: string, delimiter?: string): SigninResponse;
 
   access_token: string;
   code: string;
   error: string;
   error_description: string;
   error_uri: string;
-  expires_in: number;
   id_token: string;
   profile: any;
   scope: string;

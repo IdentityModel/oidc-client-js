@@ -1,15 +1,15 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { Log } from './Log';
-import { OidcClientSettings } from './OidcClientSettings';
-import { ErrorResponse } from './ErrorResponse';
-import { SigninRequest } from './SigninRequest';
-import { SigninResponse } from './SigninResponse';
-import { SignoutRequest } from './SignoutRequest';
-import { SignoutResponse } from './SignoutResponse';
-import { SigninState } from './SigninState';
-import { State } from './State';
+import { Log } from './Log.js';
+import { OidcClientSettings } from './OidcClientSettings.js';
+import { ErrorResponse } from './ErrorResponse.js';
+import { SigninRequest } from './SigninRequest.js';
+import { SigninResponse } from './SigninResponse.js';
+import { SignoutRequest } from './SignoutRequest.js';
+import { SignoutResponse } from './SignoutResponse.js';
+import { SigninState } from './SigninState.js';
+import { State } from './State.js';
 
 export class OidcClient {
     constructor(settings = {}) {
@@ -123,12 +123,13 @@ export class OidcClient {
         });
     }
 
-    createSignoutRequest({id_token_hint, data, state, post_logout_redirect_uri} = {},
+    createSignoutRequest({id_token_hint, data, state, post_logout_redirect_uri, extraQueryParams } = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSignoutRequest");
 
         post_logout_redirect_uri = post_logout_redirect_uri || this._settings.post_logout_redirect_uri;
+        extraQueryParams = extraQueryParams || this._settings.extraQueryParams;
 
         return this._metadataService.getEndSessionEndpoint().then(url => {
             if (!url) {
@@ -142,7 +143,8 @@ export class OidcClient {
                 url,
                 id_token_hint,
                 post_logout_redirect_uri,
-                data: data || state
+                data: data || state,
+                extraQueryParams
             });
 
             var signoutState = request.state;

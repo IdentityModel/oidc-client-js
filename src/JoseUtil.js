@@ -3,7 +3,7 @@
 
 import { jws, KEYUTIL as KeyUtil, X509, crypto, hextob64u, b64tohex } from '../jsrsasign/dist/jsrsasign.js';
 //import { jws, KEYUTIL as KeyUtil, X509, crypto, hextob64u, b64tohex } from 'jsrsasign';
-import { Log } from './Log';
+import { Log } from './Log.js';
 
 const AllowedSigningAlgs = ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'ES256', 'ES384', 'ES512'];
 
@@ -23,7 +23,7 @@ export class JoseUtil {
         }
     }
 
-    static validateJwt(jwt, key, issuer, audience, clockSkew, now) {
+    static validateJwt(jwt, key, issuer, audience, clockSkew, now, timeInsensitive) {
         Log.debug("JoseUtil.validateJwt");
 
         try {
@@ -54,7 +54,7 @@ export class JoseUtil {
                 return Promise.reject(new Error("Unsupported key type: " + key && key.kty));
             }
 
-            return JoseUtil._validateJwt(jwt, key, issuer, audience, clockSkew, now);
+            return JoseUtil._validateJwt(jwt, key, issuer, audience, clockSkew, now, timeInsensitive);
         }
         catch (e) {
             Log.error(e && e.message || e);
@@ -62,7 +62,7 @@ export class JoseUtil {
         }
     }
 
-    static validateJwtAttributes(jwt, issuer, audience, clockSkew, now) {
+    static validateJwtAttributes(jwt, issuer, audience, clockSkew, now, timeInsensitive) {
         if (!clockSkew) {
             clockSkew = 0;
         }
@@ -96,38 +96,40 @@ export class JoseUtil {
             return Promise.reject(new Error("Invalid azp in token: " + payload.azp));
         }
 
-        var lowerNow = now + clockSkew;
-        var upperNow = now - clockSkew;
+        if (!timeInsensitive) {
+            var lowerNow = now + clockSkew;
+            var upperNow = now - clockSkew;
 
-        if (!payload.iat) {
-            Log.error("JoseUtil._validateJwt: iat was not provided");
-            return Promise.reject(new Error("iat was not provided"));
-        }
-        if (lowerNow < payload.iat) {
-            Log.error("JoseUtil._validateJwt: iat is in the future", payload.iat);
-            return Promise.reject(new Error("iat is in the future: " + payload.iat));
-        }
+            if (!payload.iat) {
+                Log.error("JoseUtil._validateJwt: iat was not provided");
+                return Promise.reject(new Error("iat was not provided"));
+            }
+            if (lowerNow < payload.iat) {
+                Log.error("JoseUtil._validateJwt: iat is in the future", payload.iat);
+                return Promise.reject(new Error("iat is in the future: " + payload.iat));
+            }
 
-        if (payload.nbf && lowerNow < payload.nbf) {
-            Log.error("JoseUtil._validateJwt: nbf is in the future", payload.nbf);
-            return Promise.reject(new Error("nbf is in the future: " + payload.nbf));
-        }
+            if (payload.nbf && lowerNow < payload.nbf) {
+                Log.error("JoseUtil._validateJwt: nbf is in the future", payload.nbf);
+                return Promise.reject(new Error("nbf is in the future: " + payload.nbf));
+            }
 
-        if (!payload.exp) {
-            Log.error("JoseUtil._validateJwt: exp was not provided");
-            return Promise.reject(new Error("exp was not provided"));
-        }
-        if (payload.exp < upperNow) {
-            Log.error("JoseUtil._validateJwt: exp is in the past", payload.exp);
-            return Promise.reject(new Error("exp is in the past:" + payload.exp));
+            if (!payload.exp) {
+                Log.error("JoseUtil._validateJwt: exp was not provided");
+                return Promise.reject(new Error("exp was not provided"));
+            }
+            if (payload.exp < upperNow) {
+                Log.error("JoseUtil._validateJwt: exp is in the past", payload.exp);
+                return Promise.reject(new Error("exp is in the past:" + payload.exp));
+            }
         }
 
         return Promise.resolve(payload);
     }
 
-    static _validateJwt(jwt, key, issuer, audience, clockSkew, now) {
+    static _validateJwt(jwt, key, issuer, audience, clockSkew, now, timeInsensitive) {
 
-        return JoseUtil.validateJwtAttributes(jwt, issuer, audience, clockSkew, now).then(payload => {
+        return JoseUtil.validateJwtAttributes(jwt, issuer, audience, clockSkew, now, timeInsensitive).then(payload => {
             try {
                 if (!jws.JWS.verify(jwt, key, AllowedSigningAlgs)) {
                     Log.error("JoseUtil._validateJwt: signature validation failed");

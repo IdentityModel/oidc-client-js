@@ -1,11 +1,15 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-import { Log } from './Log';
-import { Global } from './Global';
+import { Log } from './Log.js';
+import { Global } from './Global.js';
 
 export class JsonService {
-    constructor(additionalContentTypes = null, XMLHttpRequestCtor = Global.XMLHttpRequest) {
+    constructor(
+        additionalContentTypes = null, 
+        XMLHttpRequestCtor = Global.XMLHttpRequest, 
+        jwtHandler = null
+    ) {
         if (additionalContentTypes && Array.isArray(additionalContentTypes))
         {
             this._contentTypes = additionalContentTypes.slice();
@@ -15,8 +19,12 @@ export class JsonService {
             this._contentTypes = [];
         }
         this._contentTypes.push('application/json');
+        if (jwtHandler) {
+            this._contentTypes.push('application/jwt');
+        }
 
         this._XMLHttpRequest = XMLHttpRequestCtor;
+        this._jwtHandler = jwtHandler;
     }
 
     getJson(url, token) {
@@ -33,6 +41,7 @@ export class JsonService {
             req.open('GET', url);
 
             var allowedContentTypes = this._contentTypes;
+            var jwtHandler = this._jwtHandler;
 
             req.onload = function() {
                 Log.debug("JsonService.getJson: HTTP response received, status", req.status);
@@ -47,6 +56,11 @@ export class JsonService {
                                 return true;
                             }
                         });
+
+                        if (found == "application/jwt") {
+                            jwtHandler(req).then(resolve, reject);
+                            return;
+                        }
 
                         if (found) {
                             try {
