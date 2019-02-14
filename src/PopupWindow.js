@@ -4,10 +4,8 @@
 import { Log } from './Log.js';
 import { UrlUtility } from './UrlUtility.js';
 
-const CheckForPopupClosedInterval = 500;
+const DefaultCheckForPopupClosedIntervalInSeconds = 0.5;
 const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100;';
-//const DefaultPopupFeatures = 'location=no,toolbar=no,width=500,height=500,left=100,top=100;resizable=yes';
-
 const DefaultPopupTarget = "_blank";
 
 export class PopupWindow {
@@ -24,7 +22,7 @@ export class PopupWindow {
         this._popup = window.open('', target, features);
         if (this._popup) {
             Log.debug("PopupWindow.ctor: popup successfully created");
-            this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), CheckForPopupClosedInterval);
+            this._checkForPopupClosedTimer = window.setInterval(this._checkForPopupClosed.bind(this), DefaultCheckForPopupClosedIntervalInSeconds * 1000);
         }
     }
 

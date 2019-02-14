@@ -95,25 +95,25 @@ describe("UserManager", function () {
 
     describe("signinSilent", function(){
 
-        it("should pass silentRequestTimeout from settings", function(done) {
+        it("should pass silentRequestTimeoutInSeconds from settings", function(done) {
 
             stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
 
-            settings.silentRequestTimeout = 123;
+            settings.silentRequestTimeoutInSeconds = 123;
             settings.silent_redirect_uri = "http://client/silent_callback";
             subject = new UserManager(settings);
 
             subject._signin = function(args, nav, navArgs){
                 Log.debug("_signin", args, nav, navArgs);
 
-                navArgs.silentRequestTimeout.should.equal(123);
+                navArgs.silentRequestTimeoutInSeconds.should.equal(123);
                 done();
                 return Promise.resolve()
             }
             subject.signinSilent();
         });
 
-        it("should pass silentRequestTimeout from params", function(done){
+        it("should pass silentRequestTimeoutInSeconds from params", function(done){
 
             stubUserStore.item = new User({id_token:"id_token"}).toStorageString();
 
@@ -121,11 +121,11 @@ describe("UserManager", function () {
             subject = new UserManager(settings);
 
             subject._signin = function(args, nav, navArgs){
-                navArgs.silentRequestTimeout.should.equal(234);
+                navArgs.silentRequestTimeoutInSeconds.should.equal(234);
                 done();
                 return Promise.resolve()
             }
-            subject.signinSilent({silentRequestTimeout:234});
+            subject.signinSilent({silentRequestTimeoutInSeconds:234});
         });
 
         it("should pass prompt from params", function(done){

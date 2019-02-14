@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 import { AccessTokenEvents } from '../../src/AccessTokenEvents';
+import { Log } from '../../src/Log';
 
 import chai from 'chai';
 chai.should();
@@ -32,17 +33,22 @@ describe("AccessTokenEvents", function () {
     let accessTokenExpiredTimer;
 
     beforeEach(function () {
+        
+        Log.logger = console;
+        Log.level = Log.NONE;
+
         accessTokenExpiringTimer = new StubTimer();
         accessTokenExpiredTimer = new StubTimer();
         subject = new AccessTokenEvents({
             accessTokenExpiringTimer, accessTokenExpiredTimer
         });
+        
     });
 
     describe("constructor", function () {
 
-        it("should use default expiringNotificationTime", function () {
-            subject._accessTokenExpiringNotificationTime.should.equal(60);
+        it("should use default accessTokenExpiringThresholdInSeconds", function () {
+            subject._accessTokenExpiringThresholdInSeconds.should.equal(60);
         });
 
     });

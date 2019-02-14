@@ -3,7 +3,7 @@
 
 import { Log } from './Log.js';
 
-const DefaultTimeout = 10000;
+const DefaultTimeoutInSeconds = 10;
 
 export class IFrameWindow {
 
@@ -33,9 +33,9 @@ export class IFrameWindow {
             this._error("No url provided");
         }
         else {
-            let timeout = params.silentRequestTimeout || DefaultTimeout;
-            Log.debug("IFrameWindow.navigate: Using timeout of:", timeout);
-            this._timer = window.setTimeout(this._timeout.bind(this), timeout);
+            let timeoutInSeconds = params.silentRequestTimeoutInSeconds || DefaultTimeoutInSeconds;
+            Log.debug("IFrameWindow.navigate: Using timeout of:", timeoutInSeconds);
+            this._timer = window.setTimeout(this._timeout.bind(this), timeoutInSeconds * 1000);
             this._frame.src = params.url;
         }
 

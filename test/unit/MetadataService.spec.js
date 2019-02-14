@@ -7,7 +7,7 @@ import { MetadataService } from '../../src/MetadataService';
 import { StubJsonService } from './StubJsonService';
 
 import chai from 'chai';
-import { Z_NO_COMPRESSION } from 'zlib';
+
 chai.should();
 let assert = chai.assert;
 

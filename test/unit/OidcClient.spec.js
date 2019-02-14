@@ -469,16 +469,16 @@ describe("OidcClient", function () {
         it("should call State.clearStaleState", function () {
             var oldState = State.clearStaleState;
 
-            State.clearStaleState = function (store, age) {
+            State.clearStaleState = function (store, ageInSeconds) {
                 State.clearStaleState.wasCalled = true;
                 State.clearStaleState.store = store;
-                State.clearStaleState.age = age;
+                State.clearStaleState.ageInSeconds = ageInSeconds;
             };
             subject.clearStaleState();
 
             State.clearStaleState.wasCalled.should.be.true;
             State.clearStaleState.store.should.equal(subject._stateStore);
-            State.clearStaleState.age.should.equal(subject.settings.staleStateAge);
+            State.clearStaleState.ageInSeconds.should.equal(subject.settings.staleStateAgeInSeconds);
 
             State.clearStaleState = oldState;
         });

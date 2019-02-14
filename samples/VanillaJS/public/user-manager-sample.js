@@ -38,8 +38,8 @@ var settings = {
     popup_post_logout_redirect_uri:'http://localhost:15000/user-manager-sample-popup-signout.html',
     
     silent_redirect_uri:'http://localhost:15000/user-manager-sample-silent.html',
-    automaticSilentRenew:true,
-    //silentRequestTimeout:10000,
+    automaticSilentRenew: true,
+    //silentRequestTimeoutInSeconds:10000,
 
     filterProtocolClaims: true,
     loadUserInfo: true

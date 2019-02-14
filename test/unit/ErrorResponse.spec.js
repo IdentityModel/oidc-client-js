@@ -7,7 +7,6 @@ import { ErrorResponse } from '../../src/ErrorResponse';
 import chai from 'chai';
 chai.should();
 let assert = chai.assert;
-let expect = chai.expect;
 
 describe("ErrorResponse", function() {
 

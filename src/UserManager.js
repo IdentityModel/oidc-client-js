@@ -203,7 +203,7 @@ export class UserManager extends OidcClient {
 
     _validateIdTokenFromTokenRefreshToken(profile, id_token) {
         return this._metadataService.getIssuer().then(issuer => {
-            return this._joseUtil.validateJwtAttributes(id_token, issuer, this._settings.client_id, this._settings.clockSkew).then(payload => {
+            return this._joseUtil.validateJwtAttributes(id_token, issuer, this._settings.client_id, this._settings.clockSkewInSeconds).then(payload => {
                 if (!payload) {
                     Log.error("UserManager._validateIdTokenFromTokenRefreshToken: Failed to validate id_token");
                     return Promise.reject(new Error("Failed to validate id_token"));
@@ -240,7 +240,7 @@ export class UserManager extends OidcClient {
 
         return this._signin(args, this._iframeNavigator, {
             startUrl: url,
-            silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
+            silentRequestTimeoutInSeconds: args.silentRequestTimeoutInSeconds || this.settings.silentRequestTimeoutInSeconds
         }).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
@@ -284,7 +284,7 @@ export class UserManager extends OidcClient {
 
         return this._signinStart(args, this._iframeNavigator, {
             startUrl: url,
-            silentRequestTimeout: args.silentRequestTimeout || this.settings.silentRequestTimeout
+            silentRequestTimeoutInSeconds: args.silentRequestTimeoutInSeconds || this.settings.silentRequestTimeoutInSeconds
         }).then(navResponse => {
             return this.processSigninResponse(navResponse.url).then(signinResponse => {
                 Log.debug("UserManager.querySessionStatus: got signin response");

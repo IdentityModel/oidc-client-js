@@ -41,9 +41,9 @@ export class State {
         return new State(JSON.parse(storageString));
     }
 
-    static clearStaleState(storage, age) {
-
-        var cutoff = Date.now() / 1000 - age;
+    static clearStaleState(storage, ageInSeconds) {
+        var cutoff = Date.now() / 1000 - ageInSeconds;
+        Log.debug("State.clearStaleState: cutoff is", cutoff);
 
         return storage.getAllKeys().then(keys => {
             Log.debug("State.clearStaleState: got keys", keys);

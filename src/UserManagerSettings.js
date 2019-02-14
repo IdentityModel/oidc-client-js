@@ -9,8 +9,8 @@ import { IFrameNavigator } from './IFrameNavigator.js';
 import { WebStorageStateStore } from './WebStorageStateStore.js';
 import { Global } from './Global.js';
 
-const DefaultAccessTokenExpiringNotificationTime = 60;
-const DefaultCheckSessionInterval = 2000;
+const DefaultAccessTokenExpiringThresholdInSeconds = 60;
+const DefaultCheckSessionIntervalInSeconds = 2;
 const DefaultQuerySessionStatusResponseType = "id_token";
 
 export class UserManagerSettings extends OidcClientSettings {
@@ -20,15 +20,15 @@ export class UserManagerSettings extends OidcClientSettings {
         popupWindowFeatures,
         popupWindowTarget,
         silent_redirect_uri,
-        silentRequestTimeout,
+        silentRequestTimeoutInSeconds,
         automaticSilentRenew = false,
         includeIdTokenInSilentRenew = true,
         monitorSession = true,
-        checkSessionInterval = DefaultCheckSessionInterval,
+        checkSessionIntervalInSeconds = DefaultCheckSessionIntervalInSeconds,
         stopCheckSessionOnError = true,
         query_status_response_type = DefaultQuerySessionStatusResponseType,
         revokeAccessTokenOnSignout = false,
-        accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
+        accessTokenExpiringThresholdInSeconds = DefaultAccessTokenExpiringThresholdInSeconds,
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
         iframeNavigator = new IFrameNavigator(),
@@ -42,13 +42,13 @@ export class UserManagerSettings extends OidcClientSettings {
         this._popupWindowTarget = popupWindowTarget;
 
         this._silent_redirect_uri = silent_redirect_uri;
-        this._silentRequestTimeout = silentRequestTimeout;
+        this._silentRequestTimeoutInSeconds = silentRequestTimeoutInSeconds;
         this._automaticSilentRenew = !!automaticSilentRenew;
         this._includeIdTokenInSilentRenew = includeIdTokenInSilentRenew;
-        this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
+        this._accessTokenExpiringThreshholdInSeconds = accessTokenExpiringThresholdInSeconds;
 
         this._monitorSession = monitorSession;
-        this._checkSessionInterval = checkSessionInterval;
+        this._checkSessionIntervalInSeconds = checkSessionIntervalInSeconds;
         this._stopCheckSessionOnError = stopCheckSessionOnError;
         this._query_status_response_type = query_status_response_type;
         this._revokeAccessTokenOnSignout = revokeAccessTokenOnSignout;
@@ -72,12 +72,11 @@ export class UserManagerSettings extends OidcClientSettings {
     get popupWindowTarget() {
         return this._popupWindowTarget;
     }
-
     get silent_redirect_uri() {
         return this._silent_redirect_uri;
     }
-     get silentRequestTimeout() {
-        return this._silentRequestTimeout;
+    get silentRequestTimeoutInSeconds() {
+        return this._silentRequestTimeoutInSeconds;
     }
     get automaticSilentRenew() {
         return !!(this.silent_redirect_uri && this._automaticSilentRenew);
@@ -85,15 +84,14 @@ export class UserManagerSettings extends OidcClientSettings {
     get includeIdTokenInSilentRenew() {
         return this._includeIdTokenInSilentRenew;
     }
-    get accessTokenExpiringNotificationTime() {
-        return this._accessTokenExpiringNotificationTime;
+    get accessTokenExpiringThresholdInSeconds() {
+        return this._accessTokenExpiringThreshholdInSeconds;
     }
-
     get monitorSession() {
         return this._monitorSession;
     }
-    get checkSessionInterval() {
-        return this._checkSessionInterval;
+    get checkSessionIntervalInSeconds() {
+        return this._checkSessionIntervalInSeconds;
     }
     get stopCheckSessionOnError(){
         return this._stopCheckSessionOnError;
@@ -104,7 +102,6 @@ export class UserManagerSettings extends OidcClientSettings {
     get revokeAccessTokenOnSignout() {
         return this._revokeAccessTokenOnSignout;
     }
-
     get redirectNavigator() {
         return this._redirectNavigator;
     }
@@ -114,7 +111,6 @@ export class UserManagerSettings extends OidcClientSettings {
     get iframeNavigator() {
         return this._iframeNavigator;
     }
-
     get userStore() {
         return this._userStore;
     }

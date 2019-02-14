@@ -6,7 +6,6 @@ import { SigninState } from '../../src/SigninState';
 
 import chai from 'chai';
 chai.should();
-let assert = chai.assert;
 
 describe("SigninState", function() {
 

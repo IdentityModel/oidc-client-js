@@ -5,7 +5,7 @@ import { Log } from './Log.js';
 import { Global } from './Global.js';
 import { Event } from './Event.js';
 
-const TimerDuration = 5; // seconds
+const DefaultTimerDurationInSeconds = 5;
 
 export class Timer extends Event {
 
@@ -25,13 +25,13 @@ export class Timer extends Event {
         return parseInt(this._nowFunc());
     }
 
-    init(duration) {
-        if (duration <= 0) {
-            duration = 1;
+    init(durationInSeconds) {
+        if (durationInSeconds <= 0) {
+            durationInSeconds = 1;
         }
-        duration = parseInt(duration);
+        durationInSeconds = parseInt(durationInSeconds);
 
-        var expiration = this.now + duration;
+        var expiration = this.now + durationInSeconds;
         if (this.expiration === expiration && this._timerHandle) {
             // no need to reinitialize to same expiration, so bail out
             Log.debug("Timer.init timer " + this._name + " skipping initialization since already initialized for expiration:", this.expiration);
@@ -40,17 +40,17 @@ export class Timer extends Event {
 
         this.cancel();
 
-        Log.debug("Timer.init timer " + this._name + " for duration:", duration);
+        Log.debug("Timer.init timer " + this._name + " for duration:", durationInSeconds);
         this._expiration = expiration;
 
         // we're using a fairly short timer and then checking the expiration in the
         // callback to handle scenarios where the browser device sleeps, and then
         // the timers end up getting delayed.
-        var timerDuration = TimerDuration;
-        if (duration < timerDuration) {
-            timerDuration = duration;
+        var timerDurationInSeconds = DefaultTimerDurationInSeconds;
+        if (durationInSeconds < timerDurationInSeconds) {
+            timerDurationInSeconds = durationInSeconds;
         }
-        this._timerHandle = this._timer.setInterval(this._callback.bind(this), timerDuration * 1000);
+        this._timerHandle = this._timer.setInterval(this._callback.bind(this), timerDurationInSeconds * 1000);
     }
     
     get expiration() {

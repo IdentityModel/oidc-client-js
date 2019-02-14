@@ -5,7 +5,6 @@ import { Log } from '../../src/Log';
 
 import chai from 'chai';
 chai.should();
-let assert = chai.assert;
 
 describe("Log", function() {
 
