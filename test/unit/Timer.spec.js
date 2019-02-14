@@ -5,7 +5,6 @@ import { Timer } from '../../src/Timer';
 
 import chai from 'chai';
 chai.should();
-let assert = chai.assert;
 
 class StubWindowTimer {
 

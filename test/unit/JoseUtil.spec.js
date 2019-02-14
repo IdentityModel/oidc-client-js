@@ -6,7 +6,6 @@ import { Log } from '../../src/Log';
 
 import chai from 'chai';
 chai.should();
-let assert = chai.assert;
 let expect = chai.expect;
 
 describe("JoseUtil", function () {

@@ -7,7 +7,6 @@ import { InMemoryWebStorage } from '../../src/InMemoryWebStorage';
 
 import chai from 'chai';
 chai.should();
-let assert = chai.assert;
 let expect = chai.expect;
 
 describe("WebStorageStateStore", function() {

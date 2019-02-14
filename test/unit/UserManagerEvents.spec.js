@@ -5,7 +5,6 @@ import { UserManagerEvents } from '../../src/UserManagerEvents';
 
 import chai from 'chai';
 chai.should();
-let assert = chai.assert;
 
 describe("UserManagerEvents", function () {
 
