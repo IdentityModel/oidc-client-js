@@ -17,7 +17,7 @@ gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
     entry: npmEntry,
     output: {
         filename:'oidc-client.js',
-        libraryTarget:'umd',
+        libraryTarget:'commonjs',
         // Workaround for https://github.com/webpack/webpack/issues/6642
         globalObject: 'this'
     },
@@ -35,7 +35,7 @@ gulp.task('build-lib-min', ['jsrsasign'], function() {
     entry: npmEntry,
     output: {
         filename:'oidc-client.min.js',
-        libraryTarget:'umd',
+        libraryTarget:'commonjs',
         // Workaround for https://github.com/webpack/webpack/issues/6642
         globalObject: 'this'
     },
