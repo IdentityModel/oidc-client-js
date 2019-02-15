@@ -18,6 +18,7 @@ gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
     output: {
         filename:'oidc-client.js',
         libraryTarget:'commonjs',
+        libraryExport: 'default',
         // Workaround for https://github.com/webpack/webpack/issues/6642
         globalObject: 'this'
     },
@@ -36,6 +37,7 @@ gulp.task('build-lib-min', ['jsrsasign'], function() {
     output: {
         filename:'oidc-client.min.js',
         libraryTarget:'commonjs',
+        libraryExport: 'default',
         // Workaround for https://github.com/webpack/webpack/issues/6642
         globalObject: 'this'
     },
