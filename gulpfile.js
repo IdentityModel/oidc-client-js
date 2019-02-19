@@ -166,9 +166,61 @@ function copy_ts(){
       .pipe(gulp.dest('./dist/'));
 }
 
+// Replace the babel-polyfill with specific core-js polyfills.
+function slimBuildTarget() {
+    return {
+        mode: 'production',
+        entry: ['./polyfills.js', './index.js'],
+        output: {
+            filename: 'oidc-client.slim.min.js',
+            libraryTarget: 'var',
+            library: 'Oidc'
+        },
+        plugins: [],
+        optimization: {
+            minimizer: [
+                new UglifyJsPlugin({
+                    uglifyOptions: {
+                        compress: {
+                            keep_fnames: true
+                        }
+                    }
+                })
+            ]
+        }
+    };
+}
+
+// Adds a configuration for slimming down the production build. This build
+// does not contain the full babel-polyfill. Instead it imports specific
+// core-js polyfills
+function build_dist_slim() {
+    return gulp.src('index.js')
+        .pipe(webpackStream(createWebpackConfig(slimBuildTarget()), webpack))
+        .pipe(gulp.dest('dist/'));
+};
+
+// Creates a build with only RSA256 exponent+modulus support (no X509)
+function build_dist_slim_rsa() {
+    var conf = slimBuildTarget();
+    conf.output.filename = 'oidc-client.rsa256.slim.min.js';
+
+    // This plugin should always be first in the chain
+    conf.plugins.unshift(
+        new webpack.NormalModuleReplacementPlugin(/(.*)JoseUtil(\.js)?$/, (resource) => {
+            resource.request = resource.request.replace(/JoseUtil/, 'JoseUtilRsa');
+        })
+    );
+
+    return gulp.src('index.js')
+        .pipe(webpackStream(createWebpackConfig(conf), webpack))
+        .pipe(gulp.dest('dist/'));
+};
+
+
 // putting it all together
 exports.default = gulp.series(
   build_jsrsasign,
-  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min),
+  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min, build_dist_slim, build_dist_slim_rsa),
   copy_ts
 );
