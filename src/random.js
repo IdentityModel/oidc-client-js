@@ -5,5 +5,5 @@ var uuid4 = require('uuid/v4')
  */
 
 export default function random() {
-  return uuid4() 
+  return uuid4().replace(/-/g, '');
 }
