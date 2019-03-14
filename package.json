@@ -3,6 +3,7 @@
   "version": "1.7.0",
   "description": "OpenID Connect (OIDC) & OAuth2 client library",
   "main": "lib/oidc-client.min.js",
+  "module": "index.js",
   "scripts": {
     "build": "gulp build",
     "start": "node samples/VanillaJS/server.js",
