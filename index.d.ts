@@ -153,7 +153,7 @@ export class UserManager extends OidcClient {
 
   clearStaleState(): Promise<void>;
 
-  getUser(): Promise<User>;
+  getUser(): Promise<User | null>;
   storeUser(user:User): Promise<void>;
   removeUser(): Promise<void>;
 
