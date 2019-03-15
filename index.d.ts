@@ -187,20 +187,28 @@ export interface UserManagerEvents extends AccessTokenEvents {
   load(user: User): any;
   unload(): any;
 
-  addUserLoaded(callback: (...ev: any[]) => void): void;
-  removeUserLoaded(callback: (...ev: any[]) => void): void;
+  addUserLoaded(callback: UserManagerEvents.UserLoadedCallback): void;
+  removeUserLoaded(callback: UserManagerEvents.UserLoadedCallback): void;
 
-  addUserUnloaded(callback: (...ev: any[]) => void): void;
-  removeUserUnloaded(callback: (...ev: any[]) => void): void;
+  addUserUnloaded(callback: UserManagerEvents.UserUnloadedCallback): void;
+  removeUserUnloaded(callback: UserManagerEvents.UserUnloadedCallback): void;
 
-  addSilentRenewError(callback: (...ev: any[]) => void): void;
-  removeSilentRenewError(callback: (...ev: any[]) => void): void;
+  addSilentRenewError(callback: UserManagerEvents.SilentRenewErrorCallback): void;
+  removeSilentRenewError(callback: UserManagerEvents.SilentRenewErrorCallback): void;
 
-  addUserSignedOut(callback: (...ev: any[]) => void): void;
-  removeUserSignedOut(callback: (...ev: any[]) => void): void;
+  addUserSignedOut(callback: UserManagerEvents.UserSignedOutCallback): void;
+  removeUserSignedOut(callback: UserManagerEvents.UserSignedOutCallback): void;
 
-  addUserSessionChanged(callback: (...ev: any[]) => void): void;
-  removeUserSessionChanged(callback: (...ev: any[]) => void): void;
+  addUserSessionChanged(callback: UserManagerEvents.UserSessionChangedCallback): void;
+  removeUserSessionChanged(callback: UserManagerEvents.UserSessionChangedCallback): void;
+}
+
+export namespace UserManagerEvents {
+  export type UserLoadedCallback = (user: User) => void;
+  export type UserUnloadedCallback = () => void;
+  export type SilentRenewErrorCallback = (error: Error) => void;
+  export type UserSignedOutCallback = () => void;
+  export type UserSessionChangedCallback = () => void;
 }
 
 export interface UserManagerSettings extends OidcClientSettings {
