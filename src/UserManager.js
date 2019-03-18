@@ -93,13 +93,11 @@ export class UserManager extends OidcClient {
     }
     signinRedirectCallback(url) {
         return this._signinEnd(url || this._redirectNavigator.url).then(user => {
-            if (user) {
-                if (user.profile && user.profile.sub) {
-                    Log.info("UserManager.signinRedirectCallback: successful, signed in sub: ", user.profile.sub);
-                }
-                else {
-                    Log.info("UserManager.signinRedirectCallback: no sub");
-                }
+            if (user.profile && user.profile.sub) {
+                Log.info("UserManager.signinRedirectCallback: successful, signed in sub: ", user.profile.sub);
+            }
+            else {
+                Log.info("UserManager.signinRedirectCallback: no sub");
             }
 
             return user;
