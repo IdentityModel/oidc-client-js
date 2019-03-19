@@ -121,6 +121,7 @@ export interface OidcClientSettings {
   authority?: string;
   readonly metadataUrl?: string;
   metadata?: any;
+  useDefaultEndpoints?: boolean;
   signingKeys?: any[];
   client_id?: string;
   client_secret?: string;
@@ -304,7 +305,7 @@ export class User {
   profile: any;
   expires_at: number;
   state: any;
-  
+
   toStorageString(): string;
 
   readonly expires_in: number | undefined;

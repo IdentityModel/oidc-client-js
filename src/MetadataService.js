@@ -63,15 +63,21 @@ export class MetadataService {
     }
 
     getAuthorizationEndpoint() {
-        return this._getMetadataProperty("authorization_endpoint");
+        return  (this._settings.useDefaultEndpoints)
+            ? Promise.resolve(this._settings.authority + '/connect/authorize')
+            : this._getMetadataProperty("authorization_endpoint");
     }
 
     getUserInfoEndpoint() {
-        return this._getMetadataProperty("userinfo_endpoint");
+        return  (this._settings.useDefaultEndpoints)
+            ? Promise.resolve(this._settings.authority + '/connect/userinfo')
+            : this._getMetadataProperty("userinfo_endpoint");
     }
 
     getTokenEndpoint(optional=true) {
-        return this._getMetadataProperty("token_endpoint", optional);
+        return  (this._settings.useDefaultEndpoints)
+            ? Promise.resolve(this._settings.authority + '/connect/token')
+            : this._getMetadataProperty("token_endpoint", optional);
     }
 
     getCheckSessionIframe() {
