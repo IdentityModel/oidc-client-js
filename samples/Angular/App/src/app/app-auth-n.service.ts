@@ -10,10 +10,10 @@ export { User };
 })
 export class AppAuthNService {
 
-  _userManager: UserManager;
+  userManager: UserManager;
 
   constructor() {
-    var settings = {
+    const settings = {
       authority: environment.stsAuthority,
       client_id: environment.clientId,
       redirect_uri: `${environment.clientRoot}assets/signin-callback.html`,
@@ -22,22 +22,22 @@ export class AppAuthNService {
       response_type: 'id_token token',
       scope: environment.clientScope
     };
-    this._userManager = new UserManager(settings);
+    this.userManager = new UserManager(settings);
   }
 
   public getUser(): Promise<User> {
-    return this._userManager.getUser();
+    return this.userManager.getUser();
   }
 
   public login(): Promise<void> {
-    return this._userManager.signinRedirect();
+    return this.userManager.signinRedirect();
   }
 
   public renewToken(): Promise<User> {
-    return this._userManager.signinSilent();
+    return this.userManager.signinSilent();
   }
 
   public logout(): Promise<void> {
-    return this._userManager.signoutRedirect();
+    return this.userManager.signoutRedirect();
   }
 }

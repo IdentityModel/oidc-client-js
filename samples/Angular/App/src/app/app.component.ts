@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import { AppAuthNService, User } from './app-auth-n.service';
 import { TestApiService } from './test-api.service';
 
@@ -12,20 +13,19 @@ export class AppComponent implements OnInit {
   }
 
   messages: string[] = [];
-  get currentUserJson() : string {
+  get currentUserJson(): string {
     return JSON.stringify(this.currentUser, null, 2);
   }
-  currentUser : User;
+  currentUser: User;
 
   ngOnInit(): void {
     this.authn.getUser().then(user => {
       this.currentUser = user;
 
-      if (user){
-        this.addMessage("User Logged In");
-      }
-      else {
-        this.addMessage("User Not Logged In");
+      if (user) {
+        this.addMessage('User Logged In');
+      } else {
+        this.addMessage('User Not Logged In');
       }
     }).catch(err => this.addError(err));
   }
@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
     this.messages.push(msg);
   }
   addError(msg: string | any) {
-    this.messages.push("Error: " + msg && msg.message);
+    this.messages.push('Error: ' + msg && msg.message);
   }
 
   public onLogin() {
@@ -52,16 +52,16 @@ export class AppComponent implements OnInit {
   public onCallAPI() {
     this.clearMessages();
     this.apiService.callApi().then(result => {
-      this.addMessage("API Result: " + JSON.stringify(result));
+      this.addMessage('API Result: ' + JSON.stringify(result));
     }, err => this.addError(err));
   }
 
   public onRenewToken() {
     this.clearMessages();
     this.authn.renewToken()
-      .then(user=>{
+      .then(user => {
         this.currentUser = user;
-        this.addMessage("Silent Renew Success");
+        this.addMessage('Silent Renew Success');
       })
       .catch(err => this.addError(err));
   }

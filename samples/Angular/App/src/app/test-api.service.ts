@@ -11,40 +11,38 @@ import { AppAuthNService, User } from './app-auth-n.service';
 })
 export class TestApiService {
 
-  constructor(private _httpClient: HttpClient, private _authn: AppAuthNService) {
+  constructor(private httpClient: HttpClient, private authn: AppAuthNService) {
   }
 
   public callApi(): Promise<any> {
-    return this._authn.getUser().then(user => {
+    return this.authn.getUser().then((user: User) => {
       if (user && user.access_token) {
         return this._callApi(user.access_token);
-      }
-      else if (user) {
-        return this._authn.renewToken().then(user => {
+      } else if (user) {
+        return this.authn.renewToken().then((user: User) => {
           return this._callApi(user.access_token);
         });
-      }
-      else {
-        throw new Error("user is not logged in");
+      } else {
+        throw new Error('user is not logged in');
       }
     });
   }
 
   _callApi(token: string) {
-    let headers = new HttpHeaders({
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + token
+    const headers = new HttpHeaders({
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + token
     });
 
-    return this._httpClient.get(environment.apiRoot + "test", { headers: headers })
+    return this.httpClient.get(environment.apiRoot + 'test', { headers })
       .toPromise()
-      .catch((result : HttpErrorResponse) => {
-          if (result.status === 401){
-            return this._authn.renewToken().then(user => {
-              return this._callApi(user.access_token);
-            });
-          }
-          throw result;
+      .catch((result: HttpErrorResponse) => {
+        if (result.status === 401) {
+          return this.authn.renewToken().then(user => {
+            return this._callApi(user.access_token);
+          });
+        }
+        throw result;
       });
   }
 }
