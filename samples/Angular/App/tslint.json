@@ -19,6 +19,7 @@
       true,
       140
     ],
+    "no-shadowed-variable": false,
     "member-access": false,
     "member-ordering": [
       true,
