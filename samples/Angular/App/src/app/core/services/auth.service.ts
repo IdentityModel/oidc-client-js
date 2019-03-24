@@ -8,7 +8,7 @@ export { User };
 @Injectable({
   providedIn: 'root'
 })
-export class AppAuthNService {
+export class AuthService {
 
   userManager: UserManager;
 

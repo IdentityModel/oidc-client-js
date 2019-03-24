@@ -4,22 +4,22 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { AppAuthNService, User } from './app-auth-n.service';
+import { AuthService, User } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TestApiService {
 
-  constructor(private httpClient: HttpClient, private authn: AppAuthNService) {
+  constructor(private httpClient: HttpClient, private authService: AuthService) {
   }
 
   public callApi(): Promise<any> {
-    return this.authn.getUser().then((user: User) => {
+    return this.authService.getUser().then((user: User) => {
       if (user && user.access_token) {
         return this._callApi(user.access_token);
       } else if (user) {
-        return this.authn.renewToken().then((user: User) => {
+        return this.authService.renewToken().then((user: User) => {
           return this._callApi(user.access_token);
         });
       } else {
@@ -38,7 +38,7 @@ export class TestApiService {
       .toPromise()
       .catch((result: HttpErrorResponse) => {
         if (result.status === 401) {
-          return this.authn.renewToken().then(user => {
+          return this.authService.renewToken().then(user => {
             return this._callApi(user.access_token);
           });
         }

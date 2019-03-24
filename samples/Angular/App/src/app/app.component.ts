@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { AppAuthNService, User } from './app-auth-n.service';
-import { TestApiService } from './test-api.service';
+import { AuthService, User } from './core/services/auth.service';
+import { TestApiService } from './core/services/test-api.service';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +9,7 @@ import { TestApiService } from './test-api.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  constructor(public authn: AppAuthNService, public apiService: TestApiService) {
+  constructor(public authService: AuthService, public apiService: TestApiService) {
   }
 
   messages: string[] = [];
@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
   currentUser: User;
 
   ngOnInit(): void {
-    this.authn.getUser().then(user => {
+    this.authService.getUser().then(user => {
       this.currentUser = user;
 
       if (user) {
@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
 
   public onLogin() {
     this.clearMessages();
-    this.authn.login().catch(err => {
+    this.authService.login().catch(err => {
       this.addError(err);
     });
   }
@@ -58,7 +58,7 @@ export class AppComponent implements OnInit {
 
   public onRenewToken() {
     this.clearMessages();
-    this.authn.renewToken()
+    this.authService.renewToken()
       .then(user => {
         this.currentUser = user;
         this.addMessage('Silent Renew Success');
@@ -68,6 +68,6 @@ export class AppComponent implements OnInit {
 
   public onLogout() {
     this.clearMessages();
-    this.authn.logout().catch(err => this.addError(err));
+    this.authService.logout().catch(err => this.addError(err));
   }
 }
