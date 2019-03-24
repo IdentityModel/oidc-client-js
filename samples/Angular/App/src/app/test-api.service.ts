@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Constants } from '../constants';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
+
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
 import { AppAuthNService, User } from './app-auth-n.service';
 
 @Injectable({
@@ -34,7 +36,7 @@ export class TestApiService {
       'Authorization': 'Bearer ' + token
     });
 
-    return this._httpClient.get(Constants.apiRoot + "test", { headers: headers })
+    return this._httpClient.get(environment.apiRoot + "test", { headers: headers })
       .toPromise()
       .catch((result : HttpErrorResponse) => {
           if (result.status === 401){

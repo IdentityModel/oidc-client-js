@@ -1,6 +1,7 @@
+import { User, UserManager, UserManagerSettings } from 'oidc-client';
+import { environment } from 'src/environments/environment';
+
 import { Injectable } from '@angular/core';
-import { UserManager, UserManagerSettings, User } from 'oidc-client';
-import { Constants } from '../constants';
 
 export { User };
 
@@ -13,13 +14,13 @@ export class AppAuthNService {
 
   constructor() {
     var settings = {
-      authority: Constants.stsAuthority,
-      client_id: Constants.clientId,
-      redirect_uri: `${Constants.clientRoot}assets/signin-callback.html`,
-      silent_redirect_uri: `${Constants.clientRoot}assets/silent-callback.html`,
-      post_logout_redirect_uri: `${Constants.clientRoot}`,
+      authority: environment.stsAuthority,
+      client_id: environment.clientId,
+      redirect_uri: `${environment.clientRoot}assets/signin-callback.html`,
+      silent_redirect_uri: `${environment.clientRoot}assets/silent-callback.html`,
+      post_logout_redirect_uri: `${environment.clientRoot}`,
       response_type: 'id_token token',
-      scope: Constants.clientScope
+      scope: environment.clientScope
     };
     this._userManager = new UserManager(settings);
   }
