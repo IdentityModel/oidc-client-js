@@ -19,7 +19,9 @@ export class PopupWindow {
         });
 
         let target = params.popupWindowTarget || DefaultPopupTarget;
-        let features = params.popupWindowFeatures || DefaultPopupFeatures;
+        let features = params.popupWindowFeatures === undefined 
+            ? DefaultPopupFeatures 
+            : params.popupWindowFeatures;
 
         this._popup = window.open('', target, features);
         if (this._popup) {
