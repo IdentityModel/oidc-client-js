@@ -184,6 +184,7 @@ export class UserManager extends OidcClient {
 
                     return idTokenValidation.then(() => {
                         Log.debug("UserManager._useRefreshToken: refresh token response success");
+                        user.id_token = result.id_token;
                         user.access_token = result.access_token;
                         user.refresh_token = result.refresh_token || user.refresh_token;
                         user.expires_in = result.expires_in;
