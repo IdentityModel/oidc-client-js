@@ -200,10 +200,19 @@ describe("UserManagerSettings", function () {
             });
             subject.query_status_response_type.should.equal(temp);
         });
-        it("should use default value", function () {
-            let subject = new UserManagerSettings({
-            });
-            subject.query_status_response_type.should.equal("id_token");
+        it("should infer default value", function () {
+            {
+                let subject = new UserManagerSettings({
+                    response_type: "id_token token"
+                });
+                subject.query_status_response_type.should.equal("id_token");
+            }
+            {            
+                let subject = new UserManagerSettings({
+                    response_type: "code"
+                });
+                subject.query_status_response_type.should.equal("code");
+            }
         });
     });
 

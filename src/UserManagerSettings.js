@@ -8,10 +8,10 @@ import { PopupNavigator } from './PopupNavigator.js';
 import { IFrameNavigator } from './IFrameNavigator.js';
 import { WebStorageStateStore } from './WebStorageStateStore.js';
 import { Global } from './Global.js';
+import { SigninRequest } from './SigninRequest.js';
 
 const DefaultAccessTokenExpiringNotificationTime = 60;
 const DefaultCheckSessionInterval = 2000;
-const DefaultQuerySessionStatusResponseType = "id_token";
 
 export class UserManagerSettings extends OidcClientSettings {
     constructor({
@@ -26,7 +26,7 @@ export class UserManagerSettings extends OidcClientSettings {
         monitorSession = true,
         checkSessionInterval = DefaultCheckSessionInterval,
         stopCheckSessionOnError = true,
-        query_status_response_type = DefaultQuerySessionStatusResponseType,
+        query_status_response_type,
         revokeAccessTokenOnSignout = false,
         accessTokenExpiringNotificationTime = DefaultAccessTokenExpiringNotificationTime,
         redirectNavigator = new RedirectNavigator(),
@@ -50,7 +50,15 @@ export class UserManagerSettings extends OidcClientSettings {
         this._monitorSession = monitorSession;
         this._checkSessionInterval = checkSessionInterval;
         this._stopCheckSessionOnError = stopCheckSessionOnError;
-        this._query_status_response_type = query_status_response_type;
+        if (query_status_response_type) {
+            this._query_status_response_type = query_status_response_type;
+        } 
+        else if (arguments[0] && arguments[0].response_type) {
+            this._query_status_response_type = SigninRequest.isOidc(arguments[0].response_type) ? "id_token" : "code";
+        }
+        else {
+            this._query_status_response_type = "id_token";
+        }
         this._revokeAccessTokenOnSignout = revokeAccessTokenOnSignout;
 
         this._redirectNavigator = redirectNavigator;
