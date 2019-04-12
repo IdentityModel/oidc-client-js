@@ -31,7 +31,8 @@ var url = window.location.origin;
 
 var settings = {
     authority: 'https://demo.identityserver.io',
-    client_id: 'native.code',
+    client_id: 'spa',
+    //client_id: 'spa.short',
     redirect_uri: url + '/code-identityserver-sample.html',
     post_logout_redirect_uri: url + '/code-identityserver-sample.html',
     response_type: 'code',
@@ -43,7 +44,7 @@ var settings = {
     popup_post_logout_redirect_uri: url + '/code-identityserver-sample-popup-signout.html',
     
     silent_redirect_uri: url + '/code-identityserver-sample-silent.html',
-    automaticSilentRenew:true,
+    automaticSilentRenew:false,
     //silentRequestTimeout:10000,
 
     filterProtocolClaims: true,
@@ -58,6 +59,13 @@ var mgr = new Oidc.UserManager(settings);
 mgr.events.addAccessTokenExpiring(function () {
     console.log("token expiring");
     log("token expiring");
+
+    // maybe do this code manually if automaticSilentRenew doesn't work for you
+    mgr.signinSilent().then(function(user) {
+        log("silent renew success", user);
+    }).catch(function(e) {
+        log("silent renew error", e.message);
+    })
 });
 
 mgr.events.addAccessTokenExpired(function () {
