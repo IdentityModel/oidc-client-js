@@ -43,7 +43,7 @@ export class UserManagerSettings extends OidcClientSettings {
 
         this._silent_redirect_uri = silent_redirect_uri;
         this._silentRequestTimeout = silentRequestTimeout;
-        this._automaticSilentRenew = !!automaticSilentRenew;
+        this._automaticSilentRenew = automaticSilentRenew;
         this._includeIdTokenInSilentRenew = includeIdTokenInSilentRenew;
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
@@ -80,7 +80,7 @@ export class UserManagerSettings extends OidcClientSettings {
         return this._silentRequestTimeout;
     }
     get automaticSilentRenew() {
-        return !!(this.silent_redirect_uri && this._automaticSilentRenew);
+        return this._automaticSilentRenew;
     }
     get includeIdTokenInSilentRenew() {
         return this._includeIdTokenInSilentRenew;
