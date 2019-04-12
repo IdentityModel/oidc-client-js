@@ -77,22 +77,13 @@ describe("UserManagerSettings", function () {
 
         it("should return value from initial settings", function () {
             let subject = new UserManagerSettings({
-                silent_redirect_uri: 'test',
-                automaticSilentRenew: false
+                automaticSilentRenew: true
             });
-            subject.automaticSilentRenew.should.be.false;
+            subject.automaticSilentRenew.should.be.true;
         });
 
         it("should use default value", function () {
             let subject = new UserManagerSettings({
-                silent_redirect_uri: 'test'
-            });
-            subject.automaticSilentRenew.should.be.false;
-        });
-
-        it("should be false if no silent redirect uri", function () {
-            let subject = new UserManagerSettings({
-                automaticSilentRenew: true
             });
             subject.automaticSilentRenew.should.be.false;
         });
