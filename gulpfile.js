@@ -10,7 +10,7 @@ var npmEntry ='./index.js';
 var classicEntry = ['babel-polyfill', npmEntry];
 
 // npm compliant build with source-maps
-gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
+function build_lib_sourcemap(){
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'development',
@@ -25,11 +25,11 @@ gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
     devtool:'inline-source-map'
   }), webpack))
   .pipe(gulp.dest('lib/'));
-});
+}
 
 // npm compliant build without source-maps & minified
-gulp.task('build-lib-min', ['jsrsasign'], function() {
-  // run webpack
+function build_lib_min(){
+    // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'production',
     entry: npmEntry,
@@ -52,10 +52,10 @@ gulp.task('build-lib-min', ['jsrsasign'], function() {
     }
   }), webpack))
   .pipe(gulp.dest('lib/'));
-});
+}
 
 // classic build with sourcemaps
-gulp.task('build-dist-sourcemap', ['jsrsasign'], function() {
+function build_dist_sourcemap(){
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'development',
@@ -69,10 +69,10 @@ gulp.task('build-dist-sourcemap', ['jsrsasign'], function() {
     devtool:'inline-source-map'
   }), webpack))
   .pipe(gulp.dest('dist/'));
-});
+}
 
 // classic build without sourcemaps & minified
-gulp.task('build-dist-min', ['jsrsasign'], function() {
+function build_dist_min(){
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'production',
@@ -95,7 +95,7 @@ gulp.task('build-dist-min', ['jsrsasign'], function() {
     }
   }), webpack))
   .pipe(gulp.dest('dist/'));
-});
+}
 
 // this is used to manually build jsrsasign with the fewest modules to reduce its size
 var files = [
@@ -153,11 +153,14 @@ var files = [
     ,'jsrsasign/footer.js'
 ];
 
-gulp.task('jsrsasign', function () {
+function build_jsrsasign(){
     return gulp.src(files)
         .pipe(concat('jsrsasign.js'))
         .pipe(gulp.dest('jsrsasign/dist/'));
-});
+}
 
 // putting it all together
-gulp.task('build', ['build-lib-sourcemap','build-lib-min','build-dist-sourcemap','build-dist-min']);
+//gulp.task('build', ['build-lib-sourcemap','build-lib-min','build-dist-sourcemap','build-dist-min']);
+exports.default = gulp.series(
+  build_jsrsasign,
+  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min));

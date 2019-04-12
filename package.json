@@ -4,7 +4,7 @@
   "description": "OpenID Connect (OIDC) & OAuth2 client library",
   "main": "lib/oidc-client.min.js",
   "scripts": {
-    "build": "gulp build",
+    "build": "gulp",
     "start": "node samples/VanillaJS/server.js",
     "test": "mocha --compilers js:babel-register test/unit/*.spec.js",
     "all": "gulp build & mocha --compilers js:babel-register test/unit/*.spec.js"
@@ -39,7 +39,7 @@
     "babel-register": "^6.7.2",
     "chai": "^4.2.0",
     "express": "^4.16.4",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
     "jsrsasign": "^8.0.12",
     "mocha": "^5.2.0",
