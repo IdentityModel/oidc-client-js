@@ -33,6 +33,12 @@ describe("SigninResponse", function () {
             subject.state.should.equal("foo");
         });
 
+        it("should read state json", function() {
+            let subject = new SigninResponse("state={\"id\":\"foo\",\"data\":42}");
+            subject.state.should.equal("foo");
+            subject.public_data.should.equal(42);
+        });
+
         it("should read code", function () {
             let subject = new SigninResponse("code=foo");
             subject.code.should.equal("foo");

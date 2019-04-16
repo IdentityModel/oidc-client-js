@@ -110,9 +110,10 @@ export class PopupWindow {
             url = url || window.location.href;
             if (url) {
                 var data = UrlUtility.parseUrlFragment(url, delimiter);
+                var id = UrlUtility.parseStateObject(data.state).id;
 
-                if (data.state) {
-                    var name = "popupCallback_" + data.state;
+                if (id) {
+                    var name = "popupCallback_" + id;
                     var callback = window.opener[name];
                     if (callback) {
                         Log.debug("PopupWindow.notifyOpener: passing url message to opener");

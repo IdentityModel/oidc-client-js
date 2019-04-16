@@ -112,6 +112,7 @@ export class OidcClient {
   createSignoutRequest(args?: any): Promise<SignoutRequest>;
   processSignoutResponse(url?: string, stateStore?: StateStore): Promise<SignoutResponse>;
 
+  getCallbackPublicData(url?: string): any;
   clearStaleState(stateStore: StateStore): Promise<any>;
 
   readonly metadataService: MetadataService;
@@ -263,6 +264,7 @@ export interface SigninResponse {
   scope: string;
   session_state: any;
   state: any;
+  public_data?: any;
   token_type: string;
 
   readonly expired: boolean | undefined;
@@ -278,6 +280,7 @@ export interface SignoutResponse {
   error_description: string;
   error_uri: string;
   state: any;
+  public_data?: any;
 }
 
 export interface UserSettings {
@@ -304,6 +307,7 @@ export class User {
   profile: any;
   expires_at: number;
   state: any;
+  public_data?: any;
   
   toStorageString(): string;
 

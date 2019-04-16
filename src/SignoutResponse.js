@@ -12,6 +12,8 @@ export class SignoutResponse {
         this.error_description = values.error_description;
         this.error_uri = values.error_uri;
 
-        this.state = values.state;
+        let state = UrlUtility.parseStateObject(values.state);
+        this.state = state.id;
+        this.public_data = state.data;
     }
 }

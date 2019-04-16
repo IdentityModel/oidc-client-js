@@ -76,4 +76,26 @@ describe("UrlUtility", function() {
         });
     });
 
+    describe("parseStateObject", function() {
+
+        it("should recognise state json", function() {
+            UrlUtility.parseStateObject("{\"id\":1,\"data\":2}").should.eql({ id: 1, data: 2 });
+        });
+
+        it("should ignore malformed state object", function() {
+            let id = "{\"di\":1,\"data\":2}";
+            UrlUtility.parseStateObject(id).should.eql({ id });
+        });
+
+        it("should ignore malformed state json", function() {
+            let id = "{\"id\":1,\"data\"2}";
+            UrlUtility.parseStateObject(id).should.eql({ id });
+        });
+
+        it("should recognize id", function() {
+            let id = "abc123";
+            UrlUtility.parseStateObject(id).should.eql({ id });
+        });
+    });
+
 });

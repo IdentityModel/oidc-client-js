@@ -60,4 +60,17 @@ export class UrlUtility {
 
         return {};
     }
+
+    static parseStateObject(param) {
+        try {
+            let state = JSON.parse(param);
+            if (typeof state === 'object' && state.id != null) {
+                return state;
+            } else {
+                return { id: param };
+            }
+        } catch (error) {
+            return { id: param };
+        }
+    }
 }

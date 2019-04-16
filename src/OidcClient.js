@@ -10,6 +10,7 @@ import { SignoutRequest } from './SignoutRequest.js';
 import { SignoutResponse } from './SignoutResponse.js';
 import { SigninState } from './SigninState.js';
 import { State } from './State.js';
+import { UrlUtility } from './UrlUtility.js';
 
 export class OidcClient {
     constructor(settings = {}) {
@@ -30,6 +31,11 @@ export class OidcClient {
     get _metadataService() {
         return this.settings.metadataService;
     }
+    get _signinDelimiter() {
+        let useQuery = this._settings.response_mode === "query" ||
+            (!this._settings.response_mode && SigninRequest.isCode(this._settings.response_type));
+        return useQuery ? "?" : "#";
+    }
 
     get settings() {
         return this._settings;
@@ -43,8 +49,8 @@ export class OidcClient {
         // data was meant to be the place a caller could indicate the data to
         // have round tripped, but people were getting confused, so i added state (since that matches the spec)
         // and so now if data is not passed, but state is then state will be used
-        data, state, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
-        resource, request, request_uri, response_mode, extraQueryParams } = {},
+        data, public_data, state, prompt, display, max_age, ui_locales, id_token_hint, login_hint,
+        acr_values, resource, request, request_uri, response_mode, extraQueryParams } = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSigninRequest");
@@ -80,6 +86,7 @@ export class OidcClient {
                 response_type,
                 scope,
                 data: data || state,
+                public_data,
                 authority,
                 prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
                 resource, request, request_uri, extraQueryParams, response_mode
@@ -97,11 +104,7 @@ export class OidcClient {
     processSigninResponse(url, stateStore) {
         Log.debug("OidcClient.processSigninResponse");
 
-        let useQuery = this._settings.response_mode === "query" || 
-            (!this._settings.response_mode && SigninRequest.isCode(this._settings.response_type));
-        let delimiter = useQuery ? "?" : "#";
-
-        var response = new SigninResponse(url, delimiter);
+        var response = new SigninResponse(url, this._signinDelimiter);
 
         if (!response.state) {
             Log.error("OidcClient.processSigninResponse: No state in response");
@@ -123,7 +126,7 @@ export class OidcClient {
         });
     }
 
-    createSignoutRequest({id_token_hint, data, state, post_logout_redirect_uri, extraQueryParams } = {},
+    createSignoutRequest({id_token_hint, data, public_data, state, post_logout_redirect_uri, extraQueryParams } = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSignoutRequest");
@@ -144,6 +147,7 @@ export class OidcClient {
                 id_token_hint,
                 post_logout_redirect_uri,
                 data: data || state,
+                public_data,
                 extraQueryParams
             });
 
@@ -189,6 +193,23 @@ export class OidcClient {
             Log.debug("OidcClient.processSignoutResponse: Received state from storage; validating response");
             return this._validator.validateSignoutResponse(state, response);
         });
+    }
+
+    getCallbackPublicData(url) {
+        Log.debug("OidcClient.getCallbackPublicState");
+
+        var state = undefined;
+        if (this._signinDelimiter === '#') {
+            state = UrlUtility.parseUrlFragment(url, "#").state;
+        }
+        state = state || UrlUtility.parseUrlFragment(url, "?").state;
+
+        if (!state) {
+            Log.error("OidcClient.getCallbackPublicState: No state in response");
+            throw new Error("No state in response");
+        }
+
+        return UrlUtility.parseStateObject(state).data;
     }
 
     clearStaleState(stateStore) {

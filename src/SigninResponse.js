@@ -15,7 +15,9 @@ export class SigninResponse {
         this.error_uri = values.error_uri;
 
         this.code = values.code;
-        this.state = values.state;
+        let state = UrlUtility.parseStateObject(values.state);
+        this.state = state.id;
+        this.public_data = state.data;
         this.id_token = values.id_token;
         this.session_state = values.session_state;
         this.access_token = values.access_token;

@@ -4,7 +4,7 @@
 import { Log } from './Log.js';
 
 export class User {
-    constructor({id_token, session_state, access_token, refresh_token, token_type, scope, profile, expires_at, state}) {
+    constructor({id_token, session_state, access_token, refresh_token, token_type, scope, profile, expires_at, state, public_data}) {
         this.id_token = id_token;
         this.session_state = session_state;
         this.access_token = access_token;
@@ -14,6 +14,7 @@ export class User {
         this.profile = profile;
         this.expires_at = expires_at;
         this.state = state;
+        this.public_data = public_data;
     }
 
     get expires_in() {

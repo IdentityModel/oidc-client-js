@@ -458,6 +458,30 @@ describe("OidcClient", function () {
 
     });
 
+    describe("getCallbackPublicData", function () {
+
+        it("should fail if no state on response", function () {
+            try {
+                subject.getCallbackPublicData("");
+            } catch (e) {
+                e.message.should.contain('response');
+                return;
+            }
+            assert.fail();
+        });
+
+        it("should return nothing", function () {
+            let data = subject.getCallbackPublicData("state=foo");
+            assert.isTrue(data == null);
+        });
+
+        it("should return public data", function () {
+            let url = "state={\"id\":1,\"data\":\"foo\"}";
+            subject.getCallbackPublicData(url).should.equal('foo');
+        });
+
+    });
+
     describe("clearStaleState", function () {
 
         it("should return a promise", function () {
