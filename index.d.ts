@@ -328,7 +328,7 @@ export class CordovaIFrameNavigator {
 
 
 export interface OidcMetadata {
-  issuer: string;
+  issuer: string | null;
   authorization_endpoint:string;
   token_endpoint: string;
   token_endpoint_auth_methods_supported:string[];

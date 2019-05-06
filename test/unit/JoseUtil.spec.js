@@ -242,6 +242,11 @@ describe("JoseUtil", function () {
             });
         });
 
+        it("should allow issuer check to be disabled", function (done) {
+            JoseUtil.validateJwt(jwtFromRsa, rsaKey, null, expectedAudience, 0, expectedNow).then(() => {
+                done();
+            });
+        });
 
     });
 

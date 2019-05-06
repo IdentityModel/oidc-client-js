@@ -73,11 +73,11 @@ export class JoseUtil {
 
         var payload = JoseUtil.parseJwt(jwt).payload;
 
-        if (!payload.iss) {
+        if (issuer !== null && !payload.iss) {
             Log.error("JoseUtil._validateJwt: issuer was not provided");
             return Promise.reject(new Error("issuer was not provided"));
         }
-        if (payload.iss !== issuer) {
+        if (issuer !== null && payload.iss !== issuer) {
             Log.error("JoseUtil._validateJwt: Invalid issuer in token", payload.iss);
             return Promise.reject(new Error("Invalid issuer in token: " + payload.iss));
         }
