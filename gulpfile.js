@@ -159,8 +159,14 @@ function build_jsrsasign(){
         .pipe(gulp.dest('jsrsasign/dist/'));
 }
 
+function copy_ts(){
+  return gulp.src('index.d.ts')
+      .pipe(gulp.dest('dist/oidc-client.d.ts'));
+}
+
 // putting it all together
-//gulp.task('build', ['build-lib-sourcemap','build-lib-min','build-dist-sourcemap','build-dist-min']);
 exports.default = gulp.series(
   build_jsrsasign,
-  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min));
+  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min),
+  copy_ts
+);
