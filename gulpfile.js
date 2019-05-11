@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
+var rename = require('gulp-rename');
 var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 var createWebpackConfig = require('./webpack.base');
@@ -160,8 +161,9 @@ function build_jsrsasign(){
 }
 
 function copy_ts(){
-  return gulp.src('index.d.ts')
-      .pipe(gulp.dest('dist/oidc-client.d.ts'));
+  return gulp.src('./index.d.ts')
+      .pipe(rename('oidc-client.d.ts'))
+      .pipe(gulp.dest('./dist/'));
 }
 
 // putting it all together

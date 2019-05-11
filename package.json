@@ -41,6 +41,7 @@
     "express": "^4.16.4",
     "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
+    "gulp-rename": "^1.4.0",
     "jsrsasign": "^8.0.12",
     "mocha": "^5.2.0",
     "natives": "^1.1.6",
