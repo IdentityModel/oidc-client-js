@@ -43,7 +43,7 @@ export class OidcClient {
         // data was meant to be the place a caller could indicate the data to
         // have round tripped, but people were getting confused, so i added state (since that matches the spec)
         // and so now if data is not passed, but state is then state will be used
-        data, state, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
+        data, state, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, now,
         resource, request, request_uri, response_mode, extraQueryParams } = {},
         stateStore
     ) {
@@ -63,6 +63,7 @@ export class OidcClient {
         resource = resource || this._settings.resource;
         response_mode = response_mode || this._settings.response_mode;
         extraQueryParams = extraQueryParams || this._settings.extraQueryParams;
+        now = now || this._settings.now;
 
         let authority = this._settings.authority;
 
@@ -81,7 +82,7 @@ export class OidcClient {
                 scope,
                 data: data || state,
                 authority,
-                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
+                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, now,
                 resource, request, request_uri, extraQueryParams, response_mode
             });
 
@@ -99,6 +100,7 @@ export class OidcClient {
 
         let useQuery = this._settings.response_mode === "query" || 
             (!this._settings.response_mode && SigninRequest.isCode(this._settings.response_type));
+            
         let delimiter = useQuery ? "?" : "#";
 
         var response = new SigninResponse(url, delimiter);

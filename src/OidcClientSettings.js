@@ -7,11 +7,11 @@ import { ResponseValidator } from './ResponseValidator.js';
 import { MetadataService } from './MetadataService.js';
 
 const OidcMetadataUrlPath = '.well-known/openid-configuration';
-
 const DefaultResponseType = "id_token";
 const DefaultScope = "openid";
 const DefaultStaleStateAge = 60 * 15; // seconds
 const DefaultClockSkewInSeconds = 60 * 5;
+const DefaultNow = Date.now()
 
 export class OidcClientSettings {
     constructor({
@@ -24,7 +24,7 @@ export class OidcClientSettings {
         prompt, display, max_age, ui_locales, acr_values, resource, response_mode,
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
-        staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
+        staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds, now = DefaultNow,
         userInfoJwtIssuer = 'OP',
         // other behavior
         stateStore = new WebStorageStateStore(),
@@ -59,6 +59,7 @@ export class OidcClientSettings {
         this._staleStateAge = staleStateAge;
         this._clockSkew = clockSkew;
         this._userInfoJwtIssuer = userInfoJwtIssuer;
+        this._now = now;
 
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this);
@@ -181,6 +182,9 @@ export class OidcClientSettings {
     }
     get userInfoJwtIssuer() {
         return this._userInfoJwtIssuer;
+    }
+    get now() {
+        return this._now;
     }
 
     get stateStore() {
