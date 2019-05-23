@@ -39,7 +39,7 @@
     "babel-register": "^6.7.2",
     "chai": "^4.2.0",
     "express": "^4.16.4",
-    "gulp": "^4.0.0",
+    "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-rename": "^1.4.0",
     "jsrsasign": "^8.0.12",
