@@ -24,6 +24,7 @@ export class SigninResponse {
         this.profile = undefined; // will be set from ResponseValidator
 
         this.expires_in = values.expires_in;
+        this.refresh_expires_in = values.refresh_expires_in;
     }
 
     get expires_in() {
@@ -45,6 +46,30 @@ export class SigninResponse {
         let expires_in = this.expires_in;
         if (expires_in !== undefined) {
             return expires_in <= 0;
+        }
+        return undefined;
+    }
+
+    get refresh_expires_in() {
+        if (this.refresh_expires_at) {
+            let now = parseInt(Date.now() / 1000);
+            return this.refresh_expires_at - now;
+        }
+        return undefined;
+    }
+
+    set refresh_expires_in(value) {
+        let refresh_expires_in = parseInt(value);
+        if (typeof refresh_expires_in === 'number' && refresh_expires_in > 0) {
+            let now = parseInt(Date.now() / 1000);
+            this.refresh_expires_at = now + refresh_expires_in;
+        }
+    }
+
+    get refresh_expired() {
+        let refresh_expires_in = this.refresh_expires_in;
+        if (refresh_expires_in !== undefined) {
+            return refresh_expires_in <= 0;
         }
         return undefined;
     }

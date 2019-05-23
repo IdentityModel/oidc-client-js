@@ -267,6 +267,8 @@ export interface SigninResponse {
 
   readonly expired: boolean | undefined;
   readonly expires_in: number | undefined;
+  readonly refresh_expired: number | undefined;
+  readonly refresh_expires_in: number | undefined;
   readonly isOpenIdConnect: boolean;
   readonly scopes: string[];
 }
@@ -309,6 +311,8 @@ export class User {
 
   readonly expires_in: number | undefined;
   readonly expired: boolean | undefined;
+  readonly refresh_expires_in: number | undefined;
+  readonly refresh_expired: boolean | undefined;
   readonly scopes: string[];
 }
 

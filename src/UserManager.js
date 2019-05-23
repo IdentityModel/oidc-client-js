@@ -187,6 +187,7 @@ export class UserManager extends OidcClient {
                         user.access_token = result.access_token;
                         user.refresh_token = result.refresh_token || user.refresh_token;
                         user.expires_in = result.expires_in;
+                        user.refresh_expires_in = result.refresh_expires_in;
 
                         return this.storeUser(user).then(()=>{
                             this._events.load(user);

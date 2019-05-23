@@ -4,7 +4,7 @@
 import { Log } from './Log.js';
 
 export class User {
-    constructor({id_token, session_state, access_token, refresh_token, token_type, scope, profile, expires_at, state}) {
+    constructor({id_token, session_state, access_token, refresh_token, token_type, scope, profile, expires_at, refresh_expires_at, state}) {
         this.id_token = id_token;
         this.session_state = session_state;
         this.access_token = access_token;
@@ -13,6 +13,7 @@ export class User {
         this.scope = scope;
         this.profile = profile;
         this.expires_at = expires_at;
+        this.refresh_expires_at = refresh_expires_at;
         this.state = state;
     }
 
@@ -39,6 +40,29 @@ export class User {
         return undefined;
     }
 
+    get refresh_expires_in() {
+        if (this.refresh_expires_at) {
+            let now = parseInt(Date.now() / 1000);
+            return this.refresh_expires_at - now;
+        }
+    }
+
+    set refresh_expires_in(value) {
+        let refresh_expires_in = parseInt(value);
+        if (typeof refresh_expires_in === 'number' && refresh_expires_in > 0) {
+            let now = parseInt(Date.now() / 1000);
+            this.refresh_expires_at = now + refresh_expires_in;
+        }
+    }
+
+    get refresh_expired() {
+        let refresh_expires_in = this.refresh_expires_in;
+        if (refresh_expires_in !== undefined) {
+            return refresh_expires_in <= 0;
+        }
+        return undefined;
+    }
+
     get scopes() {
         return (this.scope || "").split(" ");
     }
@@ -53,7 +77,8 @@ export class User {
             token_type: this.token_type,
             scope: this.scope,
             profile: this.profile,
-            expires_at: this.expires_at
+            expires_at: this.expires_at,
+            refresh_expires_at: this.refresh_expires_at
         });
     }
 

@@ -83,6 +83,25 @@ describe("SigninResponse", function () {
             expect(subject.expires_at).to.be.undefined;
         });
 
+        it("should read refresh_expires_in", function () {
+            let subject = new SigninResponse("refresh_expires_in=10");
+            subject.refresh_expires_in.should.equal(10);
+        });
+
+        it("should calculate refresh_expires_at", function () {
+            let subject = new SigninResponse("refresh_expires_in=10");
+            subject.refresh_expires_at.should.equal(parseInt((Date.now() / 1000) + 10));
+        });
+
+        it("should not read invalid refresh_expires_in", function () {
+            let subject = new SigninResponse("refresh_expires_in=foo");
+            expect(subject.refresh_expires_in).to.be.undefined;
+            expect(subject.refresh_expires_at).to.be.undefined;
+
+            subject = new SigninResponse("refresh_expires_in=-10");
+            expect(subject.refresh_expires_in).to.be.undefined;
+            expect(subject.refresh_expires_at).to.be.undefined;
+        });
     });
 
     describe("scopes", function () {
@@ -128,6 +147,40 @@ describe("SigninResponse", function () {
                 return 1100 * 1000; // ms
             }
             subject.expired.should.be.true;
+            Date.now = oldNow;
+        });
+    });
+
+    describe("refresh_expires_in", function () {
+        it("should calculate how much time left", function () {
+            var oldNow = Date.now;
+            Date.now = function () {
+                return 1000 * 1000; // ms
+            };
+            let subject = new SigninResponse("refresh_expires_in=100");
+            subject.refresh_expires_in.should.equal(100);
+
+            Date.now = function () {
+                return 1050 * 1000; // ms
+            };
+            subject.refresh_expires_in.should.equal(50);
+            Date.now = oldNow;
+        });
+    });
+
+    describe("refresh_expired", function () {
+        it("should calculate how much time left", function () {
+            var oldNow = Date.now;
+            Date.now = function () {
+                return 1000 * 1000; // ms
+            };
+            let subject = new SigninResponse("refresh_expires_in=100");
+            subject.refresh_expired.should.be.false;
+
+            Date.now = function () {
+                return 1100 * 1000; // ms
+            };
+            subject.refresh_expired.should.be.true;
             Date.now = oldNow;
         });
     });
