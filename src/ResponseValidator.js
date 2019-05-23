@@ -230,7 +230,7 @@ export class ResponseValidator {
                 Log.debug("ResponseValidator._validateTokens: Validating id_token and access_token");
                 return this._validateIdTokenAndAccessToken(state, response);
             }
-
+            
             Log.debug("ResponseValidator._validateTokens: Validating id_token");
             return this._validateIdToken(state, response);
         }
@@ -355,10 +355,9 @@ export class ResponseValidator {
 
                 let clockSkewInSeconds = this._settings.clockSkew;
                 Log.debug("ResponseValidator._validateIdToken: Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
-
-                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{
+                
+                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds, response.now).then(()=>{
                     Log.debug("ResponseValidator._validateIdToken: JWT validation successful");
-
                     if (!jwt.payload.sub) {
                         Log.error("ResponseValidator._validateIdToken: No sub present in id_token");
                         return Promise.reject(new Error("No sub present in id_token"));

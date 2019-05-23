@@ -12,7 +12,6 @@ import { TokenRevocationClient } from './TokenRevocationClient.js';
 import { TokenClient } from './TokenClient.js';
 import { JoseUtil } from './JoseUtil.js';
 
-
 export class UserManager extends OidcClient {
     constructor(settings = {},
         SilentRenewServiceCtor = SilentRenewService,
@@ -21,7 +20,7 @@ export class UserManager extends OidcClient {
         TokenClientCtor = TokenClient,
         joseUtil = JoseUtil
     ) {
-
+        
         if (!(settings instanceof UserManagerSettings)) {
             settings = new UserManagerSettings(settings);
         }
@@ -92,7 +91,13 @@ export class UserManager extends OidcClient {
         });
     }
     signinRedirectCallback(url) {
-        return this._signinEnd(url || this._redirectNavigator.url).then(user => {
+        url = url || this._redirectNavigator.url
+        
+        if (this._settings.now) {
+            url = url.toString().concat(`&now=${this._settings.now}`)
+        }
+
+        return this._signinEnd(url).then(user => {
             if (user) {
                 if (user.profile && user.profile.sub) {
                     Log.info("UserManager.signinRedirectCallback: successful, signed in sub: ", user.profile.sub);
@@ -203,7 +208,7 @@ export class UserManager extends OidcClient {
 
     _validateIdTokenFromTokenRefreshToken(profile, id_token) {
         return this._metadataService.getIssuer().then(issuer => {
-            return this._joseUtil.validateJwtAttributes(id_token, issuer, this._settings.client_id, this._settings.clockSkew).then(payload => {
+            return this._joseUtil.validateJwtAttributes(id_token, issuer, this._settings.client_id, this._settings.clockSkew, this._settings.now).then(payload => {
                 if (!payload) {
                     Log.error("UserManager._validateIdTokenFromTokenRefreshToken: Failed to validate id_token");
                     return Promise.reject(new Error("Failed to validate id_token"));
@@ -310,7 +315,6 @@ export class UserManager extends OidcClient {
         });
     }
     _signinStart(args, navigator, navigatorParams = {}) {
-
         return navigator.prepare(navigatorParams).then(handle => {
             Log.debug("UserManager._signinStart: got navigator window handle");
 
@@ -529,7 +533,7 @@ export class UserManager extends OidcClient {
                 Log.debug("UserManager._loadUser: user storageString loaded");
                 return User.fromStorageString(storageString);
             }
-
+            
             Log.debug("UserManager._loadUser: no user storageString");
             return null;
         });
