@@ -19,6 +19,12 @@ export interface AccessTokenEvents {
 
   addAccessTokenExpired(callback: (...ev: any[]) => void): void;
   removeAccessTokenExpired(callback: (...ev: any[]) => void): void;
+
+  addRefreshTokenExpiring(callback: (...ev: any[]) => void): void;
+  removeRefreshTokenExpiring(callback: (...ev: any[]) => void): void;
+
+  addRefreshTokenExpired(callback: (...ev: any[]) => void): void;
+  removeRefreshTokenExpired(callback: (...ev: any[]) => void): void;
 }
 
 export class InMemoryWebStorage {
