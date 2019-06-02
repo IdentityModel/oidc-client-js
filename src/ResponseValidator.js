@@ -12,9 +12,9 @@ const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "
 
 export class ResponseValidator {
 
-    constructor(settings, 
+    constructor(settings,
         MetadataServiceCtor = MetadataService,
-        UserInfoServiceCtor = UserInfoService, 
+        UserInfoServiceCtor = UserInfoService,
         joseUtil = JoseUtil,
         TokenClientCtor = TokenClient) {
         if (!settings) {
@@ -150,7 +150,8 @@ export class ResponseValidator {
                         return Promise.reject(new Error("sub from user info endpoint does not match sub in access_token"));
                     }
 
-                    response.profile = this._mergeClaims(response.profile, claims);
+                    Log.debug("ResponseValidator._mergeClaims: is set to ", this._settings.mergeClaims);
+                    response.profile = this._settings.mergeClaims ? this._mergeClaims(response.profile, claims) : Object.assign({}, response.profile, claims);
                     Log.debug("ResponseValidator._processClaims: user info claims received, updated profile:", response.profile);
 
                     return response;
@@ -189,7 +190,7 @@ export class ResponseValidator {
                 else if (result[name] !== value) {
                     if (typeof value === 'object') {
                         result[name] = this._mergeClaims(result[name], value);
-                    } 
+                    }
                     else {
                         result[name] = [result[name], value];
                     }
@@ -243,14 +244,14 @@ export class ResponseValidator {
         var request = {
             client_id: state.client_id,
             client_secret: this._settings.client_secret,
-            code : response.code,
+            code: response.code,
             redirect_uri: state.redirect_uri,
             code_verifier: state.code_verifier,
         };
-        
+
         return this._tokenClient.exchangeCode(request).then(tokenResponse => {
-            
-            for(var key in tokenResponse) {
+
+            for (var key in tokenResponse) {
                 response[key] = tokenResponse[key];
             }
 
@@ -261,7 +262,7 @@ export class ResponseValidator {
             else {
                 Log.debug("ResponseValidator._processCode: token response successful, returning response");
             }
-            
+
             return response;
         });
     }
@@ -274,7 +275,7 @@ export class ResponseValidator {
             Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
             return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds).then(payload => {
-            
+
                 if (state.nonce && state.nonce !== payload.nonce) {
                     Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
                     return Promise.reject(new Error("Invalid nonce in id_token"));
@@ -356,7 +357,7 @@ export class ResponseValidator {
                 let clockSkewInSeconds = this._settings.clockSkew;
                 Log.debug("ResponseValidator._validateIdToken: Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
-                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{
+                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(() => {
                     Log.debug("ResponseValidator._validateIdToken: JWT validation successful");
 
                     if (!jwt.payload.sub) {
@@ -372,7 +373,7 @@ export class ResponseValidator {
         });
     }
 
-    _filterByAlg(keys, alg){
+    _filterByAlg(keys, alg) {
         var kty = null;
         if (alg.startsWith("RS")) {
             kty = "RSA";

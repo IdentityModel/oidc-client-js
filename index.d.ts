@@ -141,6 +141,7 @@ export interface OidcClientSettings {
   readonly clockSkew?: number;
   readonly stateStore?: StateStore;
   readonly userInfoJwtIssuer?: 'ANY' | 'OP' | string;
+  readonly mergeClaims?: boolean;
   ResponseValidatorCtor?: ResponseValidatorCtor;
   MetadataServiceCtor?: MetadataServiceCtor;
   extraQueryParams?: {};

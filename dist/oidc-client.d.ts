@@ -141,6 +141,7 @@ export interface OidcClientSettings {
   readonly clockSkew?: number;
   readonly stateStore?: StateStore;
   readonly userInfoJwtIssuer?: 'ANY' | 'OP' | string;
+  readonly mergeClaims?: boolean;
   ResponseValidatorCtor?: ResponseValidatorCtor;
   MetadataServiceCtor?: MetadataServiceCtor;
   extraQueryParams?: {};
@@ -153,7 +154,7 @@ export class UserManager extends OidcClient {
 
   clearStaleState(): Promise<void>;
 
-  getUser(): Promise<User>;
+  getUser(): Promise<User | null>;
   storeUser(user:User): Promise<void>;
   removeUser(): Promise<void>;
 
@@ -304,7 +305,7 @@ export class User {
   profile: any;
   expires_at: number;
   state: any;
-  
+
   toStorageString(): string;
 
   readonly expires_in: number | undefined;
