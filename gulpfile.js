@@ -190,6 +190,19 @@ function slimBuildTarget() {
         }
     };
 }
+function slimBuildTargetSourceMap() {
+  return {
+      mode: 'development',
+      entry: ['./polyfills.js', './index.js'],
+      output: {
+          filename: 'oidc-client.slim.js',
+          libraryTarget: 'var',
+          library: 'Oidc'
+      },
+      plugins: [],
+      devtool:'inline-source-map'
+  };
+}
 
 // Adds a configuration for slimming down the production build. This build
 // does not contain the full babel-polyfill. Instead it imports specific
@@ -198,6 +211,11 @@ function build_dist_slim() {
     return gulp.src('index.js')
         .pipe(webpackStream(createWebpackConfig(slimBuildTarget()), webpack))
         .pipe(gulp.dest('dist/'));
+};
+function build_dist_slim_sourcemap() {
+  return gulp.src('index.js')
+      .pipe(webpackStream(createWebpackConfig(slimBuildTargetSourceMap()), webpack))
+      .pipe(gulp.dest('dist/'));
 };
 
 // Creates a build with only RSA256 exponent+modulus support (no X509)
@@ -216,11 +234,25 @@ function build_dist_slim_rsa() {
         .pipe(webpackStream(createWebpackConfig(conf), webpack))
         .pipe(gulp.dest('dist/'));
 };
+function build_dist_slim_rsa_sourcemap() {
+  var conf = slimBuildTargetSourceMap();
+  conf.output.filename = 'oidc-client.rsa256.slim.js';
 
+  // This plugin should always be first in the chain
+  conf.plugins.unshift(
+      new webpack.NormalModuleReplacementPlugin(/(.*)JoseUtil(\.js)?$/, (resource) => {
+          resource.request = resource.request.replace(/JoseUtil/, 'JoseUtilRsa');
+      })
+  );
+
+  return gulp.src('index.js')
+      .pipe(webpackStream(createWebpackConfig(conf), webpack))
+      .pipe(gulp.dest('dist/'));
+};
 
 // putting it all together
 exports.default = gulp.series(
   build_jsrsasign,
-  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min, build_dist_slim, build_dist_slim_rsa),
+  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min, build_dist_slim, build_dist_slim_rsa, build_dist_slim_sourcemap, build_dist_slim_rsa_sourcemap),
   copy_ts
 );
