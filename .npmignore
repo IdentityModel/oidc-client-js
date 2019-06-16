@@ -1,4 +1,14 @@
-samples/
+.git/
 jsrsasign/
+node_modules/
+samples/
+src/
 test/
 .babelrc
+.gitattributes
+.gitignore
+.bower.json
+.GitReleaseManager.yaml
+.gulpfile.js
+.jsconfig.js
+webpack.base.js
