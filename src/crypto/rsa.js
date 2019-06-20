@@ -18,9 +18,11 @@ http://www-cs-students.stanford.edu/~tjw/jsbn/LICENSE
  * - Perform common base64 encoding/decoding tasks.
  */
 
-import { BigInteger } from 'jsbn';
+import JSBN from 'jsbn';
 import SHA256 from 'crypto-js/sha256';
 import base64Js from 'base64-js';
+
+var BigInteger = JSBN.BigInteger;
 
 /*! (c) Tom Wu | http://www-cs-students.stanford.edu/~tjw/jsbn/
  */
