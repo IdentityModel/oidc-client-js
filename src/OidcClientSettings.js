@@ -25,6 +25,7 @@ export class OidcClientSettings {
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
         staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds, now = DefaultNow,
+        timeInsensitive = false,
         userInfoJwtIssuer = 'OP',
         // other behavior
         stateStore = new WebStorageStateStore(),
@@ -60,6 +61,7 @@ export class OidcClientSettings {
         this._clockSkew = clockSkew;
         this._userInfoJwtIssuer = userInfoJwtIssuer;
         this._now = now;
+        this._timeInsensitive = timeInsensitive;
 
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this);
@@ -185,6 +187,9 @@ export class OidcClientSettings {
     }
     get now() {
         return this._now;
+    }
+    get timeInsensitive() {
+        return this._timeInsensitive;
     }
 
     get stateStore() {

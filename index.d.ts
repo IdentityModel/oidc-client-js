@@ -139,6 +139,8 @@ export interface OidcClientSettings {
   readonly loadUserInfo?: boolean;
   readonly staleStateAge?: number;
   readonly clockSkew?: number;
+  readonly now?: date;
+  readonly timeInsensitive?: boolean;
   readonly stateStore?: StateStore;
   readonly userInfoJwtIssuer?: 'ANY' | 'OP' | string;
   ResponseValidatorCtor?: ResponseValidatorCtor;

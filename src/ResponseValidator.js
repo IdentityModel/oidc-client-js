@@ -356,7 +356,7 @@ export class ResponseValidator {
                 let clockSkewInSeconds = this._settings.clockSkew;
                 Log.debug("ResponseValidator._validateIdToken: Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
                 
-                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds, response.now).then(()=>{
+                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds, response.now, response.timeInsensitive).then(()=>{
                     Log.debug("ResponseValidator._validateIdToken: JWT validation successful");
                     if (!jwt.payload.sub) {
                         Log.error("ResponseValidator._validateIdToken: No sub present in id_token");
