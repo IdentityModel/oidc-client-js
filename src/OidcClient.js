@@ -94,8 +94,8 @@ export class OidcClient {
         });
     }
 
-    processSigninResponse(url, stateStore) {
-        Log.debug("OidcClient.processSigninResponse");
+    readSigninResponseState(url, stateStore, removeState = false) {
+        Log.debug("OidcClient.readSigninResponseState");
 
         let useQuery = this._settings.response_mode === "query" || 
             (!this._settings.response_mode && SigninRequest.isCode(this._settings.response_type));
@@ -104,20 +104,29 @@ export class OidcClient {
         var response = new SigninResponse(url, delimiter);
 
         if (!response.state) {
-            Log.error("OidcClient.processSigninResponse: No state in response");
+            Log.error("OidcClient.readSigninResponseState: No state in response");
             return Promise.reject(new Error("No state in response"));
         }
 
         stateStore = stateStore || this._stateStore;
 
-        return stateStore.remove(response.state).then(storedStateString => {
+        var stateApi = removeState ? stateStore.remove.bind(stateStore) : stateStore.get.bind(stateStore);
+
+        return stateApi(response.state).then(storedStateString => {
             if (!storedStateString) {
-                Log.error("OidcClient.processSigninResponse: No matching state found in storage");
+                Log.error("OidcClient.readSigninResponseState: No matching state found in storage");
                 throw new Error("No matching state found in storage");
             }
 
             let state = SigninState.fromStorageString(storedStateString);
+            return {state, response};
+        });
+    }
 
+    processSigninResponse(url, stateStore) {
+        Log.debug("OidcClient.processSigninResponse");
+
+        return this.readSigninResponseState(url, stateStore, true).then(({state, response}) => {
             Log.debug("OidcClient.processSigninResponse: Received state from storage; validating response");
             return this._validator.validateSigninResponse(state, response);
         });
