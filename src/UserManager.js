@@ -86,7 +86,8 @@ export class UserManager extends OidcClient {
         });
     }
 
-    signinRedirect(args) {
+    signinRedirect(args = {}) {
+        args.request_type = "si:r";
         return this._signinStart(args, this._redirectNavigator).then(()=>{
             Log.info("UserManager.signinRedirect: successful");
         });
@@ -107,6 +108,7 @@ export class UserManager extends OidcClient {
     }
 
     signinPopup(args = {}) {
+        args.request_type = "si:p";
         let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
         if (!url) {
             Log.error("UserManager.signinPopup: No popup_redirect_uri or redirect_uri configured");
@@ -151,6 +153,7 @@ export class UserManager extends OidcClient {
     }
 
     signinSilent(args = {}) {
+        args.request_type = "si:s";
         // first determine if we have a refresh token, or need to use iframe
         return this._loadUser().then(user => {
             if (user && user.refresh_token) {
@@ -270,7 +273,35 @@ export class UserManager extends OidcClient {
         });
     }
 
+    signinCallback(url) {
+        return this.readSigninResponseState(url).then(({state, response}) => {
+            if (state.response_type === "si:r") {
+                return this.signinRedirectCallback(url);
+            }
+            if (state.response_type === "si:p") {
+                return this.signinPopupCallback(url);
+            }
+            if (state.response_type === "si:s") {
+                return this.signinSilentCallback(url);
+            }
+            return Promise.reject(new Error("invalid response_type in state"));
+        });
+    }
+
+    signoutCallback(url) {
+        return this.readSignoutResponseState(url).then(({state, response}) => {
+            if (state.response_type === "so:r") {
+                return this.signoutRedirectCallback(url);
+            }
+            if (state.response_type === "si:p") {
+                return this.signoutPopupCallback(url);
+            }
+            return Promise.reject(new Error("invalid response_type in state"));
+        });
+    }
+
     querySessionStatus(args = {}) {
+        args.request_type = "si:s"; // this acts like a signin silent
         let url = args.redirect_uri || this.settings.silent_redirect_uri;
         if (!url) {
             Log.error("UserManager.querySessionStatus: No silent_redirect_uri configured");
@@ -351,6 +382,7 @@ export class UserManager extends OidcClient {
     }
 
     signoutRedirect(args = {}) {
+        args.request_type = "so:r";
         let postLogoutRedirectUri = args.post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
         if (postLogoutRedirectUri){
             args.post_logout_redirect_uri = postLogoutRedirectUri;
@@ -367,6 +399,7 @@ export class UserManager extends OidcClient {
     }
 
     signoutPopup(args = {}) {
+        args.request_type = "so:p";
         let url = args.post_logout_redirect_uri || this.settings.popup_post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
         args.post_logout_redirect_uri = url;
         args.display = "popup";
