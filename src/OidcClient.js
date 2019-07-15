@@ -168,33 +168,42 @@ export class OidcClient {
         });
     }
 
-    processSignoutResponse(url, stateStore) {
-        Log.debug("OidcClient.processSignoutResponse");
+    readSignoutResponseState(url, stateStore, removeState = false) {
+        Log.debug("OidcClient.readSignoutResponseState");
 
         var response = new SignoutResponse(url);
         if (!response.state) {
-            Log.debug("OidcClient.processSignoutResponse: No state in response");
+            Log.debug("OidcClient.readSignoutResponseState: No state in response");
 
             if (response.error) {
-                Log.warn("OidcClient.processSignoutResponse: Response was error: ", response.error);
+                Log.warn("OidcClient.readSignoutResponseState: Response was error: ", response.error);
                 return Promise.reject(new ErrorResponse(response));
             }
 
-            return Promise.resolve(response);
+            return Promise.resolve({undefined, response});
         }
 
         var stateKey = response.state;
 
         stateStore = stateStore || this._stateStore;
 
-        return stateStore.remove(stateKey).then(storedStateString => {
+        var stateApi = removeState ? stateStore.remove.bind(stateStore) : stateStore.get.bind(stateStore);
+        return stateApi(stateKey).then(storedStateString => {
             if (!storedStateString) {
-                Log.error("OidcClient.processSignoutResponse: No matching state found in storage");
+                Log.error("OidcClient.readSignoutResponseState: No matching state found in storage");
                 throw new Error("No matching state found in storage");
             }
 
             let state = State.fromStorageString(storedStateString);
 
+            return {state, response};
+        });
+    }
+
+    processSignoutResponse(url, stateStore) {
+        Log.debug("OidcClient.processSignoutResponse");
+
+        return this.readSignoutResponseState(url, stateStore, true).then(({state, response}) => {
             Log.debug("OidcClient.processSignoutResponse: Received state from storage; validating response");
             return this._validator.validateSignoutResponse(state, response);
         });
