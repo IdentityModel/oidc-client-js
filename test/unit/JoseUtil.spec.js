@@ -115,7 +115,6 @@ let expect = chai.expect;
 
             if(!isRSA) {
                 it("should validate from RSA X509 key (jsrsasign only)", function (done, fail) {
-                    Log.level = Log.DEBUG;
                     delete rsaKey.n;
                     delete rsaKey.e;
 

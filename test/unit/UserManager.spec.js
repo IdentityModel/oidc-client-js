@@ -33,7 +33,7 @@ describe("UserManager", function () {
         Global._testing();
 
         Log.logger = console;
-        Log.level = Log.DEBUG;
+        Log.level = Log.NONE;
 
         stubNavigator = {};
         stubUserStore = new StubStateStore();
