@@ -125,7 +125,7 @@ function startSigninMainWindow() {
 }
 
 function endSigninMainWindow() {
-    mgr.signinRedirectCallback().then(function(user) {
+    mgr.signinCallback().then(function(user) {
         log("signed in", user);
     }).catch(function(err) {
         log(err);
@@ -182,7 +182,7 @@ function startSignoutMainWindow(){
 };
 
 function endSignoutMainWindow(){
-    mgr.signoutRedirectCallback().then(function(resp) {
+    mgr.signoutCallback().then(function(resp) {
         log("signed out", resp);
     }).catch(function(err) {
         log(err);
