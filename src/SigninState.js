@@ -7,7 +7,7 @@ import { JoseUtil } from './JoseUtil.js';
 import random from './random.js';
 
 export class SigninState extends State {
-    constructor({nonce, authority, client_id, redirect_uri, code_verifier} = {}) {
+    constructor({nonce, authority, client_id, redirect_uri, code_verifier, response_mode} = {}) {
         super(arguments[0]);
 
         if (nonce === true) {
@@ -33,6 +33,7 @@ export class SigninState extends State {
         this._redirect_uri = redirect_uri;
         this._authority = authority;
         this._client_id = client_id;
+        this._response_mode = response_mode;
     }
 
     get nonce() {
@@ -53,7 +54,10 @@ export class SigninState extends State {
     get code_challenge() {
         return this._code_challenge;
     }
-
+    get response_mode() {
+        return this._response_mode;
+    }
+    
     toStorageString() {
         Log.debug("SigninState.toStorageString");
         return JSON.stringify({
@@ -66,6 +70,7 @@ export class SigninState extends State {
             redirect_uri: this.redirect_uri,
             authority: this.authority,
             client_id: this.client_id,
+            response_mode: this.response_mode
         });
     }
 
