@@ -288,15 +288,18 @@ export class UserManager extends OidcClient {
         });
     }
 
-    signoutCallback(url) {
+    signoutCallback(url, keepOpen) {
         return this.readSignoutResponseState(url).then(({state, response}) => {
-            if (state.request_type === "so:r") {
-                return this.signoutRedirectCallback(url);
+            if (state) {
+                if (state.request_type === "so:r") {
+                    return this.signoutRedirectCallback(url);
+                }
+                if (state.request_type === "so:p") {
+                    return this.signoutPopupCallback(url, keepOpen);
+                }
+                return Promise.reject(new Error("invalid response_type in state"));
             }
-            if (state.request_type === "si:p") {
-                return this.signoutPopupCallback(url);
-            }
-            return Promise.reject(new Error("invalid response_type in state"));
+            return response;
         });
     }
 
