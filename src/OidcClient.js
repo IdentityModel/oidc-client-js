@@ -132,7 +132,7 @@ export class OidcClient {
         });
     }
 
-    createSignoutRequest({id_token_hint, data, state, post_logout_redirect_uri, extraQueryParams } = {},
+    createSignoutRequest({id_token_hint, data, state, post_logout_redirect_uri, extraQueryParams, request_type } = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSignoutRequest");
@@ -153,7 +153,8 @@ export class OidcClient {
                 id_token_hint,
                 post_logout_redirect_uri,
                 data: data || state,
-                extraQueryParams
+                extraQueryParams,
+                request_type
             });
 
             var signoutState = request.state;

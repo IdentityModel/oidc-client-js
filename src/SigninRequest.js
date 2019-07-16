@@ -11,7 +11,7 @@ export class SigninRequest {
         url, client_id, redirect_uri, response_type, scope, authority,
         // optional
         data, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, response_mode,
-        request, request_uri, extraQueryParams,
+        request, request_uri, extraQueryParams, request_type
     }) {
         if (!url) {
             Log.error("SigninRequest.ctor: No url passed");

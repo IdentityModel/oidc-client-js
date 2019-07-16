@@ -275,13 +275,13 @@ export class UserManager extends OidcClient {
 
     signinCallback(url) {
         return this.readSigninResponseState(url).then(({state, response}) => {
-            if (state.response_type === "si:r") {
+            if (state.request_type === "si:r") {
                 return this.signinRedirectCallback(url);
             }
-            if (state.response_type === "si:p") {
+            if (state.request_type === "si:p") {
                 return this.signinPopupCallback(url);
             }
-            if (state.response_type === "si:s") {
+            if (state.request_type === "si:s") {
                 return this.signinSilentCallback(url);
             }
             return Promise.reject(new Error("invalid response_type in state"));
@@ -290,10 +290,10 @@ export class UserManager extends OidcClient {
 
     signoutCallback(url) {
         return this.readSignoutResponseState(url).then(({state, response}) => {
-            if (state.response_type === "so:r") {
+            if (state.request_type === "so:r") {
                 return this.signoutRedirectCallback(url);
             }
-            if (state.response_type === "si:p") {
+            if (state.request_type === "si:p") {
                 return this.signoutPopupCallback(url);
             }
             return Promise.reject(new Error("invalid response_type in state"));
