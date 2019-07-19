@@ -173,6 +173,9 @@ export class UserManager extends OidcClient {
   signoutPopupCallback(url?: string, keepOpen?: boolean): Promise<void>;
   signoutPopupCallback(keepOpen?: boolean): Promise<void>;
 
+  signinCallback(url?: string): Promise<User>;
+  signoutCallback(url?: string): Promise<any>;
+
   querySessionStatus(args?: any): Promise<any>;
 
   revokeAccessToken(): Promise<void>;
@@ -210,6 +213,7 @@ export interface UserManagerSettings extends OidcClientSettings {
   readonly silent_redirect_uri?: any;
   readonly silentRequestTimeout?: any;
   readonly automaticSilentRenew?: boolean;
+  readonly validateSubOnSilentRenew?: boolean;
   readonly includeIdTokenInSilentRenew?: boolean;
   readonly monitorSession?: boolean;
   readonly checkSessionInterval?: number;
