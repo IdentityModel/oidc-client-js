@@ -90,6 +90,23 @@ describe("UserManagerSettings", function () {
 
     });
 
+    describe("validateSubOnSilentRenew", function () {
+
+        it("should return value from initial settings", function () {
+            let subject = new UserManagerSettings({
+                validateSubOnSilentRenew: true
+            });
+            subject.validateSubOnSilentRenew.should.be.true;
+        });
+
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.validateSubOnSilentRenew.should.be.false;
+        });
+
+    });
+
     describe("includeIdTokenInSilentRenew", function () {
         it("should return true value from initial settings", function () {
             let subject = new UserManagerSettings({

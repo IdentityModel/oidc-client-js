@@ -162,6 +162,10 @@ export class UserManager extends OidcClient {
             }
             else {
                 args.id_token_hint = args.id_token_hint || (this.settings.includeIdTokenInSilentRenew && user && user.id_token);
+                if (user && this._settings.validateSubOnSilentRenew) {
+                    Log.debug("UserManager.signinSilent, subject prior to silent renew: ", user.profile.sub);
+                    args.current_sub = user.profile.sub;
+                }
                 return this._signinSilentIframe(args);
             }
         });
@@ -340,7 +344,7 @@ export class UserManager extends OidcClient {
 
     _signin(args, navigator, navigatorParams = {}) {
         return this._signinStart(args, navigator, navigatorParams).then(navResponse => {
-            return this._signinEnd(navResponse.url);
+            return this._signinEnd(navResponse.url, args);
         });
     }
     _signinStart(args, navigator, navigatorParams = {}) {
@@ -364,11 +368,21 @@ export class UserManager extends OidcClient {
             });
         });
     }
-    _signinEnd(url) {
+    _signinEnd(url, args = {}) {
         return this.processSigninResponse(url).then(signinResponse => {
             Log.debug("UserManager._signinEnd: got signin response");
 
             let user = new User(signinResponse);
+
+            if (args.current_sub) {
+                if (args.current_sub !== user.profile.sub) {
+                    Log.debug("UserManager._signinEnd: current user does not match user returned from signin. sub from signin: ", user.profile.sub);
+                    return Promise.reject(new Error("login_required"));
+                }
+                else {
+                    Log.debug("UserManager._signinEnd: current user matches user returned from signin");
+                }
+            }
 
             return this.storeUser(user).then(() => {
                 Log.debug("UserManager._signinEnd: user stored");

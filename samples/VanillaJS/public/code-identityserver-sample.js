@@ -45,6 +45,7 @@ var settings = {
     
     silent_redirect_uri: url + '/code-identityserver-sample-silent.html',
     automaticSilentRenew:false,
+    validateSubOnSilentRenew: true,
     //silentRequestTimeout:10000,
 
     filterProtocolClaims: true,
@@ -87,6 +88,10 @@ mgr.events.addUserLoaded(function (user) {
 
 mgr.events.addUserUnloaded(function (e) {
     console.log("user unloaded");
+});
+
+mgr.events.addUserSignedOut(function (e) {
+    log("user logged out of the token server");
 });
 
 ///////////////////////////////
