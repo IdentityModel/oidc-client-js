@@ -122,7 +122,8 @@ function removeUser() {
 }
 
 function startSigninMainWindow() {
-    mgr.signinRedirect({state:'some data'}).then(function() {
+    var someState = {message:'some data'};
+    mgr.signinRedirect({state:someState}).then(function() {
         log("signinRedirect done");
     }).catch(function(err) {
         log(err);
@@ -132,6 +133,10 @@ function startSigninMainWindow() {
 function endSigninMainWindow() {
     mgr.signinCallback().then(function(user) {
         log("signed in", user);
+        // this is how you get the state after the login:
+        var theState = user.state;
+        var theMessage = theState.message;
+        console.log("here's our post-login state", theMessage);
     }).catch(function(err) {
         log(err);
     });
