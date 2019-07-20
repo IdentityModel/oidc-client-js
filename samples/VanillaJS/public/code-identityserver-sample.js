@@ -123,7 +123,7 @@ function removeUser() {
 
 function startSigninMainWindow() {
     var someState = {message:'some data'};
-    mgr.signinRedirect({state:someState}).then(function() {
+    mgr.signinRedirect({state:someState, useReplaceToNavigate:true}).then(function() {
         log("signinRedirect done");
     }).catch(function(err) {
         log(err);

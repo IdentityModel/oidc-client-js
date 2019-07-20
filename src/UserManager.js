@@ -88,7 +88,10 @@ export class UserManager extends OidcClient {
 
     signinRedirect(args = {}) {
         args.request_type = "si:r";
-        return this._signinStart(args, this._redirectNavigator).then(()=>{
+        let navParams = {
+            useReplaceToNavigate : args.useReplaceToNavigate
+        };
+        return this._signinStart(args, this._redirectNavigator, navParams).then(()=>{
             Log.info("UserManager.signinRedirect: successful");
         });
     }
