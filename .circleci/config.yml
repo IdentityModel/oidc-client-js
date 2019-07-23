@@ -14,6 +14,9 @@ commands:
       - run:
           name: Install dependencies
           command: npm ci
+       - run:
+         name: NPM Audit
+         command: npm audit --audit-level=moderate
       - run:
           name: Test
           command: npm test
