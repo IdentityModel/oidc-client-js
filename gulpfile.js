@@ -10,6 +10,25 @@ var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 var npmEntry ='./index.js';
 var classicEntry = ['babel-polyfill', npmEntry];
 
+const optimization = {
+  minimizer: [
+    new UglifyJsPlugin({
+      uglifyOptions: {
+          compress: {
+              keep_fnames: true
+          }
+      }
+    })
+  ]
+};
+
+const swapCryptoWithRSAImpl = new webpack.NormalModuleReplacementPlugin(
+  /(.*)JoseUtil(\.js)?$/,
+  (resource) => {
+    resource.request = resource.request.replace(/JoseUtil/, 'JoseUtilRsa');
+  }
+)
+
 // npm compliant build with source-maps
 function build_lib_sourcemap(){
   // run webpack
@@ -28,9 +47,27 @@ function build_lib_sourcemap(){
   .pipe(gulp.dest('lib/'));
 }
 
+// npm compliant build with source-maps
+function build_lib_rsa_sourcemap(){
+  // run webpack
+  return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    mode: 'development',
+    entry: npmEntry,
+    output: {
+        filename:'oidc-client.rsa256.js',
+        libraryTarget:'umd',
+        // Workaround for https://github.com/webpack/webpack/issues/6642
+        globalObject: 'this'
+    },
+    plugins: [swapCryptoWithRSAImpl],
+    devtool:'inline-source-map'
+  }), webpack))
+  .pipe(gulp.dest('lib/'));
+}
+
 // npm compliant build without source-maps & minified
 function build_lib_min(){
-    // run webpack
+  // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'production',
     entry: npmEntry,
@@ -42,15 +79,26 @@ function build_lib_min(){
     },
     plugins: [],
     devtool: false,
-    optimization: {
-      minimizer: [
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            keep_fnames: true
-          }
-        })
-      ]
-    }
+    optimization
+  }), webpack))
+  .pipe(gulp.dest('lib/'));
+}
+
+// npm compliant build without source-maps & minified
+function build_lib_rsa_min(){
+    // run webpack
+  return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    mode: 'production',
+    entry: npmEntry,
+    output: {
+        filename:'oidc-client.rsa256.min.js',
+        libraryTarget:'umd',
+        // Workaround for https://github.com/webpack/webpack/issues/6642
+        globalObject: 'this'
+    },
+    plugins: [swapCryptoWithRSAImpl],
+    devtool: false,
+    optimization
   }), webpack))
   .pipe(gulp.dest('lib/'));
 }
@@ -85,15 +133,7 @@ function build_dist_min(){
     },
     plugins: [],
     devtool: false,
-    optimization: {
-      minimizer: [
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            keep_fnames: true
-          }
-        })
-      ]
-    }
+    optimization
   }), webpack))
   .pipe(gulp.dest('dist/'));
 }
@@ -177,17 +217,7 @@ function slimBuildTarget() {
             library: 'Oidc'
         },
         plugins: [],
-        optimization: {
-            minimizer: [
-                new UglifyJsPlugin({
-                    uglifyOptions: {
-                        compress: {
-                            keep_fnames: true
-                        }
-                    }
-                })
-            ]
-        }
+        optimization
     };
 }
 function slimBuildTargetSourceMap() {
@@ -224,11 +254,7 @@ function build_dist_slim_rsa() {
     conf.output.filename = 'oidc-client.rsa256.slim.min.js';
 
     // This plugin should always be first in the chain
-    conf.plugins.unshift(
-        new webpack.NormalModuleReplacementPlugin(/(.*)JoseUtil(\.js)?$/, (resource) => {
-            resource.request = resource.request.replace(/JoseUtil/, 'JoseUtilRsa');
-        })
-    );
+    conf.plugins.unshift(swapCryptoWithRSAImpl);
 
     return gulp.src('index.js')
         .pipe(webpackStream(createWebpackConfig(conf), webpack))
@@ -239,11 +265,7 @@ function build_dist_slim_rsa_sourcemap() {
   conf.output.filename = 'oidc-client.rsa256.slim.js';
 
   // This plugin should always be first in the chain
-  conf.plugins.unshift(
-      new webpack.NormalModuleReplacementPlugin(/(.*)JoseUtil(\.js)?$/, (resource) => {
-          resource.request = resource.request.replace(/JoseUtil/, 'JoseUtilRsa');
-      })
-  );
+  conf.plugins.unshift(swapCryptoWithRSAImpl);
 
   return gulp.src('index.js')
       .pipe(webpackStream(createWebpackConfig(conf), webpack))
@@ -253,6 +275,21 @@ function build_dist_slim_rsa_sourcemap() {
 // putting it all together
 exports.default = gulp.series(
   build_jsrsasign,
-  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min, build_dist_slim, build_dist_slim_rsa, build_dist_slim_sourcemap, build_dist_slim_rsa_sourcemap),
+  gulp.parallel(
+    build_lib_sourcemap,
+    build_lib_min,
+
+    build_lib_rsa_sourcemap,
+    build_lib_rsa_min,
+
+    build_dist_sourcemap,
+    build_dist_min,
+
+    build_dist_slim_sourcemap,
+    build_dist_slim,
+
+    build_dist_slim_rsa_sourcemap,
+    build_dist_slim_rsa
+  ),
   copy_ts
 );
