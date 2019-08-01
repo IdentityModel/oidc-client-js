@@ -58,7 +58,6 @@ export default function getJoseUtil({ jws, KeyUtil, X509, crypto, hextob64u, b64
                 }
 
                 return Promise.reject(e);
-                // return Promise.reject("JWT validation failed");
             }
         }
 
