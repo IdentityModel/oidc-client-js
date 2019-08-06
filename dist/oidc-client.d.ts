@@ -1,6 +1,8 @@
 /* Provides a namespace for when the library is loaded outside a module loader environment */
 export as namespace Oidc;
 
+export const Version:string;
+
 export interface Logger {
   error(message?: any, ...optionalParams: any[]): void;
   info(message?: any, ...optionalParams: any[]): void;
@@ -167,7 +169,7 @@ export class UserManager extends OidcClient {
   signinRedirectCallback(url?: string): Promise<User>;
 
   signoutRedirect(args?: any): Promise<any>;
-  signoutRedirectCallback(url?: string): Promise<any>;
+  signoutRedirectCallback(url?: string): Promise<SignoutResponse>;
 
   signoutPopup(args?: any): Promise<any>;
   signoutPopupCallback(url?: string, keepOpen?: boolean): Promise<void>;
