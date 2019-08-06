@@ -26,6 +26,7 @@ document.getElementById('popupSignout').addEventListener("click", popupSignout, 
 ///////////////////////////////
 Oidc.Log.logger = console;
 Oidc.Log.level = Oidc.Log.DEBUG;
+console.log("Using oidc-client version: ", Oidc.Version);
 
 var url = window.location.origin;
 

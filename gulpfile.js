@@ -1,4 +1,6 @@
+var package = require('./package.json');
 var gulp = require('gulp');
+var source = require('vinyl-source-stream');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
 var webpackStream = require('webpack-stream');
@@ -154,10 +156,17 @@ var files = [
     ,'jsrsasign/footer.js'
 ];
 
+
+function add_version(){
+    var stream = source('./version.js');
+    stream.end('const Version = "' + package.version + '"; export {Version};');
+    return stream.pipe(gulp.dest('./'));
+}
+
 function build_jsrsasign(){
-    return gulp.src(files)
-        .pipe(concat('jsrsasign.js'))
-        .pipe(gulp.dest('jsrsasign/dist/'));
+  return gulp.src(files)
+      .pipe(concat('jsrsasign.js'))
+      .pipe(gulp.dest('jsrsasign/dist/'));
 }
 
 function copy_ts(){
@@ -252,6 +261,7 @@ function build_dist_slim_rsa_sourcemap() {
 
 // putting it all together
 exports.default = gulp.series(
+  add_version,
   build_jsrsasign,
   gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min, build_dist_slim, build_dist_slim_rsa, build_dist_slim_sourcemap, build_dist_slim_rsa_sourcemap),
   copy_ts

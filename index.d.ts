@@ -1,6 +1,8 @@
 /* Provides a namespace for when the library is loaded outside a module loader environment */
 export as namespace Oidc;
 
+export const Version:string;
+
 export interface Logger {
   error(message?: any, ...optionalParams: any[]): void;
   info(message?: any, ...optionalParams: any[]): void;
