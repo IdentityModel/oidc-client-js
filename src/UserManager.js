@@ -406,7 +406,10 @@ export class UserManager extends OidcClient {
         if (postLogoutRedirectUri){
             args.post_logout_redirect_uri = postLogoutRedirectUri;
         }
-        return this._signoutStart(args, this._redirectNavigator).then(()=>{
+        let navParams = {
+            useReplaceToNavigate : args.useReplaceToNavigate
+        };
+        return this._signoutStart(args, this._redirectNavigator, navParams).then(()=>{
             Log.info("UserManager.signoutRedirect: successful");
         });
     }
