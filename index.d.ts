@@ -169,7 +169,7 @@ export class UserManager extends OidcClient {
   signinRedirectCallback(url?: string): Promise<User>;
 
   signoutRedirect(args?: any): Promise<any>;
-  signoutRedirectCallback(url?: string): Promise<any>;
+  signoutRedirectCallback(url?: string): Promise<SignoutResponse>;
 
   signoutPopup(args?: any): Promise<any>;
   signoutPopupCallback(url?: string, keepOpen?: boolean): Promise<void>;
