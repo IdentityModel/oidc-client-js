@@ -82,7 +82,8 @@ export class OidcClient {
                 data: data || state,
                 authority,
                 prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
-                resource, request, request_uri, extraQueryParams, request_type, response_mode
+                resource, request, request_uri, extraQueryParams, request_type, response_mode,
+                client_secret: this._settings.client_secret
             });
 
             var signinState = signinRequest.state;
