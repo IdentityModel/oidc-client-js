@@ -36,7 +36,7 @@ export class ResponseValidator {
             Log.debug("ResponseValidator.validateSigninResponse: state processed");
             return this._validateTokens(state, response).then(response => {
                 Log.debug("ResponseValidator.validateSigninResponse: tokens validated");
-                return this._processClaims(response).then(response => {
+                return this._processClaims(state, response).then(response => {
                     Log.debug("ResponseValidator.validateSigninResponse: claims processed");
                     return response;
                 });
@@ -138,13 +138,13 @@ export class ResponseValidator {
         return Promise.resolve(response);
     }
 
-    _processClaims(response) {
+    _processClaims(state, response) {
         if (response.isOpenIdConnect) {
             Log.debug("ResponseValidator._processClaims: response is OIDC, processing claims");
 
             response.profile = this._filterProtocolClaims(response.profile);
 
-            if (this._settings.loadUserInfo && response.access_token) {
+            if (state.skipUserInfo !== true && this._settings.loadUserInfo && response.access_token) {
                 Log.debug("ResponseValidator._processClaims: loading user info");
 
                 return this._userInfoService.getClaims(response.access_token).then(claims => {

@@ -44,7 +44,7 @@ export class OidcClient {
         // have round tripped, but people were getting confused, so i added state (since that matches the spec)
         // and so now if data is not passed, but state is then state will be used
         data, state, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
-        resource, request, request_uri, response_mode, extraQueryParams, extraTokenParams, request_type } = {},
+        resource, request, request_uri, response_mode, extraQueryParams, extraTokenParams, request_type, skipUserInfo } = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSigninRequest");
@@ -83,7 +83,8 @@ export class OidcClient {
                 authority,
                 prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
                 resource, request, request_uri, extraQueryParams, extraTokenParams, request_type, response_mode,
-                client_secret: this._settings.client_secret
+                client_secret: this._settings.client_secret,
+                skipUserInfo
             });
 
             var signinState = signinRequest.state;

@@ -7,7 +7,7 @@ import { JoseUtil } from './JoseUtil.js';
 import random from './random.js';
 
 export class SigninState extends State {
-    constructor({nonce, authority, client_id, redirect_uri, code_verifier, response_mode, client_secret, scope, extraTokenParams} = {}) {
+    constructor({nonce, authority, client_id, redirect_uri, code_verifier, response_mode, client_secret, scope, extraTokenParams, skipUserInfo} = {}) {
         super(arguments[0]);
 
         if (nonce === true) {
@@ -37,6 +37,7 @@ export class SigninState extends State {
         this._client_secret = client_secret;
         this._scope = scope;
         this._extraTokenParams = extraTokenParams;
+        this._skipUserInfo = skipUserInfo;
     }
 
     get nonce() {
@@ -69,6 +70,9 @@ export class SigninState extends State {
     get extraTokenParams() {
         return this._extraTokenParams;
     }
+    get skipUserInfo() {
+        return this._skipUserInfo;
+    }
     
     toStorageString() {
         Log.debug("SigninState.toStorageString");
@@ -85,7 +89,8 @@ export class SigninState extends State {
             response_mode: this.response_mode,
             client_secret: this.client_secret,
             scope: this.scope,
-            extraTokenParams : this.extraTokenParams
+            extraTokenParams : this.extraTokenParams,
+            skipUserInfo: this.skipUserInfo
         });
     }
 
