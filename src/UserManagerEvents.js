@@ -60,9 +60,9 @@ export class UserManagerEvents extends AccessTokenEvents {
     removeUserSignedOut(cb) {
         this._userSignedOut.removeHandler(cb);
     }
-    _raiseUserSignedOut(e) {
+    _raiseUserSignedOut() {
         Log.debug("UserManagerEvents._raiseUserSignedOut");
-        this._userSignedOut.raise(e);
+        this._userSignedOut.raise();
     }
 
     addUserSessionChanged(cb) {
@@ -71,8 +71,8 @@ export class UserManagerEvents extends AccessTokenEvents {
     removeUserSessionChanged(cb) {
         this._userSessionChanged.removeHandler(cb);
     }
-    _raiseUserSessionChanged(e) {
+    _raiseUserSessionChanged() {
         Log.debug("UserManagerEvents._raiseUserSessionChanged");
-        this._userSessionChanged.raise(e);
+        this._userSessionChanged.raise();
     }
 }
