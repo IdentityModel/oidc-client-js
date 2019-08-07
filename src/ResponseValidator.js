@@ -130,6 +130,11 @@ export class ResponseValidator {
             return Promise.reject(new Error("Unexpected code in response"));
         }
 
+        if (!response.scope) {
+            // if there's no scope on the response, then assume all scopes granted (per-spec) and copy over scopes from original request
+            response.scope = state.scope;
+        }
+
         return Promise.resolve(response);
     }
 

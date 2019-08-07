@@ -49,7 +49,7 @@ export class SigninRequest {
             data, client_id, authority, redirect_uri, 
             code_verifier: code, 
             request_type, response_mode,
-            client_secret });
+            client_secret, scope });
 
         url = UrlUtility.addQueryParam(url, "client_id", client_id);
         url = UrlUtility.addQueryParam(url, "redirect_uri", redirect_uri);
