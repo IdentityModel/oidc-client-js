@@ -18,6 +18,8 @@ export class TokenClient {
     }
 
     exchangeCode(args = {}) {
+        args = Object.assign({}, args);
+
         args.grant_type = args.grant_type || "authorization_code";
         args.client_id = args.client_id || this._settings.client_id;
         args.redirect_uri = args.redirect_uri || this._settings.redirect_uri;
@@ -50,6 +52,8 @@ export class TokenClient {
     }
 
     exchangeRefreshToken(args = {}) {
+        args = Object.assign({}, args);
+
         args.grant_type = args.grant_type || "refresh_token";
         args.client_id = args.client_id || this._settings.client_id;
         args.client_secret = args.client_secret || this._settings.client_secret;

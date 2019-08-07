@@ -250,8 +250,12 @@ export class ResponseValidator {
             client_secret: state.client_secret,
             code : response.code,
             redirect_uri: state.redirect_uri,
-            code_verifier: state.code_verifier,
+            code_verifier: state.code_verifier
         };
+
+        if (state.extraTokenParams && typeof(state.extraTokenParams) === 'object') {
+            Object.assign(request, state.extraTokenParams);
+        }
         
         return this._tokenClient.exchangeCode(request).then(tokenResponse => {
             
