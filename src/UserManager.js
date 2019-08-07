@@ -87,6 +87,8 @@ export class UserManager extends OidcClient {
     }
 
     signinRedirect(args = {}) {
+        args = Object.assign({}, args);
+
         args.request_type = "si:r";
         let navParams = {
             useReplaceToNavigate : args.useReplaceToNavigate
@@ -109,6 +111,8 @@ export class UserManager extends OidcClient {
     }
 
     signinPopup(args = {}) {
+        args = Object.assign({}, args);
+
         args.request_type = "si:p";
         let url = args.redirect_uri || this.settings.popup_redirect_uri || this.settings.redirect_uri;
         if (!url) {
@@ -154,6 +158,8 @@ export class UserManager extends OidcClient {
     }
 
     signinSilent(args = {}) {
+        args = Object.assign({}, args);
+
         args.request_type = "si:s";
         // first determine if we have a refresh token, or need to use iframe
         return this._loadUser().then(user => {
@@ -310,6 +316,8 @@ export class UserManager extends OidcClient {
     }
 
     querySessionStatus(args = {}) {
+        args = Object.assign({}, args);
+
         args.request_type = "si:s"; // this acts like a signin silent
         let url = args.redirect_uri || this.settings.silent_redirect_uri || this.settings.redirect_uri;
         if (!url) {
@@ -401,6 +409,8 @@ export class UserManager extends OidcClient {
     }
 
     signoutRedirect(args = {}) {
+        args = Object.assign({}, args);
+
         args.request_type = "so:r";
         let postLogoutRedirectUri = args.post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
         if (postLogoutRedirectUri){
@@ -421,6 +431,8 @@ export class UserManager extends OidcClient {
     }
 
     signoutPopup(args = {}) {
+        args = Object.assign({}, args);
+
         args.request_type = "so:p";
         let url = args.post_logout_redirect_uri || this.settings.popup_post_logout_redirect_uri || this.settings.post_logout_redirect_uri;
         args.post_logout_redirect_uri = url;
