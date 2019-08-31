@@ -207,8 +207,14 @@ export class OidcClient {
         Log.debug("OidcClient.processSignoutResponse");
 
         return this.readSignoutResponseState(url, stateStore, true).then(({state, response}) => {
-            Log.debug("OidcClient.processSignoutResponse: Received state from storage; validating response");
-            return this._validator.validateSignoutResponse(state, response);
+            if (state) {
+                Log.debug("OidcClient.processSignoutResponse: Received state from storage; validating response");
+                return this._validator.validateSignoutResponse(state, response);
+            }
+            else {
+                Log.debug("OidcClient.processSignoutResponse: No state from storage; skipping validating response");
+                return response;
+            }
         });
     }
 
