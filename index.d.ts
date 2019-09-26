@@ -320,6 +320,7 @@ export class User {
   state: any;
 
   toStorageString(): string;
+  static fromStorageString(storageString: string): User;
 
   readonly expires_in: number | undefined;
   readonly expired: boolean | undefined;
