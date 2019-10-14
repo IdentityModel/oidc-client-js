@@ -23,7 +23,12 @@ export class UrlUtility {
 
     static parseUrlFragment(value, delimiter = "#", global = Global) {
         if (typeof value !== 'string'){
-            value = global.location.href;
+            if(value !== null && typeof  value === 'object' && value.url) {
+                value = value.url;
+            }
+            else {
+                value = global.location.href;
+            }
         }
 
         var idx = value.lastIndexOf(delimiter);
