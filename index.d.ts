@@ -339,7 +339,7 @@ export interface SigninResponse {
   profile: any;
   scope: string;
   session_state: string;
-  state: string;
+  state: any;
   token_type: string;
 
   readonly expired: boolean | undefined;
@@ -354,7 +354,7 @@ export interface SignoutResponse {
   error?: string;
   error_description?: string;
   error_uri?: string;
-  state: string;
+  state?: any;
 }
 
 export interface UserSettings {
@@ -366,7 +366,7 @@ export interface UserSettings {
   scope: string;
   profile: Profile;
   expires_at: number;
-  state: string;
+  state: any;
 }
 
 export class User {
@@ -389,7 +389,7 @@ export class User {
   /** The expires at returned from the OIDC provider */
   expires_at: number;
   /** The custom state transferred in the last signin */
-  state: string;
+  state: any;
 
   toStorageString(): string;
   static fromStorageString(storageString: string): User;
