@@ -183,7 +183,7 @@ export class OidcClient {
                 return Promise.reject(new ErrorResponse(response));
             }
 
-            return Promise.resolve({undefined, response});
+            return Promise.resolve({state: undefined, response});
         }
 
         var stateKey = response.state;
