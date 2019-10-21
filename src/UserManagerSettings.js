@@ -25,6 +25,7 @@ export class UserManagerSettings extends OidcClientSettings {
         validateSubOnSilentRenew = false,
         includeIdTokenInSilentRenew = true,
         monitorSession = true,
+        monitorAnonymousSession = false,
         checkSessionInterval = DefaultCheckSessionInterval,
         stopCheckSessionOnError = true,
         query_status_response_type,
@@ -50,6 +51,7 @@ export class UserManagerSettings extends OidcClientSettings {
         this._accessTokenExpiringNotificationTime = accessTokenExpiringNotificationTime;
 
         this._monitorSession = monitorSession;
+        this._monitorAnonymousSession = monitorAnonymousSession;
         this._checkSessionInterval = checkSessionInterval;
         this._stopCheckSessionOnError = stopCheckSessionOnError;
         if (query_status_response_type) {
@@ -104,6 +106,9 @@ export class UserManagerSettings extends OidcClientSettings {
 
     get monitorSession() {
         return this._monitorSession;
+    }
+    get monitorAnonymousSession() {
+        return this._monitorAnonymousSession;
     }
     get checkSessionInterval() {
         return this._checkSessionInterval;

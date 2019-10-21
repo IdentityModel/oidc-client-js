@@ -24,6 +24,15 @@ export class SessionMonitor {
             if (user) {
                 this._start(user);
             }
+            else if (this._settings.monitorAnonymousSession) {
+                this._userManager.querySessionStatus().then(session => {
+                    this._start(session);
+                })
+                .catch(err => {
+                    // catch to suppress errors since we're in a ctor
+                    Log.error("SessionMonitor ctor: error from querySessionStatus:", err.message);
+                });
+            }
         }).catch(err => {
             // catch to suppress errors since we're in a ctor
             Log.error("SessionMonitor ctor: error from getUser:", err.message);
@@ -50,9 +59,14 @@ export class SessionMonitor {
         let session_state = user.session_state;
 
         if (session_state) {
-            this._sub = user.profile.sub;
-            this._sid = user.profile.sid;
-            Log.debug("SessionMonitor._start: session_state:", session_state, ", sub:", this._sub);
+            if (user.profile) {
+                this._sub = user.profile.sub;
+                this._sid = user.profile.sid;
+                Log.debug("SessionMonitor._start: session_state:", session_state, ", sub:", this._sub);
+            }
+            else {
+                Log.debug("SessionMonitor._start: session_state:", session_state, ", anonymous user");
+            }
 
             if (!this._checkSessionIFrame) {
                 this._metadataService.getCheckSessionIframe().then(url => {

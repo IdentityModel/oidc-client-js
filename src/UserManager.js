@@ -349,6 +349,22 @@ export class UserManager extends OidcClient {
                 else {
                     Log.info("querySessionStatus successful, user not authenticated");
                 }
+            })
+            .catch(err => {
+                if (err.session_state && this.settings.monitorAnonymousSession) {
+                    if (err.message == "login_required" || 
+                        err.message == "consent_required" || 
+                        err.message == "interaction_required" || 
+                        err.message == "account_selection_required"
+                    ) {
+                        Log.info("UserManager.querySessionStatus: querySessionStatus success for anonymous user");
+                        return {
+                            session_state: err.session_state
+                        };
+                    }
+                }
+
+                throw err;
             });
         });
     }
