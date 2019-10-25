@@ -31,7 +31,8 @@ export class OidcClientSettings {
         ResponseValidatorCtor = ResponseValidator,
         MetadataServiceCtor = MetadataService,
         // extra query params
-        extraQueryParams = {}
+        extraQueryParams = {},
+        extraTokenParams = {}
     } = {}) {
 
         this._authority = authority;
@@ -65,6 +66,7 @@ export class OidcClientSettings {
         this._metadataService = new MetadataServiceCtor(this);
 
         this._extraQueryParams = typeof extraQueryParams === 'object' ? extraQueryParams : {};
+        this._extraTokenParams = typeof extraTokenParams === 'object' ? extraTokenParams : {};
     }
 
     // client config
@@ -202,6 +204,18 @@ export class OidcClientSettings {
             this._extraQueryParams = value;
         } else {
             this._extraQueryParams = {};
+        }
+    }
+
+    // extra token params
+    get extraTokenParams() {
+        return this._extraTokenParams;
+    }
+    set extraTokenParams(value) {
+        if (typeof value === 'object'){
+            this._extraTokenParams = value;
+        } else {
+            this._extraTokenParams = {};
         }
     }
 }

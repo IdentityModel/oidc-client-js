@@ -202,6 +202,16 @@ describe("SigninRequest", function() {
             subject.url.should.contain('hd=domain.com&foo=bar');
         });
 
+        it("should store extra token params in state", function() {
+            settings.extraTokenParams = {
+                'resourceServer': 'abc',
+            };
+            subject = new SigninRequest(settings);
+            assert.deepEqual(subject.state.extraTokenParams, {
+                'resourceServer': 'abc'
+            });
+        });
+
         it("should include code flow params", function() {
             settings.response_type = "code";
             subject = new SigninRequest(settings);
