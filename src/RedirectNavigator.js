@@ -19,10 +19,13 @@ export class RedirectNavigator {
             window.location.replace(params.url);
         }
         else {
-            window.location = params.url;
+            window.location.assign(params.url);
         }
-
-        return Promise.resolve();
+  
+        // The browser keeps executing code after window.location.replace or window.location.assign
+        // are called. We return a promise that never resolves so that code does not keep executing
+        // as this would lead applications into thinking that login has been completed.
+        return new Promise((resolve, reject) => {});
     }
 
     get url() {
