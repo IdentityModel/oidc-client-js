@@ -49,6 +49,8 @@ var settings = {
     validateSubOnSilentRenew: true,
     //silentRequestTimeout:10000,
 
+    monitorAnonymousSession : true,
+
     filterProtocolClaims: true,
     loadUserInfo: true,
     revokeAccessTokenOnSignout : true
@@ -91,6 +93,9 @@ mgr.events.addUserUnloaded(function (e) {
     console.log("user unloaded");
 });
 
+mgr.events.addUserSignedIn(function (e) {
+    log("user logged in to the token server");
+});
 mgr.events.addUserSignedOut(function (e) {
     log("user logged out of the token server");
 });
