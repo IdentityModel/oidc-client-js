@@ -3,10 +3,11 @@
 
 import { Log } from './Log.js';
 import { CheckSessionIFrame } from './CheckSessionIFrame.js';
+import { Global } from './Global.js';
 
 export class SessionMonitor {
 
-    constructor(userManager, CheckSessionIFrameCtor = CheckSessionIFrame) {
+    constructor(userManager, CheckSessionIFrameCtor = CheckSessionIFrame, timer = Global.timer) {
         if (!userManager) {
             Log.error("SessionMonitor.ctor: No user manager passed to SessionMonitor");
             throw new Error("userManager");
@@ -14,6 +15,7 @@ export class SessionMonitor {
 
         this._userManager = userManager;
         this._CheckSessionIFrameCtor = CheckSessionIFrameCtor;
+        this._timer = timer;
 
         this._userManager.events.addUserLoaded(this._start.bind(this));
         this._userManager.events.addUserUnloaded(this._stop.bind(this));
@@ -117,22 +119,28 @@ export class SessionMonitor {
         }
 
         if (this._settings.monitorAnonymousSession) {
-            this._userManager.querySessionStatus().then(session => {
-                let tmpUser = {
-                    session_state : session.session_state
-                };
-                if (session.sub && session.sid) {
-                    tmpUser.profile = {
-                        sub: session.sub,
-                        sid: session.sid
+            // using a timer to delay re-initialization to avoid race conditions during signout
+            let timerHandle = this._timer.setInterval(()=>{
+                this._timer.clearInterval(timerHandle);
+
+                this._userManager.querySessionStatus().then(session => {
+                    let tmpUser = {
+                        session_state : session.session_state
                     };
-                }
-                this._start(tmpUser);
-            })
-            .catch(err => {
-                // catch to suppress errors since we're in a callback
-                Log.error("SessionMonitor: error from querySessionStatus:", err.message);
-            });
+                    if (session.sub && session.sid) {
+                        tmpUser.profile = {
+                            sub: session.sub,
+                            sid: session.sid
+                        };
+                    }
+                    this._start(tmpUser);
+                })
+                .catch(err => {
+                    // catch to suppress errors since we're in a callback
+                    Log.error("SessionMonitor: error from querySessionStatus:", err.message);
+                });
+
+            }, 1000);
         }
     }
 
