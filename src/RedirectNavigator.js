@@ -15,7 +15,12 @@ export class RedirectNavigator {
             return Promise.reject(new Error("No url provided"));
         }
 
-        window.location = params.url;
+        if (params.useReplaceToNavigate) {
+            window.location.replace(params.url);
+        }
+        else {
+            window.location = params.url;
+        }
 
         return Promise.resolve();
     }

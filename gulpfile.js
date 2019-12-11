@@ -1,5 +1,8 @@
+var package = require('./package.json');
 var gulp = require('gulp');
+var source = require('vinyl-source-stream');
 var concat = require('gulp-concat');
+var rename = require('gulp-rename');
 var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 var createWebpackConfig = require('./webpack.base');
@@ -9,8 +12,27 @@ var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 var npmEntry ='./index.js';
 var classicEntry = ['babel-polyfill', npmEntry];
 
+const optimization = {
+  minimizer: [
+    new UglifyJsPlugin({
+      uglifyOptions: {
+          compress: {
+              keep_fnames: true
+          }
+      }
+    })
+  ]
+};
+
+const swapCryptoWithRSAImpl = new webpack.NormalModuleReplacementPlugin(
+  /(.*)JoseUtil(\.js)?$/,
+  (resource) => {
+    resource.request = resource.request.replace(/JoseUtil/, 'JoseUtilRsa');
+  }
+)
+
 // npm compliant build with source-maps
-gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
+function build_lib_sourcemap(){
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'development',
@@ -25,10 +47,28 @@ gulp.task('build-lib-sourcemap', ['jsrsasign'], function() {
     devtool:'inline-source-map'
   }), webpack))
   .pipe(gulp.dest('lib/'));
-});
+}
+
+// npm compliant build with source-maps
+function build_lib_rsa_sourcemap(){
+  // run webpack
+  return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    mode: 'development',
+    entry: npmEntry,
+    output: {
+        filename:'oidc-client.rsa256.js',
+        libraryTarget:'umd',
+        // Workaround for https://github.com/webpack/webpack/issues/6642
+        globalObject: 'this'
+    },
+    plugins: [swapCryptoWithRSAImpl],
+    devtool:'inline-source-map'
+  }), webpack))
+  .pipe(gulp.dest('lib/'));
+}
 
 // npm compliant build without source-maps & minified
-gulp.task('build-lib-min', ['jsrsasign'], function() {
+function build_lib_min(){
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'production',
@@ -41,21 +81,32 @@ gulp.task('build-lib-min', ['jsrsasign'], function() {
     },
     plugins: [],
     devtool: false,
-    optimization: {
-      minimizer: [
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            keep_fnames: true
-          }
-        })
-      ]
-    }
+    optimization
   }), webpack))
   .pipe(gulp.dest('lib/'));
-});
+}
+
+// npm compliant build without source-maps & minified
+function build_lib_rsa_min(){
+    // run webpack
+  return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
+    mode: 'production',
+    entry: npmEntry,
+    output: {
+        filename:'oidc-client.rsa256.min.js',
+        libraryTarget:'umd',
+        // Workaround for https://github.com/webpack/webpack/issues/6642
+        globalObject: 'this'
+    },
+    plugins: [swapCryptoWithRSAImpl],
+    devtool: false,
+    optimization
+  }), webpack))
+  .pipe(gulp.dest('lib/'));
+}
 
 // classic build with sourcemaps
-gulp.task('build-dist-sourcemap', ['jsrsasign'], function() {
+function build_dist_sourcemap(){
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'development',
@@ -69,10 +120,10 @@ gulp.task('build-dist-sourcemap', ['jsrsasign'], function() {
     devtool:'inline-source-map'
   }), webpack))
   .pipe(gulp.dest('dist/'));
-});
+}
 
 // classic build without sourcemaps & minified
-gulp.task('build-dist-min', ['jsrsasign'], function() {
+function build_dist_min(){
   // run webpack
   return gulp.src('index.js').pipe(webpackStream(createWebpackConfig({
     mode: 'production',
@@ -84,18 +135,10 @@ gulp.task('build-dist-min', ['jsrsasign'], function() {
     },
     plugins: [],
     devtool: false,
-    optimization: {
-      minimizer: [
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            keep_fnames: true
-          }
-        })
-      ]
-    }
+    optimization
   }), webpack))
   .pipe(gulp.dest('dist/'));
-});
+}
 
 // this is used to manually build jsrsasign with the fewest modules to reduce its size
 var files = [
@@ -153,11 +196,110 @@ var files = [
     ,'jsrsasign/footer.js'
 ];
 
-gulp.task('jsrsasign', function () {
-    return gulp.src(files)
-        .pipe(concat('jsrsasign.js'))
-        .pipe(gulp.dest('jsrsasign/dist/'));
-});
+
+function add_version(){
+    var stream = source('./version.js');
+    stream.end('const Version = "' + package.version + '"; export {Version};');
+    return stream.pipe(gulp.dest('./'));
+}
+
+function build_jsrsasign(){
+  return gulp.src(files)
+      .pipe(concat('jsrsasign.js'))
+      .pipe(gulp.dest('jsrsasign/dist/'));
+}
+
+function copy_ts(){
+  return gulp.src('./index.d.ts')
+      .pipe(rename('oidc-client.d.ts'))
+      .pipe(gulp.dest('./dist/'));
+}
+
+// Replace the babel-polyfill with specific core-js polyfills.
+function slimBuildTarget() {
+    return {
+        mode: 'production',
+        entry: ['./polyfills.js', './index.js'],
+        output: {
+            filename: 'oidc-client.slim.min.js',
+            libraryTarget: 'var',
+            library: 'Oidc'
+        },
+        plugins: [],
+        optimization
+    };
+}
+function slimBuildTargetSourceMap() {
+  return {
+      mode: 'development',
+      entry: ['./polyfills.js', './index.js'],
+      output: {
+          filename: 'oidc-client.slim.js',
+          libraryTarget: 'var',
+          library: 'Oidc'
+      },
+      plugins: [],
+      devtool:'inline-source-map'
+  };
+}
+
+// Adds a configuration for slimming down the production build. This build
+// does not contain the full babel-polyfill. Instead it imports specific
+// core-js polyfills
+function build_dist_slim() {
+    return gulp.src('index.js')
+        .pipe(webpackStream(createWebpackConfig(slimBuildTarget()), webpack))
+        .pipe(gulp.dest('dist/'));
+};
+function build_dist_slim_sourcemap() {
+  return gulp.src('index.js')
+      .pipe(webpackStream(createWebpackConfig(slimBuildTargetSourceMap()), webpack))
+      .pipe(gulp.dest('dist/'));
+};
+
+// Creates a build with only RSA256 exponent+modulus support (no X509)
+function build_dist_slim_rsa() {
+    var conf = slimBuildTarget();
+    conf.output.filename = 'oidc-client.rsa256.slim.min.js';
+
+    // This plugin should always be first in the chain
+    conf.plugins.unshift(swapCryptoWithRSAImpl);
+
+    return gulp.src('index.js')
+        .pipe(webpackStream(createWebpackConfig(conf), webpack))
+        .pipe(gulp.dest('dist/'));
+};
+function build_dist_slim_rsa_sourcemap() {
+  var conf = slimBuildTargetSourceMap();
+  conf.output.filename = 'oidc-client.rsa256.slim.js';
+
+  // This plugin should always be first in the chain
+  conf.plugins.unshift(swapCryptoWithRSAImpl);
+
+  return gulp.src('index.js')
+      .pipe(webpackStream(createWebpackConfig(conf), webpack))
+      .pipe(gulp.dest('dist/'));
+};
 
 // putting it all together
-gulp.task('build', ['build-lib-sourcemap','build-lib-min','build-dist-sourcemap','build-dist-min']);
+exports.default = gulp.series(
+  add_version,
+  build_jsrsasign,
+  gulp.parallel(
+    build_lib_sourcemap,
+    build_lib_min,
+
+    build_lib_rsa_sourcemap,
+    build_lib_rsa_min,
+
+    build_dist_sourcemap,
+    build_dist_min,
+
+    build_dist_slim_sourcemap,
+    build_dist_slim,
+
+    build_dist_slim_rsa_sourcemap,
+    build_dist_slim_rsa
+  ),
+  copy_ts
+);

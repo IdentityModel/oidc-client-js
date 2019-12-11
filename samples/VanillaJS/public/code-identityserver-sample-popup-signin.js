@@ -10,6 +10,6 @@ function logMessage(msg){
 Oidc.Log.logger = console; // log;
 Oidc.Log.level = Oidc.Log.DEBUG;
 
-new Oidc.UserManager().signinPopupCallback().catch(function(err){
+new Oidc.UserManager({response_mode:'query'}).signinCallback().catch(function(err){
     Oidc.Log.logger.error("error: " + err && err.message);
 });

@@ -5,7 +5,7 @@ import { Log } from './Log.js';
 import random from './random.js';
 
 export class State {
-    constructor({id, data, created} = {}) {
+    constructor({id, data, created, request_type} = {}) {
         this._id = id || random();
         this._data = data;
 
@@ -15,6 +15,7 @@ export class State {
         else {
             this._created = parseInt(Date.now() / 1000);
         }
+        this._request_type =  request_type;
     }
 
     get id() {
@@ -26,13 +27,17 @@ export class State {
     get created() {
         return this._created;
     }
+    get request_type() {
+        return this._request_type;
+    }
 
     toStorageString() {
         Log.debug("State.toStorageString");
         return JSON.stringify({
             id: this.id,
             data: this.data,
-            created: this.created
+            created: this.created,
+            request_type: this.request_type
         });
     }
 

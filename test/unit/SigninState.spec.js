@@ -63,10 +63,15 @@ describe("SigninState", function() {
             var subject = new SigninState({ authority: "test" });
             subject.authority.should.be.equal("test");
         });
+        
+        it("should accept request_type", function() {
+            var subject = new SigninState({ request_type: 'xoxo' });
+            subject.request_type.should.be.equal('xoxo');
+        });
     });
 
     it("can serialize and then deserialize", function() {
-        var subject1 = new SigninState({ nonce: true, data: { foo: "test" }, created: 1000, client_id:"client", authority:"authority", redirect_uri:"http://cb", code_verifier:true });
+        var subject1 = new SigninState({ nonce: true, data: { foo: "test" }, created: 1000, client_id:"client", authority:"authority", redirect_uri:"http://cb", code_verifier:true, request_type:'type' });
 
         var storage = subject1.toStorageString();
         var subject2 = SigninState.fromStorageString(storage);

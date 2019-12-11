@@ -259,6 +259,46 @@ describe("OidcClient", function () {
 
     });
 
+    describe("readSigninResponseState", function () {
+
+        it("should return a promise", function () {
+            var p = subject.readSigninResponseState("state=state");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
+        });
+
+        it("should fail if no state on response", function (done) {
+            stubStore.item = "state";
+            subject.readSigninResponseState("").then(null, err => {
+                err.message.should.contain('state');
+                done();
+            });
+        });
+
+        it("should fail if storage fails", function (done) {
+            stubStore.error = "fail";
+            subject.readSigninResponseState("state=state").then(null, err => {
+                err.message.should.contain('fail');
+                done();
+            });
+        });
+
+        it("should deserialize stored state and return state and response", function (done) {
+            stubStore.item = new SigninState({ id: '1', nonce: '2', authority:'authority', client_id:'client', request_type:'type' }).toStorageString();
+
+            subject.readSigninResponseState("state=1").then(({state, response}) => {
+                state.id.should.equal('1');
+                state.nonce.should.equal('2');
+                state.authority.should.equal('authority');
+                state.client_id.should.equal('client');
+                state.request_type.should.equal('type');
+                response.state.should.equal('1');
+                done();
+            });
+        });
+
+    });
+
     describe("processSigninResponse", function () {
 
         it("should return a promise", function () {
@@ -284,7 +324,6 @@ describe("OidcClient", function () {
         });
 
         it("should deserialize stored state and call validator", function (done) {
-
             stubStore.item = new SigninState({ id: '1', nonce: '2', authority:'authority', client_id:'client' }).toStorageString();
 
             subject.processSigninResponse("state=1").then(response => {
@@ -402,6 +441,61 @@ describe("OidcClient", function () {
                 done();
             });
         });
+    });
+
+    describe("readSignoutResponseState", function () {
+
+        it("should return a promise", function () {
+            var p = subject.readSignoutResponseState("state=state");
+            p.should.be.instanceof(Promise);
+            p.catch(e=>{});
+        });
+
+        it("should return result if no state on response", function (done) {
+            subject.readSignoutResponseState("").then(({state, response}) => {
+                response.should.be.ok;
+                done();
+            });
+        });
+
+        it("should return error", function (done) {
+            subject.readSignoutResponseState("error=foo").then(null, err => {
+                err.error.should.equal("foo");
+                done();
+            });
+        });
+
+        it("should fail if storage fails", function (done) {
+            stubStore.error = "fail";
+            subject.readSignoutResponseState("state=state").then(null, err => {
+                err.message.should.contain('fail');
+                done();
+            });
+        });
+
+        it("should deserialize stored state and return state and response", function (done) {
+
+            stubStore.item = new State({ id: '1', request_type:'type' }).toStorageString();
+
+            subject.readSignoutResponseState("state=1").then(({state, response}) => {
+                state.id.should.equal('1');
+                state.request_type.should.equal('type');
+                response.state.should.be.equal('1');
+                done();
+            });
+        });
+
+        it("should call validator with state even if error in response", function (done) {
+
+            stubStore.item = new State({ id: '1', data:"bar" }).toStorageString();
+
+            subject.processSignoutResponse("state=1&error=foo").then(response => {
+                stubValidator.signoutState.id.should.equal('1');
+                stubValidator.signoutResponse.should.be.deep.equal(response);
+                done();
+            });
+        });
+
     });
 
     describe("processSignoutResponse", function () {

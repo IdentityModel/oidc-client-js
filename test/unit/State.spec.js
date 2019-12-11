@@ -54,10 +54,14 @@ describe("State", function() {
             subject.created.should.be.equal(123);
             Date.now = oldNow;
         });
+        it("should accept request_type", function() {
+            var subject = new State({ request_type: 'xoxo' });
+            subject.request_type.should.be.equal('xoxo');
+        });
     });
 
     it("can serialize and then deserialize", function() {
-        var subject1 = new State({ data: { foo: "test" }, created: 1000 });
+        var subject1 = new State({ data: { foo: "test" }, created: 1000, request_type:'type' });
 
         var storage = subject1.toStorageString();
         var subject2 = State.fromStorageString(storage);

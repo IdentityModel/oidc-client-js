@@ -17,7 +17,10 @@ import { SessionMonitor } from './src/SessionMonitor.js';
 import { Global } from './src/Global.js';
 import { User } from './src/User.js';
 
+import { Version } from './version.js';
+
 export default {
+    Version,
     Log,
     OidcClient,
     OidcClientSettings,

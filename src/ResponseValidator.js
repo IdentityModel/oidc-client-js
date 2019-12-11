@@ -36,7 +36,7 @@ export class ResponseValidator {
             Log.debug("ResponseValidator.validateSigninResponse: state processed");
             return this._validateTokens(state, response).then(response => {
                 Log.debug("ResponseValidator.validateSigninResponse: tokens validated");
-                return this._processClaims(response).then(response => {
+                return this._processClaims(state, response).then(response => {
                     Log.debug("ResponseValidator.validateSigninResponse: claims processed");
                     return response;
                 });
@@ -130,16 +130,21 @@ export class ResponseValidator {
             return Promise.reject(new Error("Unexpected code in response"));
         }
 
+        if (!response.scope) {
+            // if there's no scope on the response, then assume all scopes granted (per-spec) and copy over scopes from original request
+            response.scope = state.scope;
+        }
+
         return Promise.resolve(response);
     }
 
-    _processClaims(response) {
+    _processClaims(state, response) {
         if (response.isOpenIdConnect) {
             Log.debug("ResponseValidator._processClaims: response is OIDC, processing claims");
 
             response.profile = this._filterProtocolClaims(response.profile);
 
-            if (this._settings.loadUserInfo && response.access_token) {
+            if (state.skipUserInfo !== true && this._settings.loadUserInfo && response.access_token) {
                 Log.debug("ResponseValidator._processClaims: loading user info");
 
                 return this._userInfoService.getClaims(response.access_token).then(claims => {
@@ -242,11 +247,15 @@ export class ResponseValidator {
     _processCode(state, response) {
         var request = {
             client_id: state.client_id,
-            client_secret: this._settings.client_secret,
+            client_secret: state.client_secret,
             code : response.code,
             redirect_uri: state.redirect_uri,
-            code_verifier: state.code_verifier,
+            code_verifier: state.code_verifier
         };
+
+        if (state.extraTokenParams && typeof(state.extraTokenParams) === 'object') {
+            Object.assign(request, state.extraTokenParams);
+        }
         
         return this._tokenClient.exchangeCode(request).then(tokenResponse => {
             

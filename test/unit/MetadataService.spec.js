@@ -50,7 +50,6 @@ describe("MetadataService", function() {
         });
 
         it("should use metadata on settings", function(done) {
-            Log.level = Log.DEBUG;
             settings.metadata = "test";
 
             let p = subject.getMetadata();

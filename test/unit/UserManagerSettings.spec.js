@@ -77,24 +77,32 @@ describe("UserManagerSettings", function () {
 
         it("should return value from initial settings", function () {
             let subject = new UserManagerSettings({
-                silent_redirect_uri: 'test',
-                automaticSilentRenew: false
+                automaticSilentRenew: true
             });
-            subject.automaticSilentRenew.should.be.false;
+            subject.automaticSilentRenew.should.be.true;
         });
 
         it("should use default value", function () {
             let subject = new UserManagerSettings({
-                silent_redirect_uri: 'test'
             });
             subject.automaticSilentRenew.should.be.false;
         });
 
-        it("should be false if no silent redirect uri", function () {
+    });
+
+    describe("validateSubOnSilentRenew", function () {
+
+        it("should return value from initial settings", function () {
             let subject = new UserManagerSettings({
-                automaticSilentRenew: true
+                validateSubOnSilentRenew: true
             });
-            subject.automaticSilentRenew.should.be.false;
+            subject.validateSubOnSilentRenew.should.be.true;
+        });
+
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.validateSubOnSilentRenew.should.be.false;
         });
 
     });
@@ -209,10 +217,19 @@ describe("UserManagerSettings", function () {
             });
             subject.query_status_response_type.should.equal(temp);
         });
-        it("should use default value", function () {
-            let subject = new UserManagerSettings({
-            });
-            subject.query_status_response_type.should.equal("id_token");
+        it("should infer default value", function () {
+            {
+                let subject = new UserManagerSettings({
+                    response_type: "id_token token"
+                });
+                subject.query_status_response_type.should.equal("id_token");
+            }
+            {            
+                let subject = new UserManagerSettings({
+                    response_type: "code"
+                });
+                subject.query_status_response_type.should.equal("code");
+            }
         });
     });
 

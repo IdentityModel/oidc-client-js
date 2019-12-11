@@ -6,7 +6,7 @@ import { UrlUtility } from './UrlUtility.js';
 import { State } from './State.js';
 
 export class SignoutRequest {
-    constructor({url, id_token_hint, post_logout_redirect_uri, data, extraQueryParams}) {
+    constructor({url, id_token_hint, post_logout_redirect_uri, data, extraQueryParams, request_type}) {
         if (!url) {
             Log.error("SignoutRequest.ctor: No url passed");
             throw new Error("url");
@@ -20,7 +20,7 @@ export class SignoutRequest {
             url = UrlUtility.addQueryParam(url, "post_logout_redirect_uri", post_logout_redirect_uri);
 
             if (data) {
-                this.state = new State({ data });
+                this.state = new State({ data, request_type });
 
                 url = UrlUtility.addQueryParam(url, "state", this.state.id);
             }
