@@ -63,6 +63,7 @@ export class OidcClient {
         resource = resource || this._settings.resource;
         response_mode = response_mode || this._settings.response_mode;
         extraQueryParams = extraQueryParams || this._settings.extraQueryParams;
+        extraTokenParams = extraTokenParams || this._settings.extraTokenParams;
 
         let authority = this._settings.authority;
 

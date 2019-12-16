@@ -459,4 +459,51 @@ describe("OidcClientSettings", function () {
         });
     })
 
+    describe("extraTokenParams", function() {
+
+        it("should use default value", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client'
+            });
+            subject.extraTokenParams.should.deep.equal({});
+        });
+
+        it("should return value from initial settings", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                extraTokenParams: {
+                    'resourceServer': 'abc'
+                }
+            });
+            subject.extraTokenParams.should.deep.equal({ 'resourceServer': 'abc' });
+        });
+
+        it("should not set value from initial settings if not object, but set default value ({})", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                extraTokenParams: 123456
+            });
+            subject.extraTokenParams.should.deep.equal({});
+        });
+
+        it("should set it if object", function () {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+            });
+            subject.extraTokenParams = { 'resourceServer': 'abc' };
+            subject.extraTokenParams.should.deep.equal({ 'resourceServer': 'abc' });
+        });
+
+        it("should clear it if not object", function() {
+            let subject = new OidcClientSettings({
+                client_id: 'client',
+                extraTokenParams: {
+                    'resourceServer': 'abc',
+                }
+            });
+            subject.extraTokenParams = undefined;
+            subject.extraTokenParams.should.deep.equal({});
+        });
+    })
+
 });

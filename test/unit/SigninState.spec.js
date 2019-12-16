@@ -68,6 +68,11 @@ describe("SigninState", function() {
             var subject = new SigninState({ request_type: 'xoxo' });
             subject.request_type.should.be.equal('xoxo');
         });
+
+        it("should accept extraTokenParams", function() {
+            var subject = new SigninState({ extraTokenParams: { 'resourceServer' : 'abc' } });
+            assert.deepEqual(subject.extraTokenParams, { 'resourceServer' : 'abc' });
+        });
     });
 
     it("can serialize and then deserialize", function() {
