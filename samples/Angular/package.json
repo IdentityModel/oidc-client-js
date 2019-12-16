@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@angular/cli": "^7.3.8"
+    "@angular/cli": "^8.3.20"
   }
 }
