@@ -38,11 +38,11 @@ export class InMemoryWebStorage {
 }
 
 export class Log {
-  static readonly NONE = 0;
-  static readonly ERROR = 1;
-  static readonly WARN = 2;
-  static readonly INFO = 3;
-  static readonly DEBUG = 4;
+  static readonly NONE: 0;
+  static readonly ERROR: 1;
+  static readonly WARN: 2;
+  static readonly INFO: 3;
+  static readonly DEBUG: 4;
 
   static reset(): void;
 
@@ -123,14 +123,14 @@ export class OidcClient {
 
 export interface OidcClientSettings {
   /** The URL of the OIDC/OAuth2 provider */
-  authority: string;
+  authority?: string;
   readonly metadataUrl?: string;
   /** Provide metadata when authority server does not allow CORS on the metadata endpoint */
   metadata?: Partial<OidcMetadata>;
   /** Provide signingKeys when authority server does not allow CORS on the jwks uri */
   signingKeys?: any[];
   /** Your client application's identifier as registered with the OIDC/OAuth2 */
-  client_id: string;
+  client_id?: string;
   client_secret?: string;
   /** The type of response desired from the OIDC/OAuth2 provider (default: 'id_token') */
   readonly response_type?: string;
