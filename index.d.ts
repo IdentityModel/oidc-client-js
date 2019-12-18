@@ -38,11 +38,11 @@ export class InMemoryWebStorage {
 }
 
 export class Log {
-  static readonly NONE = 0;
-  static readonly ERROR = 1;
-  static readonly WARN = 2;
-  static readonly INFO = 3;
-  static readonly DEBUG = 4;
+  static readonly NONE: 0;
+  static readonly ERROR: 1;
+  static readonly WARN: 2;
+  static readonly INFO: 3;
+  static readonly DEBUG: 4;
 
   static reset(): void;
 
