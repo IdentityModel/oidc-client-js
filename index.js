@@ -19,7 +19,7 @@ import { User } from './src/User.js';
 
 import { Version } from './version.js';
 
-export default {
+export {
     Version,
     Log,
     OidcClient,

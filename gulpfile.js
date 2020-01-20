@@ -9,8 +9,8 @@ var createWebpackConfig = require('./webpack.base');
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // entry points for both configs
-var npmEntry ='./index.js';
-var classicEntry = ['babel-polyfill', npmEntry];
+var npmEntry = './index.js';
+var classicEntry = ['./polyfills-all.js', npmEntry];
 
 const optimization = {
   minimizer: [
@@ -38,8 +38,9 @@ function build_lib_sourcemap(){
     mode: 'development',
     entry: npmEntry,
     output: {
-        filename:'oidc-client.js',
-        libraryTarget:'umd',
+        filename: 'oidc-client.js',
+        libraryExport: 'default',
+        libraryTarget: 'umd',
         // Workaround for https://github.com/webpack/webpack/issues/6642
         globalObject: 'this'
     },
@@ -56,8 +57,9 @@ function build_lib_rsa_sourcemap(){
     mode: 'development',
     entry: npmEntry,
     output: {
-        filename:'oidc-client.rsa256.js',
-        libraryTarget:'umd',
+        filename: 'oidc-client.rsa256.js',
+        libraryExport: 'default',
+        libraryTarget: 'umd',
         // Workaround for https://github.com/webpack/webpack/issues/6642
         globalObject: 'this'
     },
@@ -74,8 +76,9 @@ function build_lib_min(){
     mode: 'production',
     entry: npmEntry,
     output: {
-        filename:'oidc-client.min.js',
-        libraryTarget:'umd',
+        filename: 'oidc-client.min.js',
+        libraryExport: "default",
+        libraryTarget: 'umd',
         // Workaround for https://github.com/webpack/webpack/issues/6642
         globalObject: 'this'
     },
@@ -93,8 +96,9 @@ function build_lib_rsa_min(){
     mode: 'production',
     entry: npmEntry,
     output: {
-        filename:'oidc-client.rsa256.min.js',
-        libraryTarget:'umd',
+        filename: 'oidc-client.rsa256.min.js',
+        libraryExport: "default",
+        libraryTarget: 'umd',
         // Workaround for https://github.com/webpack/webpack/issues/6642
         globalObject: 'this'
     },
@@ -112,9 +116,9 @@ function build_dist_sourcemap(){
     mode: 'development',
     entry: classicEntry,
     output: {
-        filename:'oidc-client.js',
-        libraryTarget:'var',
-        library:'Oidc'
+        filename: 'oidc-client.js',
+        libraryTarget: 'var',
+        library: 'Oidc'
     },
     plugins: [],
     devtool:'inline-source-map'
@@ -129,9 +133,9 @@ function build_dist_min(){
     mode: 'production',
     entry: classicEntry,
     output: {
-        filename:'oidc-client.min.js',
-        libraryTarget:'var',
-        library:'Oidc'
+        filename: 'oidc-client.min.js',
+        libraryTarget: 'var',
+        library: 'Oidc'
     },
     plugins: [],
     devtool: false,
@@ -219,7 +223,7 @@ function copy_ts(){
 function slimBuildTarget() {
     return {
         mode: 'production',
-        entry: ['./polyfills.js', './index.js'],
+        entry: ['./polyfills-selected.js', './index.js'],
         output: {
             filename: 'oidc-client.slim.min.js',
             libraryTarget: 'var',
@@ -232,7 +236,7 @@ function slimBuildTarget() {
 function slimBuildTargetSourceMap() {
   return {
       mode: 'development',
-      entry: ['./polyfills.js', './index.js'],
+      entry: ['./polyfills-selected.js', './index.js'],
       output: {
           filename: 'oidc-client.slim.js',
           libraryTarget: 'var',
