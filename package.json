@@ -50,7 +50,7 @@
     "mocha": "^5.2.0",
     "natives": "^1.1.6",
     "open": "^6.1.0",
-    "uglifyjs-webpack-plugin": "^1.3.0",
+    "terser-webpack-plugin": "^2.3.4",
     "vinyl-source-stream": "^2.0.0",
     "webpack": "^4.41.5",
     "webpack-stream": "^5.2.1"

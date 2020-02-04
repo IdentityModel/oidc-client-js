@@ -6,19 +6,18 @@ var rename = require('gulp-rename');
 var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 var createWebpackConfig = require('./webpack.base');
-var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+var TerserPlugin = require('terser-webpack-plugin');
 
 // entry points for both configs
 var npmEntry = './index.js';
 var classicEntry = ['./polyfills-all.js', npmEntry];
 
 const optimization = {
+  minimize: true,
   minimizer: [
-    new UglifyJsPlugin({
-      uglifyOptions: {
-          compress: {
-              keep_fnames: true
-          }
+    new TerserPlugin({
+      terserOptions: {
+        keep_fnames: true
       }
     })
   ]
