@@ -13,7 +13,6 @@ var npmEntry = './index.js';
 var classicEntry = ['./polyfills-all.js', npmEntry];
 
 const optimization = {
-  minimize: true,
   minimizer: [
     new TerserPlugin({
       terserOptions: {
