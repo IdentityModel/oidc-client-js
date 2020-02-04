@@ -38,10 +38,7 @@ function build_lib_sourcemap(){
     entry: npmEntry,
     output: {
         filename: 'oidc-client.js',
-        libraryExport: 'default',
-        libraryTarget: 'umd',
-        // Workaround for https://github.com/webpack/webpack/issues/6642
-        globalObject: 'this'
+        libraryTarget: 'umd'
     },
     plugins: [],
     devtool:'inline-source-map'
@@ -57,10 +54,7 @@ function build_lib_rsa_sourcemap(){
     entry: npmEntry,
     output: {
         filename: 'oidc-client.rsa256.js',
-        libraryExport: 'default',
-        libraryTarget: 'umd',
-        // Workaround for https://github.com/webpack/webpack/issues/6642
-        globalObject: 'this'
+        libraryTarget: 'umd'
     },
     plugins: [swapCryptoWithRSAImpl],
     devtool:'inline-source-map'
@@ -76,10 +70,7 @@ function build_lib_min(){
     entry: npmEntry,
     output: {
         filename: 'oidc-client.min.js',
-        libraryExport: "default",
-        libraryTarget: 'umd',
-        // Workaround for https://github.com/webpack/webpack/issues/6642
-        globalObject: 'this'
+        libraryTarget: 'umd'
     },
     plugins: [],
     devtool: false,
@@ -96,10 +87,7 @@ function build_lib_rsa_min(){
     entry: npmEntry,
     output: {
         filename: 'oidc-client.rsa256.min.js',
-        libraryExport: "default",
-        libraryTarget: 'umd',
-        // Workaround for https://github.com/webpack/webpack/issues/6642
-        globalObject: 'this'
+        libraryTarget: 'umd'
     },
     plugins: [swapCryptoWithRSAImpl],
     devtool: false,
@@ -117,6 +105,7 @@ function build_dist_sourcemap(){
     output: {
         filename: 'oidc-client.js',
         libraryTarget: 'var',
+        libraryExport: 'default',
         library: 'Oidc'
     },
     plugins: [],
@@ -134,6 +123,7 @@ function build_dist_min(){
     output: {
         filename: 'oidc-client.min.js',
         libraryTarget: 'var',
+        libraryExport: 'default',
         library: 'Oidc'
     },
     plugins: [],
