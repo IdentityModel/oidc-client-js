@@ -20,9 +20,16 @@ export class TokenClient {
     exchangeCode(args = {}) {
         args = Object.assign({}, args);
 
+        var basicAuth = undefined;
+        var urlQuery = "";
+
         args.grant_type = args.grant_type || "authorization_code";
         args.client_id = args.client_id || this._settings.client_id;
+        args.client_secret = args.client_secret || this._settings.client_secret;
         args.redirect_uri = args.redirect_uri || this._settings.redirect_uri;
+
+        var client_authentication = args._client_authentication || this._settings._client_authentication;
+        delete args._client_authentication;
 
         if (!args.code) {
             Log.error("TokenClient.exchangeCode: No code passed");
@@ -40,11 +47,26 @@ export class TokenClient {
             Log.error("TokenClient.exchangeCode: No client_id passed");
             return Promise.reject(new Error("A client_id is required"));
         }
+        if (!args.client_secret && client_authentication == "client_secret_basic") {
+            Log.error("TokenClient.exchangeCode: No client_secret passed");
+            return Promise.reject(new Error("A client_secret is required"));
+        }
+
+
+        // Sending the client credentials using the Basic Auth method
+        if(client_authentication == "client_secret_basic")
+        {
+            basicAuth = args.client_id + ':' + args.client_secret;
+            urlQuery = "?grant_type=" + encodeURIComponent(args.grant_type) + 
+                   "&redirect_uri="+ encodeURIComponent(args.redirect_uri) +
+                   "&code="+ encodeURIComponent(args.code);
+
+            args = {};
+        }
 
         return this._metadataService.getTokenEndpoint(false).then(url => {
             Log.debug("TokenClient.exchangeCode: Received token endpoint");
-
-            return this._jsonService.postForm(url, args).then(response => {
+            return this._jsonService.postForm(url + urlQuery, args, basicAuth).then(response => {
                 Log.debug("TokenClient.exchangeCode: response received");
                 return response;
             });
