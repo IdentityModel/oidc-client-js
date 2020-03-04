@@ -15,6 +15,7 @@ export class MetadataService {
 
         this._settings = settings;
         this._jsonService = new JsonServiceCtor(['application/jwk-set+json']);
+        this._metadata_promise;
     }
 
     get metadataUrl() {
@@ -38,24 +39,39 @@ export class MetadataService {
     }
 
     getMetadata() {
-        if (this._settings.metadata) {
+        // metadata was preloaded and no url was provided, so use the supplied data.
+        if (!this.metadataUrl && this._settings.metadata) {
             Log.debug("MetadataService.getMetadata: Returning metadata from settings");
             return Promise.resolve(this._settings.metadata);
         }
 
+        // no url was provided and settings were not pre-loaded then throw an error.
         if (!this.metadataUrl) {
             Log.error("MetadataService.getMetadata: No authority or metadataUrl configured on settings");
             return Promise.reject(new Error("No authority or metadataUrl configured on settings"));
         }
 
+        // if we've already started fetching metadata return the existing promise so we don't call it again.
+        if (this._metadata_promise) {
+            Log.debug("MetadataService.getMetadata: getting metadata from cache promise", this.metadataUrl);
+            return this._metadata_promise
+        }
+
         Log.debug("MetadataService.getMetadata: getting metadata from", this.metadataUrl);
 
-        return this._jsonService.getJson(this.metadataUrl)
+        this._metadata_promise = this._jsonService.getJson(this.metadataUrl)
             .then(metadata => {
                 Log.debug("MetadataService.getMetadata: json received");
-                this._settings.metadata = metadata;
-                return metadata;
+                // overlay .well-known/openid-configuration over seeded setting. this allows consumers to set values
+                // like end_session_url for Auth0 when it is not available in the configuration endpoint.
+                // precedence was set on the assumption the issuers hosted configuration is always more accurate
+                // than what the developer seeded the client with.
+                if (!this._settings.metadata) this._settings.metadata = {}
+                Object.assign(this._settings.metadata, metadata);
+                return this._settings.metadata;
             });
+
+        return this._metadata_promise;
     }
 
     getIssuer() {
