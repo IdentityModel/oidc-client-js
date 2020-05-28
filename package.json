@@ -1,5 +1,5 @@
 {
-  "name": "oidc-client",
+  "name": "oidc-client-maygo",
   "version": "1.10.1",
   "description": "OpenID Connect (OIDC) & OAuth2 client library",
   "main": "lib/oidc-client.min.js",
