@@ -1,6 +1,6 @@
 [![npm package](https://badge.fury.io/js/oidc-client.svg)](https://www.npmjs.com/package/oidc-client)
 
-# TEMP package, until https://github.com/IdentityModel/oidc-client-js/pull/1075 is merged
+TEMP package, until https://github.com/IdentityModel/oidc-client-js/pull/1075 is merged
 
 # oidc-client
 
