@@ -1,8 +1,10 @@
 [![npm package](https://badge.fury.io/js/oidc-client.svg)](https://www.npmjs.com/package/oidc-client)
 
+# TEMP package, until https://github.com/IdentityModel/oidc-client-js/pull/1075 is merged
+
 # oidc-client
 
-Library to provide OpenID Connect (OIDC) and OAuth2 protocol support for client-side, browser-based JavaScript client applications. 
+Library to provide OpenID Connect (OIDC) and OAuth2 protocol support for client-side, browser-based JavaScript client applications.
 Also included is support for user session and access token management.
 
 ## Install
@@ -19,11 +21,12 @@ Node.js v4.4 or later required.
 `npm install --save babel-polyfill` as well. Then include it in your build.
 
 ##### CommonJS
+
 If you don't use a package manager or a module loader, then you can get the library from the `dist` folder on github [here](dist).
 
 ## Including in the browser
 
-If you intend to use this library directly in a browser and are not using UMD/AMD then there is a compiled version in the [~/dist](dist) folder. 
+If you intend to use this library directly in a browser and are not using UMD/AMD then there is a compiled version in the [~/dist](dist) folder.
 It is already bundled/minified and contains the necessary dependencies and polyfills (mainly for ES6 features such as Promises).
 
 If you are using UMD/AMD and/or you already have included an ES6 polyfill (such as babel-polyfill.js) then you can include the UMD packaged version of the file from the [~/lib](lib) folder.
