@@ -38,16 +38,16 @@ export class SigninRequest {
             throw new Error("authority");
         }
 
-        let oidc = SigninRequest.isOidc(response_type);
+        let includeNonce = SigninRequest.includeNonce(response_type, scope);
         let code = SigninRequest.isCode(response_type);
 
         if (!response_mode) {
             response_mode = SigninRequest.isCode(response_type) ? "query" : null;
         }
 
-        this.state = new SigninState({ nonce: oidc, 
-            data, client_id, authority, redirect_uri, 
-            code_verifier: code, 
+        this.state = new SigninState({ nonce: includeNonce,
+            data, client_id, authority, redirect_uri, response_type,
+            code_verifier: code,
             request_type, response_mode,
             client_secret, scope, extraTokenParams, skipUserInfo });
 
@@ -57,7 +57,7 @@ export class SigninRequest {
         url = UrlUtility.addQueryParam(url, "scope", scope);
 
         url = UrlUtility.addQueryParam(url, "state", this.state.id);
-        if (oidc) {
+        if (includeNonce) {
             url = UrlUtility.addQueryParam(url, "nonce", this.state.nonce);
         }
         if (code) {
@@ -79,6 +79,16 @@ export class SigninRequest {
         this.url = url;
     }
 
+    static includeNonce(response_type, scope /* optional */) {
+        var responseTypeResult = response_type.split(/\s+/g).filter(function(item) {
+            return item === "id_token";
+        });
+        var scopeResult = scope == null ? false : scope.split(/\s+/g).filter(function(item) {
+            return item === "openid";
+        });
+        return !!(responseTypeResult[0]) || !!(scopeResult[0]);
+    }
+
     static isOidc(response_type) {
         var result = response_type.split(/\s+/g).filter(function(item) {
             return item === "id_token";
@@ -92,7 +102,7 @@ export class SigninRequest {
         });
         return !!(result[0]);
     }
-    
+
     static isCode(response_type) {
         var result = response_type.split(/\s+/g).filter(function(item) {
             return item === "code";

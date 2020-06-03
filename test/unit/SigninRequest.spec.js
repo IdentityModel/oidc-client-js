@@ -218,13 +218,30 @@ describe("SigninRequest", function() {
             subject.url.should.contain("code_challenge=");
             subject.url.should.contain("code_challenge_method=S256");
         });
-        
+
         it("should include hybrid flow params", function() {
             settings.response_type = "code id_token";
             subject = new SigninRequest(settings);
             subject.url.should.contain("nonce=");
             subject.url.should.contain("code_challenge=");
             subject.url.should.contain("code_challenge_method=S256");
+        });
+
+        it("should include nonce", function() {
+            subject.url.should.contain("nonce=");
+        });
+
+        it("should include for code flow if opend in scope", function() {
+            settings.response_type = "code";
+            subject = new SigninRequest(settings);
+            subject.url.should.contain("nonce=");
+        });
+
+        it("should not include nonce for none oidc flow", function() {
+            settings.scope = "foobar";
+            settings.response_type = "code";
+            subject = new SigninRequest(settings);
+            subject.url.should.not.contain("nonce=");
         });
     });
 
