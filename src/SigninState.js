@@ -7,7 +7,7 @@ import { JoseUtil } from './JoseUtil.js';
 import random from './random.js';
 
 export class SigninState extends State {
-    constructor({nonce, authority, client_id, redirect_uri, code_verifier, response_mode, client_secret, scope, extraTokenParams, skipUserInfo} = {}) {
+    constructor({nonce, authority, client_id, redirect_uri, response_type, code_verifier, response_mode, client_secret, scope, extraTokenParams, skipUserInfo} = {}) {
         super(arguments[0]);
 
         if (nonce === true) {
@@ -24,7 +24,7 @@ export class SigninState extends State {
         else if (code_verifier) {
             this._code_verifier = code_verifier;
         }
-        
+
         if (this.code_verifier) {
             let hash = JoseUtil.hashString(this.code_verifier, "SHA256");
             this._code_challenge = JoseUtil.hexToBase64Url(hash);
@@ -33,6 +33,7 @@ export class SigninState extends State {
         this._redirect_uri = redirect_uri;
         this._authority = authority;
         this._client_id = client_id;
+        this._response_type = response_type;
         this._response_mode = response_mode;
         this._client_secret = client_secret;
         this._scope = scope;
@@ -51,6 +52,9 @@ export class SigninState extends State {
     }
     get redirect_uri() {
         return this._redirect_uri;
+    }
+    get response_type() {
+        return this._response_type;
     }
     get code_verifier() {
         return this._code_verifier;
@@ -73,7 +77,7 @@ export class SigninState extends State {
     get skipUserInfo() {
         return this._skipUserInfo;
     }
-    
+
     toStorageString() {
         Log.debug("SigninState.toStorageString");
         return JSON.stringify({
@@ -82,6 +86,7 @@ export class SigninState extends State {
             created: this.created,
             request_type: this.request_type,
             nonce: this.nonce,
+            response_type: this.response_type,
             code_verifier: this.code_verifier,
             redirect_uri: this.redirect_uri,
             authority: this.authority,

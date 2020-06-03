@@ -135,7 +135,8 @@ describe("ResponseValidator", function () {
             nonce: "7221005209972382",
             data: { some: 'data' },
             client_id: "client",
-            authority: "op"
+            authority: "op",
+            response_type: "id_token"
         };
         stubResponse = {
             state: 'the_id',
@@ -387,7 +388,7 @@ describe("ResponseValidator", function () {
 
         it("should fail if request was not OIDC but id_token in response", function (done) {
 
-            delete stubState.nonce;
+            stubState.response_type = 'code';
             stubResponse.id_token = id_token;
 
             subject._processSigninParams(stubState, stubResponse).then(null, err => {
@@ -409,7 +410,7 @@ describe("ResponseValidator", function () {
             });
 
         });
-        
+
         it("should fail if request was not code flow no code in response", function (done) {
 
             stubResponse.id_token = id_token;

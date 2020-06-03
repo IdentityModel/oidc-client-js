@@ -12,9 +12,9 @@ const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "
 
 export class ResponseValidator {
 
-    constructor(settings, 
+    constructor(settings,
         MetadataServiceCtor = MetadataService,
-        UserInfoServiceCtor = UserInfoService, 
+        UserInfoServiceCtor = UserInfoService,
         joseUtil = JoseUtil,
         TokenClientCtor = TokenClient) {
         if (!settings) {
@@ -110,12 +110,12 @@ export class ResponseValidator {
             return Promise.reject(new ErrorResponse(response));
         }
 
-        if (state.nonce && !response.id_token) {
+        if (state.response_type === 'id_token' && !response.id_token) {
             Log.error("ResponseValidator._processSigninParams: Expecting id_token in response");
             return Promise.reject(new Error("No id_token in response"));
         }
 
-        if (!state.nonce && response.id_token) {
+        if (state.response_type !== 'id_token' && response.id_token) {
             Log.error("ResponseValidator._processSigninParams: Not expecting id_token in response");
             return Promise.reject(new Error("Unexpected id_token in response"));
         }
@@ -194,7 +194,7 @@ export class ResponseValidator {
                 else if (result[name] !== value) {
                     if (typeof value === 'object') {
                         result[name] = this._mergeClaims(result[name], value);
-                    } 
+                    }
                     else {
                         result[name] = [result[name], value];
                     }
@@ -256,9 +256,9 @@ export class ResponseValidator {
         if (state.extraTokenParams && typeof(state.extraTokenParams) === 'object') {
             Object.assign(request, state.extraTokenParams);
         }
-        
+
         return this._tokenClient.exchangeCode(request).then(tokenResponse => {
-            
+
             for(var key in tokenResponse) {
                 response[key] = tokenResponse[key];
             }
@@ -270,7 +270,7 @@ export class ResponseValidator {
             else {
                 Log.debug("ResponseValidator._processCode: token response successful, returning response");
             }
-            
+
             return response;
         });
     }
@@ -283,7 +283,7 @@ export class ResponseValidator {
             Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
             return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds).then(payload => {
-            
+
                 if (state.nonce && state.nonce !== payload.nonce) {
                     Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
                     return Promise.reject(new Error("Invalid nonce in id_token"));
