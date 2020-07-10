@@ -100,7 +100,7 @@ export class OidcClient {
     readSigninResponseState(url, stateStore, removeState = false) {
         Log.debug("OidcClient.readSigninResponseState");
 
-        let useQuery = this._settings.response_mode === "query" || 
+        let useQuery = this._settings.response_mode === "query" ||
             (!this._settings.response_mode && SigninRequest.isCode(this._settings.response_type));
         let delimiter = useQuery ? "?" : "#";
 
@@ -184,7 +184,7 @@ export class OidcClient {
                 return Promise.reject(new ErrorResponse(response));
             }
 
-            return Promise.resolve({undefined, response});
+            return Promise.resolve({state: null, response});
         }
 
         var stateKey = response.state;
