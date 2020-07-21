@@ -45,7 +45,7 @@ export class UrlUtility {
 
         var counter = 0;
         while (m = regex.exec(value)) {
-            params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            params[decodeURIComponent(m[1])] = decodeURIComponent(m[2].replace(/\+/g, ' '));
             if (counter++ > 50) {
                 Log.error("UrlUtility.parseUrlFragment: response exceeded expected number of parameters", value);
                 return {
