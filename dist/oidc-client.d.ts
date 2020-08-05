@@ -208,7 +208,7 @@ export class UserManager extends OidcClient {
   signinCallback(url?: string): Promise<User>;
 
   /** Proxy to Popup and Redirect callbacks */
-  signoutCallback(url?: string): Promise<SignoutResponse | void>;
+  signoutCallback(url?: string, keepWindowOpen?: boolean): Promise<SignoutResponse | void>;
 
   /** Query OP for user's current signin status */
   querySessionStatus(args?: any): Promise<SessionStatus>;
