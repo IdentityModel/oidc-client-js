@@ -6,22 +6,21 @@ var rename = require('gulp-rename');
 var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 var createWebpackConfig = require('./webpack.base');
-var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+var TerserPlugin = require('terser-webpack-plugin');
 
 // entry points for both configs
 var npmEntry ='./index.js';
 var classicEntry = ['babel-polyfill', npmEntry];
 
 const optimization = {
-  minimizer: [
-    new UglifyJsPlugin({
-      uglifyOptions: {
-          compress: {
-              keep_fnames: true
-          }
+  minimizer: [new TerserPlugin({
+    extractComments: false,
+    terserOptions: {
+      compress: {
+          keep_fnames: true
       }
-    })
-  ]
+    }
+  })]
 };
 
 const swapCryptoWithRSAImpl = new webpack.NormalModuleReplacementPlugin(
