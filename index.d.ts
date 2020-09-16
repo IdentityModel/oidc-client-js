@@ -223,6 +223,15 @@ export class UserManager extends OidcClient {
   events: UserManagerEvents;
 }
 
+export class UserInfoService {
+  constructor(
+    settings: OidcClientSettings,
+    JsonServiceCtor?: any,
+    MetadataServiceCtor?: MetadataServiceCtor
+  );
+  getClaims(token: any): Promise<any>;
+}
+
 export interface SessionStatus {
   /** Opaque session state used to validate if session changed (monitorSession) */
   session_state: string;
