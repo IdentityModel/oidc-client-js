@@ -21,7 +21,6 @@ export class IFrameWindow {
         // shotgun approach
         this._frame.style.visibility = "hidden";
         this._frame.style.position = "absolute";
-        this._frame.style.display = "none";
         this._frame.style.width = 0;
         this._frame.style.height = 0;
 
