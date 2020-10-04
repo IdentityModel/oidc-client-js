@@ -282,20 +282,22 @@ export class ResponseValidator {
             let clockSkewInSeconds = this._settings.clockSkew;
             Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
-            return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds).then(payload => {
-            
-                if (state.nonce && state.nonce !== payload.nonce) {
-                    Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
-                    return Promise.reject(new Error("Invalid nonce in id_token"));
-                }
-
-                if (!payload.sub) {
-                    Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
-                    return Promise.reject(new Error("No sub present in id_token"));
-                }
-
-                response.profile = payload;
-                return response;
+            return this._settings.getEpochTime().then(now => {
+                return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds, now).then(payload => {
+                
+                    if (state.nonce && state.nonce !== payload.nonce) {
+                        Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
+                        return Promise.reject(new Error("Invalid nonce in id_token"));
+                    }
+    
+                    if (!payload.sub) {
+                        Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
+                        return Promise.reject(new Error("No sub present in id_token"));
+                    }
+    
+                    response.profile = payload;
+                    return response;
+                });
             });
         });
     }

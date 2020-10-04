@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 import { Log } from './Log.js';
+import { ClockService } from './ClockService.js';
 import { WebStorageStateStore } from './WebStorageStateStore.js';
 import { ResponseValidator } from './ResponseValidator.js';
 import { MetadataService } from './MetadataService.js';
@@ -24,7 +25,9 @@ export class OidcClientSettings {
         prompt, display, max_age, ui_locales, acr_values, resource, response_mode,
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
-        staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
+        staleStateAge = DefaultStaleStateAge, 
+        clockSkew = DefaultClockSkewInSeconds,
+        clockService = new ClockService(),
         userInfoJwtIssuer = 'OP',
         // other behavior
         stateStore = new WebStorageStateStore(),
@@ -59,6 +62,7 @@ export class OidcClientSettings {
         this._loadUserInfo = !!loadUserInfo;
         this._staleStateAge = staleStateAge;
         this._clockSkew = clockSkew;
+        this._clockService = clockService;
         this._userInfoJwtIssuer = userInfoJwtIssuer;
 
         this._stateStore = stateStore;
@@ -217,5 +221,10 @@ export class OidcClientSettings {
         } else {
             this._extraTokenParams = {};
         }
+    }
+
+    // get the time
+    getEpochTime() {
+        return this._clockService.getEpochTime();
     }
 }
