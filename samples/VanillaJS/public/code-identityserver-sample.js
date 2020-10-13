@@ -32,8 +32,8 @@ var url = window.location.origin;
 
 var settings = {
     authority: 'https://demo.identityserver.io',
-    client_id: 'spa',
-    //client_id: 'spa.short',
+    client_id: 'interactive.public',
+    //client_id: 'interactive.public.short',
     redirect_uri: url + '/code-identityserver-sample.html',
     post_logout_redirect_uri: url + '/code-identityserver-sample.html',
     response_type: 'code',
