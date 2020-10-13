@@ -87,7 +87,7 @@ export class IFrameWindow {
         if (this._timer &&
             e.origin === this._origin &&
             e.source === this._frame.contentWindow &&
-            (e.data.startsWith('http://') || e.data.startsWith('https://'))
+            (typeof e.data === 'string' && (e.data.startsWith('http://') || e.data.startsWith('https://')))
         ) {
             let url = e.data;
             if (url) {
