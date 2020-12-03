@@ -57,7 +57,7 @@ export class Log {
 }
 
 export interface MetadataService {
-  new (settings: OidcClientSettings): MetadataService;
+  new(settings: OidcClientSettings): MetadataService;
 
   metadataUrl?: string;
 
@@ -69,7 +69,7 @@ export interface MetadataService {
 
   getUserInfoEndpoint(): Promise<string>;
 
-  getTokenEndpoint(): Promise<string | undefined>;
+  getTokenEndpoint(optional: boolean = true): Promise<string | undefined>;
 
   getCheckSessionIframe(): Promise<string | undefined>;
 
@@ -328,7 +328,7 @@ export class WebStorageStateStore implements StateStore {
 }
 
 export interface SigninResponse {
-  new (url: string, delimiter?: string): SigninResponse;
+  new(url: string, delimiter?: string): SigninResponse;
 
   access_token: string;
   code: string;
@@ -349,7 +349,7 @@ export interface SigninResponse {
 }
 
 export interface SignoutResponse {
-  new (url: string): SignoutResponse;
+  new(url: string): SignoutResponse;
 
   error?: string;
   error_description?: string;
@@ -506,9 +506,9 @@ export class CordovaIFrameNavigator {
 
 export interface OidcMetadata {
   issuer: string;
-  authorization_endpoint:string;
+  authorization_endpoint: string;
   token_endpoint: string;
-  token_endpoint_auth_methods_supported:string[];
+  token_endpoint_auth_methods_supported: string[];
   token_endpoint_auth_signing_alg_values_supported: string[];
   userinfo_endpoint: string;
   check_session_iframe: string;
@@ -545,7 +545,7 @@ export interface OidcMetadata {
 }
 
 export interface CheckSessionIFrame {
-  new (callback: () => void, client_id: string, url: string, interval?: number, stopOnError?: boolean): CheckSessionIFrame
+  new(callback: () => void, client_id: string, url: string, interval?: number, stopOnError?: boolean): CheckSessionIFrame
 
   load(): Promise<void>;
 
