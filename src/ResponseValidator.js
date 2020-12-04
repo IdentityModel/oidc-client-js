@@ -12,9 +12,9 @@ const ProtocolClaims = ["nonce", "at_hash", "iat", "nbf", "exp", "aud", "iss", "
 
 export class ResponseValidator {
 
-    constructor(settings, 
+    constructor(settings,
         MetadataServiceCtor = MetadataService,
-        UserInfoServiceCtor = UserInfoService, 
+        UserInfoServiceCtor = UserInfoService,
         joseUtil = JoseUtil,
         TokenClientCtor = TokenClient) {
         if (!settings) {
@@ -177,27 +177,16 @@ export class ResponseValidator {
 
         for (let name in claims2) {
             var values = claims2[name];
-            if (!Array.isArray(values)) {
-                values = [values];
-            }
 
-            for (let i = 0; i < values.length; i++) {
-                let value = values[i];
+            if (!Array.isArray(values)) {
+                result[name] = values;
+            } else {
                 if (!result[name]) {
-                    result[name] = value;
+                    result[name] = [];
                 }
-                else if (Array.isArray(result[name])) {
-                    if (result[name].indexOf(value) < 0) {
-                        result[name].push(value);
-                    }
-                }
-                else if (result[name] !== value) {
-                    if (typeof value === 'object') {
-                        result[name] = this._mergeClaims(result[name], value);
-                    } 
-                    else {
-                        result[name] = [result[name], value];
-                    }
+
+                for (let i = 0; i < values.length; i++) {
+                    result[name].push(values[i]);
                 }
             }
         }
@@ -256,9 +245,9 @@ export class ResponseValidator {
         if (state.extraTokenParams && typeof(state.extraTokenParams) === 'object') {
             Object.assign(request, state.extraTokenParams);
         }
-        
+
         return this._tokenClient.exchangeCode(request).then(tokenResponse => {
-            
+
             for(var key in tokenResponse) {
                 response[key] = tokenResponse[key];
             }
@@ -270,7 +259,7 @@ export class ResponseValidator {
             else {
                 Log.debug("ResponseValidator._processCode: token response successful, returning response");
             }
-            
+
             return response;
         });
     }
@@ -284,17 +273,17 @@ export class ResponseValidator {
 
             return this._settings.getEpochTime().then(now => {
                 return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds, now).then(payload => {
-                
+
                     if (state.nonce && state.nonce !== payload.nonce) {
                         Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
                         return Promise.reject(new Error("Invalid nonce in id_token"));
                     }
-    
+
                     if (!payload.sub) {
                         Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
                         return Promise.reject(new Error("No sub present in id_token"));
                     }
-    
+
                     response.profile = payload;
                     return response;
                 });
