@@ -92,6 +92,15 @@ class MockResponseValidator extends ResponseValidator {
         return this._mock("_mergeClaims", ...args);
     }
 
+    _getSigningKeyForJwt(...args) {
+        this._getSigningKeyForJwtSignedCalledCount = (this._getSigningKeyForJwtSignedCalledCount || 0) + 1;
+        return this._mock("_getSigningKeyForJwt", ...args);
+    }
+    _getSigningKeyForJwtWithSingleRetry(...args) {
+        this._getSigningKeyForJwtSignedCalledCount = 0;
+        return this._mock("_getSigningKeyForJwtWithSingleRetry", ...args);
+    }
+
     _validateIdTokenAndAccessToken(...args) {
         return this._mock("_validateIdTokenAndAccessToken", ...args);
     }
@@ -715,6 +724,58 @@ describe("ResponseValidator", function () {
         });
 
     });
+
+    describe("_getSigningKeyForJwt", function () {
+
+        it("should fail if loading keys fails.", function (done) {
+
+            const jwt = { header: { kid: 'a3rMUgMFv9tPclLa6yF3zAkfquE' }};
+            stubMetadataService.getSigningKeysResult = Promise.reject(new Error("keys"));
+
+            subject._getSigningKeyForJwt(jwt).then(null, err => {
+              err.message.should.contain('keys');
+              done();
+            })
+        })
+
+        it("should fetch suitable signing key for the jwt.", function (done) {
+
+            const jwt = { header: { kid: 'a3rMUgMFv9tPclLa6yF3zAkfquE' }};
+            stubMetadataService.getSigningKeysResult = Promise.resolve([{ kid: 'a3rMUgMFv9tPclLa6yF3zAkfquE' }, { kid: 'other_key' } ])
+
+            subject._getSigningKeyForJwt(jwt).then(key => {
+              key.should.deep.equal({ kid: 'a3rMUgMFv9tPclLa6yF3zAkfquE' })
+              done();
+            })
+        })
+    })
+
+    describe("_getSigningKeyForJwtWithSingleRetry", function () {
+
+        it("should retry once if suitable signing key is not found.", function (done) {
+
+            const jwt = { header: { kid: 'a3rMUgMFv9tPclLa6yF3zAkfquE' }};
+            var callCount = 0
+            stubMetadataService.getSigningKeysResult = Promise.resolve([ { kid: 'other_key' } ])
+
+            subject._getSigningKeyForJwtWithSingleRetry(jwt).then(key => {
+              subject._getSigningKeyForJwtSignedCalledCount.should.equal(2);
+              done();
+            })
+        })
+
+        it("should not retry if suitable signing key is found.", function (done) {
+
+            const jwt = { header: { kid: 'a3rMUgMFv9tPclLa6yF3zAkfquE' }};
+            var callCount = 0
+            stubMetadataService.getSigningKeysResult = Promise.resolve([ { kid: 'a3rMUgMFv9tPclLa6yF3zAkfquE' } ])
+
+            subject._getSigningKeyForJwtWithSingleRetry(jwt).then(key => {
+              subject._getSigningKeyForJwtSignedCalledCount.should.equal(1);
+              done();
+            })
+        })
+    })
 
     describe("_validateIdToken", function () {
 
