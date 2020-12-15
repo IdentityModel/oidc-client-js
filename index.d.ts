@@ -248,6 +248,10 @@ export interface UserManagerEvents extends AccessTokenEvents {
   addSilentRenewError(callback: UserManagerEvents.SilentRenewErrorCallback): void;
   removeSilentRenewError(callback: UserManagerEvents.SilentRenewErrorCallback): void;
 
+  /** Subscribe to events raised when the user's signed-in */
+  addUserSignedIn(callback: UserManagerEvents.UserSignedInCallback): void;
+  removeUserSignedIn(callback: UserManagerEvents.UserSignedInCallback): void;
+  
   /** Subscribe to events raised when the user's sign-in status at the OP has changed */
   addUserSignedOut(callback: UserManagerEvents.UserSignedOutCallback): void;
   removeUserSignedOut(callback: UserManagerEvents.UserSignedOutCallback): void;
@@ -261,6 +265,7 @@ export namespace UserManagerEvents {
   export type UserLoadedCallback = (user: User) => void;
   export type UserUnloadedCallback = () => void;
   export type SilentRenewErrorCallback = (error: Error) => void;
+  export type UserSignedInCallback = () => void;
   export type UserSignedOutCallback = () => void;
   export type UserSessionChangedCallback = () => void;
 }
