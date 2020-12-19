@@ -156,12 +156,15 @@ export interface OidcClientSettings {
   readonly staleStateAge?: number;
   /** The window of time (in seconds) to allow the current time to deviate when validating id_token's iat, nbf, and exp values (default: 300) */
   readonly clockSkew?: number;
+  readonly clockService?: ClockService;
   readonly stateStore?: StateStore;
   readonly userInfoJwtIssuer?: 'ANY' | 'OP' | string;
   ResponseValidatorCtor?: ResponseValidatorCtor;
   MetadataServiceCtor?: MetadataServiceCtor;
   /** An object containing additional query string parameters to be including in the authorization request */
   extraQueryParams?: Record<string, any>;
+
+  getEpochTime(): Promise<number>;
 }
 
 export class UserManager extends OidcClient {
@@ -298,6 +301,10 @@ export interface UserManagerSettings extends OidcClientSettings {
   readonly iframeNavigator?: any;
   /** Storage object used to persist User for currently authenticated user (default: session storage) */
   readonly userStore?: WebStorageStateStore;
+}
+
+export interface ClockService {
+  getEpochTime(): Promise<number>;
 }
 
 export interface WebStorageStateStoreSettings {
