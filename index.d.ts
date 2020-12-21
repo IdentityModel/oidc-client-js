@@ -60,6 +60,8 @@ export interface MetadataService {
   new(settings: OidcClientSettings): MetadataService;
 
   metadataUrl?: string;
+  
+  resetSigningKeys(): void;
 
   getMetadata(): Promise<OidcMetadata>;
 
