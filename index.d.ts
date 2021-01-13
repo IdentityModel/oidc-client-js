@@ -345,6 +345,9 @@ export interface SigninResponse {
   new(url: string, delimiter?: string): SigninResponse;
 
   access_token: string;
+  /** Refresh token returned from the OIDC provider (if requested, via the
+   * 'offline_access' scope) */
+  refresh_token?: string;
   code: string;
   error: string;
   error_description: string;
