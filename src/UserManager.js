@@ -160,7 +160,6 @@ export class UserManager extends OidcClient {
     signinSilent(args = {}) {
         args = Object.assign({}, args);
 
-        args.request_type = "si:s";
         // first determine if we have a refresh token, or need to use iframe
         return this._loadUser().then(user => {
             if (user && user.refresh_token) {
@@ -168,6 +167,7 @@ export class UserManager extends OidcClient {
                 return this._useRefreshToken(args);
             }
             else {
+                args.request_type = "si:s";
                 args.id_token_hint = args.id_token_hint || (this.settings.includeIdTokenInSilentRenew && user && user.id_token);
                 if (user && this._settings.validateSubOnSilentRenew) {
                     Log.debug("UserManager.signinSilent, subject prior to silent renew: ", user.profile.sub);

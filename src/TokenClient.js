@@ -20,14 +20,12 @@ export class TokenClient {
     exchangeCode(args = {}) {
         args = Object.assign({}, args);
 
-        var basicAuth = undefined;
-        var urlQuery = "";
-
         args.grant_type = args.grant_type || "authorization_code";
         args.client_id = args.client_id || this._settings.client_id;
         args.client_secret = args.client_secret || this._settings.client_secret;
         args.redirect_uri = args.redirect_uri || this._settings.redirect_uri;
 
+        var basicAuth = undefined;
         var client_authentication = args._client_authentication || this._settings._client_authentication;
         delete args._client_authentication;
 
@@ -52,21 +50,17 @@ export class TokenClient {
             return Promise.reject(new Error("A client_secret is required"));
         }
 
-
         // Sending the client credentials using the Basic Auth method
         if(client_authentication == "client_secret_basic")
         {
             basicAuth = args.client_id + ':' + args.client_secret;
-            urlQuery = "?grant_type=" + encodeURIComponent(args.grant_type) + 
-                   "&redirect_uri="+ encodeURIComponent(args.redirect_uri) +
-                   "&code="+ encodeURIComponent(args.code);
-
-            args = {};
+            delete args.client_id;
+            delete args.client_secret;
         }
 
         return this._metadataService.getTokenEndpoint(false).then(url => {
             Log.debug("TokenClient.exchangeCode: Received token endpoint");
-            return this._jsonService.postForm(url + urlQuery, args, basicAuth).then(response => {
+            return this._jsonService.postForm(url, args, basicAuth).then(response => {
                 Log.debug("TokenClient.exchangeCode: response received");
                 return response;
             });
@@ -80,6 +74,10 @@ export class TokenClient {
         args.client_id = args.client_id || this._settings.client_id;
         args.client_secret = args.client_secret || this._settings.client_secret;
 
+        var basicAuth = undefined;
+        var client_authentication = args._client_authentication || this._settings._client_authentication;
+        delete args._client_authentication;
+
         if (!args.refresh_token) {
             Log.error("TokenClient.exchangeRefreshToken: No refresh_token passed");
             return Promise.reject(new Error("A refresh_token is required"));
@@ -89,10 +87,18 @@ export class TokenClient {
             return Promise.reject(new Error("A client_id is required"));
         }
 
+        // Sending the client credentials using the Basic Auth method
+        if(client_authentication == "client_secret_basic")
+        {
+            basicAuth = args.client_id + ':' + args.client_secret;
+            delete args.client_id;
+            delete args.client_secret;
+        }
+
         return this._metadataService.getTokenEndpoint(false).then(url => {
             Log.debug("TokenClient.exchangeRefreshToken: Received token endpoint");
 
-            return this._jsonService.postForm(url, args).then(response => {
+            return this._jsonService.postForm(url, args, basicAuth).then(response => {
                 Log.debug("TokenClient.exchangeRefreshToken: response received");
                 return response;
             });
