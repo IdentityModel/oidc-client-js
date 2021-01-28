@@ -192,9 +192,9 @@ export class ResponseValidator {
                     }
                 }
                 else if (result[name] !== value) {
-                    if (typeof value === 'object') {
+                    if (typeof value === 'object' && this._settings.mergeClaims) {
                         result[name] = this._mergeClaims(result[name], value);
-                    } 
+                    }
                     else {
                         result[name] = [result[name], value];
                     }

@@ -31,6 +31,7 @@ export class OidcClientSettings {
         clockSkew = DefaultClockSkewInSeconds,
         clockService = new ClockService(),
         userInfoJwtIssuer = 'OP',
+        mergeClaims = false,
         // other behavior
         stateStore = new WebStorageStateStore(),
         ResponseValidatorCtor = ResponseValidator,
@@ -67,6 +68,7 @@ export class OidcClientSettings {
         this._clockSkew = clockSkew;
         this._clockService = clockService;
         this._userInfoJwtIssuer = userInfoJwtIssuer;
+        this._mergeClaims = !!mergeClaims;
 
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this);
@@ -194,7 +196,10 @@ export class OidcClientSettings {
     get userInfoJwtIssuer() {
         return this._userInfoJwtIssuer;
     }
-
+    get mergeClaims() {
+        return this._mergeClaims;
+    }
+    
     get stateStore() {
         return this._stateStore;
     }

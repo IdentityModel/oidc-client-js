@@ -544,13 +544,24 @@ describe("ResponseValidator", function () {
 
             var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ a: 'apple', c: 'carrot', b: 'banana' });
-
         });
 
-        it("should merge claims when claim types are objects", function () {
+        it("should not merge claims when claim types are objects", function () {
 
             var c1 = { custom: {'apple': 'foo', 'pear': 'bar'} };
             var c2 = { custom: {'apple': 'foo', 'orange': 'peel'}, b: 'banana' };
+
+            var result = subject._mergeClaims(c1, c2);
+            result.should.deep.equal({ custom: [{'apple': 'foo', 'pear': 'bar'}, {'apple': 'foo', 'orange': 'peel'}], b: 'banana' });
+        });
+
+        it("should merge claims when claim types are objects when mergeClaims settings is true", function () {
+
+            settings.mergeClaims = true;
+
+            var c1 = { custom: {'apple': 'foo', 'pear': 'bar'} };
+            var c2 = { custom: {'apple': 'foo', 'orange': 'peel'}, b: 'banana' };
+            
             var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ custom: {'apple': 'foo', 'pear': 'bar', 'orange': 'peel'}, b: 'banana' });
         });
@@ -562,7 +573,6 @@ describe("ResponseValidator", function () {
 
             var result = subject._mergeClaims(c1, c2);
             result.should.deep.equal({ a: ['apple', 'carrot'], b: 'banana' });
-
         });
 
         it("should merge arrays of same claim types into array", function () {
