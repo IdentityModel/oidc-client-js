@@ -20,7 +20,7 @@ export class SessionMonitor {
         this._userManager.events.addUserLoaded(this._start.bind(this));
         this._userManager.events.addUserUnloaded(this._stop.bind(this));
 
-        this._userManager.getUser().then(user => {
+        Promise.resolve(this._userManager.getUser().then(user => {
             // doing this manually here since calling getUser 
             // doesn't trigger load event.
             if (user) {
@@ -47,7 +47,7 @@ export class SessionMonitor {
         }).catch(err => {
             // catch to suppress errors since we're in a ctor
             Log.error("SessionMonitor ctor: error from getUser:", err.message);
-        });
+        }));
     }
 
     get _settings() {

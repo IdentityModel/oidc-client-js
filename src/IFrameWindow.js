@@ -21,8 +21,8 @@ export class IFrameWindow {
         // shotgun approach
         this._frame.style.visibility = "hidden";
         this._frame.style.position = "absolute";
-        this._frame.style.width = 0;
-        this._frame.style.height = 0;
+        this._frame.width = 0;
+        this._frame.height = 0;
 
         window.document.body.appendChild(this._frame);
     }
@@ -86,7 +86,8 @@ export class IFrameWindow {
 
         if (this._timer &&
             e.origin === this._origin &&
-            e.source === this._frame.contentWindow
+            e.source === this._frame.contentWindow &&
+            (typeof e.data === 'string' && (e.data.startsWith('http://') || e.data.startsWith('https://')))
         ) {
             let url = e.data;
             if (url) {

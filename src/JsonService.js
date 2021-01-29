@@ -96,7 +96,7 @@ export class JsonService {
         });
     }
 
-    postForm(url, payload) {
+    postForm(url, payload, basicAuth) {
         if (!url){
             Log.error("JsonService.postForm: No url passed");
             throw new Error("url");
@@ -197,6 +197,12 @@ export class JsonService {
             }
 
             req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            if (basicAuth !== undefined)
+            {
+                req.setRequestHeader("Authorization", "Basic " + btoa(basicAuth));
+            }
+
             req.send(body);
         });
     }

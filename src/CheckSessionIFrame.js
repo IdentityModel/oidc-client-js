@@ -22,8 +22,8 @@ export class CheckSessionIFrame {
         this._frame.style.visibility = "hidden";
         this._frame.style.position = "absolute";
         this._frame.style.display = "none";
-        this._frame.style.width = 0;
-        this._frame.style.height = 0;
+        this._frame.width = 0;
+        this._frame.height = 0;
 
         this._frame.src = url;
     }
