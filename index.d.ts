@@ -166,6 +166,11 @@ export interface OidcClientSettings {
   MetadataServiceCtor?: MetadataServiceCtor;
   /** An object containing additional query string parameters to be including in the authorization request */
   extraQueryParams?: Record<string, any>;
+  clockService: ClockService;
+}
+
+export interface ClockService {
+  getEpochTime(): Promise<number>;
 }
 
 export class UserManager extends OidcClient {
