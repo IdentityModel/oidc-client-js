@@ -167,7 +167,7 @@ export interface OidcClientSettings {
   /** An object containing additional query string parameters to be including in the authorization request */
   extraQueryParams?: Record<string, any>;
 
-  getEpochTime(): Promise<number>;
+  getEpochTime?(): Promise<number>;
 }
 
 export class UserManager extends OidcClient {
