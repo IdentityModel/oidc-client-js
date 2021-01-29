@@ -192,9 +192,9 @@ export class ResponseValidator {
                     }
                 }
                 else if (result[name] !== value) {
-                    if (typeof value === 'object') {
+                    if (typeof value === 'object' && this._settings.mergeClaims) {
                         result[name] = this._mergeClaims(result[name], value);
-                    } 
+                    }
                     else {
                         result[name] = [result[name], value];
                     }
@@ -282,20 +282,22 @@ export class ResponseValidator {
             let clockSkewInSeconds = this._settings.clockSkew;
             Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
-            return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds).then(payload => {
-            
-                if (state.nonce && state.nonce !== payload.nonce) {
-                    Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
-                    return Promise.reject(new Error("Invalid nonce in id_token"));
-                }
-
-                if (!payload.sub) {
-                    Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
-                    return Promise.reject(new Error("No sub present in id_token"));
-                }
-
-                response.profile = payload;
-                return response;
+            return this._settings.getEpochTime().then(now => {
+                return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds, now).then(payload => {
+                
+                    if (state.nonce && state.nonce !== payload.nonce) {
+                        Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
+                        return Promise.reject(new Error("Invalid nonce in id_token"));
+                    }
+    
+                    if (!payload.sub) {
+                        Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
+                        return Promise.reject(new Error("No sub present in id_token"));
+                    }
+    
+                    response.profile = payload;
+                    return response;
+                });
             });
         });
     }
@@ -303,6 +305,49 @@ export class ResponseValidator {
     _validateIdTokenAndAccessToken(state, response) {
         return this._validateIdToken(state, response).then(response => {
             return this._validateAccessToken(response);
+        });
+    }
+
+    _getSigningKeyForJwt(jwt) {
+        return this._metadataService.getSigningKeys().then(keys => {
+            const kid = jwt.header.kid;
+            if (!keys) {
+                Log.error("ResponseValidator._validateIdToken: No signing keys from metadata");
+                return Promise.reject(new Error("No signing keys from metadata"));
+            }
+
+            Log.debug("ResponseValidator._validateIdToken: Received signing keys");
+            let key;
+            if (!kid) {
+                keys = this._filterByAlg(keys, jwt.header.alg);
+
+                if (keys.length > 1) {
+                    Log.error("ResponseValidator._validateIdToken: No kid found in id_token and more than one key found in metadata");
+                    return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
+                } else {
+                    // kid is mandatory only when there are multiple keys in the referenced JWK Set document
+                    // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
+                    key = keys[0];
+                }
+            } else {
+                key = keys.filter(key => {
+                    return key.kid === kid;
+                })[0];
+            }
+            return Promise.resolve(key);
+        });
+    }
+
+    _getSigningKeyForJwtWithSingleRetry(jwt) {
+        return this._getSigningKeyForJwt(jwt).then(key => {
+            // Refreshing signingKeys if no suitable verification key is present for given jwt header.
+            if (!key) {
+                // set to undefined, to trigger network call to jwks_uri.
+                this._metadataService.resetSigningKeys();
+                return this._getSigningKeyForJwt(jwt);
+            } else {
+                return Promise.resolve(key);
+            }
         });
     }
 
@@ -323,38 +368,9 @@ export class ResponseValidator {
             return Promise.reject(new Error("Invalid nonce in id_token"));
         }
 
-        var kid = jwt.header.kid;
-
         return this._metadataService.getIssuer().then(issuer => {
             Log.debug("ResponseValidator._validateIdToken: Received issuer");
-
-            return this._metadataService.getSigningKeys().then(keys => {
-                if (!keys) {
-                    Log.error("ResponseValidator._validateIdToken: No signing keys from metadata");
-                    return Promise.reject(new Error("No signing keys from metadata"));
-                }
-
-                Log.debug("ResponseValidator._validateIdToken: Received signing keys");
-                let key;
-                if (!kid) {
-                    keys = this._filterByAlg(keys, jwt.header.alg);
-
-                    if (keys.length > 1) {
-                        Log.error("ResponseValidator._validateIdToken: No kid found in id_token and more than one key found in metadata");
-                        return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
-                    }
-                    else {
-                        // kid is mandatory only when there are multiple keys in the referenced JWK Set document
-                        // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
-                        key = keys[0];
-                    }
-                }
-                else {
-                    key = keys.filter(key => {
-                        return key.kid === kid;
-                    })[0];
-                }
-
+            return this._getSigningKeyForJwtWithSingleRetry(jwt).then(key => {
                 if (!key) {
                     Log.error("ResponseValidator._validateIdToken: No key matching kid or alg found in signing keys");
                     return Promise.reject(new Error("No key matching kid or alg found in signing keys"));

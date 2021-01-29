@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 import { Log } from './Log.js';
+import { ClockService } from './ClockService.js';
 import { WebStorageStateStore } from './WebStorageStateStore.js';
 import { ResponseValidator } from './ResponseValidator.js';
 import { MetadataService } from './MetadataService.js';
@@ -10,6 +11,7 @@ const OidcMetadataUrlPath = '.well-known/openid-configuration';
 
 const DefaultResponseType = "id_token";
 const DefaultScope = "openid";
+const DefaultClientAuthentication = "client_secret_post" // The default value must be client_secret_basic, as explained in https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
 const DefaultStaleStateAge = 60 * 15; // seconds
 const DefaultClockSkewInSeconds = 60 * 5;
 
@@ -20,12 +22,16 @@ export class OidcClientSettings {
         // client related
         client_id, client_secret, response_type = DefaultResponseType, scope = DefaultScope,
         redirect_uri, post_logout_redirect_uri,
+        client_authentication = DefaultClientAuthentication,
         // optional protocol
         prompt, display, max_age, ui_locales, acr_values, resource, response_mode,
         // behavior flags
         filterProtocolClaims = true, loadUserInfo = true,
-        staleStateAge = DefaultStaleStateAge, clockSkew = DefaultClockSkewInSeconds,
+        staleStateAge = DefaultStaleStateAge, 
+        clockSkew = DefaultClockSkewInSeconds,
+        clockService = new ClockService(),
         userInfoJwtIssuer = 'OP',
+        mergeClaims = false,
         // other behavior
         stateStore = new WebStorageStateStore(),
         ResponseValidatorCtor = ResponseValidator,
@@ -46,6 +52,7 @@ export class OidcClientSettings {
         this._scope = scope;
         this._redirect_uri = redirect_uri;
         this._post_logout_redirect_uri = post_logout_redirect_uri;
+        this._client_authentication = client_authentication;
 
         this._prompt = prompt;
         this._display = display;
@@ -59,7 +66,9 @@ export class OidcClientSettings {
         this._loadUserInfo = !!loadUserInfo;
         this._staleStateAge = staleStateAge;
         this._clockSkew = clockSkew;
+        this._clockService = clockService;
         this._userInfoJwtIssuer = userInfoJwtIssuer;
+        this._mergeClaims = !!mergeClaims;
 
         this._stateStore = stateStore;
         this._validator = new ResponseValidatorCtor(this);
@@ -98,7 +107,10 @@ export class OidcClientSettings {
     get post_logout_redirect_uri() {
         return this._post_logout_redirect_uri;
     }
-
+    get client_authentication() {
+        return this._client_authentication;
+    }
+    
 
     // optional protocol params
     get prompt() {
@@ -184,7 +196,10 @@ export class OidcClientSettings {
     get userInfoJwtIssuer() {
         return this._userInfoJwtIssuer;
     }
-
+    get mergeClaims() {
+        return this._mergeClaims;
+    }
+    
     get stateStore() {
         return this._stateStore;
     }
@@ -217,5 +232,10 @@ export class OidcClientSettings {
         } else {
             this._extraTokenParams = {};
         }
+    }
+
+    // get the time
+    getEpochTime() {
+        return this._clockService.getEpochTime();
     }
 }

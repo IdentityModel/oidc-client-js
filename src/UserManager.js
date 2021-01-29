@@ -160,7 +160,6 @@ export class UserManager extends OidcClient {
     signinSilent(args = {}) {
         args = Object.assign({}, args);
 
-        args.request_type = "si:s";
         // first determine if we have a refresh token, or need to use iframe
         return this._loadUser().then(user => {
             if (user && user.refresh_token) {
@@ -168,6 +167,7 @@ export class UserManager extends OidcClient {
                 return this._useRefreshToken(args);
             }
             else {
+                args.request_type = "si:s";
                 args.id_token_hint = args.id_token_hint || (this.settings.includeIdTokenInSilentRenew && user && user.id_token);
                 if (user && this._settings.validateSubOnSilentRenew) {
                     Log.debug("UserManager.signinSilent, subject prior to silent renew: ", user.profile.sub);
@@ -198,7 +198,7 @@ export class UserManager extends OidcClient {
 
                     return idTokenValidation.then(() => {
                         Log.debug("UserManager._useRefreshToken: refresh token response success");
-                        user.id_token = result.id_token;
+                        user.id_token = result.id_token || user.id_token;
                         user.access_token = result.access_token;
                         user.refresh_token = result.refresh_token || user.refresh_token;
                         user.expires_in = result.expires_in;
@@ -218,27 +218,29 @@ export class UserManager extends OidcClient {
 
     _validateIdTokenFromTokenRefreshToken(profile, id_token) {
         return this._metadataService.getIssuer().then(issuer => {
-            return this._joseUtil.validateJwtAttributes(id_token, issuer, this._settings.client_id, this._settings.clockSkew).then(payload => {
-                if (!payload) {
-                    Log.error("UserManager._validateIdTokenFromTokenRefreshToken: Failed to validate id_token");
-                    return Promise.reject(new Error("Failed to validate id_token"));
-                }
-                if (payload.sub !== profile.sub) {
-                    Log.error("UserManager._validateIdTokenFromTokenRefreshToken: sub in id_token does not match current sub");
-                    return Promise.reject(new Error("sub in id_token does not match current sub"));
-                }
-                if (payload.auth_time && payload.auth_time !== profile.auth_time) {
-                    Log.error("UserManager._validateIdTokenFromTokenRefreshToken: auth_time in id_token does not match original auth_time");
-                    return Promise.reject(new Error("auth_time in id_token does not match original auth_time"));
-                }
-                if (payload.azp && payload.azp !== profile.azp) {
-                    Log.error("UserManager._validateIdTokenFromTokenRefreshToken: azp in id_token does not match original azp");
-                    return Promise.reject(new Error("azp in id_token does not match original azp"));
-                }
-                if (!payload.azp && profile.azp) {
-                    Log.error("UserManager._validateIdTokenFromTokenRefreshToken: azp not in id_token, but present in original id_token");
-                    return Promise.reject(new Error("azp not in id_token, but present in original id_token"));
-                }
+            return this.settings.getEpochTime().then(now => {
+                return this._joseUtil.validateJwtAttributes(id_token, issuer, this._settings.client_id, this._settings.clockSkew, now).then(payload => {
+                    if (!payload) {
+                        Log.error("UserManager._validateIdTokenFromTokenRefreshToken: Failed to validate id_token");
+                        return Promise.reject(new Error("Failed to validate id_token"));
+                    }
+                    if (payload.sub !== profile.sub) {
+                        Log.error("UserManager._validateIdTokenFromTokenRefreshToken: sub in id_token does not match current sub");
+                        return Promise.reject(new Error("sub in id_token does not match current sub"));
+                    }
+                    if (payload.auth_time && payload.auth_time !== profile.auth_time) {
+                        Log.error("UserManager._validateIdTokenFromTokenRefreshToken: auth_time in id_token does not match original auth_time");
+                        return Promise.reject(new Error("auth_time in id_token does not match original auth_time"));
+                    }
+                    if (payload.azp && payload.azp !== profile.azp) {
+                        Log.error("UserManager._validateIdTokenFromTokenRefreshToken: azp in id_token does not match original azp");
+                        return Promise.reject(new Error("azp in id_token does not match original azp"));
+                    }
+                    if (!payload.azp && profile.azp) {
+                        Log.error("UserManager._validateIdTokenFromTokenRefreshToken: azp not in id_token, but present in original id_token");
+                        return Promise.reject(new Error("azp not in id_token, but present in original id_token"));
+                    }
+                });
             });
         });
     }

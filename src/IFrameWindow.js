@@ -21,9 +21,8 @@ export class IFrameWindow {
         // shotgun approach
         this._frame.style.visibility = "hidden";
         this._frame.style.position = "absolute";
-        this._frame.style.display = "none";
-        this._frame.style.width = 0;
-        this._frame.style.height = 0;
+        this._frame.width = 0;
+        this._frame.height = 0;
 
         window.document.body.appendChild(this._frame);
     }
@@ -87,7 +86,8 @@ export class IFrameWindow {
 
         if (this._timer &&
             e.origin === this._origin &&
-            e.source === this._frame.contentWindow
+            e.source === this._frame.contentWindow &&
+            (typeof e.data === 'string' && (e.data.startsWith('http://') || e.data.startsWith('https://')))
         ) {
             let url = e.data;
             if (url) {
@@ -105,12 +105,10 @@ export class IFrameWindow {
 
     static notifyParent(url) {
         Log.debug("IFrameWindow.notifyParent");
-        if (window.frameElement) {
-            url = url || window.location.href;
-            if (url) {
-                Log.debug("IFrameWindow.notifyParent: posting url message to parent");
-                window.parent.postMessage(url, location.protocol + "//" + location.host);
-            }
+        url = url || window.location.href;
+        if (url) {
+            Log.debug("IFrameWindow.notifyParent: posting url message to parent");
+            window.parent.postMessage(url, location.protocol + "//" + location.host);
         }
     }
 }

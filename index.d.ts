@@ -57,9 +57,11 @@ export class Log {
 }
 
 export interface MetadataService {
-  new (settings: OidcClientSettings): MetadataService;
+  new(settings: OidcClientSettings): MetadataService;
 
   metadataUrl?: string;
+  
+  resetSigningKeys(): void;
 
   getMetadata(): Promise<OidcMetadata>;
 
@@ -69,7 +71,7 @@ export interface MetadataService {
 
   getUserInfoEndpoint(): Promise<string>;
 
-  getTokenEndpoint(): Promise<string | undefined>;
+  getTokenEndpoint(optional: boolean = true): Promise<string | undefined>;
 
   getCheckSessionIframe(): Promise<string | undefined>;
 
@@ -156,12 +158,16 @@ export interface OidcClientSettings {
   readonly staleStateAge?: number;
   /** The window of time (in seconds) to allow the current time to deviate when validating id_token's iat, nbf, and exp values (default: 300) */
   readonly clockSkew?: number;
+  readonly clockService?: ClockService;
   readonly stateStore?: StateStore;
   readonly userInfoJwtIssuer?: 'ANY' | 'OP' | string;
+  readonly mergeClaims?: boolean;
   ResponseValidatorCtor?: ResponseValidatorCtor;
   MetadataServiceCtor?: MetadataServiceCtor;
   /** An object containing additional query string parameters to be including in the authorization request */
   extraQueryParams?: Record<string, any>;
+
+  getEpochTime(): Promise<number>;
 }
 
 export class UserManager extends OidcClient {
@@ -208,7 +214,7 @@ export class UserManager extends OidcClient {
   signinCallback(url?: string): Promise<User>;
 
   /** Proxy to Popup and Redirect callbacks */
-  signoutCallback(url?: string): Promise<SignoutResponse | void>;
+  signoutCallback(url?: string, keepWindowOpen?: boolean): Promise<SignoutResponse | undefined>;
 
   /** Query OP for user's current signin status */
   querySessionStatus(args?: any): Promise<SessionStatus>;
@@ -257,6 +263,10 @@ export interface UserManagerEvents extends AccessTokenEvents {
   addSilentRenewError(callback: UserManagerEvents.SilentRenewErrorCallback): void;
   removeSilentRenewError(callback: UserManagerEvents.SilentRenewErrorCallback): void;
 
+  /** Subscribe to events raised when the user's signed-in */
+  addUserSignedIn(callback: UserManagerEvents.UserSignedInCallback): void;
+  removeUserSignedIn(callback: UserManagerEvents.UserSignedInCallback): void;
+  
   /** Subscribe to events raised when the user's sign-in status at the OP has changed */
   addUserSignedOut(callback: UserManagerEvents.UserSignedOutCallback): void;
   removeUserSignedOut(callback: UserManagerEvents.UserSignedOutCallback): void;
@@ -270,6 +280,7 @@ export namespace UserManagerEvents {
   export type UserLoadedCallback = (user: User) => void;
   export type UserUnloadedCallback = () => void;
   export type SilentRenewErrorCallback = (error: Error) => void;
+  export type UserSignedInCallback = () => void;
   export type UserSignedOutCallback = () => void;
   export type UserSessionChangedCallback = () => void;
 }
@@ -309,6 +320,10 @@ export interface UserManagerSettings extends OidcClientSettings {
   readonly userStore?: WebStorageStateStore;
 }
 
+export interface ClockService {
+  getEpochTime(): Promise<number>;
+}
+
 export interface WebStorageStateStoreSettings {
   prefix?: string;
   store?: any;
@@ -337,9 +352,12 @@ export class WebStorageStateStore implements StateStore {
 }
 
 export interface SigninResponse {
-  new (url: string, delimiter?: string): SigninResponse;
+  new(url: string, delimiter?: string): SigninResponse;
 
   access_token: string;
+  /** Refresh token returned from the OIDC provider (if requested, via the
+   * 'offline_access' scope) */
+  refresh_token?: string;
   code: string;
   error: string;
   error_description: string;
@@ -358,7 +376,7 @@ export interface SigninResponse {
 }
 
 export interface SignoutResponse {
-  new (url: string): SignoutResponse;
+  new(url: string): SignoutResponse;
 
   error?: string;
   error_description?: string;
@@ -515,9 +533,9 @@ export class CordovaIFrameNavigator {
 
 export interface OidcMetadata {
   issuer: string;
-  authorization_endpoint:string;
+  authorization_endpoint: string;
   token_endpoint: string;
-  token_endpoint_auth_methods_supported:string[];
+  token_endpoint_auth_methods_supported: string[];
   token_endpoint_auth_signing_alg_values_supported: string[];
   userinfo_endpoint: string;
   check_session_iframe: string;
@@ -554,7 +572,7 @@ export interface OidcMetadata {
 }
 
 export interface CheckSessionIFrame {
-  new (callback: () => void, client_id: string, url: string, interval?: number, stopOnError?: boolean): CheckSessionIFrame
+  new(callback: () => void, client_id: string, url: string, interval?: number, stopOnError?: boolean): CheckSessionIFrame
 
   load(): Promise<void>;
 
