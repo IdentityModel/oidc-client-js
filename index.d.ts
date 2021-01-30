@@ -71,7 +71,7 @@ export interface MetadataService {
 
   getUserInfoEndpoint(): Promise<string>;
 
-  getTokenEndpoint(optional: boolean = true): Promise<string | undefined>;
+  getTokenEndpoint(optional?: boolean): Promise<string | undefined>;
 
   getCheckSessionIframe(): Promise<string | undefined>;
 
