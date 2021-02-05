@@ -60,7 +60,8 @@ export class MetadataService {
                 Log.debug("MetadataService.getMetadata: json received");
                 
                 var seed = this._settings.metadataSeed || {};
-                this._settings.metadata = Object.assign({}, seed, metadata);
+                var override = this._settings.metadataOverride || {};
+                this._settings.metadata = Object.assign({}, seed, metadata, override);
                 return this._settings.metadata;
             });
     }

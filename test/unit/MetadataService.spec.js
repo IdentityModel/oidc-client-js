@@ -93,12 +93,12 @@ describe("MetadataService", function() {
 
         it("should return metadata from json call", function(done) {
             settings.metadataUrl = "http://sts/metadata";
-            stubJsonService.result = Promise.resolve("test");
+            stubJsonService.result = Promise.resolve({test: "test"});
 
             let p = subject.getMetadata();
 
             p.then(result => {
-                result.should.equal("test");
+                result.should.deep.equal({test: "test"});
                 done();
             });
         });
@@ -118,7 +118,7 @@ describe("MetadataService", function() {
         it.only("should merge metadata from seed", function(done) {
             settings.metadataUrl = "http://sts/metadata";
             settings.metadataSeed = {test1:"one"};
-            stubJsonService.result = Promise.resolve({test2:"two"});
+            stubJsonService.result = Promise.resolve({test1: "two", test2:"two"});
 
             let p = subject.getMetadata();
 
@@ -137,6 +137,29 @@ describe("MetadataService", function() {
 
             p.then(null, err => {
                 err.message.should.contain("test");
+                done();
+            });
+        });
+
+        it("should openid-configuration be overridable", function(done) {
+            settings.metadataUrl = "http://sts/metadata";
+            settings.metadataOverride = {
+                property2: "overrided",
+            }
+            const response = {
+                property1: "original1",
+                property2: "original2"
+            }
+            const expected =  {
+                property1: "original1",
+                property2: "overrided"
+            }
+            stubJsonService.result = Promise.resolve(response);
+
+            let p = subject.getMetadata();
+
+            p.then(result => {
+                result.should.deep.equal(expected);
                 done();
             });
         });

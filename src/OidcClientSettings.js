@@ -18,7 +18,7 @@ const DefaultClockSkewInSeconds = 60 * 5;
 export class OidcClientSettings {
     constructor({
         // metadata related
-        authority, metadataUrl, metadata, signingKeys, metadataSeed,
+        authority, metadataUrl, metadata, metadataOverride, signingKeys, metadataSeed,
         // client related
         client_id, client_secret, response_type = DefaultResponseType, scope = DefaultScope,
         redirect_uri, post_logout_redirect_uri,
@@ -45,6 +45,7 @@ export class OidcClientSettings {
         this._metadataUrl = metadataUrl;
         this._metadata = metadata;
         this._metadataSeed = metadataSeed;
+        this._metadataOverride = metadataOverride;
         this._signingKeys = signingKeys;
 
         this._client_id = client_id;
@@ -178,6 +179,13 @@ export class OidcClientSettings {
     }
     set metadataSeed(value) {
         this._metadataSeed = value;
+    }
+
+    get metadataOverride() {
+        return this._metadataOverride;
+    }
+    set metadataOverride(value) {
+        this._metadataOverride = value;
     }
 
     get signingKeys() {
