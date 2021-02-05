@@ -44,7 +44,8 @@ export class OidcClient {
         // have round tripped, but people were getting confused, so i added state (since that matches the spec)
         // and so now if data is not passed, but state is then state will be used
         data, state, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
-        resource, request, request_uri, response_mode, extraQueryParams, extraTokenParams, request_type, skipUserInfo } = {},
+        resource, request, request_uri, response_mode, extraQueryParams, extraTokenParams, request_type,
+        skipUserInfo, access_type } = {},
         stateStore
     ) {
         Log.debug("OidcClient.createSigninRequest");
@@ -56,6 +57,7 @@ export class OidcClient {
 
         // id_token_hint, login_hint aren't allowed on _settings
         prompt = prompt || this._settings.prompt;
+        access_type = access_type || this._settings.access_type;
         display = display || this._settings.display;
         max_age = max_age || this._settings.max_age;
         ui_locales = ui_locales || this._settings.ui_locales;
@@ -82,7 +84,7 @@ export class OidcClient {
                 scope,
                 data: data || state,
                 authority,
-                prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
+                prompt, access_type, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
                 resource, request, request_uri, extraQueryParams, extraTokenParams, request_type, response_mode,
                 client_secret: this._settings.client_secret,
                 skipUserInfo

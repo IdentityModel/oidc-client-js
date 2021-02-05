@@ -11,7 +11,8 @@ export class SigninRequest {
         url, client_id, redirect_uri, response_type, scope, authority,
         // optional
         data, prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, response_mode,
-        request, request_uri, extraQueryParams, request_type, client_secret, extraTokenParams, skipUserInfo
+        request, request_uri, extraQueryParams, request_type, client_secret, extraTokenParams, skipUserInfo,
+        access_type,
     }) {
         if (!url) {
             Log.error("SigninRequest.ctor: No url passed");
@@ -65,7 +66,10 @@ export class SigninRequest {
             url = UrlUtility.addQueryParam(url, "code_challenge_method", "S256");
         }
 
-        var optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri, response_mode };
+        var optional = {
+            prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values,
+            resource, request, request_uri, response_mode, access_type,
+        };
         for(let key in optional){
             if (optional[key]) {
                 url = UrlUtility.addQueryParam(url, key, optional[key]);
