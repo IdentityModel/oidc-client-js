@@ -8,6 +8,7 @@ import { User } from './User.js';
 import { UserManagerEvents } from './UserManagerEvents.js';
 import { SilentRenewService } from './SilentRenewService.js';
 import { SessionMonitor } from './SessionMonitor.js';
+import { SigninRequest } from "./SigninRequest";
 import { TokenRevocationClient } from './TokenRevocationClient.js';
 import { TokenClient } from './TokenClient.js';
 import { JoseUtil } from './JoseUtil.js';
@@ -424,7 +425,9 @@ export class UserManager extends OidcClient {
     }
     _signinCallback(url, navigator) {
         Log.debug("UserManager._signinCallback");
-        return navigator.callback(url);
+        let useQuery = this._settings.response_mode === "query" || (!this._settings.response_mode && SigninRequest.isCode(this._settings.response_type));
+        let delimiter = useQuery ? "?" : "#";
+        return navigator.callback(url, undefined, delimiter);
     }
 
     signoutRedirect(args = {}) {
