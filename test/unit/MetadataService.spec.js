@@ -105,12 +105,25 @@ describe("MetadataService", function() {
 
         it("should cache metadata from json call", function(done) {
             settings.metadataUrl = "http://sts/metadata";
-            stubJsonService.result = Promise.resolve("test");
+            stubJsonService.result = Promise.resolve({test:"value"});
 
             let p = subject.getMetadata();
 
             p.then(result => {
-                settings.metadata.should.equal("test");
+                settings.metadata.should.deep.equal({test:"value"});
+                done();
+            });
+        });
+
+        it("should merge metadata from seed", function(done) {
+            settings.metadataUrl = "http://sts/metadata";
+            settings.metadataSeed = {test1:"one"};
+            stubJsonService.result = Promise.resolve({test2:"two"});
+
+            let p = subject.getMetadata();
+
+            p.then(result => {
+                settings.metadata.should.deep.equal({test1:"one", test2:"two"});
                 done();
             });
         });

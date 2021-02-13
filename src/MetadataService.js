@@ -58,7 +58,11 @@ export class MetadataService {
         return this._jsonService.getJson(this.metadataUrl)
             .then(metadata => {
                 Log.debug("MetadataService.getMetadata: json received");
-                this._settings.metadata = metadata;
+                
+                var mergedMetadata = this._settings.metadataSeed || {};
+                Object.assign(mergedMetadata, metadata);
+                
+                this._settings.metadata = mergedMetadata;
                 return metadata;
             });
     }
