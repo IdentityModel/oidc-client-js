@@ -93,26 +93,24 @@ describe("MetadataService", function() {
 
         it("should return metadata from json call", function(done) {
             settings.metadataUrl = "http://sts/metadata";
-            const expected = { test: "test" };
-            stubJsonService.result = Promise.resolve(expected);
+            stubJsonService.result = Promise.resolve("test");
 
             let p = subject.getMetadata();
 
             p.then(result => {
-                result.should.deep.equal(expected);
+                result.should.equal("test");
                 done();
             });
         });
 
         it("should cache metadata from json call", function(done) {
             settings.metadataUrl = "http://sts/metadata";
-            const expected = { test: "test" };
-            stubJsonService.result = Promise.resolve(expected);
+            stubJsonService.result = Promise.resolve("test");
 
             let p = subject.getMetadata();
 
             p.then(result => {
-                settings.metadata.should.deep.equal(expected);
+                settings.metadata.should.equal("test");
                 done();
             });
         });
@@ -125,27 +123,6 @@ describe("MetadataService", function() {
 
             p.then(null, err => {
                 err.message.should.contain("test");
-                done();
-            });
-        });
-
-        it("should return merge openid-configuration  from json call and injected metadata", function(done) {
-            settings.metadataUrl = "http://sts/metadata";
-            settings.metadata = {
-                property1: "injected",
-                property2: "injected"
-            }
-            const response = { property2: "merged" };
-            const expected =  {
-                property1: "injected",
-                property2: "merged"
-            }
-            stubJsonService.result = Promise.resolve(response);
-
-            let p = subject.getMetadata();
-
-            p.then(result => {
-                result.should.deep.equal(expected);
                 done();
             });
         });
