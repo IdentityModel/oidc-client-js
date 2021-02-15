@@ -115,7 +115,7 @@ describe("MetadataService", function() {
             });
         });
 
-        it("should merge metadata from seed", function(done) {
+        it.only("should merge metadata from seed", function(done) {
             settings.metadataUrl = "http://sts/metadata";
             settings.metadataSeed = {test1:"one"};
             stubJsonService.result = Promise.resolve({test2:"two"});
@@ -123,6 +123,7 @@ describe("MetadataService", function() {
             let p = subject.getMetadata();
 
             p.then(result => {
+                result.should.deep.equal({test1:"one", test2:"two"});
                 settings.metadata.should.deep.equal({test1:"one", test2:"two"});
                 done();
             });
