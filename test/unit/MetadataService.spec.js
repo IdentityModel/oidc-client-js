@@ -93,12 +93,12 @@ describe("MetadataService", function() {
 
         it("should return metadata from json call", function(done) {
             settings.metadataUrl = "http://sts/metadata";
-            stubJsonService.result = Promise.resolve("test");
+            stubJsonService.result = Promise.resolve({"test":"data"});
 
             let p = subject.getMetadata();
 
             p.then(result => {
-                result.should.equal("test");
+                result.should.deep.equal({"test":"data"});
                 done();
             });
         });
@@ -123,6 +123,7 @@ describe("MetadataService", function() {
             let p = subject.getMetadata();
 
             p.then(result => {
+                result.should.deep.equal({test1:"one", test2:"two"});
                 settings.metadata.should.deep.equal({test1:"one", test2:"two"});
                 done();
             });
