@@ -166,6 +166,7 @@ export interface OidcClientSettings {
   MetadataServiceCtor?: MetadataServiceCtor;
   /** An object containing additional query string parameters to be including in the authorization request */
   extraQueryParams?: Record<string, any>;
+  extraTokenParams?: Record<string, any>;
 }
 
 export class UserManager extends OidcClient {
