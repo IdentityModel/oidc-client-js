@@ -246,4 +246,18 @@ describe("UserManagerSettings", function () {
             subject.stopCheckSessionOnError.should.be.true;
         });
     });
+
+    describe("userSessionError", function() {
+        it("should return value from initial settings", function() {
+            let subject = new UserManagerSettings({
+                propagateUserSessionError : true
+            });
+            subject.propagateUserSessionError.should.be.true;
+        });
+        it("should use default value", function () {
+            let subject = new UserManagerSettings({
+            });
+            subject.propagateUserSessionError.should.be.false;
+        });
+    });
 });

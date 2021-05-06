@@ -6,6 +6,7 @@
 *.user
 *.sln.docstates
 .idea/
+*.iml
 
 # Build results
 
@@ -17,7 +18,8 @@ build/
 [Oo]bj/
 bower_components/
 node_modules/
-
+dist
+lib
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
 

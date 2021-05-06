@@ -15,6 +15,7 @@ export class UserManagerEvents extends AccessTokenEvents {
         this._userSignedIn = new Event("User signed in");
         this._userSignedOut = new Event("User signed out");
         this._userSessionChanged = new Event("User session changed");
+        this._userSessionError = new Event("User session error");
     }
 
     load(user, raiseEvent=true) {
@@ -86,5 +87,16 @@ export class UserManagerEvents extends AccessTokenEvents {
     _raiseUserSessionChanged() {
         Log.debug("UserManagerEvents._raiseUserSessionChanged");
         this._userSessionChanged.raise();
+    }
+
+    addUserSessionError(cb) {
+        this._userSessionError.addHandler(cb);
+    }
+    removeUserSessionError(cb) {
+        this._userSessionError.removeHandler(cb);
+    }
+    _raiseUserSessionError() {
+        Log.debug("UserManagerEvents._raiseUserSessionError");
+        this._userSessionError.raise();
     }
 }

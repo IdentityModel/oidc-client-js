@@ -6,12 +6,14 @@ import { Log } from './Log.js';
 const DefaultInterval = 2000;
 
 export class CheckSessionIFrame {
-    constructor(callback, client_id, url, interval, stopOnError = true) {
+    constructor(callback, client_id, url, interval, stopOnError = true, propagateUserSessionError, userSessionErrorCallback) {
         this._callback = callback;
         this._client_id = client_id;
         this._url = url;
         this._interval = interval || DefaultInterval;
         this._stopOnError = stopOnError;
+        this._propagateUserSessionError = propagateUserSessionError;
+        this._userSessionErrorCallback = userSessionErrorCallback;
 
         var idx = url.indexOf("/", url.indexOf("//") + 2);
         this._frame_origin = url.substr(0, idx);
@@ -44,8 +46,12 @@ export class CheckSessionIFrame {
         ) {
             if (e.data === "error") {
                 Log.error("CheckSessionIFrame: error message from check session op iframe");
-                if (this._stopOnError) {
+                if (this._stopOnError && !this._propagateUserSessionError) {
                     this.stop();
+                }
+
+                if (this._propagateUserSessionError) {
+                    this._userSessionErrorCallback();
                 }
             }
             else if (e.data === "changed") {
