@@ -131,6 +131,8 @@ export interface OidcClientSettings {
   metadata?: Partial<OidcMetadata>;
   /** Provide signingKeys when authority server does not allow CORS on the jwks uri */
   signingKeys?: any[];
+  /** Can be used to seed or add additional values to the results of the discovery request */
+  metadataSeed?: Partial<OidcMetadata>;
   /** Your client application's identifier as registered with the OIDC/OAuth2 */
   client_id?: string;
   client_secret?: string;
@@ -252,11 +254,11 @@ export interface UserManagerEvents extends AccessTokenEvents {
   addSilentRenewError(callback: UserManagerEvents.SilentRenewErrorCallback): void;
   removeSilentRenewError(callback: UserManagerEvents.SilentRenewErrorCallback): void;
 
-  /** Subscribe to events raised when the user's signed-in */
+  /** When `monitorSession` subscribe to events raised when the user's signed-in */
   addUserSignedIn(callback: UserManagerEvents.UserSignedInCallback): void;
   removeUserSignedIn(callback: UserManagerEvents.UserSignedInCallback): void;
   
-  /** Subscribe to events raised when the user's sign-in status at the OP has changed */
+  /** When `monitorSession` subscribe to events raised when the user's sign-in status at the OP has changed */
   addUserSignedOut(callback: UserManagerEvents.UserSignedOutCallback): void;
   removeUserSignedOut(callback: UserManagerEvents.UserSignedOutCallback): void;
 
