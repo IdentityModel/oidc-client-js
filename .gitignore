@@ -161,3 +161,6 @@ source/IdentityServer3.sln.GhostDoc.xml
 #nyc reports
 /.nyc_output
 /coverage
+
+#VS code files
+/.vscode

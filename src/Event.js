@@ -15,7 +15,7 @@ export class Event {
     }
 
     removeHandler(cb) {
-        var idx = this._callbacks.findIndex(item => item === cb);
+        const idx = this._callbacks.findIndex(item => item === cb);
         if (idx >= 0) {
             this._callbacks.splice(idx, 1);
         }

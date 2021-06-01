@@ -26,7 +26,7 @@ export class UrlUtility {
             value = global.location.href;
         }
 
-        var idx = value.lastIndexOf(delimiter);
+        let idx = value.lastIndexOf(delimiter);
         if (idx >= 0) {
             value = value.substr(idx + 1);
         }
@@ -39,11 +39,11 @@ export class UrlUtility {
             }
         }
 
-        var params = {},
-            regex = /([^&=]+)=([^&]*)/g,
-            m;
+        const params = {},
+            regex = /([^&=]+)=([^&]*)/g;
+        let m;
 
-        var counter = 0;
+        let counter = 0;
         while (m = regex.exec(value)) {
             params[decodeURIComponent(m[1])] = decodeURIComponent(m[2].replace(/\+/g, ' '));
             if (counter++ > 50) {
@@ -53,8 +53,8 @@ export class UrlUtility {
                 };
             }
         }
-
-        for (var prop in params) {
+        
+        for (let prop in params) {
             return params;
         }
 

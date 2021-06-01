@@ -48,48 +48,43 @@ export class State {
 
     static clearStaleState(storage, age) {
 
-        var cutoff = Date.now() / 1000 - age;
+        const cutoff = Date.now() / 1000 - age;
 
-        return storage.getAllKeys().then(keys => {
-            Log.debug("State.clearStaleState: got keys", keys);
+        return storage.getAllKeys()
+            .then(keys => {
+                Log.debug("State.clearStaleState: got keys", keys);
 
-            var promises = [];
-            for (let i = 0; i < keys.length; i++) {
-                let key = keys[i];
-                var p = storage.get(key).then(item => {
-                    let remove = false;
+                const promises = keys.map(key => storage.get(key)
+                    .then(item => {
+                        let remove = false;
 
-                    if (item) {
-                        try {
-                            var state = State.fromStorageString(item)
+                        if (item) {
+                            try {
+                                const state = State.fromStorageString(item);
 
-                            Log.debug("State.clearStaleState: got item from key: ", key, state.created);
+                                Log.debug("State.clearStaleState: got item from key: ", key, state.created);
 
-                            if (state.created <= cutoff) {
+                                if (state.created <= cutoff) {
+                                    remove = true;
+                                }
+                            } catch (e) {
+                                Log.error("State.clearStaleState: Error parsing state for key", key, e.message);
                                 remove = true;
                             }
-                        }
-                        catch (e) {
-                            Log.error("State.clearStaleState: Error parsing state for key", key, e.message);
+                        } else {
+                            Log.debug("State.clearStaleState: no item in storage for key: ", key);
                             remove = true;
                         }
-                    }
-                    else {
-                        Log.debug("State.clearStaleState: no item in storage for key: ", key);
-                        remove = true;
-                    }
 
-                    if (remove) {
-                        Log.debug("State.clearStaleState: removed item for key: ", key);
-                        return storage.remove(key);
-                    }
-                });
+                        if (remove) {
+                            Log.debug("State.clearStaleState: removed item for key: ", key);
+                            return storage.remove(key);
+                        }
+                    })
+                );
 
-                promises.push(p);
-            }
-
-            Log.debug("State.clearStaleState: waiting on promise count:", promises.length);
-            return Promise.all(promises);
-        });
+                Log.debug("State.clearStaleState: waiting on promise count:", promises.length);
+                return Promise.all(promises);
+            });
     }
 }

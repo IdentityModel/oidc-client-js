@@ -31,22 +31,22 @@ export class Timer extends Event {
         }
         duration = parseInt(duration);
 
-        var expiration = this.now + duration;
+        const expiration = this.now + duration;
         if (this.expiration === expiration && this._timerHandle) {
             // no need to reinitialize to same expiration, so bail out
-            Log.debug("Timer.init timer " + this._name + " skipping initialization since already initialized for expiration:", this.expiration);
+            Log.debug(`Timer.init timer ${this._name} skipping initialization since already initialized for expiration:`, this.expiration);
             return;
         }
 
         this.cancel();
 
-        Log.debug("Timer.init timer " + this._name + " for duration:", duration);
+        Log.debug(`Timer.init timer ${this._name} for duration:`, duration);
         this._expiration = expiration;
 
         // we're using a fairly short timer and then checking the expiration in the
         // callback to handle scenarios where the browser device sleeps, and then
         // the timers end up getting delayed.
-        var timerDuration = TimerDuration;
+        let timerDuration = TimerDuration;
         if (duration < timerDuration) {
             timerDuration = duration;
         }
@@ -66,8 +66,8 @@ export class Timer extends Event {
     }
 
     _callback() {
-        var diff = this._expiration - this.now;
-        Log.debug("Timer.callback; " + this._name + " timer expires in:", diff);
+        const diff = this._expiration - this.now;
+        Log.debug(`Timer.callback; ${this._name} timer expires in:`, diff);
 
         if (this._expiration <= this.now) {
             this.cancel();

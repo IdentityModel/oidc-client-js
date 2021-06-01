@@ -7,7 +7,7 @@ import { PopupWindow } from './PopupWindow.js';
 export class PopupNavigator {
 
     prepare(params) {
-        let popup = new PopupWindow(params);
+        const popup = new PopupWindow(params);
         return Promise.resolve(popup);
     }
 

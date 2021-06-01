@@ -6,7 +6,7 @@ import { UrlUtility } from './UrlUtility.js';
 export class SignoutResponse {
     constructor(url) {
 
-        var values = UrlUtility.parseUrlFragment(url, "?");
+        const values = UrlUtility.parseUrlFragment(url, "?");
 
         this.error = values.error;
         this.error_description = values.error_description;
