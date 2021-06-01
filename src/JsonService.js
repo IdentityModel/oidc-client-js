@@ -171,14 +171,10 @@ export class JsonService {
                 reject(Error("Network Error"));
             };
 
-            let body = [];
-            for(let key in payload) {
-                let value = payload[key];
-
-                if (value) {
-                    body.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
-                }
-            }
+            const body = Object.keys(payload)                
+                .filter(key => !!payload[key])
+                .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(payload[key])}`)
+                .join("&");
 
             req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
@@ -187,7 +183,7 @@ export class JsonService {
                 req.setRequestHeader("Authorization", "Basic " + btoa(basicAuth));
             }
 
-            req.send(body.join("&"));
+            req.send(body);
         });
     }
 }

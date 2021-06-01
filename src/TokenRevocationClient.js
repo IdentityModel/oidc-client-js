@@ -4,7 +4,6 @@
 import { Log } from './Log.js';
 import { MetadataService } from './MetadataService.js';
 import { Global } from './Global.js';
-import { B } from '../dist/oidc-client.js';
 
 const AccessTokenTypeHint = "access_token";
 const RefreshTokenTypeHint = "refresh_token";
