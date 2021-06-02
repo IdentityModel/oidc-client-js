@@ -136,6 +136,8 @@ export interface OidcClientSettings {
   /** Your client application's identifier as registered with the OIDC/OAuth2 */
   client_id?: string;
   client_secret?: string;
+  /** Indicates when sending client secret if sent as a post param or in Authorization header using HTTP Basic */
+  client_authentication?: 'client_secret_post' | 'client_secret_basic';
   /** The type of response desired from the OIDC/OAuth2 provider (default: 'id_token') */
   readonly response_type?: string;
   readonly response_mode?: string;
