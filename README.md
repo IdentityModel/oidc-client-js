@@ -1,3 +1,18 @@
+# Looking for a new maintainer
+
+I've been working as the main and (for the most part) only individual on this project for 6+ years. Much has changed since then in the work of JavaScript and many updates are needed here. I no longer have the time to keep up and maintain this library and project (well, really haven't for some time now as many know).
+
+As such, I plan to disable PRs and won't be responding to issues going forward. The repo will be archived by the end of the year.
+
+If anyone wishes to step up and maintain this project, then that is very welcome! I suggest forking and then once there's a track record for such a commitment I would be happy to provide a link to your new repo letting people know that it is now maintained elsewhere.
+
+Please contact me if you're interested in doing this: [@BrockLAllen](https://twitter.com/BrockLAllen)
+
+So long and thanks for all the fish.
+
+--------------------------------------------------
+
+
 [![npm package](https://badge.fury.io/js/oidc-client.svg)](https://www.npmjs.com/package/oidc-client)
 
 # oidc-client
