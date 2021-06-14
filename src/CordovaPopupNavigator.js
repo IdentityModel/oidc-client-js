@@ -6,7 +6,7 @@ import { CordovaPopupWindow } from './CordovaPopupWindow.js';
 export class CordovaPopupNavigator {
 
     prepare(params) {
-        let popup = new CordovaPopupWindow(params);
+        const popup = new CordovaPopupWindow(params);
         return Promise.resolve(popup);
     }
 }

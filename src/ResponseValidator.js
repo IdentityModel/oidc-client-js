@@ -32,16 +32,19 @@ export class ResponseValidator {
     validateSigninResponse(state, response) {
         Log.debug("ResponseValidator.validateSigninResponse");
 
-        return this._processSigninParams(state, response).then(response => {
-            Log.debug("ResponseValidator.validateSigninResponse: state processed");
-            return this._validateTokens(state, response).then(response => {
+        return this._processSigninParams(state, response)
+            .then(response => {
+                Log.debug("ResponseValidator.validateSigninResponse: state processed");
+                return this._validateTokens(state, response);
+            })
+            .then(response => {
                 Log.debug("ResponseValidator.validateSigninResponse: tokens validated");
-                return this._processClaims(state, response).then(response => {
-                    Log.debug("ResponseValidator.validateSigninResponse: claims processed");
-                    return response;
-                });
+                return this._processClaims(state, response);
+            })
+            .then(response => {
+                Log.debug("ResponseValidator.validateSigninResponse: claims processed");
+                return response;
             });
-        });
     }
 
     validateSignoutResponse(state, response) {
@@ -173,16 +176,16 @@ export class ResponseValidator {
     }
 
     _mergeClaims(claims1, claims2) {
-        var result = Object.assign({}, claims1);
+        const result = Object.assign({}, claims1);
 
         for (let name in claims2) {
-            var values = claims2[name];
+            let values = claims2[name];
             if (!Array.isArray(values)) {
                 values = [values];
             }
 
             for (let i = 0; i < values.length; i++) {
-                let value = values[i];
+                const value = values[i];
                 if (!result[name]) {
                     result[name] = value;
                 }
@@ -208,7 +211,7 @@ export class ResponseValidator {
     _filterProtocolClaims(claims) {
         Log.debug("ResponseValidator._filterProtocolClaims, incoming claims:", claims);
 
-        var result = Object.assign({}, claims);
+        const result = Object.assign({}, claims);
 
         if (this._settings._filterProtocolClaims) {
             ProtocolClaims.forEach(type => {
@@ -245,7 +248,7 @@ export class ResponseValidator {
     }
 
     _processCode(state, response) {
-        var request = {
+        const request = {
             client_id: state.client_id,
             client_secret: state.client_secret,
             code : response.code,
@@ -259,7 +262,7 @@ export class ResponseValidator {
         
         return this._tokenClient.exchangeCode(request).then(tokenResponse => {
             
-            for(var key in tokenResponse) {
+            for(let key in tokenResponse) {
                 response[key] = tokenResponse[key];
             }
 
@@ -276,79 +279,85 @@ export class ResponseValidator {
     }
 
     _validateIdTokenAttributes(state, response) {
-        return this._metadataService.getIssuer().then(issuer => {
 
-            let audience = state.client_id;
-            let clockSkewInSeconds = this._settings.clockSkew;
-            Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
+        return Promise.all([
+            this._metadataService.getIssuer(),
+            this._settings.getEpochTime()
+        ])
+            .then(([issuer, now]) => {
+                const audience = state.client_id;
+                const clockSkewInSeconds = this._settings.clockSkew;
+                Log.debug("ResponseValidator._validateIdTokenAttributes: Validaing JWT attributes; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
-            return this._settings.getEpochTime().then(now => {
-                return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds, now).then(payload => {
-                
-                    if (state.nonce && state.nonce !== payload.nonce) {
-                        Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
-                        return Promise.reject(new Error("Invalid nonce in id_token"));
-                    }
-    
-                    if (!payload.sub) {
-                        Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
-                        return Promise.reject(new Error("No sub present in id_token"));
-                    }
-    
-                    response.profile = payload;
-                    return response;
-                });
+                return this._joseUtil.validateJwtAttributes(response.id_token, issuer, audience, clockSkewInSeconds, now);
+            })
+            .then(payload => {                    
+                if (state.nonce && state.nonce !== payload.nonce) {
+                    Log.error("ResponseValidator._validateIdTokenAttributes: Invalid nonce in id_token");
+                    return Promise.reject(new Error("Invalid nonce in id_token"));
+                }
+
+                if (!payload.sub) {
+                    Log.error("ResponseValidator._validateIdTokenAttributes: No sub present in id_token");
+                    return Promise.reject(new Error("No sub present in id_token"));
+                }
+
+                response.profile = payload;
+                return response;
             });
-        });
     }
 
     _validateIdTokenAndAccessToken(state, response) {
-        return this._validateIdToken(state, response).then(response => {
-            return this._validateAccessToken(response);
-        });
+        return this._validateIdToken(state, response)
+            .then(response => {
+                return this._validateAccessToken(response);
+            });
     }
 
     _getSigningKeyForJwt(jwt) {
-        return this._metadataService.getSigningKeys().then(keys => {
-            const kid = jwt.header.kid;
-            if (!keys) {
-                Log.error("ResponseValidator._validateIdToken: No signing keys from metadata");
-                return Promise.reject(new Error("No signing keys from metadata"));
-            }
-
-            Log.debug("ResponseValidator._validateIdToken: Received signing keys");
-            let key;
-            if (!kid) {
-                keys = this._filterByAlg(keys, jwt.header.alg);
-
-                if (keys.length > 1) {
-                    Log.error("ResponseValidator._validateIdToken: No kid found in id_token and more than one key found in metadata");
-                    return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
-                } else {
-                    // kid is mandatory only when there are multiple keys in the referenced JWK Set document
-                    // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
-                    key = keys[0];
+        return this._metadataService.getSigningKeys()
+            .then(keys => {
+                const kid = jwt.header.kid;
+                if (!keys) {
+                    Log.error("ResponseValidator._validateIdToken: No signing keys from metadata");
+                    return Promise.reject(new Error("No signing keys from metadata"));
                 }
-            } else {
-                key = keys.filter(key => {
-                    return key.kid === kid;
-                })[0];
-            }
-            return Promise.resolve(key);
-        });
+
+                Log.debug("ResponseValidator._validateIdToken: Received signing keys");
+                let key;
+                if (!kid) {
+                    keys = this._filterByAlg(keys, jwt.header.alg);
+
+                    if (keys.length > 1) {
+                        Log.error("ResponseValidator._validateIdToken: No kid found in id_token and more than one key found in metadata");
+                        return Promise.reject(new Error("No kid found in id_token and more than one key found in metadata"));
+                    } else {
+                        // kid is mandatory only when there are multiple keys in the referenced JWK Set document
+                        // see http://openid.net/specs/openid-connect-core-1_0.html#Signing
+                        key = keys[0];
+                    }
+                } else {
+                    key = keys.filter(key => {
+                        return key.kid === kid;
+                    })[0];
+                }
+
+                return Promise.resolve(key);
+            });
     }
 
     _getSigningKeyForJwtWithSingleRetry(jwt) {
-        return this._getSigningKeyForJwt(jwt).then(key => {
-            // Refreshing signingKeys if no suitable verification key is present for given jwt header.
-            if (!key) {
-                // set to undefined, to trigger network call to jwks_uri.
-                this._metadataService.resetSigningKeys();
-                return this._getSigningKeyForJwt(jwt);
-            } else {
-                return Promise.resolve(key);
-            }
-        });
+        return this._getSigningKeyForJwt(jwt)
+            .then(key => {
+                // Refreshing signingKeys if no suitable verification key is present for given jwt header.
+                if (!key) {
+                    // set to undefined, to trigger network call to jwks_uri.
+                    this._metadataService.resetSigningKeys();
+                    return this._getSigningKeyForJwt(jwt);
+                } else {
+                    return Promise.resolve(key);
+                }
+            });
     }
 
     _validateIdToken(state, response) {
@@ -357,7 +366,7 @@ export class ResponseValidator {
             return Promise.reject(new Error("No nonce on state"));
         }
 
-        let jwt = this._joseUtil.parseJwt(response.id_token);
+        const jwt = this._joseUtil.parseJwt(response.id_token);
         if (!jwt || !jwt.header || !jwt.payload) {
             Log.error("ResponseValidator._validateIdToken: Failed to parse id_token", jwt);
             return Promise.reject(new Error("Failed to parse id_token"));
@@ -368,47 +377,49 @@ export class ResponseValidator {
             return Promise.reject(new Error("Invalid nonce in id_token"));
         }
 
-        return this._metadataService.getIssuer().then(issuer => {
-            Log.debug("ResponseValidator._validateIdToken: Received issuer");
-            return this._getSigningKeyForJwtWithSingleRetry(jwt).then(key => {
+        return Promise.all([
+            this._metadataService.getIssuer(),
+            this._getSigningKeyForJwtWithSingleRetry(jwt),
+            this._settings.getEpochTime()
+        ])
+            .then(([issuer, key, now]) => {
+                Log.debug("ResponseValidator._validateIdToken: Received issuer");
+
                 if (!key) {
                     Log.error("ResponseValidator._validateIdToken: No key matching kid or alg found in signing keys");
                     return Promise.reject(new Error("No key matching kid or alg found in signing keys"));
                 }
 
-                let audience = state.client_id;
+                const audience = state.client_id;
+                const clockSkewInSeconds = this._settings.clockSkew;
 
-                let clockSkewInSeconds = this._settings.clockSkew;
                 Log.debug("ResponseValidator._validateIdToken: Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
-                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds).then(()=>{
-                    Log.debug("ResponseValidator._validateIdToken: JWT validation successful");
+                return this._joseUtil.validateJwt(response.id_token, key, issuer, audience, clockSkewInSeconds, now);
+            })
+            .then(() => {
+                Log.debug("ResponseValidator._validateIdToken: JWT validation successful");
 
-                    if (!jwt.payload.sub) {
-                        Log.error("ResponseValidator._validateIdToken: No sub present in id_token");
-                        return Promise.reject(new Error("No sub present in id_token"));
-                    }
+                if (!jwt.payload.sub) {
+                    Log.error("ResponseValidator._validateIdToken: No sub present in id_token");
+                    return Promise.reject(new Error("No sub present in id_token"));
+                }
 
-                    response.profile = jwt.payload;
+                response.profile = jwt.payload;
 
-                    return response;
-                });
+                return response;
             });
-        });
     }
 
     _filterByAlg(keys, alg){
-        var kty = null;
+        let kty = null;
         if (alg.startsWith("RS")) {
             kty = "RSA";
-        }
-        else if (alg.startsWith("PS")) {
+        } else if (alg.startsWith("PS")) {
             kty = "PS";
-        }
-        else if (alg.startsWith("ES")) {
+        } else if (alg.startsWith("ES")) {
             kty = "EC";
-        }
-        else {
+        } else {
             Log.debug("ResponseValidator._filterByAlg: alg not supported: ", alg);
             return [];
         }
@@ -440,19 +451,19 @@ export class ResponseValidator {
             return Promise.reject(new Error("No id_token"));
         }
 
-        let jwt = this._joseUtil.parseJwt(response.id_token);
+        const jwt = this._joseUtil.parseJwt(response.id_token);
         if (!jwt || !jwt.header) {
             Log.error("ResponseValidator._validateAccessToken: Failed to parse id_token", jwt);
             return Promise.reject(new Error("Failed to parse id_token"));
         }
 
-        var hashAlg = jwt.header.alg;
+        const hashAlg = jwt.header.alg;
         if (!hashAlg || hashAlg.length !== 5) {
             Log.error("ResponseValidator._validateAccessToken: Unsupported alg:", hashAlg);
             return Promise.reject(new Error("Unsupported alg: " + hashAlg));
         }
 
-        var hashBits = hashAlg.substr(2, 3);
+        let hashBits = hashAlg.substr(2, 3);
         if (!hashBits) {
             Log.error("ResponseValidator._validateAccessToken: Unsupported alg:", hashAlg, hashBits);
             return Promise.reject(new Error("Unsupported alg: " + hashAlg));
@@ -464,15 +475,15 @@ export class ResponseValidator {
             return Promise.reject(new Error("Unsupported alg: " + hashAlg));
         }
 
-        let sha = "sha" + hashBits;
-        var hash = this._joseUtil.hashString(response.access_token, sha);
+        const sha = "sha" + hashBits;
+        const hash = this._joseUtil.hashString(response.access_token, sha);
         if (!hash) {
             Log.error("ResponseValidator._validateAccessToken: access_token hash failed:", sha);
             return Promise.reject(new Error("Failed to validate at_hash"));
         }
 
-        var left = hash.substr(0, hash.length / 2);
-        var left_b64u = this._joseUtil.hexToBase64Url(left);
+        const left = hash.substr(0, hash.length / 2);
+        const left_b64u = this._joseUtil.hexToBase64Url(left);
         if (left_b64u !== response.profile.at_hash) {
             Log.error("ResponseValidator._validateAccessToken: Failed to validate at_hash", left_b64u, response.profile.at_hash);
             return Promise.reject(new Error("Failed to validate at_hash"));

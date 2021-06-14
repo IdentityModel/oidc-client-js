@@ -25,8 +25,8 @@ export class TokenClient {
         args.client_secret = args.client_secret || this._settings.client_secret;
         args.redirect_uri = args.redirect_uri || this._settings.redirect_uri;
 
-        var basicAuth = undefined;
-        var client_authentication = args._client_authentication || this._settings._client_authentication;
+        let basicAuth;
+        const client_authentication = args._client_authentication || this._settings._client_authentication;
         delete args._client_authentication;
 
         if (!args.code) {
@@ -51,20 +51,22 @@ export class TokenClient {
         }
 
         // Sending the client credentials using the Basic Auth method
-        if(client_authentication == "client_secret_basic")
+        if(client_authentication === "client_secret_basic")
         {
-            basicAuth = args.client_id + ':' + args.client_secret;
+            basicAuth = `${args.client_id}:${args.client_secret}`;
             delete args.client_id;
             delete args.client_secret;
         }
 
-        return this._metadataService.getTokenEndpoint(false).then(url => {
-            Log.debug("TokenClient.exchangeCode: Received token endpoint");
-            return this._jsonService.postForm(url, args, basicAuth).then(response => {
+        return this._metadataService.getTokenEndpoint(false)
+            .then(url => {
+                Log.debug("TokenClient.exchangeCode: Received token endpoint");
+                return this._jsonService.postForm(url, args, basicAuth);
+            })
+            .then(response => {
                 Log.debug("TokenClient.exchangeCode: response received");
                 return response;
             });
-        });
     }
 
     exchangeRefreshToken(args = {}) {
@@ -74,8 +76,8 @@ export class TokenClient {
         args.client_id = args.client_id || this._settings.client_id;
         args.client_secret = args.client_secret || this._settings.client_secret;
 
-        var basicAuth = undefined;
-        var client_authentication = args._client_authentication || this._settings._client_authentication;
+        let basicAuth = undefined;
+        const client_authentication = args._client_authentication || this._settings._client_authentication;
         delete args._client_authentication;
 
         if (!args.refresh_token) {
@@ -90,18 +92,19 @@ export class TokenClient {
         // Sending the client credentials using the Basic Auth method
         if(client_authentication == "client_secret_basic")
         {
-            basicAuth = args.client_id + ':' + args.client_secret;
+            basicAuth = `${args.client_id}:${args.client_secret}`;
             delete args.client_id;
             delete args.client_secret;
         }
 
-        return this._metadataService.getTokenEndpoint(false).then(url => {
-            Log.debug("TokenClient.exchangeRefreshToken: Received token endpoint");
-
-            return this._jsonService.postForm(url, args, basicAuth).then(response => {
+        return this._metadataService.getTokenEndpoint(false)
+            .then(url => {
+                Log.debug("TokenClient.exchangeRefreshToken: Received token endpoint");
+                return this._jsonService.postForm(url, args, basicAuth);
+            })
+            .then(response => {
                 Log.debug("TokenClient.exchangeRefreshToken: response received");
                 return response;
             });
-        });
     }
 }

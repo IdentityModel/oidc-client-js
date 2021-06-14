@@ -2,7 +2,7 @@
  * Generates RFC4122 version 4 guid ()
  */
 
-var crypto = (typeof window !== 'undefined') ? (window.crypto || window.msCrypto) : null;
+const crypto = (typeof window !== 'undefined') ? (window.crypto || window.msCrypto) : null;
 
 function _cryptoUuidv4() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -17,8 +17,8 @@ function _uuidv4() {
 }
 
 export default function random() {
-  var hasCrypto = crypto != 'undefined' && crypto !== null;
-  var hasRandomValues = hasCrypto && (typeof(crypto.getRandomValues) != 'undefined');  
-  var uuid = hasRandomValues ? _cryptoUuidv4 : _uuidv4;
+  const hasCrypto = crypto != 'undefined' && crypto !== null;
+  const hasRandomValues = hasCrypto && (typeof(crypto.getRandomValues) != 'undefined');  
+  const uuid = hasRandomValues ? _cryptoUuidv4 : _uuidv4;
   return uuid().replace(/-/g, '');
 }

@@ -22,9 +22,8 @@ export class CordovaPopupWindow {
     }
 
     _isInAppBrowserInstalled(cordovaMetadata) {
-        return ["cordova-plugin-inappbrowser", "cordova-plugin-inappbrowser.inappbrowser", "org.apache.cordova.inappbrowser"].some(function (name) {
-            return cordovaMetadata.hasOwnProperty(name)
-        })
+        return ["cordova-plugin-inappbrowser", "cordova-plugin-inappbrowser.inappbrowser", "org.apache.cordova.inappbrowser"]
+            .some(name => cordovaMetadata.hasOwnProperty(name));
     }
     
     navigate(params) {
@@ -35,7 +34,7 @@ export class CordovaPopupWindow {
                 return this._error("cordova is undefined")
             }
             
-            var cordovaMetadata = window.cordova.require("cordova/plugin_list").metadata;
+            const cordovaMetadata = window.cordova.require("cordova/plugin_list").metadata;
             if (this._isInAppBrowserInstalled(cordovaMetadata) === false) {
                 return this._error("InAppBrowser plugin not found")
             }

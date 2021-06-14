@@ -111,7 +111,6 @@ export class OidcClientSettings {
     get client_authentication() {
         return this._client_authentication;
     }
-    
 
     // optional protocol params
     get prompt() {
@@ -135,7 +134,6 @@ export class OidcClientSettings {
     get response_mode() {
         return this._response_mode;
     }
-
 
     // metadata
     get authority() {

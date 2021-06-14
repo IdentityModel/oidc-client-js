@@ -18,8 +18,8 @@ export class PopupWindow {
             this._reject = reject;
         });
 
-        let target = params.popupWindowTarget || DefaultPopupTarget;
-        let features = params.popupWindowFeatures || DefaultPopupFeatures;
+        const target = params.popupWindowTarget || DefaultPopupTarget;
+        const features = params.popupWindowFeatures || DefaultPopupFeatures;
 
         this._popup = window.open('', target, features);
         if (this._popup) {
@@ -35,12 +35,10 @@ export class PopupWindow {
     navigate(params) {
         if (!this._popup) {
             this._error("PopupWindow.navigate: Error opening popup window");
-        }
-        else if (!params || !params.url) {
+        } else if (!params || !params.url) {
             this._error("PopupWindow.navigate: no url provided");
             this._error("No url provided");
-        }
-        else {
+        } else {
             Log.debug("PopupWindow.navigate: Setting URL in popup");
 
             this._id = params.id;
@@ -98,8 +96,7 @@ export class PopupWindow {
         if (url) {
             Log.debug("PopupWindow.callback success");
             this._success({ url: url });
-        }
-        else {
+        } else {
             Log.debug("PopupWindow.callback: Invalid response from popup");
             this._error("Invalid response from popup");
         }
@@ -109,25 +106,22 @@ export class PopupWindow {
         if (window.opener) {
             url = url || window.location.href;
             if (url) {
-                var data = UrlUtility.parseUrlFragment(url, delimiter);
+                const data = UrlUtility.parseUrlFragment(url, delimiter);
 
                 if (data.state) {
-                    var name = "popupCallback_" + data.state;
-                    var callback = window.opener[name];
+                    const name = "popupCallback_" + data.state;
+                    const callback = window.opener[name];
                     if (callback) {
                         Log.debug("PopupWindow.notifyOpener: passing url message to opener");
                         callback(url, keepOpen);
-                    }
-                    else {
+                    } else {
                         Log.warn("PopupWindow.notifyOpener: no matching callback found on opener");
                     }
-                }
-                else {
+                } else {
                     Log.warn("PopupWindow.notifyOpener: no state found in response url");
                 }
             }
-        }
-        else {
+        } else {
             Log.warn("PopupWindow.notifyOpener: no window.opener. Can't complete notification.");
         }
     }

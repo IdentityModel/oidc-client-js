@@ -18,21 +18,21 @@ export class User {
 
     get expires_in() {
         if (this.expires_at) {
-            let now = parseInt(Date.now() / 1000);
+            const now = parseInt(Date.now() / 1000);
             return this.expires_at - now;
         }
         return undefined;
     }
     set expires_in(value) {
-        let expires_in = parseInt(value);
+        const expires_in = parseInt(value);
         if (typeof expires_in === 'number' && expires_in > 0) {
-            let now = parseInt(Date.now() / 1000);
+            const now = parseInt(Date.now() / 1000);
             this.expires_at = now + expires_in;
         }
     }
 
     get expired() {
-        let expires_in = this.expires_in;
+        const expires_in = this.expires_in;
         if (expires_in !== undefined) {
             return expires_in <= 0;
         }

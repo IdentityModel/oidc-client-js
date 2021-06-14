@@ -7,7 +7,7 @@ const DefaultTimeout = 10000;
 
 export class IFrameWindow {
 
-    constructor(params) {
+    constructor() {
         this._promise = new Promise((resolve, reject) => {
             this._resolve = resolve;
             this._reject = reject;
@@ -30,8 +30,7 @@ export class IFrameWindow {
     navigate(params) {
         if (!params || !params.url) {
             this._error("No url provided");
-        }
-        else {
+        } else {
             let timeout = params.silentRequestTimeout || DefaultTimeout;
             Log.debug("IFrameWindow.navigate: Using timeout of:", timeout);
             this._timer = window.setTimeout(this._timeout.bind(this), timeout);
@@ -89,7 +88,7 @@ export class IFrameWindow {
             e.source === this._frame.contentWindow &&
             (typeof e.data === 'string' && (e.data.startsWith('http://') || e.data.startsWith('https://')))
         ) {
-            let url = e.data;
+            const url = e.data;
             if (url) {
                 this._success({ url: url });
             }

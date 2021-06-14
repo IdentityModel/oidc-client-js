@@ -31,29 +31,29 @@ export class TokenRevocationClient {
             throw new Error("Invalid token type.");
         }
 
-        return this._metadataService.getRevocationEndpoint().then(url => {
-            if (!url) {
-                if (required) {
-                    Log.error("TokenRevocationClient.revoke: Revocation not supported");
-                    throw new Error("Revocation not supported");
+        return this._metadataService.getRevocationEndpoint()
+            .then(url => {
+                if (!url) {
+                    if (required) {
+                        Log.error("TokenRevocationClient.revoke: Revocation not supported");
+                        throw new Error("Revocation not supported");
+                    }
+
+                    // not required, so don't error and just return
+                    return;
                 }
 
-                // not required, so don't error and just return
-                return;
-            }
-
-            Log.debug("TokenRevocationClient.revoke: Revoking " + type);
-            var client_id = this._settings.client_id;
-            var client_secret = this._settings.client_secret;
-            return this._revoke(url, client_id, client_secret, token, type);
-        });
+                Log.debug("TokenRevocationClient.revoke: Revoking " + type);
+                const { client_id, client_secret } = this._settings;                
+                return this._revoke(url, client_id, client_secret, token, type);
+            });
     }
 
     _revoke(url, client_id, client_secret, token, type) {
 
         return new Promise((resolve, reject) => {
 
-            var xhr = new this._XMLHttpRequestCtor();
+            const xhr = new this._XMLHttpRequestCtor();
             xhr.open("POST", url);
 
             xhr.onload = () => {
@@ -61,25 +61,28 @@ export class TokenRevocationClient {
 
                 if (xhr.status === 200) {
                     resolve();
-                }
-                else {
+                } else {
                     reject(Error(xhr.statusText + " (" + xhr.status + ")"));
                 }
             };
+
             xhr.onerror = () => { 
                 Log.debug("TokenRevocationClient.revoke: Network Error.")
                 reject("Network Error");
             };
 
-            var body = "client_id=" + encodeURIComponent(client_id);
+            const body = [
+                `${client_id}=${encodeURIComponent(client_id)}`,
+            ];
+
             if (client_secret) {
-                body += "&client_secret=" + encodeURIComponent(client_secret);
+                body.push(`${client_secret}=${encodeURIComponent(client_secret)}`);
             }
-            body += "&token_type_hint=" + encodeURIComponent(type);
-            body += "&token=" + encodeURIComponent(token);
+            body.push(`${token_type_hint}=${encodeURIComponent(type)}`);
+            body.push(`${token}=${encodeURIComponent(token)}`);
 
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.send(body);
+            xhr.send(body.join("&"));
         });
     }
 }

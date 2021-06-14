@@ -26,7 +26,7 @@ export class SigninState extends State {
         }
         
         if (this.code_verifier) {
-            let hash = JoseUtil.hashString(this.code_verifier, "SHA256");
+            const hash = JoseUtil.hashString(this.code_verifier, "SHA256");
             this._code_challenge = JoseUtil.hexToBase64Url(hash);
         }
 
@@ -96,7 +96,7 @@ export class SigninState extends State {
 
     static fromStorageString(storageString) {
         Log.debug("SigninState.fromStorageString");
-        var data = JSON.parse(storageString);
+        const data = JSON.parse(storageString);
         return new SigninState(data);
     }
 }

@@ -9,7 +9,7 @@ export default function getJoseUtil({ jws, KeyUtil, X509, crypto, hextob64u, b64
         static parseJwt(jwt) {
             Log.debug("JoseUtil.parseJwt");
             try {
-                var token = jws.JWS.parse(jwt);
+                const token = jws.JWS.parse(jwt);
                 return {
                     header: token.headerObj,
                     payload: token.payloadObj
@@ -27,7 +27,7 @@ export default function getJoseUtil({ jws, KeyUtil, X509, crypto, hextob64u, b64
                     if (key.e && key.n) {
                         key = KeyUtil.getKey(key);
                     } else if (key.x5c && key.x5c.length) {
-                        var hex = b64tohex(key.x5c[0]);
+                        const hex = b64tohex(key.x5c[0]);
                         key = X509.getPublicKeyFromCertHex(hex);
                     } else {
                         Log.error("JoseUtil.validateJwt: RSA key missing key material", key);
@@ -61,12 +61,13 @@ export default function getJoseUtil({ jws, KeyUtil, X509, crypto, hextob64u, b64
                 now = parseInt(Date.now() / 1000);
             }
 
-            var payload = JoseUtil.parseJwt(jwt).payload;
+            const payload = JoseUtil.parseJwt(jwt).payload;
 
             if (!payload.iss) {
                 Log.error("JoseUtil._validateJwt: issuer was not provided");
                 return Promise.reject(new Error("issuer was not provided"));
             }
+
             if (payload.iss !== issuer) {
                 Log.error("JoseUtil._validateJwt: Invalid issuer in token", payload.iss);
                 return Promise.reject(new Error("Invalid issuer in token: " + payload.iss));
@@ -76,7 +77,8 @@ export default function getJoseUtil({ jws, KeyUtil, X509, crypto, hextob64u, b64
                 Log.error("JoseUtil._validateJwt: aud was not provided");
                 return Promise.reject(new Error("aud was not provided"));
             }
-            var validAudience = payload.aud === audience || (Array.isArray(payload.aud) && payload.aud.indexOf(audience) >= 0);
+
+            const validAudience = payload.aud === audience || (Array.isArray(payload.aud) && payload.aud.indexOf(audience) >= 0);
             if (!validAudience) {
                 Log.error("JoseUtil._validateJwt: Invalid audience in token", payload.aud);
                 return Promise.reject(new Error("Invalid audience in token: " + payload.aud));
@@ -87,8 +89,8 @@ export default function getJoseUtil({ jws, KeyUtil, X509, crypto, hextob64u, b64
             }
 
             if (!timeInsensitive) {
-                var lowerNow = now + clockSkew;
-                var upperNow = now - clockSkew;
+                const lowerNow = now + clockSkew;
+                const upperNow = now - clockSkew;
 
                 if (!payload.iat) {
                     Log.error("JoseUtil._validateJwt: iat was not provided");
@@ -119,19 +121,20 @@ export default function getJoseUtil({ jws, KeyUtil, X509, crypto, hextob64u, b64
 
         static _validateJwt(jwt, key, issuer, audience, clockSkew, now, timeInsensitive) {
 
-            return JoseUtil.validateJwtAttributes(jwt, issuer, audience, clockSkew, now, timeInsensitive).then(payload => {
-                try {
-                    if (!jws.JWS.verify(jwt, key, AllowedSigningAlgs)) {
-                        Log.error("JoseUtil._validateJwt: signature validation failed");
+            return JoseUtil.validateJwtAttributes(jwt, issuer, audience, clockSkew, now, timeInsensitive)
+                .then(payload => {
+                    try {
+                        if (!jws.JWS.verify(jwt, key, AllowedSigningAlgs)) {
+                            Log.error("JoseUtil._validateJwt: signature validation failed");
+                            return Promise.reject(new Error("signature validation failed"));
+                        }
+
+                        return payload;
+                    } catch (e) {
+                        Log.error(e && e.message || e);
                         return Promise.reject(new Error("signature validation failed"));
                     }
-
-                    return payload;
-                } catch (e) {
-                    Log.error(e && e.message || e);
-                    return Promise.reject(new Error("signature validation failed"));
-                }
-            });
+                });
         }
 
         static hashString(value, alg) {

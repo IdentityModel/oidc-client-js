@@ -13,6 +13,11 @@ let assert = chai.assert;
 let expect = chai.expect;
 
 class MockJoseUtility {
+
+    constructor() {
+        this._settings = new StubSettings();
+    }
+
     parseJwt(...args) {
         this.parseJwtWasCalled = true;
         if (this.parseJwtResult) {
@@ -50,9 +55,22 @@ class MockJoseUtility {
     }
 }
 
+class StubSettings {
+
+    constructor() {
+        this.authority = "op";
+        this.client_id = 'client';
+    }
+
+    getEpochTime() {
+        return Promise.resolve(Date.now() / 1000 | 0);
+    }
+}
+
 class StubUserInfoService {
     constructor() {
         this.getClaimsWasCalled = false;
+        this._settings = new StubSettings();
     }
 
     getClaims() {
@@ -151,10 +169,7 @@ describe("ResponseValidator", function () {
             isOpenIdConnect: false
         };
 
-        settings = {
-            authority: "op",
-            client_id: 'client'
-        };
+        settings = new StubSettings();
         stubMetadataService = new StubMetadataService();
         stubUserInfoService = new StubUserInfoService();
         mockJoseUtility = new MockJoseUtility();
@@ -834,8 +849,9 @@ describe("ResponseValidator", function () {
         it("should fail if issuer fails", function (done) {
             stubResponse.id_token = id_token;
             stubMetadataService.getIssuerResult = Promise.reject(new Error("issuer"));
+            stubMetadataService.getSigningKeysResult = Promise.resolve([]);
 
-            subject._validateIdToken(stubState, stubResponse).then(null, err => {
+            subject._validateIdToken(stubState, stubResponse).then(null, err => {                
                 err.message.should.contain('issuer');
                 done();
             });

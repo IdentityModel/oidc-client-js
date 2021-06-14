@@ -22,7 +22,7 @@ export class AccessTokenEvents {
     load(container) {
         // only register events if there's an access token and it has an expiration
         if (container.access_token && container.expires_in !== undefined) {
-            let duration = container.expires_in;
+            const duration = container.expires_in;
             Log.debug("AccessTokenEvents.load: access token present, remaining duration:", duration);
 
             if (duration > 0) {
@@ -41,7 +41,7 @@ export class AccessTokenEvents {
             }
 
             // if it's negative, it will still fire
-            let expired = duration + 1;
+            const expired = duration + 1;
             Log.debug("AccessTokenEvents.load: registering expired timer in:", expired);
             this._accessTokenExpired.init(expired);
         }

@@ -15,12 +15,13 @@ export class SilentRenewService {
             this._userManager.events.addAccessTokenExpiring(this._callback);
 
             // this will trigger loading of the user so the expiring events can be initialized
-            this._userManager.getUser().then(user=>{
-                // deliberate nop
-            }).catch(err=>{
-                // catch to suppress errors since we're in a ctor
-                Log.error("SilentRenewService.start: Error from getUser:", err.message);
-            });
+            this._userManager.getUser()
+                .then(user=>{
+                    // deliberate nop
+                }).catch(err=>{
+                    // catch to suppress errors since we're in a ctor
+                    Log.error("SilentRenewService.start: Error from getUser:", err.message);
+                });
         }
     }
 
@@ -32,11 +33,12 @@ export class SilentRenewService {
     }
 
     _tokenExpiring() {
-        this._userManager.signinSilent().then(user => {
-            Log.debug("SilentRenewService._tokenExpiring: Silent token renewal successful");
-        }, err => {
-            Log.error("SilentRenewService._tokenExpiring: Error from signinSilent:", err.message);
-            this._userManager.events._raiseSilentRenewError(err);
-        });
+        this._userManager.signinSilent()
+            .then(user => {
+                Log.debug("SilentRenewService._tokenExpiring: Silent token renewal successful");
+            }, err => {
+                Log.error("SilentRenewService._tokenExpiring: Error from signinSilent:", err.message);
+                this._userManager.events._raiseSilentRenewError(err);
+            });
     }
 }

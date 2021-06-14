@@ -20,7 +20,7 @@ export class SessionMonitor {
         this._userManager.events.addUserLoaded(this._start.bind(this));
         this._userManager.events.addUserUnloaded(this._stop.bind(this));
 
-        Promise.resolve(this._userManager.getUser().then(user => {
+        this._userManager.getUser().then(user => {
             // doing this manually here since calling getUser 
             // doesn't trigger load event.
             if (user) {
@@ -28,7 +28,7 @@ export class SessionMonitor {
             }
             else if (this._settings.monitorAnonymousSession) {
                 this._userManager.querySessionStatus().then(session => {
-                    let tmpUser = {
+                    const tmpUser = {
                         session_state : session.session_state
                     };
                     if (session.sub && session.sid) {
@@ -44,10 +44,10 @@ export class SessionMonitor {
                     Log.error("SessionMonitor ctor: error from querySessionStatus:", err.message);
                 });
             }
-        }).catch(err => {
+        }, err => {
             // catch to suppress errors since we're in a ctor
             Log.error("SessionMonitor ctor: error from getUser:", err.message);
-        }));
+        });
     }
 
     get _settings() {
@@ -67,7 +67,7 @@ export class SessionMonitor {
     }
 
     _start(user) {
-        let session_state = user.session_state;
+        const session_state = user.session_state;
 
         if (session_state) {
             if (user.profile) {
@@ -86,9 +86,9 @@ export class SessionMonitor {
                     if (url) {
                         Log.debug("SessionMonitor._start: Initializing check session iframe")
 
-                        let client_id = this._client_id;
-                        let interval = this._checkSessionInterval;
-                        let stopOnError = this._stopCheckSessionOnError;
+                        const client_id = this._client_id;
+                        const interval = this._checkSessionInterval;
+                        const stopOnError = this._stopCheckSessionOnError;
 
                         this._checkSessionIFrame = new this._CheckSessionIFrameCtor(this._callback.bind(this), client_id, url, interval, stopOnError);
                         this._checkSessionIFrame.load().then(() => {
@@ -120,11 +120,11 @@ export class SessionMonitor {
 
         if (this._settings.monitorAnonymousSession) {
             // using a timer to delay re-initialization to avoid race conditions during signout
-            let timerHandle = this._timer.setInterval(()=>{
+            const timerHandle = this._timer.setInterval(()=>{
                 this._timer.clearInterval(timerHandle);
 
                 this._userManager.querySessionStatus().then(session => {
-                    let tmpUser = {
+                    const tmpUser = {
                         session_state : session.session_state
                     };
                     if (session.sub && session.sid) {
@@ -146,7 +146,7 @@ export class SessionMonitor {
 
     _callback() {
         this._userManager.querySessionStatus().then(session => {
-            var raiseEvent = true;
+            let raiseEvent = true;
 
             if (session) {
                 if (session.sub === this._sub) {

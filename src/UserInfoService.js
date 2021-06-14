@@ -42,13 +42,13 @@ export class UserInfoService {
 
     _getClaimsFromJwt(req) {
         try {
-            let jwt = this._joseUtil.parseJwt(req.responseText);
+            const jwt = this._joseUtil.parseJwt(req.responseText);
             if (!jwt || !jwt.header || !jwt.payload) {
                 Log.error("UserInfoService._getClaimsFromJwt: Failed to parse JWT", jwt);
                 return Promise.reject(new Error("Failed to parse id_token"));
             }
 
-            var kid = jwt.header.kid;
+            const kid = jwt.header.kid;
 
             let issuerPromise;
             switch (this._settings.userInfoJwtIssuer) {
@@ -63,10 +63,16 @@ export class UserInfoService {
                     break;
             }
 
-            return issuerPromise.then(issuer => {
-                Log.debug("UserInfoService._getClaimsFromJwt: Received issuer:" + issuer);
+            return issuerPromise
+                .then(issuer => {
+                    Log.debug("UserInfoService._getClaimsFromJwt: Received issuer:" + issuer);
 
-                return this._metadataService.getSigningKeys().then(keys => {
+                    return Promise.all([
+                        this._metadataService.getSigningKeys(),
+                        this._settings.getEpochTime()
+                    ]);
+                })
+                .then(([keys, now]) => {
                     if (!keys) {
                         Log.error("UserInfoService._getClaimsFromJwt: No signing keys from metadata");
                         return Promise.reject(new Error("No signing keys from metadata"));
@@ -88,9 +94,7 @@ export class UserInfoService {
                         }
                     }
                     else {
-                        key = keys.filter(key => {
-                            return key.kid === kid;
-                        })[0];
+                        key = keys.filter(key => key.kid === kid)[0];
                     }
 
                     if (!key) {
@@ -98,18 +102,16 @@ export class UserInfoService {
                         return Promise.reject(new Error("No key matching kid or alg found in signing keys"));
                     }
 
-                    let audience = this._settings.client_id;
-
-                    let clockSkewInSeconds = this._settings.clockSkew;
+                    const audience = this._settings.client_id;
+                    const clockSkewInSeconds = this._settings.clockSkew;
                     Log.debug("UserInfoService._getClaimsFromJwt: Validaing JWT; using clock skew (in seconds) of: ", clockSkewInSeconds);
 
-                    return this._joseUtil.validateJwt(req.responseText, key, issuer, audience, clockSkewInSeconds, undefined, true).then(() => {
-                        Log.debug("UserInfoService._getClaimsFromJwt: JWT validation successful");
-                        return jwt.payload;
-                    });
+                    return this._joseUtil.validateJwt(req.responseText, key, issuer, audience, clockSkewInSeconds, now, true);
+                })
+                .then(() => {
+                    Log.debug("UserInfoService._getClaimsFromJwt: JWT validation successful");
+                    return jwt.payload;
                 });
-            });
-            return;
         }
         catch (e) {
             Log.error("UserInfoService._getClaimsFromJwt: Error parsing JWT response", e.message);
@@ -119,7 +121,7 @@ export class UserInfoService {
     }
 
     _filterByAlg(keys, alg) {
-        var kty = null;
+        let kty = null;
         if (alg.startsWith("RS")) {
             kty = "RSA";
         }
@@ -136,9 +138,7 @@ export class UserInfoService {
 
         Log.debug("UserInfoService._filterByAlg: Looking for keys that match kty: ", kty);
 
-        keys = keys.filter(key => {
-            return key.kty === kty;
-        });
+        keys = keys.filter(key => key.kty === kty);
 
         Log.debug("UserInfoService._filterByAlg: Number of keys that match kty: ", kty, keys.length);
 

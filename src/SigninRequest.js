@@ -38,8 +38,8 @@ export class SigninRequest {
             throw new Error("authority");
         }
 
-        let oidc = SigninRequest.isOidc(response_type);
-        let code = SigninRequest.isCode(response_type);
+        const oidc = SigninRequest.isOidc(response_type);
+        const code = SigninRequest.isCode(response_type);
 
         if (!response_mode) {
             response_mode = SigninRequest.isCode(response_type) ? "query" : null;
@@ -65,7 +65,7 @@ export class SigninRequest {
             url = UrlUtility.addQueryParam(url, "code_challenge_method", "S256");
         }
 
-        var optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri, response_mode };
+        const optional = { prompt, display, max_age, ui_locales, id_token_hint, login_hint, acr_values, resource, request, request_uri, response_mode };
         for(let key in optional){
             if (optional[key]) {
                 url = UrlUtility.addQueryParam(url, key, optional[key]);
@@ -80,23 +80,22 @@ export class SigninRequest {
     }
 
     static isOidc(response_type) {
-        var result = response_type.split(/\s+/g).filter(function(item) {
-            return item === "id_token";
-        });
-        return !!(result[0]);
+        return SigninRequest.isOfType(response_type, "id_token");
     }
 
     static isOAuth(response_type) {
-        var result = response_type.split(/\s+/g).filter(function(item) {
-            return item === "token";
-        });
-        return !!(result[0]);
+        return SigninRequest.isOfType(response_type, "token");
     }
     
     static isCode(response_type) {
-        var result = response_type.split(/\s+/g).filter(function(item) {
-            return item === "code";
-        });
+        return SigninRequest.isOfType(response_type, "code");
+    }
+
+    static isOfType(response_type, type) {
+        const result = response_type
+            .split(/\s+/g)
+            .filter(item => item === type);
+
         return !!(result[0]);
     }
 }

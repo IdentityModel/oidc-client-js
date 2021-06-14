@@ -7,7 +7,7 @@ import { IFrameWindow } from './IFrameWindow.js';
 export class IFrameNavigator {
 
     prepare(params) {
-        let frame = new IFrameWindow(params);
+        const frame = new IFrameWindow(params);
         return Promise.resolve(frame);
     }
 
