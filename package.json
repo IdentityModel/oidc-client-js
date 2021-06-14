@@ -7,6 +7,7 @@
     "build": "gulp",
     "start": "node samples/VanillaJS/server.js",
     "test": "mocha --compilers js:babel-register test/unit/*.spec.js",
+    "coverage": "nyc --reporter=html mocha --compilers js:babel-register test/unit/*.spec.js",
     "all": "gulp build & mocha --compilers js:babel-register test/unit/*.spec.js"
   },
   "repository": {
@@ -34,6 +35,7 @@
     "base64-js": "^1.5.1",
     "core-js": "^3.8.3",
     "crypto-js": "^4.0.0",
+    "nyc": "^15.1.0",
     "serialize-javascript": "^4.0.0"
   },
   "devDependencies": {
