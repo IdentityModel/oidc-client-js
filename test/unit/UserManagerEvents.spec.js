@@ -53,4 +53,31 @@ describe("UserManagerEvents", function () {
 
     });
 
+    describe("user session error status", function () {
+
+        it("should allow callback", function () {
+            var cb = function () {
+                cb.wasCalled = true;
+            };
+            subject.addUserSessionError(cb);
+
+            subject._raiseUserSessionError(new Error("boom"));
+
+            cb.wasCalled.should.be.true;
+        });
+
+        it("should allow unregistering callback", function () {
+            var cb = function () {
+                cb.wasCalled = true;
+            };
+            cb.wasCalled = false;
+
+            subject.addUserSessionError(cb);
+            subject.removeUserSessionError(cb);
+
+            subject._raiseUserSessionError(new Error("boom"));
+
+            cb.wasCalled.should.be.false;
+        });
+    });
 });

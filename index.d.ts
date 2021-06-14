@@ -265,6 +265,9 @@ export interface UserManagerEvents extends AccessTokenEvents {
   /** When `monitorSession` subscribe to events raised when the user session changed */
   addUserSessionChanged(callback: UserManagerEvents.UserSessionChangedCallback): void;
   removeUserSessionChanged(callback: UserManagerEvents.UserSessionChangedCallback): void;
+
+  addUserSessionError(callback: UserManagerEvents.UserSessionErrorCallback): void;
+  removeUserSessionError(callback: UserManagerEvents.UserSessionErrorCallback): void;
 }
 
 export namespace UserManagerEvents {
@@ -274,6 +277,7 @@ export namespace UserManagerEvents {
   export type UserSignedInCallback = () => void;
   export type UserSignedOutCallback = () => void;
   export type UserSessionChangedCallback = () => void;
+  export type UserSessionErrorCallback = () => void;
 }
 
 export interface UserManagerSettings extends OidcClientSettings {
@@ -309,6 +313,8 @@ export interface UserManagerSettings extends OidcClientSettings {
   readonly iframeNavigator?: any;
   /** Storage object used to persist User for currently authenticated user (default: session storage) */
   readonly userStore?: WebStorageStateStore;
+  /** Toggle event porpagation in case of an OIDC session management error status (default: false) **/
+  readonly propagateUserSessionError?: boolean;
 }
 
 export interface ClockService {

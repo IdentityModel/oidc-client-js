@@ -34,7 +34,8 @@ export class UserManagerSettings extends OidcClientSettings {
         redirectNavigator = new RedirectNavigator(),
         popupNavigator = new PopupNavigator(),
         iframeNavigator = new IFrameNavigator(),
-        userStore = new WebStorageStateStore({ store: Global.sessionStorage })
+        userStore = new WebStorageStateStore({ store: Global.sessionStorage }),
+        propagateUserSessionError = false
     } = {}) {
         super(arguments[0]);
 
@@ -70,6 +71,7 @@ export class UserManagerSettings extends OidcClientSettings {
         this._iframeNavigator = iframeNavigator;
 
         this._userStore = userStore;
+        this._propagateUserSessionError = propagateUserSessionError;
     }
 
     get popup_redirect_uri() {
@@ -135,5 +137,9 @@ export class UserManagerSettings extends OidcClientSettings {
 
     get userStore() {
         return this._userStore;
+    }
+
+    get propagateUserSessionError() {
+        return this._propagateUserSessionError;
     }
 }
