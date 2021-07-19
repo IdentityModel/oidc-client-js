@@ -1,6 +1,6 @@
 {
   "name": "oidc-client",
-  "version": "1.11.5",
+  "version": "1.11.6-beta.1",
   "description": "OpenID Connect (OIDC) & OAuth2 client library",
   "main": "lib/oidc-client.min.js",
   "scripts": {
@@ -50,7 +50,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-rename": "^1.4.0",
     "jsbn": "^1.1.0",
-    "jsrsasign": "^8.0.24",
+    "jsrsasign": "^10.3.0",
     "mocha": "^5.2.0",
     "natives": "^1.1.6",
     "open": "^6.4.0",

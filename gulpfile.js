@@ -143,7 +143,7 @@ function build_dist_min(){
 var files = [
      'jsrsasign/header.js'
 
-    ,'jsrsasign/ext/yahoo-min.js'
+//    ,'jsrsasign/ext/yahoo-min.js'
 
     ,'jsrsasign/ext/cj/cryptojs-312-core-fix-min.js'
     ,'jsrsasign/ext/cj/x64-core_min.js'
