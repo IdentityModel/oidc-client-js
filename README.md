@@ -8,6 +8,7 @@ A successor project that is showing great progress in updating and modernizing i
 
 
 [![npm package](https://badge.fury.io/js/oidc-client.svg)](https://www.npmjs.com/package/oidc-client)
+[![CircleCI](https://circleci.com/gh/IdentityModel/oidc-client-js/tree/dev.svg?style=svg)](https://circleci.com/gh/IdentityModel/oidc-client-js/tree/dev)
 
 # oidc-client
 
